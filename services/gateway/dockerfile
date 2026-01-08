@@ -1,0 +1,15 @@
+# 1. Build Stage
+FROM golang:1.25-alpine AS builder
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+# Build a static binary
+RUN CGO_ENABLED=0 GOOS=linux go build -o bridge .
+
+# 2. Run Stage (Distroless/Alpine)
+FROM alpine:latest
+WORKDIR /root/
+COPY --from=builder /app/bridge .
+EXPOSE 8080
+CMD ["./bridge"]

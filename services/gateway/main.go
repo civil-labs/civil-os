@@ -49,7 +49,7 @@ func main() {
 	})
 
 	port := getEnv("PORT", "8080")
-	log.Printf("Civil Bridge starting on port %s...", port)
+	log.Printf("Civil Gateway starting on port %s...", port)
 	r.Run(":" + port)
 }
 
@@ -94,7 +94,7 @@ func authMiddleware() gin.HandlerFunc {
 		// 1. Extract Token from Header or Query Param
 		// MapLibre often sends tokens in query params: ?token=xyz
 		tokenString := c.Query("token")
-		
+
 		// Fallback to Authorization Header
 		if tokenString == "" {
 			authHeader := c.GetHeader("Authorization")
@@ -150,11 +150,11 @@ func handleTileProxy(c *gin.Context) {
 	originalDirector := proxy.Director
 	proxy.Director = func(req *http.Request) {
 		originalDirector(req)
-		
+
 		// 1. Strip the "/tiles" prefix so Nginx gets the clean path
 		// Example: /tiles/rpc/get_mvt -> /rpc/get_mvt
 		req.URL.Path = strings.TrimPrefix(req.URL.Path, "/tiles")
-		
+
 		// 2. Set Host header so Nginx/Martin knows who we are
 		// (Important if Nginx has vhost routing)
 		req.Host = remote.Host

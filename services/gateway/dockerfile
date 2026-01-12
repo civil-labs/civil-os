@@ -5,11 +5,11 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 # Build a static binary
-RUN CGO_ENABLED=0 GOOS=linux go build -o bridge .
+RUN CGO_ENABLED=0 GOOS=linux go build -o gateway .
 
 # 2. Run Stage (Distroless/Alpine)
 FROM alpine:latest
 WORKDIR /root/
-COPY --from=builder /app/bridge .
+COPY --from=builder /app/gateway .
 EXPOSE 8080
-CMD ["./bridge"]
+CMD ["./gateway"]

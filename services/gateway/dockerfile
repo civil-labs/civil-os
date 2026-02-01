@@ -9,7 +9,17 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o gateway .
 
 # 2. Run Stage (Distroless/Alpine)
 FROM alpine:latest
-WORKDIR /root/
-COPY --from=builder /app/gateway .
+
+# Create a non-root user
+RUN adduser -D -u 1001 gatewayuser
+
+# Copy in the binary
+COPY --from=builder --chown=gatewayuser:gatewayuser /app/gateway /app/gateway
+
+# Switch to the non-root user
+USER 1001
+
+# Document 8080 as the default port 
 EXPOSE 8080
-CMD ["./gateway"]
+
+CMD ["/app/gateway"]

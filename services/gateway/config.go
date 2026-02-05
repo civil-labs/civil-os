@@ -17,7 +17,7 @@ type Config struct {
 func LoadConfig() (*Config, error) {
 	// 1. Define the list of required environment variables
 	required := []string{
-		"CIVIL_CLOUD_MAP_NAMESPACE",
+		"CLOUD_MAP_NAMESPACE",
 		"TILE_SERVER_CLOUD_MAP_SERVICE_NAME",
 		// Add future variables here, e.g., "AWS_REGION", "API_KEY", etc.
 	}
@@ -39,7 +39,7 @@ func LoadConfig() (*Config, error) {
 	// You can also set defaults here for optional vars (like Port)
 	return &Config{
 		Namespace:             os.Getenv("CLOUD_MAP_NAMESPACE"),
-		TileServerServiceName: os.Getenv("CLOUD_MAP_SERVICE_NAME"),
+		TileServerServiceName: os.Getenv("TILE_SERVER_CLOUD_MAP_SERVICE_NAME"),
 		Port:                  getEnv("PORT", "8080"), // Optional with default
 	}, nil
 }

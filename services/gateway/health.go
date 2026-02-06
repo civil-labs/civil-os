@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 )
 
@@ -37,6 +36,5 @@ func HealthCheckHandler(lb *BackendManager) http.HandlerFunc {
 		}
 
 		json.NewEncoder(w).Encode(resp)
-		log.Printf("Returnined health check")
 	}
 }

@@ -191,6 +191,9 @@ func main() {
 
 func CORSMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		log.Println("CORS middleware activated")
+
 		// 1. Allow any origin (for development) or specific domains
 		// In production, you might want to change "*" to your specific frontend domain
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -205,6 +208,7 @@ func CORSMiddleware(next http.Handler) http.Handler {
 		// The browser sends this first. We must answer "OK" immediately
 		// and NOT forward it to the backend.
 		if r.Method == "OPTIONS" {
+			log.Println("Returning options")
 			w.WriteHeader(http.StatusOK)
 			return
 		}

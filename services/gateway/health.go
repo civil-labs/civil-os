@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -15,6 +16,8 @@ type HealthResponse struct {
 // It takes the BackendManager as a dependency.
 func HealthCheckHandler(lb *BackendManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("Received health check")
+
 		// Check if there is anywhere to send tile server traffic to
 		ready := lb.IsReady()
 
@@ -27,13 +30,16 @@ func HealthCheckHandler(lb *BackendManager) http.HandlerFunc {
 
 		if ready {
 			w.WriteHeader(http.StatusOK) // 200
+			log.Printf("Returning 200 on health check")
 		} else {
 			// Return 503 Service Unavailable if no backends found
 			// This tells AWS ALB/ECS to stop routing traffic here until some come up
 			w.WriteHeader(http.StatusServiceUnavailable) // 503
 			resp.Status = "No tile servers available"
+			log.Printf("Returning 503 on health check")
 		}
 
 		json.NewEncoder(w).Encode(resp)
+		log.Printf("Returnined health check")
 	}
 }

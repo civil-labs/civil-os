@@ -124,6 +124,7 @@ func (bm *BackendManager) IsReady() bool {
 	defer bm.mu.RUnlock()
 	return len(bm.endpoints) > 0
 }
+
 func main() {
 	cfg, err := LoadConfig()
 	if err != nil {
@@ -180,10 +181,35 @@ func main() {
 
 	// 3. Setup Middleware and Handler
 	// We handle /tiles/, strip the prefix, and pass to proxy
-	http.Handle("/tiles/", http.StripPrefix("/tiles", proxy))
+	http.Handle("/tiles/", CORSMiddleware(http.StripPrefix("/tiles", proxy)))
 
 	log.Printf("Server listening on :%s", cfg.Port)
 	if err := http.ListenAndServe(":"+cfg.Port, nil); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func CORSMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// 1. Allow any origin (for development) or specific domains
+		// In production, you might want to change "*" to your specific frontend domain
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+
+		// 2. Allow specific methods (Tiles are usually just GET)
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+
+		// 3. Allow headers usually sent by mapping libraries (Mapbox/Leaflet)
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Range")
+
+		// 4. Handle Preflight (OPTIONS) requests
+		// The browser sends this first. We must answer "OK" immediately
+		// and NOT forward it to the backend.
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		// 5. Pass the actual request (GET) to the proxy
+		next.ServeHTTP(w, r)
+	})
 }

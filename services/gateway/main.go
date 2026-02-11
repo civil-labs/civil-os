@@ -195,12 +195,11 @@ func main() {
 		// This is needed to strip off any conflicting header details that the Tile Server attaches
 		ModifyResponse: func(r *http.Response) error {
 
-			// Set the CORS headers from the returned tiles get request, overwriting whatever the tile server sets
-			r.Header.Set("Access-Control-Allow-Origin", "*")
-
-			// Ensure these are set too if the frontend needs them
-			r.Header.Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-			r.Header.Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+			// The Middleware already set these headers.
+			// We MUST delete any versions sent by the backend to avoid the "Multiple Values" error.
+			r.Header.Del("Access-Control-Allow-Origin")
+			r.Header.Del("Access-Control-Allow-Methods")
+			r.Header.Del("Access-Control-Allow-Headers")
 
 			return nil
 		},
@@ -223,19 +222,19 @@ func CORSMiddleware(next http.Handler) http.Handler {
 
 		log.Println("CORS middleware activated")
 
-		// 1. HANDLE PREFLIGHT (Browser asking "Permission to speak?")
-		// The Proxy doesn't run for this, so we must answer here.
+		// 1. ALWAYS set headers (Success, Failure, or Preflight)
+		// This guarantees the browser never sees a "Missing Header" error.
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		// 2. Handle Preflight
 		if r.Method == "OPTIONS" {
-			w.Header().Set("Access-Control-Allow-Origin", "*")
-			w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 			w.WriteHeader(http.StatusOK)
 			return
 		}
 
-		// 2. PASS EVERYTHING ELSE TO PROXY
-		// We do NOT set headers here. We let ModifyResponse handle it.
-		// This prevents any "Duplicate Header" conflicts.
+		// 3. Pass to Proxy
 		next.ServeHTTP(w, r)
 	})
 }

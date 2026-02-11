@@ -175,6 +175,18 @@ func main() {
 			// Note: We do NOT touch req.URL.Path here.
 			// It has already been stripped by the middleware below.
 		},
+
+		// This is needed to strip off any conflicting header details that the Tile Server attaches
+		ModifyResponse: func(r *http.Response) error {
+			// The Gateway handles CORS.
+			// If the Backend (Tile Server) sends CORS headers, delete them
+			// so we don't end up with duplicate/conflicting headers.
+			r.Header.Del("Access-Control-Allow-Origin")
+			r.Header.Del("Access-Control-Allow-Methods")
+			r.Header.Del("Access-Control-Allow-Headers")
+
+			return nil
+		},
 	}
 
 	http.HandleFunc("/health", HealthCheckHandler(tileServers))

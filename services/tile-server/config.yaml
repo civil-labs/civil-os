@@ -3,9 +3,10 @@ listen_addresses: '0.0.0.0:3000'
 route_prefix: '/tiles'
 base_path: '/tiles'
 
-connection_string: $DATABASE_URL
+postgres:
+  connection_string: $DATABASE_URL
 
-pool_size: 20
+pool_size: 5
 
 auto_bounds: 'skip'
 

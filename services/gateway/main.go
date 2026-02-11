@@ -209,7 +209,7 @@ func main() {
 
 	// 3. Setup Middleware and Handler
 	// We handle /tiles/, strip the prefix, and pass to proxy
-	http.Handle("/tiles/", CORSMiddleware(http.StripPrefix("/tiles", proxy)))
+	http.Handle("/tiles/", CORSMiddleware(proxy))
 
 	log.Printf("Server listening on :%s", cfg.Port)
 	if err := http.ListenAndServe(":"+cfg.Port, nil); err != nil {

@@ -160,6 +160,12 @@ func main() {
 				return
 			}
 
+			originalHost := req.Host
+
+			if originalHost == "" {
+				originalHost = req.URL.Host // Fallback
+			}
+
 			// Parse the target URL (e.g. "http://10.0.1.5:8080")
 			// In a real app, you might parse these once and cache them,
 			// but parsing here is negligible for most tile loads.
@@ -171,6 +177,16 @@ func main() {
 
 			// Important: Update the Host header so the backend accepts it
 			req.Host = targetURL.Host
+
+			// 3. TELL THE BACKEND THE TRUTH
+			// "The user actually typed 'civillabs.app'"
+			req.Header.Set("X-Forwarded-Host", originalHost)
+
+			// "The user is using HTTPS (even if we are talking HTTP right now)"
+			req.Header.Set("X-Forwarded-Proto", "https")
+
+			// "This is the user's real IP" (Optional but good for logs)
+			req.Header.Set("X-Real-IP", req.RemoteAddr)
 
 			// Note: We do NOT touch req.URL.Path here.
 			// It has already been stripped by the middleware below.

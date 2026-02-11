@@ -194,12 +194,13 @@ func main() {
 
 		// This is needed to strip off any conflicting header details that the Tile Server attaches
 		ModifyResponse: func(r *http.Response) error {
-			// The Gateway handles CORS.
-			// If the Backend (Tile Server) sends CORS headers, delete them
-			// so we don't end up with duplicate/conflicting headers.
-			r.Header.Del("Access-Control-Allow-Origin")
-			r.Header.Del("Access-Control-Allow-Methods")
-			r.Header.Del("Access-Control-Allow-Headers")
+
+			// Set the CORS headers from the returned tiles get request, overwriting whatever the tile server sets
+			r.Header.Set("Access-Control-Allow-Origin", "*")
+
+			// Ensure these are set too if the frontend needs them
+			r.Header.Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+			r.Header.Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
 			return nil
 		},
@@ -222,26 +223,19 @@ func CORSMiddleware(next http.Handler) http.Handler {
 
 		log.Println("CORS middleware activated")
 
-		// 1. Allow any origin (for development) or specific domains
-		// In production, you might want to change "*" to your specific frontend domain
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-
-		// 2. Allow specific methods (Tiles are usually just GET)
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-
-		// 3. Allow headers usually sent by mapping libraries (Mapbox/Leaflet)
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Range")
-
-		// 4. Handle Preflight (OPTIONS) requests
-		// The browser sends this first. We must answer "OK" immediately
-		// and NOT forward it to the backend.
+		// 1. HANDLE PREFLIGHT (Browser asking "Permission to speak?")
+		// The Proxy doesn't run for this, so we must answer here.
 		if r.Method == "OPTIONS" {
-			log.Println("Returning options")
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 			w.WriteHeader(http.StatusOK)
 			return
 		}
 
-		// 5. Pass the actual request (GET) to the proxy
+		// 2. PASS EVERYTHING ELSE TO PROXY
+		// We do NOT set headers here. We let ModifyResponse handle it.
+		// This prevents any "Duplicate Header" conflicts.
 		next.ServeHTTP(w, r)
 	})
 }

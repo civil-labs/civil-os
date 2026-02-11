@@ -142,7 +142,7 @@ func main() {
 	// Replace with your actual Cloud Map details
 	tileServers, err := NewBackendManager(ctx, cfg.Namespace, cfg.TileServerServiceName)
 	if err != nil {
-		log.Fatalf("Failed to init load balancer: %v", err)
+		log.Fatalf("Failed to init tile service load balancer: %v", err)
 	}
 
 	// Poll AWS every 30 seconds

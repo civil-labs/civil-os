@@ -21,6 +21,8 @@ func LoadConfig() (*Config, error) {
 	required := []string{
 		"CLOUD_MAP_NAMESPACE",
 		"TILE_SERVER_CLOUD_MAP_SERVICE_NAME",
+		"CIVIL_IDP_LOCAL_HOSTNAME",
+		"CIVIL_IDP_LOCAL_PORT",
 		// Add future variables here, e.g., "AWS_REGION", "API_KEY", etc.
 	}
 

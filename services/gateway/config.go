@@ -11,6 +11,8 @@ type Config struct {
 	Namespace             string
 	TileServerServiceName string
 	Port                  string
+	IDPLocalPort          string
+	IDPLocalHostName      string
 }
 
 // LoadConfig reads and validates all environment variables
@@ -38,9 +40,11 @@ func LoadConfig() (*Config, error) {
 	// 4. Return the populated config struct
 	// You can also set defaults here for optional vars (like Port)
 	return &Config{
+		Port:                  getEnv("PORT", "8080"), // Optional with default
 		Namespace:             os.Getenv("CLOUD_MAP_NAMESPACE"),
 		TileServerServiceName: os.Getenv("TILE_SERVER_CLOUD_MAP_SERVICE_NAME"),
-		Port:                  getEnv("PORT", "8080"), // Optional with default
+		IDPLocalHostName:      os.Getenv("CIVIL_IDP_LOCAL_HOSTNAME"),
+		IDPLocalPort:          os.Getenv("CIVIL_IDP_LOCAL_PORT"),
 	}, nil
 }
 

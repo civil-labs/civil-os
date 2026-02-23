@@ -205,11 +205,15 @@ func main() {
 		},
 	}
 
+	allowedClientIDs := []string{"civil-prototype-frontend"}
+
+	auth, err := RequireAuth(cfg.IDPLocalHostName, cfg.IDPLocalPort, allowedClientIDs)
+
 	http.HandleFunc("/health", HealthCheckHandler(tileServers))
 
 	// 3. Setup Middleware and Handler
 	// We handle /tiles/, strip the prefix, and pass to proxy
-	http.Handle("/tiles/", CORSMiddleware(proxy))
+	http.Handle("/tiles/", CORSMiddleware(auth(proxy)))
 
 	log.Printf("Server listening on :%s", cfg.Port)
 	if err := http.ListenAndServe(":"+cfg.Port, nil); err != nil {
@@ -234,7 +238,7 @@ func CORSMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		// 3. Pass to Proxy
+		// 3. Pass to next handler
 		next.ServeHTTP(w, r)
 	})
 }

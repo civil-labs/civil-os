@@ -8,19 +8,19 @@ import (
 
 // Config holds all the runtime configuration
 type Config struct {
-	Namespace             string
-	TileServerServiceName string
-	Port                  string
-	IDPLocalPort          string
-	IDPLocalHostName      string
+	Namespace               string
+	TileServerLocalHostName string
+	Port                    string
+	IDPLocalPort            string
+	IDPLocalHostName        string
 }
 
 // LoadConfig reads and validates all environment variables
 func LoadConfig() (*Config, error) {
 	// 1. Define the list of required environment variables
 	required := []string{
-		"CLOUD_MAP_NAMESPACE",
-		"TILE_SERVER_CLOUD_MAP_SERVICE_NAME",
+		"CIVIL_CLOUD_MAP_NAMESPACE",
+		"CIVIL_TILE_SERVER_LOCAL_HOSTNAME",
 		"CIVIL_IDP_LOCAL_HOSTNAME",
 		"CIVIL_IDP_LOCAL_PORT",
 		// Add future variables here, e.g., "AWS_REGION", "API_KEY", etc.
@@ -42,11 +42,11 @@ func LoadConfig() (*Config, error) {
 	// 4. Return the populated config struct
 	// You can also set defaults here for optional vars (like Port)
 	return &Config{
-		Port:                  getEnv("PORT", "8080"), // Optional with default
-		Namespace:             os.Getenv("CLOUD_MAP_NAMESPACE"),
-		TileServerServiceName: os.Getenv("TILE_SERVER_CLOUD_MAP_SERVICE_NAME"),
-		IDPLocalHostName:      os.Getenv("CIVIL_IDP_LOCAL_HOSTNAME"),
-		IDPLocalPort:          os.Getenv("CIVIL_IDP_LOCAL_PORT"),
+		Port:                    getEnv("PORT", "8080"), // Optional with default
+		Namespace:               os.Getenv("CIVIL_CLOUD_MAP_NAMESPACE"),
+		TileServerLocalHostName: os.Getenv("CIVIL_TILE_SERVER_LOCAL_HOSTNAME"),
+		IDPLocalHostName:        os.Getenv("CIVIL_IDP_LOCAL_HOSTNAME"),
+		IDPLocalPort:            os.Getenv("CIVIL_IDP_LOCAL_PORT"),
 	}, nil
 }
 

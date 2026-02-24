@@ -17,14 +17,14 @@ func main() {
 	}
 
 	log.Printf("Starting proxy on port %s for Service: %s in Namespace: %s",
-		cfg.Port, cfg.TileServerServiceName, cfg.Namespace)
+		cfg.Port, cfg.TileServerLocalHostName, cfg.Namespace)
 
 	//
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	// Replace with your actual Cloud Map details
-	tileServers, err := NewBackendManager(ctx, cfg.Namespace, cfg.TileServerServiceName)
+	tileServers, err := NewBackendManager(ctx, cfg.Namespace, cfg.TileServerLocalHostName)
 	if err != nil {
 		log.Fatalf("Failed to init tile service load balancer: %v", err)
 	}
@@ -91,7 +91,7 @@ func main() {
 
 	allowedClientIDs := []string{"civil-prototype-frontend"}
 
-	auth, err := RequireAuth(cfg.IDPLocalHostName, cfg.IDPLocalPort, allowedClientIDs)
+	auth, err := RequireAuth(cfg.IDPLocalHostName, cfg.IDPLocalPort, cfg.Namespace, allowedClientIDs)
 
 	http.HandleFunc("/health", HealthCheckHandler(tileServers))
 

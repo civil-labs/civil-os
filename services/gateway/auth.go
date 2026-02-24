@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -34,6 +35,8 @@ func RequireAuth(localHostName string, localPort string, namespace string, allow
 		JWKSURL:     "http://" + localHostName + "." + namespace + ":" + localPort + "/keys",
 		Algorithms:  []string{"RS256"}, // Dex uses RS256 by default
 	}
+
+	DumpRawJWKS(providerConfig.JWKSURL)
 
 	// Initialize the Provider to securely fetch the JWKS keys from Dex
 	provider := providerConfig.NewProvider(context.Background())
@@ -107,4 +110,25 @@ func RequireAuth(localHostName string, localPort string, namespace string, allow
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}, nil
+}
+
+// DumpRawJWKS makes a raw HTTP request to the IDP and prints the exact response body.
+func DumpRawJWKS(jwksURL string) {
+	log.Printf("🕵️ DEBUG: Attempting to fetch raw keys from %s", jwksURL)
+
+	resp, err := http.Get(jwksURL)
+	if err != nil {
+		log.Printf("🚨 DEBUG FATAL: Network request failed: %v", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("🚨 DEBUG FATAL: Failed to read response body: %v", err)
+		return
+	}
+
+	log.Printf("🕵️ DEBUG: HTTP Status %d", resp.StatusCode)
+	log.Printf("🕵️ DEBUG: RAW JWKS PAYLOAD:\n%s", string(body))
 }

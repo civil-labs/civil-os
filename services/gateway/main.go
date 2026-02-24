@@ -104,7 +104,7 @@ func main() {
 
 	// 3. Setup Middleware and Handler
 	// We handle /tiles/, strip the prefix, and pass to proxy
-	http.Handle("/tiles/", CORSMiddleware(auth(proxy)))
+	http.Handle("/tiles/", CORSMiddleware(auth(proxy), verbose))
 
 	log.Printf("Server listening on :%s", cfg.Port)
 	if err := http.ListenAndServe(":"+cfg.Port, nil); err != nil {
@@ -112,10 +112,12 @@ func main() {
 	}
 }
 
-func CORSMiddleware(next http.Handler) http.Handler {
+func CORSMiddleware(next http.Handler, verbose bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		log.Println("CORS middleware activated")
+		if verbose {
+			log.Println("CORS middleware activated")
+		}
 
 		// 1. ALWAYS set headers (Success, Failure, or Preflight)
 		// This guarantees the browser never sees a "Missing Header" error.

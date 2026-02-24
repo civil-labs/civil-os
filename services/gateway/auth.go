@@ -66,7 +66,9 @@ func RequireAuth(verbose bool, localHostName string, localPort string, namespace
 			}
 			rawIDToken := strings.TrimPrefix(authHeader, "Bearer ")
 
-			log.Println("ID Token: " + rawIDToken)
+			if verbose {
+				log.Println("ID Token: " + rawIDToken)
+			}
 
 			// Verify the cryptographic signature and expiration
 			idToken, err := verifier.Verify(r.Context(), rawIDToken)

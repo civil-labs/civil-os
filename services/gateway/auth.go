@@ -62,8 +62,9 @@ func RequireAuth(localHostName string, localPort string, allowedClientIDs []stri
 			// Verify the cryptographic signature and expiration
 			idToken, err := verifier.Verify(r.Context(), rawIDToken)
 			if err != nil {
+				log.Printf("Unauthorized: Invalid or expired token: %v", err)
+
 				http.Error(w, "Unauthorized: Invalid or expired token", http.StatusUnauthorized)
-				log.Println("Unauthorized: Invalid or expired token")
 				return
 			}
 

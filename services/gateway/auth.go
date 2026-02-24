@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"strings"
 
@@ -51,6 +52,7 @@ func RequireAuth(localHostName string, localPort string, allowedClientIDs []stri
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
 				http.Error(w, "Unauthorized: Missing or invalid Bearer token", http.StatusUnauthorized)
+				log.Println("Unauthorized: Missing or invalid Bearer token")
 				return
 			}
 			rawIDToken := strings.TrimPrefix(authHeader, "Bearer ")
@@ -59,6 +61,7 @@ func RequireAuth(localHostName string, localPort string, allowedClientIDs []stri
 			idToken, err := verifier.Verify(r.Context(), rawIDToken)
 			if err != nil {
 				http.Error(w, "Unauthorized: Invalid or expired token", http.StatusUnauthorized)
+				log.Println("Unauthorized: Invalid or expired token")
 				return
 			}
 
@@ -77,6 +80,7 @@ func RequireAuth(localHostName string, localPort string, allowedClientIDs []stri
 
 			if !isValidAudience {
 				http.Error(w, "Unauthorized: Unrecognized client application", http.StatusUnauthorized)
+				log.Println("Unauthorized: Unrecognized client application")
 				return
 			}
 
@@ -84,6 +88,7 @@ func RequireAuth(localHostName string, localPort string, allowedClientIDs []stri
 			var claims Claims
 			if err := idToken.Claims(&claims); err != nil {
 				http.Error(w, "Internal Error: Failed to parse identity claims", http.StatusInternalServerError)
+				log.Println("Unauthorized: Failed to parse identity claims")
 				return
 			}
 

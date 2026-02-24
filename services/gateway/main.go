@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strconv"
 	"time"
 )
 
@@ -89,9 +90,15 @@ func main() {
 		},
 	}
 
+	verbose, err := strconv.ParseBool(cfg.Verbose)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	allowedClientIDs := []string{"civil-prototype-frontend"}
 
-	auth, err := RequireAuth(cfg.IDPLocalHostName, cfg.IDPLocalPort, cfg.Namespace, allowedClientIDs)
+	auth, err := RequireAuth(verbose, cfg.IDPLocalHostName, cfg.IDPLocalPort, cfg.Namespace, allowedClientIDs)
 
 	http.HandleFunc("/health", HealthCheckHandler(tileServers))
 

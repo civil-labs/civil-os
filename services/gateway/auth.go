@@ -25,7 +25,7 @@ type Claims struct {
 }
 
 // RequireAuth is the middleware wrapper
-func RequireAuth(localHostName string, localPort string, namespace string, allowedClientIDs []string) (func(http.Handler) http.Handler, error) {
+func RequireAuth(verbose bool, localHostName string, localPort string, namespace string, allowedClientIDs []string) (func(http.Handler) http.Handler, error) {
 
 	providerConfig := oidc.ProviderConfig{
 		IssuerURL:   "https://auth.civillabs.app",
@@ -36,7 +36,9 @@ func RequireAuth(localHostName string, localPort string, namespace string, allow
 		Algorithms:  []string{"RS256"}, // Dex uses RS256 by default
 	}
 
-	DumpRawJWKS(providerConfig.JWKSURL)
+	if verbose {
+		DumpRawJWKS(providerConfig.JWKSURL)
+	}
 
 	// Initialize the Provider to securely fetch the JWKS keys from Dex
 	provider := providerConfig.NewProvider(context.Background())
@@ -55,24 +57,26 @@ func RequireAuth(localHostName string, localPort string, namespace string, allow
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
 				http.Error(w, "Unauthorized: Missing or invalid Bearer token", http.StatusUnauthorized)
-				log.Println("Unauthorized: Missing or invalid Bearer token")
+
+				if verbose {
+					log.Println("Unauthorized: Missing or invalid Bearer token")
+				}
+
 				return
 			}
 			rawIDToken := strings.TrimPrefix(authHeader, "Bearer ")
 
-			log.Println("rawIDToken: " + rawIDToken)
-
-			keySet := oidc.NewRemoteKeySet(r.Context(), "http://"+localHostName+"."+namespace+":"+localPort+"/keys")
-			log.Printf("🚨 GATEWAY LOADED KEYS. Found key set: %v", keySet) // This will fail but print debug info
-			keys, _ := keySet.VerifySignature(r.Context(), rawIDToken)
-			log.Printf("🚨 GATEWAY LOADED KEYS. Token requires kid: %s", keys) // This will fail but print debug info
+			log.Println("ID Token: " + rawIDToken)
 
 			// Verify the cryptographic signature and expiration
 			idToken, err := verifier.Verify(r.Context(), rawIDToken)
 			if err != nil {
-				log.Printf("Unauthorized: Invalid or expired token: %v", err)
+				log.Printf("Unauthorized: Invalid or expired token. Error: %v", err)
 
-				http.Error(w, "Unauthorized: Invalid or expired token", http.StatusUnauthorized)
+				if verbose {
+					http.Error(w, "Unauthorized: Invalid or expired token", http.StatusUnauthorized)
+				}
+
 				return
 			}
 
@@ -91,7 +95,11 @@ func RequireAuth(localHostName string, localPort string, namespace string, allow
 
 			if !isValidAudience {
 				http.Error(w, "Unauthorized: Unrecognized client application", http.StatusUnauthorized)
-				log.Println("Unauthorized: Unrecognized client application")
+
+				if verbose {
+					log.Println("Unauthorized: Unrecognized client application")
+				}
+
 				return
 			}
 
@@ -99,7 +107,11 @@ func RequireAuth(localHostName string, localPort string, namespace string, allow
 			var claims Claims
 			if err := idToken.Claims(&claims); err != nil {
 				http.Error(w, "Internal Error: Failed to parse identity claims", http.StatusInternalServerError)
-				log.Println("Unauthorized: Failed to parse identity claims")
+
+				if verbose {
+					log.Printf("Unauthorized: Failed to parse identity claims. Error: %v", err)
+				}
+
 				return
 			}
 

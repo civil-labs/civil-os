@@ -59,6 +59,10 @@ func RequireAuth(localHostName string, localPort string, namespace string, allow
 
 			log.Println("rawIDToken: " + rawIDToken)
 
+			keySet := oidc.NewRemoteKeySet(r.Context(), "http://"+localHostName+"."+namespace+":"+localPort+"/keys")
+			keys, _ := keySet.VerifySignature(r.Context(), rawIDToken)
+			log.Printf("🚨 GATEWAY LOADED KEYS. Token requires kid: %s", keys) // This will fail but print debug info
+
 			// Verify the cryptographic signature and expiration
 			idToken, err := verifier.Verify(r.Context(), rawIDToken)
 			if err != nil {

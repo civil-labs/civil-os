@@ -105,7 +105,6 @@ func main() {
 
 	auth, err := RequireAuth(verbose, cfg.IDPLocalHostName, cfg.IDPLocalPort, cfg.Namespace, allowedClientIDs)
 
-
 	mux := http.NewServeMux()
 	// path, handler := greetv1connect.NewGreetServiceHandler(
 	// 	greeter,
@@ -119,6 +118,7 @@ func main() {
 
 	p := new(http.Protocols)
 	p.SetHTTP1(true)
+	
 	// Use h2c so we can serve HTTP/2 without TLS.
 	p.SetUnencryptedHTTP2(true)
 	s := http.Server{

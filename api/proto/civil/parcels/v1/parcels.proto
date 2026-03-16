@@ -1,3 +1,54 @@
 syntax = "proto3";
 
 package civil.parcels.v1;
+
+import "buf/validate/validate.proto";
+import "gnostic/openapi/v3/annotations.proto";
+
+option (gnostic.openapi.v3.document) = {
+  components: {
+    security_schemes: {
+      additional_properties: [
+        {
+          name: "BearerAuth"
+          value: {
+            security_scheme: {
+              type: "http"
+              scheme: "bearer"
+              bearer_format: "JWT"
+            }
+          }
+        }
+      ]
+    }
+  }
+};
+
+message UpdateParcelAttributeRequest {
+  repeated string parcel_ids = 1 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 1000
+    items: {
+      string: {
+        min_len: 1
+        max_len: 256
+      }
+    }
+  }];
+
+  string attribute_name = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+
+  string attribute_value = 3 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+}
+
+message UpdateParcelAttributeResponse {}
+
+service ParcelService {
+  rpc UpdateParcelAttribute(UpdateParcelAttributeRequest) returns (UpdateParcelAttributeResponse) {}
+}

@@ -1,0 +1,20 @@
+version: v2
+plugins:
+  - local: [go, tool, protoc-gen-go]
+    out: gen
+    opt: paths=source_relative
+  - local: [go, tool, protoc-gen-connect-go]
+    out: gen
+    opt:
+      - paths=source_relative
+      - simple
+  - remote: buf.build/community/sudorandom-connect-openapi
+    out: gen/openapi
+managed:
+  enabled: true
+  override:
+    - file_option: go_package_prefix
+      value: example/gen
+  disable:
+    - file_option: go_package
+      module: buf.build/bufbuild/protovalidate

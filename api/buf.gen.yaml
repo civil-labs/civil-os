@@ -1,15 +1,19 @@
 version: v2
 plugins:
-  - local: [go, tool, protoc-gen-go]
-    out: gen
+  # Generate standard Go Protobuf structs
+  - remote: buf.build/protocolbuffers/go
+    out: gen/go
     opt: paths=source_relative
-  - local: [go, tool, protoc-gen-connect-go]
-    out: gen
-    opt:
-      - paths=source_relative
-      - simple
+
+  # Generate ConnectRPC Go handlers/clients
+  - remote: buf.build/connectrpc/go
+    out: gen/go
+    opt: paths=source_relative
+
+  # Generate OpenAPI v3 Spec
   - remote: buf.build/community/sudorandom-connect-openapi
     out: gen/openapi
+    opt: format=yaml
 managed:
   enabled: true
   override:

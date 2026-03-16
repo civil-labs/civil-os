@@ -5,6 +5,7 @@ package civil.parcels.v1;
 import "buf/validate/validate.proto";
 import "gnostic/openapi/v3/annotations.proto";
 
+option go_package = "github.com/civil-labs/civil-api-go/civil/parcels/v1;parcelsv1";
 option (gnostic.openapi.v3.document) = {
   components: {
     security_schemes: {

@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package civil.tiles.v1;
+
+import "google/api/annotations.proto";
+
+service TileService {
+  // GetTileJson retrieves the discovery metadata for a tile source.
+  // Clients use this to configure map layers.
+  rpc GetTileJson(GetTileJsonRequest) returns (GetTileJsonResponse) {
+    option (google.api.http) = {get: "/tiles/{source_name}"};
+  }
+
+  // GetTile retrieves a vector tile (MVT/PBF) for a given coordinate.
+  rpc GetTile(GetTileRequest) returns (GetTileResponse) {
+    option (google.api.http) = {get: "/tiles/{source_name}/{z}/{x}/{y}"};
+  }
+}
+
+message GetTileJsonRequest {
+  string source_name = 1; // e.g., "parcels"
+}
+
+// TileJsonResponse represents the standard TileJSON (v2.2.0/v3.0.0) spec.
+message GetTileJsonResponse {
+  string tilejson = 1; // Usually "2.2.0" or "3.0.0"
+  string name = 2;
+  string description = 3;
+  repeated string tiles = 4; // The URL array for tiles
+  int32 minzoom = 5;
+  int32 maxzoom = 6;
+  repeated double bounds = 7;
+  repeated double center = 8;
+  // vector_layers is critical for Mapbox Vector Tiles (MVT)
+  repeated VectorLayer vector_layers = 9;
+}
+
+message VectorLayer {
+  string id = 1; // The name of the table/layer
+  string description = 2;
+  int32 minzoom = 3;
+  int32 maxzoom = 4;
+  map<string, string> fields = 5; // Metadata about the columns
+}
+
+message GetTileRequest {
+  string source_name = 1;
+  int32 z = 2;
+  int32 x = 3;
+  int32 y = 4;
+}
+
+message GetTileResponse {
+  string content_type = 1;
+  bytes data = 2;
+}

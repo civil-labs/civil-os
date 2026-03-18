@@ -3,7 +3,7 @@ version: v2
 deps:
   - buf.build/bufbuild/protovalidate
   - buf.build/googleapis/googleapis
-  - buf.build/gnostic/gnostic # Add this for OpenAPI v3 specific options
+  - buf.build/gnostic/gnostic
 modules:
   - path: proto
 lint:

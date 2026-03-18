@@ -13,7 +13,11 @@ plugins:
   # Generate OpenAPI v3 Spec
   - remote: buf.build/community/sudorandom-connect-openapi
     out: gen/openapi
-    opt: format=yaml
+    opt:
+      - format=yaml
+      - path=openapi.yaml  # <--- This is the correct way to "merge"
+      # In v0.25+, it's recommended to explicitly enable the features you're using
+      - features=connectrpc;google.api.http;gnostic;protovalidate
 managed:
   enabled: true
   override:

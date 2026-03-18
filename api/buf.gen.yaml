@@ -10,19 +10,30 @@ plugins:
     out: gen/go
     opt: paths=source_relative
 
+  # 1. Standard JavaScript Generation (Messages + Connect v2 Services)
+  # This replaces both protocolbuffers/js and connectrpc/js
+  - remote: buf.build/bufbuild/es:v2.11.0
+    out: gen/js
+    opt: 
+      - target=js+dts
+
   # Generate OpenAPI v3 Spec
   - remote: buf.build/community/sudorandom-connect-openapi
     out: gen/openapi
     opt:
       - format=yaml
-      - path=openapi.yaml  # <--- This is the correct way to "merge"
+      - path=openapi.yaml  # Merge all services into a single description
       # In v0.25+, it's recommended to explicitly enable the features you're using
       - features=connectrpc;google.api.http;gnostic;protovalidate
 managed:
   enabled: true
   override:
     - file_option: go_package_prefix
-      value: example/gen
+      value: github.com/civil-labs/civil-api-go
   disable:
     - file_option: go_package
       module: buf.build/bufbuild/protovalidate
+    - file_option: go_package
+      module: buf.build/gnostic/gnostic
+    - file_option: go_package
+      module: buf.build/googleapis/googleapis

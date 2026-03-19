@@ -123,7 +123,7 @@ func main() {
 	// End experimental connect functionality
 
 	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), verbose))
-	http.HandleFunc("/health", HealthCheckHandler(tileServers))
+	mux.HandleFunc("/health", HealthCheckHandler(tileServers))
 
 	p := new(http.Protocols)
 	p.SetHTTP1(true)

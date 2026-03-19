@@ -39,8 +39,10 @@ service ParcelService {
   // Updates a specified attribute for one or more parcels, identified by their parcel IDs.
   rpc UpdateParcelAttribute(UpdateParcelAttributeRequest) returns (UpdateParcelAttributeResponse) {}
 
+  // Retrieves all details about a parcel in a JSON object
   rpc GetParcel(GetParcelRequest) returns (GetParcelResponse) {}
 
+  // Retrieves a specified attribute value for a given parcel
   rpc GetParcelAttribute(GetParcelAttributeRequest) returns (GetParcelAttributeResponse) {}
 }
 

@@ -39,11 +39,14 @@ service ParcelService {
   // Updates a specified attribute for one or more parcels, identified by their parcel IDs.
   rpc UpdateParcelAttribute(UpdateParcelAttributeRequest) returns (UpdateParcelAttributeResponse) {}
 
-  // Retrieves all details about a parcel in a JSON object.
+  // Retrieves all a specified parcel's attributes as an object.
   rpc GetParcel(GetParcelRequest) returns (GetParcelResponse) {}
 
   // Retrieves a specified attribute value for a given parcel.
   rpc GetParcelAttribute(GetParcelAttributeRequest) returns (GetParcelAttributeResponse) {}
+
+  // Retrieves specificied attributes about a parcel as an object.
+  rpc GetParcelAttributes(GetParcelAttributesRequest) returns (GetParcelAttributesResponse) {}
 }
 
 message UpdateParcelAttributeRequest {
@@ -79,7 +82,7 @@ message GetParcelRequest {
 }
 
 message GetParcelResponse {
-  google.protobuf.Struct parcel_details = 1;
+  google.protobuf.Struct parcel_attributes = 1;
 }
 
 message GetParcelAttributeRequest {
@@ -99,4 +102,26 @@ message GetParcelAttributeResponse {
     min_len: 1
     max_len: 256
   }];
+}
+
+message GetParcelAttributesRequest {
+  string parcel_id = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+
+  repeated string attribute_names = 2 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 100
+    items: {
+      string: {
+        min_len: 1
+        max_len: 256
+      }
+    }
+  }];
+}
+
+message GetParcelAttributesResponse {
+  google.protobuf.Struct parcel_attributes = 1;
 }

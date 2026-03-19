@@ -35,7 +35,7 @@ option (gnostic.openapi.v3.document) = {
     {url: "https://leepa.civillabs.app"}]
 };
 
-service ParcelService {
+service ParcelsService {
   // Updates a specified attribute for one or more parcels, identified by their parcel IDs.
   rpc UpdateParcelAttribute(UpdateParcelAttributeRequest) returns (UpdateParcelAttributeResponse) {}
 

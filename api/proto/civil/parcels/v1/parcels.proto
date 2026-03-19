@@ -4,6 +4,7 @@ package civil.parcels.v1;
 
 import "buf/validate/validate.proto";
 import "gnostic/openapi/v3/annotations.proto";
+import "google/protobuf/struct.proto";
 
 option go_package = "github.com/civil-labs/civil-api-go/civil/parcels/v1;parcelsv1";
 option (gnostic.openapi.v3.document) = {
@@ -34,6 +35,15 @@ option (gnostic.openapi.v3.document) = {
     {url: "https://leepa.civillabs.app"}]
 };
 
+service ParcelService {
+  // Updates a specified attribute for one or more parcels, identified by their parcel IDs.
+  rpc UpdateParcelAttribute(UpdateParcelAttributeRequest) returns (UpdateParcelAttributeResponse) {}
+
+  rpc GetParcel(GetParcelRequest) returns (GetParcelResponse) {}
+
+  rpc GetParcelAttribute(GetParcelAttributeRequest) returns (GetParcelAttributeResponse) {}
+}
+
 message UpdateParcelAttributeRequest {
   repeated string parcel_ids = 1 [(buf.validate.field).repeated = {
     min_items: 1
@@ -59,7 +69,32 @@ message UpdateParcelAttributeRequest {
 
 message UpdateParcelAttributeResponse {}
 
-service ParcelService {
-  // Updates a specified attribute for one or more parcels, identified by their parcel IDs.
-  rpc UpdateParcelAttribute(UpdateParcelAttributeRequest) returns (UpdateParcelAttributeResponse) {}
+message GetParcelRequest {
+  string parcel_id = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+}
+
+message GetParcelResponse {
+  google.protobuf.Struct parcel_details = 1;
+}
+
+message GetParcelAttributeRequest {
+  string parcel_id = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+
+  string attribute_name = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+}
+
+message GetParcelAttributeResponse {
+  string attribute_value = 3 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
 }

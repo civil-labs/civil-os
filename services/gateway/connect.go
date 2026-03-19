@@ -56,7 +56,7 @@ func GetHardcodedParcelDetails() *structpb.Struct {
 		"sq_ft":      2500.5,
 		"zone_type":  "Residential",
 		"is_cleared": true,
-		"tags":       []string{"prime", "corner-lot"},
+		"tags":       []any{"prime", "corner-lot"},
 		"owner": map[string]any{
 			"name": "Lars Doucet",
 		},

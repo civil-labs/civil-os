@@ -8,6 +8,11 @@ import (
 	"net/url"
 	"strconv"
 	"time"
+
+	"github.com/civil-labs/civil-api-go/civil/parcels/v1/parcelsv1connect"
+
+	"connectrpc.com/connect"
+	"connectrpc.com/validate"
 )
 
 func main() {
@@ -90,6 +95,8 @@ func main() {
 		},
 	}
 
+	// Handle the bool parse here, as the config function
+	// should pass it straight
 	verbose, err := strconv.ParseBool(cfg.Verbose)
 
 	if err != nil {
@@ -100,16 +107,40 @@ func main() {
 
 	auth, err := RequireAuth(verbose, cfg.IDPLocalHostName, cfg.IDPLocalPort, cfg.Namespace, allowedClientIDs)
 
+	// Start experimental connect functionality
+
+	parcelsServer := &ParcelServer{}
+
+	mux := http.NewServeMux()
+
+	path, handler := parcelsv1connect.NewParcelsServiceHandler(
+		parcelsServer,
+		connect.WithInterceptors(validate.NewInterceptor()),
+	)
+
+	mux.Handle(path, handler)
+
+	// End experimental connect functionality
+
+	mux.handle("/tiles/", CORSMiddleware(auth(proxy), verbose))
 	http.HandleFunc("/health", HealthCheckHandler(tileServers))
 
-	// 3. Setup Middleware and Handler
-	// We handle /tiles/, strip the prefix, and pass to proxy
-	http.Handle("/tiles/", CORSMiddleware(auth(proxy), verbose))
+	p := new(http.Protocols)
+	p.SetHTTP1(true)
+	// Use h2c so we can serve HTTP/2 without TLS.
+	p.SetUnencryptedHTTP2(true)
+	s := http.Server{
+		Addr:      ":" + cfg.Port,
+		Handler:   mux,
+		Protocols: p,
+	}
 
 	log.Printf("Server listening on :%s", cfg.Port)
-	if err := http.ListenAndServe(":"+cfg.Port, nil); err != nil {
+
+	if err := s.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
+
 }
 
 func CORSMiddleware(next http.Handler, verbose bool) http.Handler {

@@ -8,8 +8,9 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.41.1
 	github.com/aws/aws-sdk-go-v2/config v1.32.7
 	github.com/aws/aws-sdk-go-v2/service/servicediscovery v1.39.22
-	github.com/civil-labs/civil-api-go v0.0.0-20260319124609-617cd0ed1592
+	github.com/civil-labs/civil-api-go v0.0.0-20260319125358-0607a6143bab
 	github.com/coreos/go-oidc/v3 v3.17.0
+	google.golang.org/protobuf v1.36.11
 )
 
 require (
@@ -40,5 +41,4 @@ require (
 	golang.org/x/text v0.29.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260316180232-0b37fe3546d5 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260311181403-84a4fc48630c // indirect
-	google.golang.org/protobuf v1.36.11 // indirect
 )

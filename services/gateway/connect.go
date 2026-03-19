@@ -4,7 +4,6 @@ import (
 	"context"
 
 	parcelsv1 "github.com/civil-labs/civil-api-go/civil/parcels/v1"
-	tilesv1 "github.com/civil-labs/civil-api-go/civil/tiles/v1"
 )
 
 type ParcelServer struct{}

@@ -47,6 +47,9 @@ service ParcelsService {
 
   // Retrieves specificied attributes about a parcel as an object.
   rpc GetParcelAttributes(GetParcelAttributesRequest) returns (GetParcelAttributesResponse) {}
+
+  // Retrieves a set of summary statistics about the specified attribute for a specified list of parcels. Optionally returns the values as well
+  rpc GetParcelsStats(GetParcelsStatsRequest) returns (GetParcelsStatsResponse) {}
 }
 
 message UpdateParcelsAttributeRequest {
@@ -124,4 +127,30 @@ message GetParcelAttributesRequest {
 
 message GetParcelAttributesResponse {
   google.protobuf.Struct parcel_attributes = 1;
+}
+
+message GetParcelsStatsRequest {
+  repeated string parcel_ids = 1 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 1000
+    items: {
+      string: {
+        min_len: 1
+        max_len: 256
+      }
+    }
+  }];
+
+  string attribute_name = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+
+  bool return_values = 3 [(buf.validate.field).bool = {}];
+}
+
+message GetParcelsStatsResponse {
+  float mean = 1 [(buf.validate.field).float = {}];
+  float median = 2 [(buf.validate.field).float = {}];
+  float mode = 3 [(buf.validate.field).float = {}];
 }

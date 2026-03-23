@@ -107,8 +107,6 @@ func main() {
 
 	auth, err := RequireAuth(verbose, cfg.IDPLocalHostName, cfg.IDPLocalPort, cfg.Namespace, allowedClientIDs)
 
-	// Start experimental connect functionality
-
 	parcelsServer := &ParcelServer{}
 
 	mux := http.NewServeMux()
@@ -119,8 +117,6 @@ func main() {
 	)
 
 	mux.Handle(path, handler)
-
-	// End experimental connect functionality
 
 	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), verbose))
 	mux.HandleFunc("/health", HealthCheckHandler(tileServers))

@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/civil-labs/civil-api-go/civil/parcels/v1/parcelsv1connect"
+
 	"connectrpc.com/connect"
 	"connectrpc.com/validate"
 )
@@ -105,16 +107,19 @@ func main() {
 
 	auth, err := RequireAuth(verbose, cfg.IDPLocalHostName, cfg.IDPLocalPort, cfg.Namespace, allowedClientIDs)
 
+	parcelsServer := &ParcelServer{}
+
 	mux := http.NewServeMux()
-	// path, handler := greetv1connect.NewGreetServiceHandler(
-	// 	greeter,
-	// 	// Validation via Protovalidate is almost always recommended
-	// 	connect.WithInterceptors(validate.NewInterceptor()),
-	// )
-	// mux.Handle(path, handler)
-	
-	mux.handle("/tiles/", CORSMiddleware(auth(proxy), verbose))
-	http.HandleFunc("/health", HealthCheckHandler(tileServers))
+
+	path, handler := parcelsv1connect.NewParcelsServiceHandler(
+		parcelsServer,
+		connect.WithInterceptors(validate.NewInterceptor()),
+	)
+
+	mux.Handle(path, handler)
+
+	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), verbose))
+	mux.HandleFunc("/health", HealthCheckHandler(tileServers))
 
 	p := new(http.Protocols)
 	p.SetHTTP1(true)
@@ -122,7 +127,7 @@ func main() {
 	// Use h2c so we can serve HTTP/2 without TLS.
 	p.SetUnencryptedHTTP2(true)
 	s := http.Server{
-		Addr:      ":"+cfg.Port,
+		Addr:      ":" + cfg.Port,
 		Handler:   mux,
 		Protocols: p,
 	}
@@ -132,7 +137,7 @@ func main() {
 	if err := s.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
-	
+
 }
 
 func CORSMiddleware(next http.Handler, verbose bool) http.Handler {

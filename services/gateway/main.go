@@ -123,6 +123,7 @@ func main() {
 
 	p := new(http.Protocols)
 	p.SetHTTP1(true)
+	
 	// Use h2c so we can serve HTTP/2 without TLS.
 	p.SetUnencryptedHTTP2(true)
 	s := http.Server{

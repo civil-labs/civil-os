@@ -43,7 +43,7 @@ func main() {
 			req.Host = "civil-tile-server"
 
 			// TELL THE BACKEND THE TRUTH
-			// "The user actually typed 'civillabs.app'"
+			// "The real host'"
 			req.Header.Set("X-Forwarded-Host", originalHost)
 
 			// "The user is using HTTPS (even if we are talking HTTP right now)"

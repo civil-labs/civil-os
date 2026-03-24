@@ -39,11 +39,6 @@ func main() {
 				originalHost = req.URL.Host // Fallback
 			}
 
-			// Parse the target URL (e.g. "http://10.0.1.5:8080")
-			// In a real app, you might parse these once and cache them,
-			// but parsing here is negligible for most tile loads.
-			targetURL, _ := url.Parse(targetStr)
-
 			// Rewrite the request to target the backend
 			req.URL.Scheme = "http"
 			req.URL.Host = "civil-tile-server"

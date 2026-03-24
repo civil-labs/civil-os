@@ -5,9 +5,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httputil"
-	"net/url"
 	"strconv"
-	"time"
 
 	"github.com/civil-labs/civil-api-go/civil/parcels/v1/parcelsv1connect"
 
@@ -97,11 +95,11 @@ func main() {
 	mux.Handle(path, handler)
 
 	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), verbose))
-	mux.HandleFunc("/health", HealthCheckHandler(tileServers))
+	mux.HandleFunc("/health", HealthCheckHandler())
 
 	p := new(http.Protocols)
 	p.SetHTTP1(true)
-	
+
 	// Use h2c so we can serve HTTP/2 without TLS.
 	p.SetUnencryptedHTTP2(true)
 	s := http.Server{

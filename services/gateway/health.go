@@ -15,9 +15,6 @@ type HealthResponse struct {
 func HealthCheckHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		// Check if there is anywhere to send tile server traffic to
-		ready := lb.IsReady()
-
 		// Prepare the response
 		resp := HealthResponse{
 			Status: "OK",

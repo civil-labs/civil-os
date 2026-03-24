@@ -19,8 +19,8 @@ func main() {
 		log.Fatalf("Configuration Error: %v", err)
 	}
 
-	log.Printf("Starting proxy on port %s for Service: %s in Namespace: %s",
-		cfg.Port, cfg.TileServerLocalHostName, cfg.Namespace)
+	// log.Printf("Starting proxy on port %s for Service: %s in Namespace: %s",
+	// 	cfg.Port, cfg.TileServerLocalHostName, cfg.Namespace)
 
 	//ctx, cancel := context.WithCancel(context.Background())
 	//defer cancel()
@@ -37,7 +37,7 @@ func main() {
 
 			// Rewrite the request to target the backend
 			req.URL.Scheme = "http"
-			req.URL.Host = "civil-tile-server:8082"
+			req.URL.Host = "civil-tile-server:" + cfg.EgressPort
 
 			// Important: Update the Host header so the backend accepts it
 			req.Host = "civil-tile-server"

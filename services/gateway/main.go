@@ -101,12 +101,12 @@ func main() {
 	// Use h2c so we can serve HTTP/2 without TLS.
 	p.SetUnencryptedHTTP2(true)
 	s := http.Server{
-		Addr:      ":" + cfg.Port,
+		Addr:      ":" + cfg.IngressPort,
 		Handler:   mux,
 		Protocols: p,
 	}
 
-	log.Printf("Server listening on :%s", cfg.Port)
+	log.Printf("Server listening on :%s", cfg.IngressPort)
 
 	if err := s.ListenAndServe(); err != nil {
 		log.Fatal(err)

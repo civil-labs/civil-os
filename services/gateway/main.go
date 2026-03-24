@@ -23,9 +23,8 @@ func main() {
 	log.Printf("Starting proxy on port %s for Service: %s in Namespace: %s",
 		cfg.Port, cfg.TileServerLocalHostName, cfg.Namespace)
 
-	//
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	//ctx, cancel := context.WithCancel(context.Background())
+	//defer cancel()
 
 	// Create the Reverse Proxy for the Tile Server with a custom Director
 	proxy := &httputil.ReverseProxy{

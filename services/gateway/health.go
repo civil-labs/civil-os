@@ -7,7 +7,7 @@ import (
 
 // HealthResponse is the JSON structure we return
 type HealthResponse struct {
-	Status       string `json:"status"`
+	Status string `json:"status"`
 }
 
 // HealthCheckHandler returns 200 if we have backends, In the future may

@@ -37,7 +37,7 @@ func main() {
 
 			// Rewrite the request to target the backend
 			req.URL.Scheme = "http"
-			req.URL.Host = "civil-tile-server"
+			req.URL.Host = "civil-tile-server:8082"
 
 			// Important: Update the Host header so the backend accepts it
 			req.Host = "civil-tile-server"
@@ -79,7 +79,7 @@ func main() {
 
 	allowedClientIDs := []string{"civil-prototype-frontend"}
 
-	auth, err := RequireAuth(verbose, cfg.IDPLocalHostName, cfg.IDPLocalPort, cfg.Namespace, allowedClientIDs)
+	auth, err := RequireAuth(verbose, "civil-idp", cfg.EgressPort, allowedClientIDs)
 
 	parcelsServer := &ParcelServer{}
 

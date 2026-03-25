@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"encoding/json"
 	"net/http"
 )
@@ -14,6 +15,8 @@ type HealthResponse struct {
 // do further health introspection to downstream services
 func HealthCheckHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		log.Printf("Health check hit")
 
 		// Prepare the response
 		resp := HealthResponse{

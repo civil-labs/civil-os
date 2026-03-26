@@ -25,13 +25,13 @@ type Claims struct {
 }
 
 // RequireAuth is the middleware wrapper
-func RequireAuth(verbose bool, localHostName string, localPort string, namespace string, allowedClientIDs []string) (func(http.Handler) http.Handler, error) {
+func RequireAuth(verbose bool, authServer string, localHostName string, localPort string, namespace string, allowedClientIDs []string) (func(http.Handler) http.Handler, error) {
 
 	providerConfig := oidc.ProviderConfig{
-		IssuerURL:   "https://auth.civillabs.app",
-		AuthURL:     "https://auth.civillabs.app",
-		TokenURL:    "https://auth.civillabs.app/token",
-		UserInfoURL: "https://auth.civillabs.app/userinfo",
+		IssuerURL:   "https://" + authServer,
+		AuthURL:     "https://" + authServer,
+		TokenURL:    "https://" + authServer + "/token",
+		UserInfoURL: "https://" + authServer + "/userinfo",
 		JWKSURL:     "http://" + localHostName + "." + namespace + ":" + localPort + "/keys",
 		Algorithms:  []string{"RS256"}, // Dex uses RS256 by default
 	}

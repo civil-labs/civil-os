@@ -14,6 +14,7 @@ type Config struct {
 	IDPLocalPort            string
 	IDPLocalHostName        string
 	Verbose                 string
+	AuthServer              string
 }
 
 func LoadConfig() (*Config, error) {
@@ -23,6 +24,7 @@ func LoadConfig() (*Config, error) {
 		"CIVIL_TILE_SERVER_LOCAL_HOSTNAME",
 		"CIVIL_IDP_LOCAL_HOSTNAME",
 		"CIVIL_IDP_LOCAL_PORT",
+		"CIVIL_AUTH_SERVER",
 	}
 
 	// Loop through and check for missing ones
@@ -47,6 +49,7 @@ func LoadConfig() (*Config, error) {
 		TileServerLocalHostName: os.Getenv("CIVIL_TILE_SERVER_LOCAL_HOSTNAME"),
 		IDPLocalHostName:        os.Getenv("CIVIL_IDP_LOCAL_HOSTNAME"),
 		IDPLocalPort:            os.Getenv("CIVIL_IDP_LOCAL_PORT"),
+		AuthServer:              os.Getenv("CIVIL_AUTH_SERVER"),
 	}, nil
 }
 

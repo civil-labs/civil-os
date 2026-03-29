@@ -1,13 +1,10 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net/http"
 	"net/http/httputil"
-	"net/url"
 	"strconv"
-	"time"
 
 	"github.com/civil-labs/civil-api-go/civil/parcels/v1/parcelsv1connect"
 
@@ -22,33 +19,15 @@ func main() {
 		log.Fatalf("Configuration Error: %v", err)
 	}
 
-	log.Printf("Starting proxy on port %s for Service: %s in Namespace: %s",
-		cfg.Port, cfg.TileServerLocalHostName, cfg.Namespace)
+	// log.Printf("Starting proxy on port %s for Service: %s in Namespace: %s",
+	// 	cfg.Port, cfg.TileServerLocalHostName, cfg.Namespace)
 
-	//
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	//ctx, cancel := context.WithCancel(context.Background())
+	//defer cancel()
 
-	// Replace with your actual Cloud Map details
-	tileServers, err := NewBackendManager(ctx, cfg.Namespace, cfg.TileServerLocalHostName)
-	if err != nil {
-		log.Fatalf("Failed to init tile service load balancer: %v", err)
-	}
-
-	// Poll AWS every 30 seconds
-	tileServers.StartPolling(ctx, 30*time.Second)
-
-	// 2. Create the Reverse Proxy with a custom Director
+	// Create the Reverse Proxy for the Tile Server with a custom Director
 	proxy := &httputil.ReverseProxy{
 		Director: func(req *http.Request) {
-			// Get next target from our load balancer
-			targetStr, err := tileServers.NextEndpoint()
-			if err != nil {
-				// If no backends, we can't really fail gracefully inside Director
-				// best effort is to log. The handler will eventually error out.
-				log.Printf("Proxy error: %v", err)
-				return
-			}
 
 			originalHost := req.Host
 
@@ -56,26 +35,21 @@ func main() {
 				originalHost = req.URL.Host // Fallback
 			}
 
-			// Parse the target URL (e.g. "http://10.0.1.5:8080")
-			// In a real app, you might parse these once and cache them,
-			// but parsing here is negligible for most tile loads.
-			targetURL, _ := url.Parse(targetStr)
-
 			// Rewrite the request to target the backend
-			req.URL.Scheme = targetURL.Scheme
-			req.URL.Host = targetURL.Host
+			req.URL.Scheme = "http"
+			req.URL.Host = "civil-tile-server:" + cfg.EgressPort
 
 			// Important: Update the Host header so the backend accepts it
-			req.Host = targetURL.Host
+			req.Host = "civil-tile-server"
 
-			// 3. TELL THE BACKEND THE TRUTH
-			// "The user actually typed 'civillabs.app'"
+			// TELL THE BACKEND THE TRUTH
+			// "The real host'"
 			req.Header.Set("X-Forwarded-Host", originalHost)
 
 			// "The user is using HTTPS (even if we are talking HTTP right now)"
 			req.Header.Set("X-Forwarded-Proto", "https")
 
-			// "This is the user's real IP" (Optional but good for logs)
+			// The user's real IP (Optional but good for logs)
 			req.Header.Set("X-Real-IP", req.RemoteAddr)
 
 			// Note: We do NOT touch req.URL.Path here.
@@ -105,7 +79,7 @@ func main() {
 
 	allowedClientIDs := []string{"civil-prototype-frontend"}
 
-	auth, err := RequireAuth(verbose, cfg.AuthServer, cfg.IDPLocalHostName, cfg.IDPLocalPort, cfg.Namespace, allowedClientIDs)
+	auth, err := RequireAuth(verbose, "civil-idp", cfg.EgressPort, allowedClientIDs)
 
 	parcelsServer := &ParcelServer{}
 
@@ -119,7 +93,7 @@ func main() {
 	mux.Handle(path, handler)
 
 	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), verbose))
-	mux.HandleFunc("/health", HealthCheckHandler(tileServers))
+	mux.HandleFunc("/health", HealthCheckHandler())
 
 	p := new(http.Protocols)
 	p.SetHTTP1(true)
@@ -127,12 +101,12 @@ func main() {
 	// Use h2c so we can serve HTTP/2 without TLS.
 	p.SetUnencryptedHTTP2(true)
 	s := http.Server{
-		Addr:      ":" + cfg.Port,
+		Addr:      ":" + cfg.IngressPort,
 		Handler:   mux,
 		Protocols: p,
 	}
 
-	log.Printf("Server listening on :%s", cfg.Port)
+	log.Printf("Server listening on :%s", cfg.IngressPort)
 
 	if err := s.ListenAndServe(); err != nil {
 		log.Fatal(err)

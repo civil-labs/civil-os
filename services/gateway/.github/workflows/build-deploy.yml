@@ -2,7 +2,7 @@ name: Build and Publish Container
 
 on:
   push:
-    branches: [ "master", "feat/dynamic-auth-server" ]
+    branches: [ "master", "feat/proxy" ]
   # Optional: Allows you to run this manually from the Actions tab
   workflow_dispatch:
 

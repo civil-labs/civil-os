@@ -79,7 +79,7 @@ func main() {
 
 	allowedClientIDs := []string{"civil-prototype-frontend"}
 
-	auth, err := RequireAuth(verbose, "civil-idp", cfg.EgressPort, allowedClientIDs)
+	auth, err := RequireAuth(verbose, cfg.AuthServer, "civil-idp", cfg.EgressPort, cfg.Namespace, allowedClientIDs)
 
 	parcelsServer := &ParcelServer{}
 

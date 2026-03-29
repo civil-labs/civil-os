@@ -11,7 +11,8 @@ type Config struct {
 	Verbose     string
 	IngressPort string
 	EgressPort  string
-	// Namespace               string
+	AuthServer  string
+	Namespace   string
 	// TileServerLocalHostName string
 	// IDPLocalPort            string
 	// IDPLocalHostName        string
@@ -45,7 +46,8 @@ func LoadConfig() (*Config, error) {
 		Verbose:     getEnv("CIVIL_VERBOSE", "false"),
 		IngressPort: getEnv("CIVIL_HTTP_PORT", "8080"),
 		EgressPort:  getEnv("CIVIL_EGRESS_PORT", "8082"),
-		// Namespace:               os.Getenv("CIVIL_CLOUD_MAP_NAMESPACE"),
+		AuthServer:  os.Getenv("CIVIL_AUTH_SERVER"),
+		Namespace:   os.Getenv("CIVIL_NAMESPACE"),
 		// TileServerLocalHostName: os.Getenv("CIVIL_TILE_SERVER_LOCAL_HOSTNAME"),
 		// IDPLocalHostName:        os.Getenv("CIVIL_IDP_LOCAL_HOSTNAME"),
 		// IDPLocalPort:            os.Getenv("CIVIL_IDP_LOCAL_PORT"),

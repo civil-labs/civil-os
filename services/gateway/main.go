@@ -93,7 +93,7 @@ func main() {
 	mux.Handle(path, handler)
 
 	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), verbose))
-	mux.HandleFunc("/health", HealthCheckHandler())
+	mux.HandleFunc("/health", HealthCheckHandler(verbose))
 
 	p := new(http.Protocols)
 	p.SetHTTP1(true)

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"log"
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -13,10 +13,12 @@ type HealthResponse struct {
 
 // HealthCheckHandler returns 200 if we have backends, In the future may
 // do further health introspection to downstream services
-func HealthCheckHandler() http.HandlerFunc {
+func HealthCheckHandler(verbose bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		log.Printf("Health check hit")
+		if verbose {
+			log.Printf("Health check hit")
+		}
 
 		// Prepare the response
 		resp := HealthResponse{

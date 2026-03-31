@@ -62,8 +62,8 @@ func getEnv(key, fallback string) string {
 }
 
 func getVerboseEnv() bool {
-	if _, exists := os.LookupEnv("CIVIL_VERBOSE"); exists {
-		verbose, err := strconv.ParseBool("CIVIL_VERBOSE")
+	if value, exists := os.LookupEnv("CIVIL_VERBOSE"); exists {
+		verbose, err := strconv.ParseBool(value)
 
 		if err != nil {
 			slog.Error("Failure in parsing CIVIL_VERBOSE. Defaulting to false", slog.Any("error", err))

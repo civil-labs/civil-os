@@ -66,7 +66,7 @@ func getVerboseEnv() bool {
 		verbose, err := strconv.ParseBool("CIVIL_VERBOSE")
 
 		if err != nil {
-			slog.Error("Failure in parsing CIVIL_VERBOSE. Defaulting to false")
+			slog.Error("Failure in parsing CIVIL_VERBOSE. Defaulting to false", slog.Any("error", err))
 			return false
 		}
 
@@ -84,7 +84,7 @@ func getAllowedClientIdsEnv() []string {
 			// Unmarshal the JSON string directly into the slice
 			err := json.Unmarshal([]byte(value), &clientIds)
 			if err != nil {
-				slog.Error("Failed to parse CIVIL_ALLOWED_CLIENT_IDS: %v. Defaulting to empty slice", err)
+				slog.Error("Failed to parse CIVIL_ALLOWED_CLIENT_IDS. Defaulting to empty slice", slog.Any("error", err))
 				return []string{}
 			}
 		}

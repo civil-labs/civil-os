@@ -27,6 +27,10 @@ type Claims struct {
 // RequireAuth is the middleware wrapper
 func RequireAuth(verbose bool, authServer string, localHostName string, localPort string, namespace string, allowedClientIDs []string) (func(http.Handler) http.Handler, error) {
 
+	if verbose {
+		log.Println("JWKS URL: " + "http://" + localHostName + "." + namespace + ":" + localPort + "/keys")
+	}
+
 	providerConfig := oidc.ProviderConfig{
 		IssuerURL:   "https://" + authServer,
 		AuthURL:     "https://" + authServer,
@@ -37,7 +41,6 @@ func RequireAuth(verbose bool, authServer string, localHostName string, localPor
 	}
 
 	if verbose {
-		log.Println("JWKS URL: " + "http://" + localHostName + "." + namespace + ":" + localPort + "/keys")
 		DumpRawJWKS(providerConfig.JWKSURL)
 	}
 

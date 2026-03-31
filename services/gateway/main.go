@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"log/slog"
+	"net"
 	"net/http"
 	"net/http/httputil"
 
@@ -51,7 +52,14 @@ func main() {
 			req.Header.Set("X-Forwarded-Proto", "https")
 
 			// The user's real IP (Optional but good for logs)
-			req.Header.Set("X-Real-IP", req.RemoteAddr)
+			// Safely extract JUST the IP address, dropping the ephemeral port
+			ip, _, err := net.SplitHostPort(req.RemoteAddr)
+			if err == nil {
+				req.Header.Set("X-Real-IP", ip)
+			} else {
+				// Fallback if RemoteAddr was somehow just an IP without a port
+				req.Header.Set("X-Real-IP", req.RemoteAddr)
+			}
 
 			// Note: We do NOT touch req.URL.Path here.
 			// It has already been stripped by the middleware below.

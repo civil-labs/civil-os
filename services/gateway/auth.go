@@ -37,6 +37,7 @@ func RequireAuth(verbose bool, authServer string, localHostName string, localPor
 	}
 
 	if verbose {
+		log.Println("JWKS URL: " + "http://" + localHostName + "." + namespace + ":" + localPort + "/keys")
 		DumpRawJWKS(providerConfig.JWKSURL)
 	}
 

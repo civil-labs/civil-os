@@ -1,9 +1,9 @@
 package main
 
 import (
-	//"fmt"
+	"fmt"
 	"os"
-	//"strings"
+	"strings"
 )
 
 // Config holds all the runtime configuration
@@ -19,38 +19,33 @@ type Config struct {
 }
 
 func LoadConfig() (*Config, error) {
-	// // Define the list of required environment variables
-	// required := []string{
-	// 	"CIVIL_CLOUD_MAP_NAMESPACE",
-	// 	"CIVIL_TILE_SERVER_LOCAL_HOSTNAME",
-	// 	"CIVIL_IDP_LOCAL_HOSTNAME",
-	// 	"CIVIL_IDP_LOCAL_PORT",
-	// }
+	// Define the list of required environment variables
+	required := []string{
+		"CIVIL_AUTH_SERVER",
+		"CIVIL_NAMESPACE",
+	}
 
-	// // Loop through and check for missing ones
-	// var missing []string
-	// for _, key := range required {
-	// 	if os.Getenv(key) == "" {
-	// 		missing = append(missing, key)
-	// 	}
-	// }
+	// Loop through and check for missing ones
+	var missing []string
+	for _, key := range required {
+		if os.Getenv(key) == "" {
+			missing = append(missing, key)
+		}
+	}
 
-	// // If any are missing, return a detailed error
-	// if len(missing) > 0 {
-	// 	return nil, fmt.Errorf("missing required environment variables: %s", strings.Join(missing, ", "))
-	// }
+	// If any are missing, return a detailed error
+	if len(missing) > 0 {
+		return nil, fmt.Errorf("missing required environment variables: %s", strings.Join(missing, ", "))
+	}
 
 	// Return the populated config struct
 	// You can also set defaults here for optional vars (like Port)
 	return &Config{
 		Verbose:     getEnv("CIVIL_VERBOSE", "false"),
-		IngressPort: getEnv("CIVIL_HTTP_PORT", "8080"),
+		IngressPort: getEnv("CIVIL_INGRESS_PORT", "8080"),
 		EgressPort:  getEnv("CIVIL_EGRESS_PORT", "8082"),
 		AuthServer:  os.Getenv("CIVIL_AUTH_SERVER"),
 		Namespace:   os.Getenv("CIVIL_NAMESPACE"),
-		// TileServerLocalHostName: os.Getenv("CIVIL_TILE_SERVER_LOCAL_HOSTNAME"),
-		// IDPLocalHostName:        os.Getenv("CIVIL_IDP_LOCAL_HOSTNAME"),
-		// IDPLocalPort:            os.Getenv("CIVIL_IDP_LOCAL_PORT"),
 	}, nil
 }
 

@@ -77,7 +77,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	allowedClientIDs := []string{"civil-prototype-frontend"}
+	allowedClientIDs := []string{"civil-prototype-frontend", "oidc-debugger"}
 
 	auth, err := RequireAuth(verbose, cfg.AuthServer, "idp", cfg.EgressPort, cfg.Namespace, allowedClientIDs)
 

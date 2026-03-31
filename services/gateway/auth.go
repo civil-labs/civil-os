@@ -25,18 +25,14 @@ type Claims struct {
 }
 
 // RequireAuth is the middleware wrapper
-func RequireAuth(verbose bool, authServer string, localHostName string, localPort string, namespace string, allowedClientIDs []string) (func(http.Handler) http.Handler, error) {
-
-	if verbose {
-		log.Println("JWKS URL: " + "http://" + localHostName + "." + namespace + ":" + localPort + "/keys")
-	}
+func RequireAuth(verbose bool, authServer string, idpAddress string, allowedClientIDs []string) (func(http.Handler) http.Handler, error) {
 
 	providerConfig := oidc.ProviderConfig{
 		IssuerURL:   "https://" + authServer,
 		AuthURL:     "https://" + authServer,
 		TokenURL:    "https://" + authServer + "/token",
 		UserInfoURL: "https://" + authServer + "/userinfo",
-		JWKSURL:     "http://" + localHostName + "." + namespace + ":" + localPort + "/keys",
+		JWKSURL:     "http://" + idpAddress + "/keys",
 		Algorithms:  []string{"RS256"}, // Dex uses RS256 by default
 	}
 
@@ -123,6 +119,10 @@ func RequireAuth(verbose bool, authServer string, localHostName string, localPor
 
 			// 4. Inject the claims into the request context
 			ctx := context.WithValue(r.Context(), userContextKey, claims)
+
+			if verbose {
+				log.Println("Authentication successful")
+			}
 
 			// Pass the request down the chain with the newly populated context
 			next.ServeHTTP(w, r.WithContext(ctx))

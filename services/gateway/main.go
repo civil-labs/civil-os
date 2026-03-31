@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 	"net/http/httputil"
-	"strconv"
 
 	"github.com/civil-labs/civil-api-go/civil/parcels/v1/parcelsv1connect"
 
@@ -35,12 +34,12 @@ func main() {
 				originalHost = req.URL.Host // Fallback
 			}
 
-			// Rewrite the request to target the backend
+			// Rewrite the request to target the tile server
 			req.URL.Scheme = "http"
-			req.URL.Host = "tile-server:" + cfg.EgressPort
+			req.URL.Host = cfg.TileServerAddress
 
-			// Important: Update the Host header so the backend accepts it
-			req.Host = "tile-server"
+			// Important: Update the Host header so the tile server accepts it
+			req.Host = cfg.TileServerAddress
 
 			// TELL THE BACKEND THE TRUTH
 			// "The real host'"
@@ -69,17 +68,7 @@ func main() {
 		},
 	}
 
-	// Handle the bool parse here, as the config function
-	// should pass it straight
-	verbose, err := strconv.ParseBool(cfg.Verbose)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	allowedClientIDs := []string{"civil-prototype-frontend", "oidc-debugger"}
-
-	auth, err := RequireAuth(verbose, cfg.AuthServer, "idp", cfg.EgressPort, cfg.Namespace, allowedClientIDs)
+	auth, err := RequireAuth(cfg.Verbose, cfg.AuthServer, cfg.IDPAddress, cfg.AllowedClientsIds)
 
 	parcelsServer := &ParcelServer{}
 
@@ -92,8 +81,8 @@ func main() {
 
 	mux.Handle(path, handler)
 
-	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), verbose))
-	mux.HandleFunc("/health", HealthCheckHandler(verbose))
+	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), cfg.Verbose))
+	mux.HandleFunc("/health", HealthCheckHandler(cfg.Verbose))
 
 	p := new(http.Protocols)
 	p.SetHTTP1(true)
@@ -101,12 +90,12 @@ func main() {
 	// Use h2c so we can serve HTTP/2 without TLS.
 	p.SetUnencryptedHTTP2(true)
 	s := http.Server{
-		Addr:      ":" + cfg.IngressPort,
+		Addr:      ":" + cfg.HttpPort,
 		Handler:   mux,
 		Protocols: p,
 	}
 
-	log.Printf("Server listening on :%s", cfg.IngressPort)
+	log.Printf("Server listening on :%s", cfg.HttpPort)
 
 	if err := s.ListenAndServe(); err != nil {
 		log.Fatal(err)

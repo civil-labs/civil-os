@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"log/slog"
 	"net/http"
 	"net/http/httputil"
 
@@ -18,8 +19,9 @@ func main() {
 		log.Fatalf("Configuration Error: %v", err)
 	}
 
-	// log.Printf("Starting proxy on port %s for Service: %s in Namespace: %s",
-	// 	cfg.Port, cfg.TileServerLocalHostName, cfg.Namespace)
+	if cfg.Verbose {
+		slog.Info("Starting proxy", slog.Any("address", cfg.TileServerAddress))
+	}
 
 	//ctx, cancel := context.WithCancel(context.Background())
 	//defer cancel()

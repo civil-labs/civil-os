@@ -48,9 +48,10 @@ service ParcelsService {
   // Retrieves specificied attributes about a parcel as an object.
   rpc GetParcelAttributes(GetParcelAttributesRequest) returns (GetParcelAttributesResponse) {}
 
+  // Retrieves a set of summary statistics about the specified numerical attribute for a specified list of parcels. Optionally returns the values as well
   rpc GetNumericalStats(GetNumericalStatsRequest) returns (GetNumericalStatsResponse) {}
 
-  // Retrieves a set of summary statistics about the specified attribute for a specified list of parcels. Optionally returns the values as well
+  // Retrieves a set of summary statistics about the specified categorical attribute for a specified list of parcels. Optionally returns the values as well
   rpc GetCategoricalStats(GetCategoricalStatsRequest) returns (GetCategoricalStatsResponse) {}
 }
 

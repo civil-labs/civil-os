@@ -6,7 +6,6 @@ base_path: '/tiles'
 postgres:
   connection_string: $DATABASE_URL
   auto_bounds: skip
-
-pool_size: 5
+  pool_size: 20
 
 web_ui: disable

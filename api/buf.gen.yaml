@@ -22,7 +22,9 @@ plugins:
     out: gen/openapi
     opt:
       - format=yaml
-      - path=civil-openapi.yaml # Point it all to one path to ensure that it generates one OpenAPI spec, but this is overridden in the CICD pipeline to allow for generating one spec for interal and one for public
+      # Point it all to one path to ensure that it generates one OpenAPI spec, 
+      # but this will be overridden in the CICD pipeline to allow for generating one spec for the mesh APIs and one for the public APIs
+      - path=civil-openapi.yaml 
       # In v0.25+, it's recommended to explicitly enable the features you're using
       - features=connectrpc;google.api.http;gnostic;protovalidate
 managed:

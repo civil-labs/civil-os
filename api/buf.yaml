@@ -4,8 +4,8 @@ version: v2
 modules:
   - path: proto/public
     name: buf.build/civillabs/civil-blueprints-public
-  - path: proto/internal
-    name: buf.build/civillabs/civil-blueprints-internal
+  - path: proto/mesh
+    name: buf.build/civillabs/civil-blueprints-mesh
 
 deps:
   - buf.build/bufbuild/protovalidate
@@ -15,7 +15,7 @@ deps:
 lint:
   use:
     - STANDARD
-    
+
 breaking:
   use:
     - FILE

@@ -1,14 +1,21 @@
-# For details on buf.yaml configuration, visit https://buf.build/docs/configuration/v2/buf-yaml
 version: v2
+
+# Define both modules from the centralized config
+modules:
+  - path: proto/public
+    name: buf.build/civillabs/civil-blueprints-public
+  - path: proto/internal
+    name: buf.build/civillabs/civil-blueprints-internal
+
 deps:
   - buf.build/bufbuild/protovalidate
   - buf.build/googleapis/googleapis
   - buf.build/gnostic/gnostic
-modules:
-  - path: proto
+
 lint:
   use:
     - STANDARD
+    
 breaking:
   use:
     - FILE

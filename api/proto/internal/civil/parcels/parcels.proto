@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package civil.parcels.v1;
+
+import "buf/validate/validate.proto";
+import "gnostic/openapi/v3/annotations.proto";
+import "google/protobuf/struct.proto";
+
+service ParcelsService {
+    // Retrieves a specified attribute value for a given parcel.
+    rpc GetParcelAttribute(GetParcelAttributeRequest) returns (GetParcelAttributeResponse) {}
+}
+
+message GetParcelAttributeRequest {
+  string parcel_id = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+
+  string attribute_name = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 63
+  }];
+}
+
+message GetParcelAttributeResponse {
+  string attribute_value = 3 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+}

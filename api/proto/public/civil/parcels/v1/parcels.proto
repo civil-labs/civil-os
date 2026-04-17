@@ -6,12 +6,12 @@ import "buf/validate/validate.proto";
 import "gnostic/openapi/v3/annotations.proto";
 import "google/protobuf/struct.proto";
 
-option go_package = "github.com/civil-labs/civil-api-go/civil/parcels/v1;parcelsv1";
+//option go_package = "github.com/civil-labs/civil-api-go/civil/parcels/v1;parcelsv1";
 option (gnostic.openapi.v3.document) = {
   info: {
     title: "Civil API"
     version: "0.0.2"
-    description: "API description for the Civil platform. Auth token can be retrieved by prefixing \"auth-\" to the beginning of your jurisdiction's endpoint."
+    description: "Public API description for the Civil platform. Auth token can be retrieved by prefixing \"auth-\" to the beginning of your jurisdiction's endpoint."
   }
 
   components: {
@@ -39,7 +39,7 @@ service ParcelsService {
   // Updates a specified attribute for one or more parcels, identified by their parcel IDs.
   rpc UpdateParcelsAttribute(UpdateParcelsAttributeRequest) returns (UpdateParcelsAttributeResponse) {}
 
-  // Retrieves all a specified parcel's attributes as an object.
+  // Retrieves all of a specified parcel's attributes as an object.
   rpc GetParcel(GetParcelRequest) returns (GetParcelResponse) {}
 
   // Retrieves a specified attribute value for a given parcel.

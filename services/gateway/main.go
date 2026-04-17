@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 
-	"github.com/civil-labs/civil-api-go/civil/parcels/v1/parcelsv1connect"
+	"github.com/civil-labs/civil-api-go/civil/public/parcels/v1/parcelsv1connect"
 
 	"connectrpc.com/connect"
 	"connectrpc.com/validate"

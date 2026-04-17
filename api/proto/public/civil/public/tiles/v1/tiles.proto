@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package civil.tiles.v1;
+package civil.public.tiles.v1;
 
 import "google/api/annotations.proto";
 

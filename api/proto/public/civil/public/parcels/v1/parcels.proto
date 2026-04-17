@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package civil.parcels.v1;
+package civil.public.parcels.v1;
 
 import "buf/validate/validate.proto";
 import "gnostic/openapi/v3/annotations.proto";

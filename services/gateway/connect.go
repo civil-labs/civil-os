@@ -17,6 +17,7 @@ import (
 
 type ParcelServer struct {
 	dbReaderClient meshparcelsv1connect.ParcelsServiceClient
+	logger         *slog.Logger
 }
 
 func (s *ParcelServer) UpdateParcelsAttribute(
@@ -41,6 +42,8 @@ func (s *ParcelServer) GetParcelAttribute(
 	ctx context.Context,
 	req *connect.Request[publicparcelsv1.GetParcelAttributeRequest],
 ) (*connect.Response[publicparcelsv1.GetParcelAttributeResponse], error) {
+
+	s.logger.Debug("received GetParcelAttribute request")
 
 	if req.Msg.ParcelId == "" {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("parcel ID is required"))

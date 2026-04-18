@@ -23,19 +23,19 @@ import (
 
 func main() {
 	// Create context, logger, and config first
-	_, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	_, cancelApp := context.WithCancel(context.Background())
+	defer cancelApp()
 
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
-	cfg, err := LoadConfig(logger)
+	config, err := LoadConfig(logger)
 	if err != nil {
 		logger.Error("failed to load config", slog.Any("error", err))
 		os.Exit(1)
 	}
 
-	if cfg.Verbose {
-		logger.Info("Starting proxy", slog.Any("address", cfg.TileServerAddress))
+	if config.Verbose {
+		logger.Info("Starting proxy", slog.Any("address", config.TileServerAddress))
 	}
 
 	// Create the Reverse Proxy for the Tile Server with a custom Director
@@ -50,10 +50,10 @@ func main() {
 
 			// Rewrite the request to target the tile server
 			req.URL.Scheme = "http"
-			req.URL.Host = cfg.TileServerAddress
+			req.URL.Host = config.TileServerAddress
 
 			// Update the Host header so the tile server accepts it
-			req.Host = cfg.TileServerAddress
+			req.Host = config.TileServerAddress
 
 			// TELL THE BACKEND THE TRUTH
 			// "The real host"
@@ -87,7 +87,7 @@ func main() {
 		},
 	}
 
-	auth, err := RequireAuth(cfg.Verbose, cfg.AuthServer, cfg.IDPAddress, cfg.AllowedClientsIds, logger)
+	auth, err := RequireAuth(config.Verbose, config.AuthServer, config.IDPAddress, config.AllowedClientsIds, logger)
 
 	meshClient := meshparcelsv1connect.NewParcelsServiceClient(
 		http.DefaultClient,
@@ -107,10 +107,10 @@ func main() {
 
 	mux.Handle(path, handler)
 
-	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), cfg.Verbose, logger))
-	mux.HandleFunc("/health", HealthCheckHandler(cfg.Verbose))
+	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), config.Verbose, logger))
+	mux.HandleFunc("/health", HealthCheckHandler(config.Verbose))
 
-	listenPort := fmt.Sprintf(":%d", cfg.Port)
+	listenPort := fmt.Sprintf(":%d", config.Port)
 
 	p := new(http.Protocols)
 	p.SetHTTP1(true)
@@ -123,38 +123,47 @@ func main() {
 		Protocols: p,
 	}
 
-	// Graceful Shutdown
+	shutdownSig := make(chan os.Signal, 1)
+	signal.Notify(shutdownSig, os.Interrupt, syscall.SIGTERM)
+
+	serverErr := make(chan error, 1)
+
+	// Start the HTTP server in a background goroutine
 	go func() {
-		quit := make(chan os.Signal, 1)
-		signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
-		<-quit // Block until a signal is received
+		logger.Info("starting connect server", slog.Int("port", int(config.Port)))
+		serverErr <- httpSrv.ListenAndServe()
+	}()
 
-		logger.Info("received shutdown signal. stopping ConnectRPC server gracefully...")
+	// This is inited by default to go's int zero value, zero
+	var exitCode int
 
-		// Create a timeout context. If active requests take longer than 15 seconds
-		// to finish, forcefully drop them so the container can be killed
+	// Block main() until something happens
+	select {
+	case err := <-serverErr:
+		// The server crashed prematurely
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			logger.Error("server crashed", slog.Any("error", err))
+			exitCode = 1
+		}
+	case sig := <-shutdownSig:
+		// Graceful shutdown signal received
+		logger.Info("received shutdown signal", slog.String("signal", sig.String()))
+
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 15*time.Second)
 		defer shutdownCancel()
 
-		// Trigger the HTTP shutdown
 		if err := httpSrv.Shutdown(shutdownCtx); err != nil {
-			logger.Error("server shutdown failed or timed out", slog.Any("error", err))
+			logger.Error("HTTP graceful shutdown failed", slog.Any("error", err))
+			exitCode = 1
 		}
-
-		cancel() // Invoke master cancel
-	}()
-
-	logger.Info("starting connect server", slog.Int("port", int(cfg.Port)))
-
-	err = httpSrv.ListenAndServe()
-
-	// Catch the exit. Ignore ErrServerClosed, as that means the graceful shutdown worked
-	if err != nil && !errors.Is(err, http.ErrServerClosed) {
-		logger.Error("Server crashed", slog.Any("error", err))
-		os.Exit(1)
 	}
 
-	logger.Info("graceful shutdown complete. exiting")
+	// This block runs no matter how the select statement unblocked.
+	slog.Info("stopping background workers...")
+	cancelApp()
+
+	slog.Info("teardown complete. exiting.")
+	os.Exit(exitCode)
 
 }
 

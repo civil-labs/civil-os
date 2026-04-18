@@ -103,12 +103,12 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	path, handler := parcelsv1connect.NewParcelsServiceHandler(
+	parcelsPath, parcelsHandler := parcelsv1connect.NewParcelsServiceHandler(
 		parcelsServer,
 		connect.WithInterceptors(validate.NewInterceptor()),
 	)
 
-	mux.Handle(path, handler)
+	mux.Handle(parcelsPath, CORSMiddleware(parcelsHandler, config.Verbose, logger))
 
 	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), config.Verbose, logger))
 	mux.HandleFunc("/health", HealthCheckHandler(config.Verbose))

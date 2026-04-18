@@ -88,11 +88,13 @@ func main() {
 		},
 	}
 
-	auth, err := RequireAuth(config.Verbose, config.AuthServer, config.IDPAddress, config.AllowedClientsIds, logger)
+	auth, err := RequireAuth(config.Verbose, config.AuthServer, config.IDPHost, config.AllowedClientsIds, logger)
+
+	dbReaderAddress := "http://" + config.DBReaderHost
 
 	meshClient := meshparcelsv1connect.NewParcelsServiceClient(
 		http.DefaultClient,
-		config.DBReaderAddress, // The Envoy-routable address for the db-reader service
+		dbReaderAddress, // The Envoy-routable address for the db-reader service
 	)
 
 	parcelsServer := &ParcelServer{

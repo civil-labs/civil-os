@@ -14,8 +14,8 @@ type Config struct {
 	Verbose           bool
 	Port              uint16
 	AuthServer        string
-	IDPAddress        string // Use local address here. Its where the gateway will make requests for JWKS
-	DBReaderAddress   string
+	IDPHost           string // Use local address here. Its where the gateway will make requests for JWKS
+	DBReaderHost      string
 	TileServerHost    string
 	AllowedClientsIds []string
 }
@@ -49,9 +49,9 @@ func LoadConfig(logger *slog.Logger) (*Config, error) {
 		Verbose:           getVerboseEnv(),
 		Port:              getPortEnv("CIVIL_PORT", 8080, logger),
 		AuthServer:        os.Getenv("CIVIL_AUTH_SERVER"),
-		IDPAddress:        os.Getenv("CIVIL_IDP_ADDRESS"),
+		IDPHost:           os.Getenv("CIVIL_IDP_HOST"),
 		TileServerHost:    os.Getenv("CIVIL_TILE_SERVER_HOST"),
-		DBReaderAddress:   os.Getenv("CIVIL_DB_READER_ADDRESS"),
+		DBReaderHost:      os.Getenv("CIVIL_DB_READER_HOST"),
 		AllowedClientsIds: getAllowedClientIdsEnv(),
 	}, nil
 }

@@ -26,14 +26,14 @@ type Claims struct {
 }
 
 // RequireAuth is the middleware wrapper
-func RequireAuth(verbose bool, authServer string, idpAddress string, allowedClientIDs []string, logger *slog.Logger) (func(http.Handler) http.Handler, error) {
+func RequireAuth(verbose bool, authServer string, idpHost string, allowedClientIDs []string, logger *slog.Logger) (func(http.Handler) http.Handler, error) {
 
 	providerConfig := oidc.ProviderConfig{
-		IssuerURL:   authServer,
-		AuthURL:     authServer,
-		TokenURL:    authServer + "/token",
-		UserInfoURL: authServer + "/userinfo",
-		JWKSURL:     idpAddress + "/keys",
+		IssuerURL:   "https://" + authServer,
+		AuthURL:     "https://" + authServer,
+		TokenURL:    "https://" + authServer + "/token",
+		UserInfoURL: "https://" + authServer + "/userinfo",
+		JWKSURL:     "http://" + idpHost + "/keys",
 		Algorithms:  []string{"RS256"}, // Dex uses RS256 by default
 	}
 

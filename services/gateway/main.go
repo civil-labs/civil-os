@@ -36,7 +36,7 @@ func main() {
 	}
 
 	if config.Verbose {
-		logger.Info("Starting proxy", slog.Any("address", config.TileServerAddress))
+		logger.Info("Starting proxy", slog.Any("address", config.TileServerHost))
 	}
 
 	// Create the Reverse Proxy for the Tile Server with a custom Director
@@ -51,10 +51,10 @@ func main() {
 
 			// Rewrite the request to target the tile server
 			req.URL.Scheme = "http"
-			req.URL.Host = config.TileServerAddress
+			req.URL.Host = config.TileServerHost
 
 			// Update the Host header so the tile server accepts it
-			req.Host = config.TileServerAddress
+			req.Host = config.TileServerHost
 
 			// TELL THE BACKEND THE TRUTH
 			// "The real host"
@@ -92,7 +92,7 @@ func main() {
 
 	meshClient := meshparcelsv1connect.NewParcelsServiceClient(
 		http.DefaultClient,
-		"http://db-reader", // The Envoy-routable address for the db-reader service
+		config.DBReaderAddress, // The Envoy-routable address for the db-reader service
 	)
 
 	parcelsServer := &ParcelServer{

@@ -16,7 +16,7 @@ type Config struct {
 	AuthServer        string
 	IDPAddress        string // Use local address here. Its where the gateway will make requests for JWKS
 	DBReaderAddress   string
-	TileServerAddress string
+	TileServerHost    string
 	AllowedClientsIds []string
 }
 
@@ -25,7 +25,7 @@ func LoadConfig(logger *slog.Logger) (*Config, error) {
 	required := []string{
 		"CIVIL_AUTH_SERVER",
 		"CIVIL_IDP_ADDRESS",
-		"CIVIL_TILE_SERVER_ADDRESS",
+		"CIVIL_TILE_SERVER_HOST",
 		"CIVIL_ALLOWED_CLIENT_IDS",
 		"CIVIL_DB_READER_ADDRESS",
 	}
@@ -50,7 +50,7 @@ func LoadConfig(logger *slog.Logger) (*Config, error) {
 		Port:              getPortEnv("CIVIL_PORT", 8080, logger),
 		AuthServer:        os.Getenv("CIVIL_AUTH_SERVER"),
 		IDPAddress:        os.Getenv("CIVIL_IDP_ADDRESS"),
-		TileServerAddress: os.Getenv("CIVIL_TILE_SERVER_ADDRESS"),
+		TileServerHost:    os.Getenv("CIVIL_TILE_SERVER_HOST"),
 		DBReaderAddress:   os.Getenv("CIVIL_DB_READER_ADDRESS"),
 		AllowedClientsIds: getAllowedClientIdsEnv(),
 	}, nil

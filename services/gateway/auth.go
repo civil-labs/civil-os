@@ -29,11 +29,11 @@ type Claims struct {
 func RequireAuth(verbose bool, authServer string, idpAddress string, allowedClientIDs []string, logger *slog.Logger) (func(http.Handler) http.Handler, error) {
 
 	providerConfig := oidc.ProviderConfig{
-		IssuerURL:   "https://" + authServer,
-		AuthURL:     "https://" + authServer,
-		TokenURL:    "https://" + authServer + "/token",
-		UserInfoURL: "https://" + authServer + "/userinfo",
-		JWKSURL:     "http://" + idpAddress + "/keys",
+		IssuerURL:   authServer,
+		AuthURL:     authServer,
+		TokenURL:    authServer + "/token",
+		UserInfoURL: authServer + "/userinfo",
+		JWKSURL:     idpAddress + "/keys",
 		Algorithms:  []string{"RS256"}, // Dex uses RS256 by default
 	}
 

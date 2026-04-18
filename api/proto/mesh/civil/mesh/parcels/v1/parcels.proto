@@ -7,8 +7,11 @@ import "buf/validate/validate.proto";
 // import "google/protobuf/struct.proto";
 
 service ParcelsService {
-    // Retrieves a specified attribute value for a given parcel.
+    // Retrieves the value for a specified attribute for a given parcel
     rpc GetParcelAttribute(GetParcelAttributeRequest) returns (GetParcelAttributeResponse) {}
+
+    // Retrieves the value for a specified property for a given parcel
+    rpc GetParcelProperty(GetParcelPropertyRequest) returns (GetParcelPropertyResponse) {}
 }
 
 message GetParcelAttributeRequest {
@@ -25,6 +28,25 @@ message GetParcelAttributeRequest {
 
 message GetParcelAttributeResponse {
   string attribute_value = 3 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+}
+
+message GetParcelPropertyRequest {
+  string parcel_id = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+
+  string property_name = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 63
+  }];
+}
+
+message GetParcelPropertyResponse {
+  string property_value = 3 [(buf.validate.field).string = {
     min_len: 1
     max_len: 256
   }];

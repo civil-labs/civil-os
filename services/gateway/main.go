@@ -99,6 +99,7 @@ func main() {
 
 	parcelsServer := &ParcelServer{
 		dbReaderClient: meshClient,
+		logger:         logger,
 	}
 
 	mux := http.NewServeMux()

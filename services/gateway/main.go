@@ -2,12 +2,16 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/civil-labs/civil-api-go/civil/public/parcels/v1/parcelsv1connect"
 
@@ -113,18 +117,44 @@ func main() {
 
 	// Use h2c so we can serve HTTP/2 without TLS.
 	p.SetUnencryptedHTTP2(true)
-	s := http.Server{
+	httpSrv := http.Server{
 		Addr:      listenPort,
 		Handler:   mux,
 		Protocols: p,
 	}
 
+	// Graceful Shutdown
+	go func() {
+		quit := make(chan os.Signal, 1)
+		signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+		<-quit // Block until a signal is received
+
+		logger.Info("received shutdown signal. stopping ConnectRPC server gracefully...")
+
+		// Create a timeout context. If active requests take longer than 15 seconds
+		// to finish, forcefully drop them so the container can be killed
+		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 15*time.Second)
+		defer shutdownCancel()
+
+		// Trigger the HTTP shutdown
+		if err := httpSrv.Shutdown(shutdownCtx); err != nil {
+			logger.Error("server shutdown failed or timed out", slog.Any("error", err))
+		}
+
+		cancel() // Invoke master cancel
+	}()
+
 	logger.Info("starting connect server", slog.Int("port", int(cfg.Port)))
 
-	if err := s.ListenAndServe(); err != nil {
+	err = httpSrv.ListenAndServe()
+
+	// Catch the exit. Ignore ErrServerClosed, as that means the graceful shutdown worked
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		logger.Error("Server crashed", slog.Any("error", err))
 		os.Exit(1)
 	}
+
+	logger.Info("graceful shutdown complete. exiting")
 
 }
 

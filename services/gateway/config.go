@@ -12,20 +12,22 @@ import (
 // Config holds all the runtime configuration
 type Config struct {
 	Verbose           bool
-	HttpPort          string
+	Port              uint16
 	AuthServer        string
 	IDPAddress        string // Use local address here. Its where the gateway will make requests for JWKS
+	DBReaderAddress   string
 	TileServerAddress string
 	AllowedClientsIds []string
 }
 
-func LoadConfig() (*Config, error) {
+func LoadConfig(logger *slog.Logger) (*Config, error) {
 	// Define the list of required environment variables
 	required := []string{
 		"CIVIL_AUTH_SERVER",
 		"CIVIL_IDP_ADDRESS",
 		"CIVIL_TILE_SERVER_ADDRESS",
 		"CIVIL_ALLOWED_CLIENT_IDS",
+		"CIVIL_DB_READER_ADDRESS",
 	}
 
 	// Loop through and check for missing ones
@@ -45,10 +47,11 @@ func LoadConfig() (*Config, error) {
 	// You can also set defaults here for optional vars (like Port)
 	return &Config{
 		Verbose:           getVerboseEnv(),
-		HttpPort:          getEnv("CIVIL_HTTP_PORT", "8080"),
+		Port:              getPortEnv("CIVIL_PORT", 8080, logger),
 		AuthServer:        os.Getenv("CIVIL_AUTH_SERVER"),
 		IDPAddress:        os.Getenv("CIVIL_IDP_ADDRESS"),
 		TileServerAddress: os.Getenv("CIVIL_TILE_SERVER_ADDRESS"),
+		DBReaderAddress:   os.Getenv("CIVIL_DB_READER_ADDRESS"),
 		AllowedClientsIds: getAllowedClientIdsEnv(),
 	}, nil
 }
@@ -74,6 +77,22 @@ func getVerboseEnv() bool {
 	}
 
 	return false
+}
+
+func getPortEnv(key string, fallback uint16, logger *slog.Logger) uint16 {
+	if value, exists := os.LookupEnv(key); exists {
+		var intValue, err = strconv.ParseUint(value, 10, 16)
+
+		if err != nil {
+			logger.Warn("Failure in parsing integer. Falling back to default", slog.Any("error", err), slog.Int("applied_default", int(fallback)))
+			return fallback
+		}
+
+		return uint16(intValue)
+	} else {
+		return fallback
+	}
+
 }
 
 func getAllowedClientIdsEnv() []string {

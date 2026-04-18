@@ -1,31 +1,38 @@
 package main
 
 import (
-	"log"
+	"context"
+	"fmt"
 	"log/slog"
 	"net"
 	"net/http"
 	"net/http/httputil"
+	"os"
 
 	"github.com/civil-labs/civil-api-go/civil/public/parcels/v1/parcelsv1connect"
+
+	meshparcelsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/parcels/v1/parcelsv1connect"
 
 	"connectrpc.com/connect"
 	"connectrpc.com/validate"
 )
 
 func main() {
-	cfg, err := LoadConfig()
+	// Create context, logger, and config first
+	_, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
+	cfg, err := LoadConfig(logger)
 	if err != nil {
-		// Log fatal ensures the app exits with a non-zero status code
-		log.Fatalf("Configuration Error: %v", err)
+		logger.Error("failed to load config", slog.Any("error", err))
+		os.Exit(1)
 	}
 
 	if cfg.Verbose {
-		slog.Info("Starting proxy", slog.Any("address", cfg.TileServerAddress))
+		logger.Info("Starting proxy", slog.Any("address", cfg.TileServerAddress))
 	}
-
-	//ctx, cancel := context.WithCancel(context.Background())
-	//defer cancel()
 
 	// Create the Reverse Proxy for the Tile Server with a custom Director
 	proxy := &httputil.ReverseProxy{
@@ -41,11 +48,11 @@ func main() {
 			req.URL.Scheme = "http"
 			req.URL.Host = cfg.TileServerAddress
 
-			// Important: Update the Host header so the tile server accepts it
+			// Update the Host header so the tile server accepts it
 			req.Host = cfg.TileServerAddress
 
 			// TELL THE BACKEND THE TRUTH
-			// "The real host'"
+			// "The real host"
 			req.Header.Set("X-Forwarded-Host", originalHost)
 
 			// "The user is using HTTPS (even if we are talking HTTP right now)"
@@ -61,8 +68,6 @@ func main() {
 				req.Header.Set("X-Real-IP", req.RemoteAddr)
 			}
 
-			// Note: We do NOT touch req.URL.Path here.
-			// It has already been stripped by the middleware below.
 		},
 
 		// This is needed to strip off any conflicting header details that the Tile Server attaches
@@ -78,9 +83,16 @@ func main() {
 		},
 	}
 
-	auth, err := RequireAuth(cfg.Verbose, cfg.AuthServer, cfg.IDPAddress, cfg.AllowedClientsIds)
+	auth, err := RequireAuth(cfg.Verbose, cfg.AuthServer, cfg.IDPAddress, cfg.AllowedClientsIds, logger)
 
-	parcelsServer := &ParcelServer{}
+	meshClient := meshparcelsv1connect.NewParcelsServiceClient(
+		http.DefaultClient,
+		"http://db-reader", // The Envoy-routable address for the db-reader service
+	)
+
+	parcelsServer := &ParcelServer{
+		dbReaderClient: meshClient,
+	}
 
 	mux := http.NewServeMux()
 
@@ -91,8 +103,10 @@ func main() {
 
 	mux.Handle(path, handler)
 
-	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), cfg.Verbose))
+	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), cfg.Verbose, logger))
 	mux.HandleFunc("/health", HealthCheckHandler(cfg.Verbose))
+
+	listenPort := fmt.Sprintf(":%d", cfg.Port)
 
 	p := new(http.Protocols)
 	p.SetHTTP1(true)
@@ -100,24 +114,25 @@ func main() {
 	// Use h2c so we can serve HTTP/2 without TLS.
 	p.SetUnencryptedHTTP2(true)
 	s := http.Server{
-		Addr:      ":" + cfg.HttpPort,
+		Addr:      listenPort,
 		Handler:   mux,
 		Protocols: p,
 	}
 
-	log.Printf("Server listening on :%s", cfg.HttpPort)
+	logger.Info("starting connect server", slog.Int("port", int(cfg.Port)))
 
 	if err := s.ListenAndServe(); err != nil {
-		log.Fatal(err)
+		logger.Error("Server crashed", slog.Any("error", err))
+		os.Exit(1)
 	}
 
 }
 
-func CORSMiddleware(next http.Handler, verbose bool) http.Handler {
+func CORSMiddleware(next http.Handler, verbose bool, logger *slog.Logger) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		if verbose {
-			log.Println("CORS middleware activated")
+			logger.Info("CORS middleware activated")
 		}
 
 		// 1. ALWAYS set headers (Success, Failure, or Preflight)

@@ -24,10 +24,10 @@ func LoadConfig(logger *slog.Logger) (*Config, error) {
 	// Define the list of required environment variables
 	required := []string{
 		"CIVIL_AUTH_SERVER",
-		"CIVIL_IDP_ADDRESS",
+		"CIVIL_IDP_HOST",
 		"CIVIL_TILE_SERVER_HOST",
 		"CIVIL_ALLOWED_CLIENT_IDS",
-		"CIVIL_DB_READER_ADDRESS",
+		"CIVIL_DB_READER_HOST",
 	}
 
 	// Loop through and check for missing ones

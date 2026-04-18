@@ -18,6 +18,7 @@ import (
 	meshparcelsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/parcels/v1/parcelsv1connect"
 
 	"connectrpc.com/connect"
+	"connectrpc.com/grpchealth"
 	"connectrpc.com/validate"
 )
 
@@ -109,6 +110,15 @@ func main() {
 
 	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), config.Verbose, logger))
 	mux.HandleFunc("/health", HealthCheckHandler(config.Verbose))
+
+	// Pass the fully qualified name of the service so the health check
+	// can report on this specific service, as well as the global server status.
+	checker := grpchealth.NewStaticChecker(
+		parcelsv1connect.ParcelsServiceName,
+	)
+
+	healthPath, healthHandler := grpchealth.NewHandler(checker)
+	mux.Handle(healthPath, healthHandler)
 
 	listenPort := fmt.Sprintf(":%d", config.Port)
 

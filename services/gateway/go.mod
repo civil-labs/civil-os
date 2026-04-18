@@ -4,6 +4,7 @@ go 1.26.1
 
 require (
 	connectrpc.com/connect v1.19.1
+	connectrpc.com/grpchealth v1.4.0
 	connectrpc.com/validate v0.6.0
 	github.com/aws/aws-sdk-go-v2 v1.41.1
 	github.com/aws/aws-sdk-go-v2/config v1.32.7

@@ -61,7 +61,7 @@ func (s *ParcelServer) GetParcelAttribute(
 	if err != nil {
 		// ConnectRPC automatically handles wrapping standard gRPC error codes
 		// You might want to log the internal error here, but return a sanitized error to the public client
-		slog.Error("GetParcelAttribute request failed", slog.Any("error", err))
+		slog.Error("upstream GetParcelAttribute request failed", slog.Any("error", err))
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 

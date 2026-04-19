@@ -45,16 +45,17 @@ func (s *ParcelServer) GetParcelAttribute(
 
 	s.logger.Debug("received GetParcelAttribute request")
 
-	if req.Msg.ParcelId == "" {
+	if req.Msg.GetParcelId() == "" {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("parcel ID is required"))
 	}
 
-	if req.Msg.AttributeName == "" {
+	if req.Msg.GetAttributeName() == "" {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("attribute name is required"))
 	}
 
 	meshReq := connect.NewRequest(&meshparcelsv1.GetParcelAttributeRequest{
-		ParcelId: req.Msg.GetParcelId(),
+		ParcelId:      req.Msg.GetParcelId(),
+		AttributeName: req.Msg.GetAttributeName(),
 	})
 
 	meshRes, err := s.dbReaderClient.GetParcelAttribute(ctx, meshReq)

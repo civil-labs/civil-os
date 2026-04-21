@@ -32,7 +32,8 @@ option (gnostic.openapi.v3.document) = {
   }
 
   servers: [
-    {url: "https://leepa.civillabs.app"}]
+    {url: "https://leepa.civillabs.app"},
+    {url: "https://louisville.civillabs.app"}]
 };
 
 service ParcelsService {

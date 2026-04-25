@@ -75,7 +75,14 @@ message GetParcelRequest {
 }
 
 message GetParcelResponse {
-  google.protobuf.Struct parcel_attributes = 1;
+  string parcel_id = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 256
+  }];
+
+  float parcel_area_sq_m
+
+  string parcel_owner
 }
 
 message GetParcelAttributesRequest {

@@ -1,3 +1,6 @@
+##############################
+### Extensions
+##############################
 schema "public" {
   comment = "standard public schema"
 }
@@ -6,1164 +9,679 @@ extension "postgis" {
   schema = schema.public
 }
 
-// Entity tables
+extension "btree_gist" {
+  schema = schema.public
+}
 
+##############################
+### System Settings
+##############################
+table "system_settings" {
+  schema = schema.public
+
+  column "system_setting_id" {
+    type = int
+    null = false
+    default = 1
+  }
+
+  column "base_currency" {
+    type = char(3)
+    null = false
+    default = "USD"
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [column.system_setting_id]
+  }
+
+  check "enforce_single_row" {
+    expr = "system_setting_id = 1"
+  }
+}
+
+table "system_settings_history" {
+  schema = schema.public
+
+  column "system_setting_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "system_setting_id" {
+    type = int
+    null = false
+  }
+
+  column "base_currency" {
+    type = char(3)
+    null = false
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [column.system_setting_history_id]
+  }
+}
+
+##############################
+### Parcels
+##############################
+
+// Domain Anchor
 table "parcels" {
   schema = schema.public
 
   column "parcel_id" {
-    null = false
     type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
   }
 
   column "public_id" {
-    null = false
     type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
   }
 
   column "legacy_id" {
-    null = true
     type = text
+    null = true
   }
 
-  column "geom_web" {
+  column "is_voided" {
+    type = boolean
     null = false
-    type = sql("geometry(MultiPolygon, 4326)")
+    default = false
   }
 
-  column "geom_legal" {
+  column "voided_at" {
+    type = timestamptz
     null = true
-    type = sql("geometry(MultiPolygon)")
   }
 
-  column "local_srid" {
-    null = true
-    type = int
-  }
-
-  column "updated_at" {
+  column "system_updated_at" {
+    type = timestamptz
     null = false
     default = sql("now()")
-    type = timestamptz
   }
 
   primary_key {
-    columns = [column.parcel_id]
+    columns = [ column.parcel_id ]
+  }
+
+  index "idx_parcels_public_id" {
+    unique  = true
+    columns = [column.public_id]
+  }
+
+  check "chk_voided_logic" {
+    expr = "(is_voided = false AND voided_at IS NULL) OR (is_voided = true AND voided_at IS NOT NULL)"
   }
 }
 
-table "parcel_attributes" {
-  schema = schema.public
-
-  column "parcel_id" {
-    null = false
-    type = bigint
-  }
-
-  column "owner_id" {
-    null = false
-    type = bigint
-  }
-
-  column "address_id" {
-    null = false
-    type = bigint
-  }
-
-  column "land_area_sq_m" {
-    null = false
-    type = double_precision
-  }
-
-  column "zoning_id" {
-    null = true
-    type = bigint
-  }
-
-  column "land_use_id" {
-    null = true
-    type = bigint
-  }
-
-  column "neighborhood_id" {
-    null = true
-    type = bigint
-  }
-
-  column "market_area_id" {
-    null = true
-    type = bigint
-  }
-
-  column "properties" {
-    null = true
-    type = jsonb
-  }
-
-  column "updated_at" {
-    null = false
-    default = sql("now()")
-    type = timestamptz
-  }
-
-  primary_key {
-    columns = [column.parcel_id]
-  }
-
-  foreign_key "fk_parcel_id" {
-    columns = [column.parcel_id]
-    ref_columns = [table.parcels.column.parcel_id]
-  }
-
-  foreign_key "fk_owner_id" {
-    columns = [column.owner_id]
-    ref_columns = [table.owners.column.owner_id]
-  }
-
-  foreign_key "fk_address_id" {
-    columns = [column.address_id]
-    ref_columns = [table.addresses.column.address_id]
-  }
-
-  foreign_key "fk_zoning_id" {
-    columns = [column.zoning_id]
-    ref_columns = [table.zoning.column.zoning_id]
-  }
-
-  foreign_key "fk_land_use_id" {
-    columns = [column.land_use_id]
-    ref_columns = [table.land_uses.column.land_use_id]
-  }
-
-  foreign_key "fk_neighborhood_id" {
-    columns = [column.neighborhood_id]
-    ref_columns = [table.neighborhoods.column.neighborhood_id]
-  }
-
-  foreign_key "fk_market_area_id" {
-    columns = [column.market_area_id]
-    ref_columns = [table.market_areas.column.market_area_id]
-  }
-}
-
-table "improvements" {
-  schema = schema.public
-
-  column "improvement_id" {
-    null = false
-    type = bigint
-  }
-
-  column "public_id" {
-    null = false
-    type = uuid
-  }
-
-  column "legacy_id" {
-    null = true
-    type = text
-  }
-
-  column "geom_web" {
-    null = false
-    type = sql("geometry(MultiPolygonZ, 4326)")
-  }
-
-  column "geom_legal" {
-    null = true
-    type = sql("geometry(MultiPolygonZ)")
-  }
-
-  column "local_horizontal_srid" {
-    null = true
-    type = int
-  }
-
-  column "local_vertical_datum" {
-    null = true
-    type = text
-  }
-
-  column "updated_at" {
-    null = false
-    default = sql("now()")
-    type = timestamptz
-  }
-
-  primary_key {
-    columns = [column.improvement_id]
-  }
-}
-
-table "improvement_attributes" {
-  schema = schema.public
-
-  column "improvement_id" {
-    null = false
-    type = bigint
-  }
-
-  column "owner_id" {
-    null = false
-    type = bigint
-  }
-
-  column "address_id" {
-    null = false
-    type = bigint
-  }
-
-  column "area_sq_m" {
-    null = true
-    type = double_precision
-  }
-
-  column "bathrooms" {
-    null = true
-    type = int
-  }
-
-  column "bedrooms" {
-    null = true
-    type = int
-  }
-
-  column "year_built" {
-    null = true
-    type = int
-  }
-
-  column "condition_num" {
-    null = true
-    type = int
-  }
-
-  column "units" {
-    null = true
-    type = int
-  }
-
-    column "properties" {
-    null = true
-    type = jsonb
-  }
-
-  column "updated_at" {
-    null = false
-    default = sql("now()")
-    type = timestamptz
-  }
-
-  primary_key {
-    columns = [column.improvement_id]
-  }
-
-  foreign_key "fk_improvement_id" {
-    columns = [column.improvement_id]
-    ref_columns = [table.improvements.column.improvement_id]
-  }
-
-  foreign_key "fk_owner_id" {
-    columns = [column.owner_id]
-    ref_columns = [table.owners.column.owner_id]
-  }
-
-  foreign_key "fk_address_id" {
-    columns = [column.address_id]
-    ref_columns = [table.addresses.column.address_id]
-  }
-}
-
-table "owners" {
-  schema = schema.public
-
-  column "owner_id" {
-    null = false
-    type = bigint
-  }
-
-  column "public_id" {
-    null = false
-    type = uuid
-  }
-
-  column "legacy_id" {
-    null = true
-    type = text
-  }
-
-  column "name" {
-    null = false
-    type = text
-  }
-
-  column "address_id" {
-    null = true
-    type = bigint
-  }
-
-  column "updated_at" {
-    null = false
-    default = sql("now()")
-    type = timestamptz
-  }
-
-  primary_key {
-    columns = [column.owner_id]
-  }
-
-  foreign_key "fk_address_id" {
-    columns = [column.address_id]
-    ref_columns = [table.addresses.column.address_id]
-  }
-}
-
-table "addresses" {
-  schema = schema.public
-
-  column "address_id" {
-    null = false
-    type = bigint
-  }
-
-  column "public_id" {
-    null = false
-    type = uuid
-  }
-
-  column "country_code_id" {
-    null = false
-    type = bigint
-  }
-
-  column "administrative_area" {
-    null = true
-    type = text
-  }
-
-  column "locality" {
-    null = true
-    type = text
-  }
-
-  column "sublocality" {
-    null = true
-    type = text
-  }
-
-  column "postal_code" {
-    null = true
-    type = text
-  }
-
-  column "address_line_1" {
-    null = true
-    type = text
-  }
-
-  column "address_line_2" {
-    null = true
-    type = text
-  }
-
-  column "address_line_3" {
-    null = true
-    type = text
-  }
-
-  column "formatted_address" {
-    null = false
-    type = text
-  }
-
-  column "coordinates" {
-    null = false
-    type = sql("geometry(Point, 4326)")
-  }
-
-  column "updated_at" {
-    null = false
-    default = sql("now()")
-    type = timestamptz
-  }
-
-  primary_key {
-    columns = [column.address_id]
-  }
-
-  foreign_key "fk_country_code_id" {
-    columns = [column.country_code_id]
-    ref_columns = [table.country_codes.column.country_code_id]
-  }
-}
-
-// Event tables
-table "sales" {
-  schema = schema.public
-
-  column "sale_id" {
-    null = false
-    type = bigint
-  }
-
-  column "public_id" {
-    null = false
-    type = uuid
-  }
-
-  column "legacy_id" {
-    null = true
-    type = text
-  }
-
-  column "seller_id" {
-    null = false
-    type = bigint
-  }
-
-  column "buyer_id" {
-    null = false
-    type = bigint
-  }
-
-  column "sale_date" {
-    null = false
-    type = timestamptz
-  }
-
-  column "sale_price" {
-    null = false
-    type = money
-  }
-
-  column "sale_deed_book" {
-    null = true
-    type = text
-  }
-
-  column "sale_deed_page" {
-    null = true
-    type = text
-  }
-
-  column "sale_deed_uri" {
-    null = true
-    type = text
-  }
-
-  primary_key {
-    columns = [column.sale_id]
-  }
-
-  foreign_key "fk_seller_id" {
-    columns = [column.seller_id]
-    ref_columns = [table.owners.column.owner_id]
-  }
-
-  foreign_key "fk_buyer_id" {
-    columns = [column.buyer_id]
-    ref_columns = [table.owners.column.owner_id]
-  }
-}
-
-table "valuations" {
-  schema = schema.public
-
-  column "valuation_id" {
-    null = false
-    type = bigint    
-  }
-
-  column "valuation_amount" {
-    null = false
-    type = money
-  }
-
-  column "valuation_date" {
-    null = false
-    type = timestamptz
-  }
-
-  primary_key {
-    columns = [column.valuation_id]
-  }
-}
-
-// Linking tables
-table "parcel_improvements" {
-  schema = schema.public
-
-  column "parcel_id" {
-    null = false
-    type = bigint
-  }
-
-  column "improvement_id" {
-    null = false
-    type = bigint
-  }
-
-  primary_key {
-    columns = [column.parcel_id, column.improvement_id]
-  }
-
-
-  foreign_key "fk_parcel_id" {
-    columns = [column.parcel_id]
-    ref_columns = [table.parcels.column.parcel_id]
-  }
-
-  foreign_key "fk_improvement_id" {
-    columns = [column.improvement_id]
-    ref_columns = [table.improvements.column.improvement_id]
-  }
-}
-
-table "parcel_sales" {
-  schema = schema.public
-
-  column "parcel_id" {
-    null = false
-    type = bigint
-  }
-
-  column "sale_id" {
-    null = false
-    type = bigint
-  }
-
-  primary_key {
-    columns = [column.parcel_id, column.sale_id]
-  }
-
-  foreign_key "fk_parcel_id" {
-    columns = [column.parcel_id]
-    ref_columns = [table.parcels.column.parcel_id]
-  }
-
-  foreign_key "fk_sale_id" {
-    columns = [column.sale_id]
-    ref_columns = [table.sales.column.sale_id]
-  }
-
-}
-
-table "improvement_sales" {
-  schema = schema.public
-
-  column "improvement_id" {
-    null = false
-    type = bigint
-  }
-
-  column "sale_id" {
-    null = false
-    type = bigint
-  }
-
-  primary_key {
-    columns = [column.improvement_id, column.sale_id]
-  }
-
-  foreign_key "fk_improvement_id" {
-    columns = [column.improvement_id]
-    ref_columns = [table.improvements.column.improvement_id]
-  }
-
-  foreign_key "fk_sale_id" {
-    columns = [column.sale_id]
-    ref_columns = [table.sales.column.sale_id]
-  }
-
-}
-
-table "parcel_valuations" {
-  schema = schema.public
-
-  column "parcel_id" {
-    null = false
-    type = bigint
-  }
-
-  column "valuation_id" {
-    null = false
-    type = bigint
-  }
-
-  primary_key {
-    columns = [column.parcel_id, column.valuation_id]
-  }
-
-  foreign_key "fk_parcel_id" {
-    columns = [column.parcel_id]
-    ref_columns = [table.parcels.column.parcel_id]
-  }
-
-  foreign_key "fk_valuation_id" {
-    columns = [column.valuation_id]
-    ref_columns = [table.valuations.column.valuation_id]
-  }
-
-}
-
-table "improvement_valuations" {
-  schema = schema.public
-
-  column "improvement_id" {
-    null = false
-    type = bigint
-  }
-
-  column "valuation_id" {
-    null = false
-    type = bigint
-  }
-
-  primary_key {
-    columns = [column.improvement_id, column.valuation_id]
-  }
-
-  foreign_key "fk_improvement_id" {
-    columns = [column.improvement_id]
-    ref_columns = [table.improvements.column.improvement_id]
-  }
-
-  foreign_key "fk_valuation_id" {
-    columns = [column.valuation_id]
-    ref_columns = [table.valuations.column.valuation_id]
-  }
-
-}
-
-// Lookup tables
-table "country_codes" {
-  schema = schema.public
-
-  column "country_code_id" {
-    null = false
-    type = bigint
-  }
-
-  column "country_code" {
-    null = false
-    type = char(2)
-  }
-
-  primary_key {
-    columns = [column.country_code_id]
-  }
-}
-
-table "zoning" {
-  schema = schema.public
-
-  column "zoning_id" {
-    null = false
-    type = bigint
-  }
-
-  column "name" {
-    null = false
-    type = text
-  }
-
-  primary_key {
-    columns = [column.zoning_id]
-  }
-}
-
-table "land_uses" {
-  schema = schema.public
-
-  column "land_use_id" {
-    null = false
-    type = bigint
-  }
-
-  column "name" {
-    null = false
-    type = text
-  }
-
-  primary_key {
-    columns = [column.land_use_id]
-  }
-}
-
-table "neighborhoods" {
-  schema = schema.public
-
-  column "neighborhood_id" {
-    null = false
-    type = bigint
-  }
-
-  column "name" {
-    null = false
-    type = text
-  }
-
-  primary_key {
-    columns = [column.neighborhood_id]
-  }
-}
-
-table "market_areas" {
-  schema = schema.public
-
-  column "market_area_id" {
-    null = false
-    type = bigint
-  }
-
-  column "name" {
-    null = false
-    type = text
-  }
-
-  primary_key {
-    columns = [column.market_area_id]
-  }
-}
-
-// History (shadow) tables
 table "parcels_history" {
   schema = schema.public
 
-  column "parcel_id" {
-    null = false
+  column "parcel_history_id" {
     type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "parcel_id" {
+    type = bigint
+    null = false
   }
 
   column "public_id" {
-    null = false
     type = uuid
+    null = false
   }
 
   column "legacy_id" {
-    null = true
     type = text
+    null = true
+  }
+
+  column "is_voided" {
+    type = boolean
+    null = false
+  }
+
+  column "voided_at" {
+    type = timestamptz
+    null = true
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.parcel_history_id ]
+  }
+
+  index "idx_parcels_history_parcel_id" {
+    columns = [column.parcel_id]
+  }
+}
+
+// Geometry
+table "parcel_geometry" {
+  schema = schema.public
+
+  column "parcel_geometry_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "parcel_id" {
+    type = bigint
+    null = false
   }
 
   column "geom_web" {
-    null = false
     type = sql("geometry(MultiPolygon, 4326)")
+    null = false
   }
 
   column "geom_legal" {
-    null = true
     type = sql("geometry(MultiPolygon)")
+    null = true
   }
 
   column "local_srid" {
-    null = true
     type = int
+    null = true
   }
 
-  column "start_at" {
+  column "legal_valid_range" {
+    type = tstzrange
     null = false
-    type = timestamptz
   }
 
-  column "end_at" {
+  column "system_updated_at" {
+    type = timestamptz
     null = false
     default = sql("now()")
-    type = timestamptz
   }
 
   primary_key {
-    columns = [column.parcel_id]
+    columns = [ column.parcel_geometry_id ]
   }
 
   foreign_key "fk_parcel_id" {
     columns = [column.parcel_id]
     ref_columns = [table.parcels.column.parcel_id]
+    on_delete = RESTRICT
   }
 
+  index "idx_geom_web_parcel_geometry" {
+    type = GIST
+
+    on {
+      column = column.geom_web
+    }
+  }
+
+  exclude "no_overlapping_parcel_geometry" {
+    type = GIST
+    on {
+      column = column.parcel_id
+      op = "="
+    }
+    on {
+      column = column.legal_valid_range
+      op = "&&"
+    }
+  }
 }
 
-table "parcel_attributes_history" {
+table "parcel_geometry_history" {
   schema = schema.public
+
+  column "parcel_geometry_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "parcel_geometry_id" {
+    type = bigint
+    null = false
+  }
 
   column "parcel_id" {
-    null = false
     type = bigint
-  }
-
-  column "owner_id" {
     null = false
-    type = bigint
-  }
-
-  column "address_id" {
-    null = false
-    type = bigint
-  }
-
-  column "land_area_sq_m" {
-    null = false
-    type = double_precision
-  }
-
-  column "zoning_id" {
-    null = true
-    type = bigint
-  }
-
-  column "land_use_id" {
-    null = true
-    type = bigint
-  }
-
-  column "neighborhood_id" {
-    null = true
-    type = bigint
-  }
-
-  column "market_area_id" {
-    null = true
-    type = bigint
-  }
-
-  column "properties" {
-    null = true
-    type = jsonb
-  }
-
-  column "start_at" {
-    null = false
-    type = timestamptz
-  }
-
-  column "end_at" {
-    null = false
-    default = sql("now()")
-    type = timestamptz
-  }
-
-  primary_key {
-    columns = [column.parcel_id]
-  }
-
-  foreign_key "fk_parcel_id" {
-    columns = [column.parcel_id]
-    ref_columns = [table.parcels.column.parcel_id]
-  }
-
-  foreign_key "fk_owner_id" {
-    columns = [column.owner_id]
-    ref_columns = [table.owners.column.owner_id]
-  }
-
-  foreign_key "fk_address_id" {
-    columns = [column.address_id]
-    ref_columns = [table.addresses.column.address_id]
-  }
-
-  foreign_key "fk_zoning_id" {
-    columns = [column.zoning_id]
-    ref_columns = [table.zoning.column.zoning_id]
-  }
-
-  foreign_key "fk_land_use_id" {
-    columns = [column.land_use_id]
-    ref_columns = [table.land_uses.column.land_use_id]
-  }
-
-  foreign_key "fk_neighborhood_id" {
-    columns = [column.neighborhood_id]
-    ref_columns = [table.neighborhoods.column.neighborhood_id]
-  }
-
-  foreign_key "fk_market_area_id" {
-    columns = [column.market_area_id]
-    ref_columns = [table.market_areas.column.market_area_id]
-  }
-}
-
-table "improvements_history" {
-  schema = schema.public
-
-  column "improvement_id" {
-    null = false
-    type = bigint
-  }
-
-  column "public_id" {
-    null = false
-    type = uuid
-  }
-
-  column "legacy_id" {
-    null = true
-    type = text
   }
 
   column "geom_web" {
+    type = sql("geometry(MultiPolygon, 4326)")
     null = false
-    type = sql("geometry(MultiPolygonZ, 4326)")
   }
 
   column "geom_legal" {
+    type = sql("geometry(MultiPolygon)")
     null = true
-    type = sql("geometry(MultiPolygonZ)")
   }
 
-  column "local_horizontal_srid" {
-    null = true
+  column "local_srid" {
     type = int
-  }
-
-  column "local_vertical_datum" {
     null = true
-    type = text
   }
 
-  column "start_at" {
+  column "legal_valid_range" {
+    type = tstzrange
     null = false
-    type = timestamptz
   }
 
-  column "end_at" {
+  column "system_valid_range" {
+    type = tstzrange
     null = false
-    default = sql("now()")
-    type = timestamptz
   }
 
   primary_key {
-    columns = [column.improvement_id]
+    columns = [ column.parcel_geometry_history_id ]
   }
 
-  foreign_key "fk_improvement_id" {
-    columns = [column.improvement_id]
-    ref_columns = [table.improvements.column.improvement_id]
+  index "idx_parcel_geometry_history_parcel_id" {
+    columns = [column.parcel_id]
   }
 }
 
-table "improvement_attributes_history" {
-  schema = schema.public
+##############################
+### Improvements
+##############################
 
-  column "improvement_id" {
-    null = false
-    type = bigint
+##############################
+### History Triggers
+##############################
+trigger "record_system_settings_history" {
+  # Attach it to the base table
+  on = table.system_settings
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
   }
 
-  column "owner_id" {
-    null = false
-    type = bigint
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_system_settings_history
+  } 
+} 
+
+trigger "record_parcels_history" {
+  # Attach it to the current-state table
+  on = table.parcels
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
   }
 
-  column "address_id" {
-    null = false
-    type = bigint
-  }
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_parcels_history
+  } 
+} 
 
-  column "area_sq_m" {
-    null = true
-    type = double_precision
-  }
-
-  column "bathrooms" {
-    null = true
-    type = int
-  }
-
-  column "bedrooms" {
-    null = true
-    type = int
-  }
-
-  column "year_built" {
-    null = true
-    type = int
-  }
-
-  column "condition_num" {
-    null = true
-    type = int
-  }
-
-  column "units" {
-    null = true
-    type = int
-  }
-
-    column "properties" {
-    null = true
-    type = jsonb
-  }
-
-  column "start_at" {
-    null = false
-    type = timestamptz
-  }
-
-  column "end_at" {
-    null = false
-    default = sql("now()")
-    type = timestamptz
-  }
-
-  primary_key {
-    columns = [column.improvement_id]
-  }
-
-  foreign_key "fk_improvement_id" {
-    columns = [column.improvement_id]
-    ref_columns = [table.improvements.column.improvement_id]
-  }
-
-  foreign_key "fk_owner_id" {
-    columns = [column.owner_id]
-    ref_columns = [table.owners.column.owner_id]
-  }
-
-  foreign_key "fk_address_id" {
-    columns = [column.address_id]
-    ref_columns = [table.addresses.column.address_id]
-  }
+trigger "history_immutable" {
+  execute {
+    function = function.prevent_history_tampering
+  } 
 }
 
-table "owners_history" {
+##############################
+### History Functions
+##############################
+function "record_system_settings_history" {
   schema = schema.public
-
-  column "owner_id" {
-    null = false
-    type = bigint
-  }
-
-  column "public_id" {
-    null = false
-    type = uuid
-  }
-
-  column "legacy_id" {
-    null = true
-    type = text
-  }
-
-  column "name" {
-    null = false
-    type = text
-  }
-
-  column "address_id" {
-    null = true
-    type = bigint
-  }
-
-  column "start_at" {
-    null = false
-    type = timestamptz
-  }
-
-  column "end_at" {
-    null = false
-    default = sql("now()")
-    type = timestamptz
-  }
-
-  primary_key {
-    columns = [column.owner_id]
-  }
-
-  foreign_key "fk_owner_id" {
-    columns = [column.owner_id]
-    ref_columns = [table.owners.column.owner_id]
-  }
-
-
-  foreign_key "fk_address_id" {
-    columns = [column.address_id]
-    ref_columns = [table.addresses.column.address_id]
-  }
+  lang   = "plpgsql"
+  return = "trigger"
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO system_settings_history (
+            system_setting_id,
+            base_currency,
+            system_valid_range
+          ) VALUES (
+            OLD.system_setting_id,
+            OLD.base_currency,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the 
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL
 }
 
-table "addresses_history" {
+function "record_parcels_history" {
   schema = schema.public
+  lang   = "plpgsql"
+  return = "trigger"
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO parcels_history (
+            parcel_id,
+            public_id,
+            legacy_id,
+            is_voided,
+            voided_at,
+            system_valid_range
+          ) VALUES (
+            OLD.parcel_id,
+            OLD.public_id,
+            OLD.legacy_id,
+            OLD.is_voided,
+            OLD.voided_at,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL
+}
 
-  column "address_id" {
-    null = false
-    type = bigint
-  }
+function "prevent_history_tampering" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = "trigger"
+  
+  as = <<-SQL
+    BEGIN
+      RAISE EXCEPTION 'TAMPER ALERT: History tables are immutable, append-only ledgers. UPDATE and DELETE operations are strictly forbidden.';
+    END;
+  SQL
+}
 
-  column "public_id" {
-    null = false
-    type = uuid
-  }
+##############################
+### Lookup Table Data Prepopulation
+##############################
 
-  column "country_code_id" {
-    null = false
-    type = bigint
-  }
+## Populate countries lookup table
+data {
+  table = table.countries
+  rows = [
+    { country_id = 1, code = "AF", name = "Afghanistan" },
+    { country_id = 2, code = "AL", name = "Albania" },
+    { country_id = 3, code = "DZ", name = "Algeria" },
+    { country_id = 4, code = "AD", name = "Andorra" },
+    { country_id = 5, code = "AO", name = "Angola" },
+    { country_id = 6, code = "AG", name = "Antigua and Barbuda" },
+    { country_id = 7, code = "AR", name = "Argentina" },
+    { country_id = 8, code = "AM", name = "Armenia" },
+    { country_id = 9, code = "AU", name = "Australia" },
+    { country_id = 10, code = "AT", name = "Austria" },
+    { country_id = 11, code = "AZ", name = "Azerbaijan" },
+    { country_id = 12, code = "BS", name = "Bahamas" },
+    { country_id = 13, code = "BH", name = "Bahrain" },
+    { country_id = 14, code = "BD", name = "Bangladesh" },
+    { country_id = 15, code = "BB", name = "Barbados" },
+    { country_id = 16, code = "BY", name = "Belarus" },
+    { country_id = 17, code = "BE", name = "Belgium" },
+    { country_id = 18, code = "BZ", name = "Belize" },
+    { country_id = 19, code = "BJ", name = "Benin" },
+    { country_id = 20, code = "BT", name = "Bhutan" },
+    { country_id = 21, code = "BO", name = "Bolivia" },
+    { country_id = 22, code = "BA", name = "Bosnia and Herzegovina" },
+    { country_id = 23, code = "BW", name = "Botswana" },
+    { country_id = 24, code = "BR", name = "Brazil" },
+    { country_id = 25, code = "BN", name = "Brunei" },
+    { country_id = 26, code = "BG", name = "Bulgaria" },
+    { country_id = 27, code = "BF", name = "Burkina Faso" },
+    { country_id = 28, code = "BI", name = "Burundi" },
+    { country_id = 29, code = "CV", name = "Cabo Verde" },
+    { country_id = 30, code = "KH", name = "Cambodia" },
+    { country_id = 31, code = "CM", name = "Cameroon" },
+    { country_id = 32, code = "CA", name = "Canada" },
+    { country_id = 33, code = "CF", name = "Central African Republic" },
+    { country_id = 34, code = "TD", name = "Chad" },
+    { country_id = 35, code = "CL", name = "Chile" },
+    { country_id = 36, code = "CN", name = "China" },
+    { country_id = 37, code = "CO", name = "Colombia" },
+    { country_id = 38, code = "KM", name = "Comoros" },
+    { country_id = 39, code = "CG", name = "Congo" },
+    { country_id = 40, code = "CR", name = "Costa Rica" },
+    { country_id = 41, code = "HR", name = "Croatia" },
+    { country_id = 42, code = "CU", name = "Cuba" },
+    { country_id = 43, code = "CY", name = "Cyprus" },
+    { country_id = 44, code = "CZ", name = "Czechia" },
+    { country_id = 45, code = "CD", name = "Democratic Republic of the Congo" },
+    { country_id = 46, code = "DK", name = "Denmark" },
+    { country_id = 47, code = "DJ", name = "Djibouti" },
+    { country_id = 48, code = "DM", name = "Dominica" },
+    { country_id = 49, code = "DO", name = "Dominican Republic" },
+    { country_id = 50, code = "EC", name = "Ecuador" },
+    { country_id = 51, code = "EG", name = "Egypt" },
+    { country_id = 52, code = "SV", name = "El Salvador" },
+    { country_id = 53, code = "GQ", name = "Equatorial Guinea" },
+    { country_id = 54, code = "ER", name = "Eritrea" },
+    { country_id = 55, code = "EE", name = "Estonia" },
+    { country_id = 56, code = "SZ", name = "Eswatini" },
+    { country_id = 57, code = "ET", name = "Ethiopia" },
+    { country_id = 58, code = "FJ", name = "Fiji" },
+    { country_id = 59, code = "FI", name = "Finland" },
+    { country_id = 60, code = "FR", name = "France" },
+    { country_id = 61, code = "GA", name = "Gabon" },
+    { country_id = 62, code = "GM", name = "Gambia" },
+    { country_id = 63, code = "GE", name = "Georgia" },
+    { country_id = 64, code = "DE", name = "Germany" },
+    { country_id = 65, code = "GH", name = "Ghana" },
+    { country_id = 66, code = "GR", name = "Greece" },
+    { country_id = 67, code = "GD", name = "Grenada" },
+    { country_id = 68, code = "GT", name = "Guatemala" },
+    { country_id = 69, code = "GN", name = "Guinea" },
+    { country_id = 70, code = "GW", name = "Guinea-Bissau" },
+    { country_id = 71, code = "GY", name = "Guyana" },
+    { country_id = 72, code = "HT", name = "Haiti" },
+    { country_id = 73, code = "HN", name = "Honduras" },
+    { country_id = 74, code = "HU", name = "Hungary" },
+    { country_id = 75, code = "IS", name = "Iceland" },
+    { country_id = 76, code = "IN", name = "India" },
+    { country_id = 77, code = "ID", name = "Indonesia" },
+    { country_id = 78, code = "IR", name = "Iran" },
+    { country_id = 79, code = "IQ", name = "Iraq" },
+    { country_id = 80, code = "IE", name = "Ireland" },
+    { country_id = 81, code = "IL", name = "Israel" },
+    { country_id = 82, code = "IT", name = "Italy" },
+    { country_id = 83, code = "JM", name = "Jamaica" },
+    { country_id = 84, code = "JP", name = "Japan" },
+    { country_id = 85, code = "JO", name = "Jordan" },
+    { country_id = 86, code = "KZ", name = "Kazakhstan" },
+    { country_id = 87, code = "KE", name = "Kenya" },
+    { country_id = 88, code = "KI", name = "Kiribati" },
+    { country_id = 89, code = "KW", name = "Kuwait" },
+    { country_id = 90, code = "KG", name = "Kyrgyzstan" },
+    { country_id = 91, code = "LA", name = "Laos" },
+    { country_id = 92, code = "LV", name = "Latvia" },
+    { country_id = 93, code = "LB", name = "Lebanon" },
+    { country_id = 94, code = "LS", name = "Lesotho" },
+    { country_id = 95, code = "LR", name = "Liberia" },
+    { country_id = 96, code = "LY", name = "Libya" },
+    { country_id = 97, code = "LI", name = "Liechtenstein" },
+    { country_id = 98, code = "LT", name = "Lithuania" },
+    { country_id = 99, code = "LU", name = "Luxembourg" },
+    { country_id = 100, code = "MG", name = "Madagascar" },
+    { country_id = 101, code = "MW", name = "Malawi" },
+    { country_id = 102, code = "MY", name = "Malaysia" },
+    { country_id = 103, code = "MV", name = "Maldives" },
+    { country_id = 104, code = "ML", name = "Mali" },
+    { country_id = 105, code = "MT", name = "Malta" },
+    { country_id = 106, code = "MH", name = "Marshall Islands" },
+    { country_id = 107, code = "MR", name = "Mauritania" },
+    { country_id = 108, code = "MU", name = "Mauritius" },
+    { country_id = 109, code = "MX", name = "Mexico" },
+    { country_id = 110, code = "FM", name = "Micronesia" },
+    { country_id = 111, code = "MD", name = "Moldova" },
+    { country_id = 112, code = "MC", name = "Monaco" },
+    { country_id = 113, code = "MN", name = "Mongolia" },
+    { country_id = 114, code = "ME", name = "Montenegro" },
+    { country_id = 115, code = "MA", name = "Morocco" },
+    { country_id = 116, code = "MZ", name = "Mozambique" },
+    { country_id = 117, code = "MM", name = "Myanmar" },
+    { country_id = 118, code = "NA", name = "Namibia" },
+    { country_id = 119, code = "NR", name = "Nauru" },
+    { country_id = 120, code = "NP", name = "Nepal" },
+    { country_id = 121, code = "NL", name = "Netherlands" },
+    { country_id = 122, code = "NZ", name = "New Zealand" },
+    { country_id = 123, code = "NI", name = "Nicaragua" },
+    { country_id = 124, code = "NE", name = "Niger" },
+    { country_id = 125, code = "NG", name = "Nigeria" },
+    { country_id = 126, code = "KP", name = "North Korea" },
+    { country_id = 127, code = "MK", name = "North Macedonia" },
+    { country_id = 128, code = "NO", name = "Norway" },
+    { country_id = 129, code = "OM", name = "Oman" },
+    { country_id = 130, code = "PK", name = "Pakistan" },
+    { country_id = 131, code = "PW", name = "Palau" },
+    { country_id = 132, code = "PS", name = "Palestine" },
+    { country_id = 133, code = "PA", name = "Panama" },
+    { country_id = 134, code = "PG", name = "Papua New Guinea" },
+    { country_id = 135, code = "PY", name = "Paraguay" },
+    { country_id = 136, code = "PE", name = "Peru" },
+    { country_id = 137, code = "PH", name = "Philippines" },
+    { country_id = 138, code = "PL", name = "Poland" },
+    { country_id = 139, code = "PT", name = "Portugal" },
+    { country_id = 140, code = "QA", name = "Qatar" },
+    { country_id = 141, code = "RO", name = "Romania" },
+    { country_id = 142, code = "RU", name = "Russia" },
+    { country_id = 143, code = "RW", name = "Rwanda" },
+    { country_id = 144, code = "KN", name = "Saint Kitts and Nevis" },
+    { country_id = 145, code = "LC", name = "Saint Lucia" },
+    { country_id = 146, code = "VC", name = "Saint Vincent and the Grenadines" },
+    { country_id = 147, code = "WS", name = "Samoa" },
+    { country_id = 148, code = "SM", name = "San Marino" },
+    { country_id = 149, code = "ST", name = "Sao Tome and Principe" },
+    { country_id = 150, code = "SA", name = "Saudi Arabia" },
+    { country_id = 151, code = "SN", name = "Senegal" },
+    { country_id = 152, code = "RS", name = "Serbia" },
+    { country_id = 153, code = "SC", name = "Seychelles" },
+    { country_id = 154, code = "SL", name = "Sierra Leone" },
+    { country_id = 155, code = "SG", name = "Singapore" },
+    { country_id = 156, code = "SK", name = "Slovakia" },
+    { country_id = 157, code = "SI", name = "Slovenia" },
+    { country_id = 158, code = "SB", name = "Solomon Islands" },
+    { country_id = 159, code = "SO", name = "Somalia" },
+    { country_id = 160, code = "ZA", name = "South Africa" },
+    { country_id = 161, code = "KR", name = "South Korea" },
+    { country_id = 162, code = "SS", name = "South Sudan" },
+    { country_id = 163, code = "ES", name = "Spain" },
+    { country_id = 164, code = "LK", name = "Sri Lanka" },
+    { country_id = 165, code = "SD", name = "Sudan" },
+    { country_id = 166, code = "SR", name = "Suriname" },
+    { country_id = 167, code = "SE", name = "Sweden" },
+    { country_id = 168, code = "CH", name = "Switzerland" },
+    { country_id = 169, code = "SY", name = "Syria" },
+    { country_id = 170, code = "TJ", name = "Tajikistan" },
+    { country_id = 171, code = "TZ", name = "Tanzania" },
+    { country_id = 172, code = "TH", name = "Thailand" },
+    { country_id = 173, code = "TL", name = "Timor-Leste" },
+    { country_id = 174, code = "TG", name = "Togo" },
+    { country_id = 175, code = "TO", name = "Tonga" },
+    { country_id = 176, code = "TT", name = "Trinidad and Tobago" },
+    { country_id = 177, code = "TN", name = "Tunisia" },
+    { country_id = 178, code = "TR", name = "Turkey" },
+    { country_id = 179, code = "TM", name = "Turkmenistan" },
+    { country_id = 180, code = "TV", name = "Tuvalu" },
+    { country_id = 181, code = "UG", name = "Uganda" },
+    { country_id = 182, code = "UA", name = "Ukraine" },
+    { country_id = 183, code = "AE", name = "United Arab Emirates" },
+    { country_id = 184, code = "GB", name = "United Kingdom" },
+    { country_id = 185, code = "US", name = "United States" },
+    { country_id = 186, code = "UY", name = "Uruguay" },
+    { country_id = 187, code = "UZ", name = "Uzbekistan" },
+    { country_id = 188, code = "VU", name = "Vanuatu" },
+    { country_id = 189, code = "VA", name = "Vatican City" },
+    { country_id = 190, code = "VE", name = "Venezuela" },
+    { country_id = 191, code = "VN", name = "Vietnam" },
+    { country_id = 192, code = "YE", name = "Yemen" },
+    { country_id = 193, code = "ZM", name = "Zambia" },
+    { country_id = 194, code = "ZW", name = "Zimbabwe" }
+  ]
+}
 
-  column "administrative_area" {
-    null = true
-    type = text
-  }
+## Populate affordance types lookup table
+data {
+  table = table.affordance_types
 
-  column "locality" {
-    null = true
-    type = text
-  }
-
-  column "sublocality" {
-    null = true
-    type = text
-  }
-
-  column "postal_code" {
-    null = true
-    type = text
-  }
-
-  column "address_line_1" {
-    null = true
-    type = text
-  }
-
-  column "address_line_2" {
-    null = true
-    type = text
-  }
-
-  column "address_line_3" {
-    null = true
-    type = text
-  }
-
-  column "formatted_address" {
-    null = false
-    type = text
-  }
-
-  column "coordinates" {
-    null = false
-    type = sql("geometry(Point, 4326)")
-  }
-
-  column "start_at" {
-    null = false
-    type = timestamptz
-  }
-
-  column "end_at" {
-    null = false
-    default = sql("now()")
-    type = timestamptz
-  }
-
-  primary_key {
-    columns = [column.address_id]
-  }
-
-  foreign_key "fk_address_id" {
-    columns = [column.address_id]
-    ref_columns = [table.addresses.column.address_id]
-  }
-
-  foreign_key "fk_country_code_id" {
-    columns = [column.country_code_id]
-    ref_columns = [table.country_codes.column.country_code_id]
-  }
+  rows = [
+    { affordance_type_id = 1, name = "BASE_ZONING" },
+    { affordance_type_id = 2, name = "OVERLAY" },
+    { affordance_type_id = 3, name = "VARIANCE" },
+    { affordance_type_id = 4, name = "DEED_RESTRICTION" }
+  ]
 }

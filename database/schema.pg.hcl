@@ -314,6 +314,10 @@ table "parcel_geometry_history" {
     columns = [ column.parcel_geometry_history_id ]
   }
 
+  index "idx_parcel_geometry_history_parcel_geometry_id" {
+    columns = [column.parcel_geometry_id]
+  }
+
   index "idx_parcel_geometry_history_parcel_id" {
     columns = [column.parcel_id]
   }
@@ -371,6 +375,29 @@ trigger "record_parcels_history" {
     function = function.record_parcels_history
   } 
 } 
+
+trigger "record_parcel_geometry_history" {
+  # Attach it to the current-state table
+  on = table.parcel_geometry
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_parcel_geometry_history
+  }   
+}
 
 trigger "history_immutable" {
   execute {
@@ -455,6 +482,49 @@ function "record_parcels_history" {
         RETURN NULL;
       END;
     SQL
+}
+
+function "record_parcel_geometry_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = "trigger"
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO parcel_geometry_history (
+            parcel_geometry_id,
+            parcel_id,
+            geom_web,
+            geom_legal,
+            local_srid,
+            legal_valid_range,
+            system_valid_range
+          ) VALUES (
+            OLD.parcel_geometry_id,
+            OLD.parcel_id,
+            OLD.geom_web,
+            OLD.geom_legal,
+            OLD.local_srid,
+            OLD.legal_valid_range,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
 }
 
 function "prevent_history_tampering" {

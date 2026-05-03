@@ -184,7 +184,7 @@ table "parcels_history" {
   }
 
   index "idx_parcels_history_parcel_id" {
-    columns = [column.parcel_id]
+    columns = [ column.parcel_id ]
   }
 }
 
@@ -1443,20 +1443,858 @@ table "zoning_attributes_history" {
 ##############################
 
 // Domain Anchor
+table "owners" {
+  schema = schema.public
+
+  column "owner_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
+  }
+
+  column "is_voided" {
+    type = boolean
+    null = false
+    default = false
+  }
+
+  column "voided_at" {
+    type = timestamptz
+    null = true
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.owner_id ]
+  }  
+
+  index "idx_owners_public_id" {
+    unique  = true
+    columns = [ column.public_id ]
+  }
+
+  check "chk_voided_logic" {
+    expr = "(is_voided = false AND voided_at IS NULL) OR (is_voided = true AND voided_at IS NOT NULL)"
+  }
+}
+
+table "owners_history" {
+  schema = schema.public
+
+  column "owner_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "owner_id" {
+    type = bigint
+    null = false
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
+  }
+
+  column "is_voided" {
+    type = boolean
+    null = false
+  }
+
+  column "voided_at" {
+    type = timestamptz
+    null = true
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.owner_history_id ]
+  }
+
+  index "idx_owners_history_owner_id" {
+    columns = [column.owner_id]
+  }
+}
 
 // Attributes
+table "owner_attributes" {
+  schema = schema.public
+
+  column "owner_attribute_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "owner_id" {
+    type = bigint
+    null = false
+  }
+
+  column "name" {
+    type = text
+    null = false
+  }
+
+  column "address_id" {
+    type = bigint
+    null = false
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.owner_attribute_id ]
+  }
+
+  foreign_key "fk_owner_id" {
+    columns = [ column.owner_id ]
+    ref_columns = [ table.owners.column.owner_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_address_id" {
+    columns = [ column.address_id ]
+    ref_columns = [ table.addresses.column.address_id ]
+    on_delete = RESTRICT
+  }
+
+  exclude "no_overlapping_owner_attributes" {
+    type = GIST
+    on {
+      column = column.owner_id
+      op = "="
+    }
+    on {
+      column = column.legal_valid_range
+      op = "&&"
+    }
+  }
+}
+
+table "owner_attributes_history" {
+  schema = schema.public
+
+  column "owner_attribute_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "owner_attribute_id" {
+    type = bigint
+    null = false
+  }
+
+  column "owner_id" {
+    type = bigint
+    null = false
+  }
+
+  column "name" {
+    type = text
+    null = false
+  }
+
+  column "address_id" {
+    type = bigint
+    null = false
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.owner_attribute_history_id ]
+  }
+
+  index "idx_owner_attributes_history_owner_attribute_id" {
+    columns = [ column.owner_attribute_id ]
+  }
+
+  index "idx_owner_attributes_history_owner_id" {
+    columns = [ column.owner_id ]
+  }  
+}
 
 ##############################
 ### Addresses
 ##############################
 
 // Domain Anchor
+table "addresses" {
+  schema = schema.public
+
+  column "address_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
+  }
+
+  column "is_voided" {
+    type = boolean
+    null = false
+    default = false
+  }
+
+  column "voided_at" {
+    type = timestamptz
+    null = true
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.address_id ]
+  }  
+
+  index "idx_addresses_public_id" {
+    unique  = true
+    columns = [ column.public_id ]
+  }
+
+  check "chk_voided_logic" {
+    expr = "(is_voided = false AND voided_at IS NULL) OR (is_voided = true AND voided_at IS NOT NULL)"
+  }
+}
+
+table "addresses_history" {
+  schema = schema.public
+
+  column "address_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "address_id" {
+    type = bigint
+    null = false
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
+  }
+
+  column "is_voided" {
+    type = boolean
+    null = false
+  }
+
+  column "voided_at" {
+    type = timestamptz
+    null = true
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.address_history_id ]
+  }
+
+  index "idx_addresses_history_address_id" {
+    columns = [column.address_id]
+  }
+}
 
 // Attributes
+table "address_attributes" {
+  schema = schema.public
+
+  column "address_attribute_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "address_id" {
+    type = bigint
+    null = false
+  }
+
+  column "country_id" {
+    type = bigint
+    null = false
+  }
+
+  column "administrative_area" {
+    type = text
+    null = true
+  }
+
+  column "locality" {
+    type = text
+    null = true
+  }
+
+  column "sublocality" {
+    type = text
+    null = true
+  }
+
+  column "postal_code" {
+    type = text
+    null = true
+  }
+
+  column "address_line_1" {
+    type = text
+    null = true
+  }
+
+  column "address_line_2" {
+    type = text
+    null = true
+  }
+
+  column "address_line_3" {
+    type = text
+    null = true
+  }
+
+  column "formatted_address" {
+    type = text
+    null = false
+  }
+
+  column "coordinates" {
+    type = sql("geometry(Point, 4326)")
+    null = true
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.address_attribute_id ]
+  }
+
+  foreign_key "fk_address_id" {
+    columns = [ column.address_id ]
+    ref_columns = [ table.addresses.column.address_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_country_id" {
+    columns = [ column.country_id ]
+    ref_columns = [ table.countries.column.country_id ]
+    on_delete = RESTRICT
+  }
+
+  exclude "no_overlapping_address_attributes" {
+    type = GIST
+    on {
+      column = column.address_id
+      op = "="
+    }
+    on {
+      column = column.legal_valid_range
+      op = "&&"
+    }
+  }
+}
+
+table "address_attributes_history" {
+  schema = schema.public
+
+  column "address_attribute_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "address_attribute_id" {
+    type = bigint
+    null = false
+  }
+
+  column "address_id" {
+    type = bigint
+    null = false
+  }
+
+  column "country_id" {
+    type = bigint
+    null = false
+  }
+
+  column "administrative_area" {
+    type = text
+    null = true
+  }
+
+  column "locality" {
+    type = text
+    null = true
+  }
+
+  column "sublocality" {
+    type = text
+    null = true
+  }
+
+  column "address_line_1" {
+    type = text
+    null = true
+  }
+
+  column "address_line_2" {
+    type = text
+    null = true
+  }
+
+  column "address_line_3" {
+    type = text
+    null = true
+  }
+
+  column "formatted_address" {
+    type = text
+    null = false
+  }
+
+  column "coordinates" {
+    type = sql("geometry(Point, 4326)")
+    null = true
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.address_attribute_history_id ]
+  }
+
+  index "idx_address_attributes_history_address_attribute_id" {
+    columns = [ column.address_attribute_id ]
+  }
+
+  index "idx_address_attributes_history_address_id" {
+    columns = [ column.address_id ]
+  }  
+}
 
 ##############################
 ### Sales
 ##############################
+
+# Sales
+table "sales" {
+  schema = schema.public
+
+  column "sale_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
+  }
+
+  column "seller_id" {
+    type = bigint
+    null = false
+  }
+
+  column "buyer_id" {
+    type = bigint
+    null = false
+  }
+
+  column "sale_date" {
+    type = timestamptz
+    null = false
+  }
+
+  column "sale_price" {
+    type = numeric(19, 4)
+    null = false
+  }
+
+  column "sale_deed_book" {
+    type = text
+    null = true
+  }
+
+  column "sale_deed_page" {
+    type = text
+    null = true
+  }
+
+  column "sale_deed_uri" {
+    type = text
+    null = true
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.sale_id ]
+  }
+
+  foreign_key "fk_seller_id" {
+    columns = [ column.seller_id ]
+    ref_columns = [ table.owners.column.owner_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_buyer_id" {
+    columns = [ column.buyer_id ]
+    ref_columns = [ table.owners.column.owner_id ]
+    on_delete = RESTRICT
+  }
+
+  index "idx_sales_public_id" {
+    unique  = true
+    columns = [column.public_id]
+  }
+}
+
+table "sales_history" {
+  schema = schema.public
+
+  column "sale_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "sale_id" {
+    type = bigint
+    null = false
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
+  }
+
+  column "seller_id" {
+    type = bigint
+    null = false
+  }
+
+  column "buyer_id" {
+    type = bigint
+    null = false
+  }
+
+  column "sale_date" {
+    type = timestamptz
+    null = false
+  }
+
+  column "sale_price" {
+    type = numeric(19, 4)
+    null = false
+  }
+
+  column "sale_deed_book" {
+    type = text
+    null = true
+  }
+
+  column "sale_deed_page" {
+    type = text
+    null = true
+  }
+
+  column "sale_deed_uri" {
+    type = text
+    null = true
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.sale_history_id ]
+  }
+
+  index "idx_sales_history_sale_id" {
+    columns = [ column.sale_id ]
+  }
+}
+
+# Linking Tables
+table "parcel_sales" {
+  schema = schema.public
+
+  column "improvement_sale_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "improvement_id" {
+    type = bigint
+    null = false
+  }
+
+  column "sale_id" {
+    type = bigint
+    null = false
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ improvement_sale_id ]
+  }
+
+  foreign_key "fk_improvement_id" {
+    columns = [ column.improvement_id ]
+    ref_columns = [ table.improvements.column.improvement_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_sale_id" {
+    columns = [ column.sale_id ]
+    ref_columns = [ table.sales.column.sale_id ]
+    on_delete = RESTRICT
+  }
+
+  index "idx_improvement_sales_improvement_id_sale_id" {
+    unique = true
+    columns = [ column.improvement_id, column.sale_id ]
+  }
+}
+
+table "improvement_sales" {
+  schema = schema.public
+
+  column "improvement_sale_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "improvement_id" {
+    type = bigint
+    null = false
+  }
+
+  column "sale_id" {
+    type = bigint
+    null = false
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.improvement_sale_id ]
+  }
+
+  foreign_key "fk_improvement_id" {
+    columns = [ column.improvement_id ]
+    ref_columns = [ table.improvements.column.improvement_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_sale_id" {
+    columns = [ column.sale_id ]
+    ref_columns = [ table.sales.column.sale_id ]
+    on_delete = RESTRICT
+  }
+
+  index "idx_improvement_sales_improvement_id_sale_id" {
+    unique = true
+    columns = [ column.improvement_id, column.sale_id ]
+  }
+}
+
+table "improvement_sales_history" {
+  schema = schema.public
+
+  column "improvement_sale_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "improvement_sale_id" {
+    type = bigint
+    null = false
+  }
+
+  column "improvement_id" {
+    type = bigint
+    null = false
+  }
+
+  column "sale_id" {
+    type = bigint
+    null = false
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.improvement_sale_history_id ]
+  }
+
+  index "idx_improvement_sales_history_improvement_sale_id" {
+    columns = [ column.improvement_sale_id ]
+  }  
+
+  index "idx_improvement_sales_history_improvement_id" {
+    columns = [ column.improvement_id ]
+  }  
+
+  index "idx_improvement_sales_history_sale_id" {
+    columns = [ column.sale_id ]
+  }  
+}
 
 ##############################
 ### Valuations
@@ -1696,6 +2534,144 @@ trigger "record_zoning_attributes_history" {
   # Point to the function that has the archive logic
   execute {
     function = function.record_zoning_attributes_history
+  }
+}
+
+trigger "record_owners_history" {
+  # Attach it to the current-state table
+  on = table.owners
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_owners_history
+  }
+}
+
+trigger "record_owner_attributes_history" {
+  # Attach it to the current-state table
+  on = table.owner_attributes
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_owner_attributes_history
+  }
+}
+
+trigger "record_addresses_history" {
+  # Attach it to the current-state table
+  on = table.addresses
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_addresses_history
+  }
+}
+
+trigger "record_address_attributes_history" {
+  # Attach it to the current-state table
+  on = table.address_attributes
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_address_attributes_history
+  }
+}
+
+trigger "record_sales_history" {
+  # Attach it to the current-state table
+  on = table.sales
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_sales_history
+  }
+}
+
+trigger "record_improvement_sales_history" {
+  # Attach it to the current-state table
+  on = table.improvement_sales
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_improvement_sales_history
   }
 }
 
@@ -2159,6 +3135,243 @@ function "record_zoning_attributes_history" {
             OLD.min_lot_size_sq_m,
             OLD.max_height_m,
             OLD.legal_valid_range,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_owners_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = "trigger"
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO owners_history (
+            owner_id,
+            public_id,
+            legacy_id,
+            is_voided,
+            voided_at,
+            system_valid_range
+          ) VALUES (
+            OLD.owner_id,
+            OLD.public_id,
+            OLD.legacy_id,
+            OLD.is_voided,
+            OLD.voided_at,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_addresses_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = "trigger"
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO addresses_history (
+            address_id,
+            public_id,
+            legacy_id,
+            is_voided,
+            voided_at,
+            system_valid_range
+          ) VALUES (
+            OLD.address_id,
+            OLD.public_id,
+            OLD.legacy_id,
+            OLD.is_voided,
+            OLD.voided_at,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_address_attributes_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = "trigger"
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO address_attributes_history (
+            address_attribute_id,
+            address_id,
+            country_id,
+            administrative_area,
+            locality,
+            sublocality,
+            postal_code,
+            address_line_1,
+            address_line_2,
+            address_line_3,
+            formatted_address,
+            coordinates,
+            legal_valid_range,
+            system_valid_range
+          ) VALUES (
+            OLD.address_attribute_id,
+            OLD.address_id,
+            OLD.country_id,
+            OLD.administrative_area,
+            OLD.locality,
+            OLD.sublocality,
+            OLD.postal_code,
+            OLD.address_line_1,
+            OLD.address_line_2,
+            OLD.address_line_3,
+            OLD.formatted_address,
+            OLD.coordinates,
+            OLD.legal_valid_range,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_sales_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = "trigger"
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO sales_history (
+            sale_id,
+            public_id,
+            legacy_id,
+            seller_id,
+            buyer_id,
+            sale_date,
+            sale_price,
+            sale_deed_book,
+            sale_deed_page,
+            sale_deed_uri,
+            system_valid_range
+          ) VALUES (
+            OLD.sale_id,
+            OLD.public_id,
+            OLD.legacy_id,
+            OLD.seller_id,
+            OLD.buyer_id,
+            OLD.sale_date,
+            OLD.sale_price,
+            OLD.sale_deed_book,
+            OLD.sale_deed_page,
+            OLD.sale_deed_uri,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_improvement_sales_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = "trigger"
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO improvement_sales_history (
+            improvement_sale_id,
+            improvement_id,
+            sale_id,
+            system_valid_range
+          ) VALUES (
+            OLD.improvement_sale_id,
+            OLD.improvement_id,
+            OLD.sale_id,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
           );
         END IF;

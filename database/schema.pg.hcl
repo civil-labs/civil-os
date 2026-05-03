@@ -323,8 +323,1147 @@ table "parcel_geometry_history" {
   }
 }
 
+// Attributes
+table "parcel_attributes" {
+  schema = schema.public
+
+  column "parcel_attribute_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "parcel_id" {
+    type = bigint
+    null = false
+  }
+
+  column "owner_id" {
+    type = bigint
+    null = false
+  }
+
+  column "address_id" {
+    type = bigint
+    null = false
+  }
+
+  column "land_area_sq_m" {
+    type = double_precision
+    null = false
+  }
+
+  column "land_use_id" {
+    type = bigint
+    null = false
+  }
+
+  column "neighborhood_id" {
+    type = bigint
+    null = false
+  }
+
+  column "market_area_id" {
+    type = bigint
+    null = false
+  }
+
+  column "properties" {
+    type = jsonb
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.parcel_attribute_id ]
+  }
+
+  foreign_key "fk_parcel_id" {
+    columns = [column.parcel_id]
+    ref_columns = [table.parcels.column.parcel_id]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_owner_id" {
+    columns = [ column.owner_id ]
+    ref_columns = [ table.owners.column.owner_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_address_id" {
+    columns = [ column.address_id ]
+    ref_columns = [ table.addresses.column.address_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_land_use_id" {
+    columns = [ column.land_use_id ]
+    ref_columns = [ table.land_uses.column.land_use_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_neighborhood_id" {
+    columns = [ column.neighborhood_id ]
+    ref_columns = [ table.neighborhoods.column.neighborhood_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_market_area_id" {
+    columns = [ column.market_area_id ]
+    ref_columns = [ table.market_areas.column.market_area_id ]
+    on_delete = RESTRICT
+  }
+
+  exclude "no_overlapping_parcel_attributes" {
+    type = GIST
+    on {
+      column = column.parcel_id
+      op = "="
+    }
+    on {
+      column = column.legal_valid_range
+      op = "&&"
+    }
+  }
+}
+
+table "parcel_attributes_history" {
+  schema = schema.public
+
+  column "parcel_attribute_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "parcel_attribute_id" {
+    type = bigint
+    null = false
+  }
+
+  column "parcel_id" {
+    type = bigint
+    null = false
+  }
+
+  column "owner_id" {
+    type = bigint
+    null = false
+  }
+
+  column "address_id" {
+    type = bigint
+    null = false
+  }
+
+  column "land_area_sq_m" {
+    type = double_precision
+    null = false
+  }
+
+  column "land_use_id" {
+    type = bigint
+    null = false
+  }
+
+  column "neighborhood_id" {
+    type = bigint
+    null = false
+  }
+
+  column "market_area_id" {
+    type = bigint
+    null = false
+  }
+
+  column "properties" {
+    type = jsonb
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.parcel_attribute_history_id ]
+  }
+
+  index "idx_parcel_attributes_history_parcel_attribute_id" {
+    columns = [column.parcel_attribute_id]
+  }
+
+  index "idx_parcel_attributes_history_parcel_id" {
+    columns = [column.parcel_id]
+  }
+}
+
+// Affordances
+table "parcel_affordances" {
+  schema = schema.public
+
+  column "parcel_affordance_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
+  }
+
+  column "parcel_id" {
+    type = bigint
+    null = false
+  }
+
+  column "zoning_id" {
+    type = bigint
+    null = true
+  }
+
+  column "affordance_type_id" {
+    type = smallint
+    null = false
+  }
+
+  column "source" {
+    type = text
+    null = true
+  }
+
+  column "precedence_rank" {
+    type = int
+    null = false
+    default = 100
+  }
+
+  column "max_far" {
+    type = numeric(6,2)
+    null = true
+  }
+
+  column "min_lot_size_sq_m" {
+    type = numeric(6,2)
+    null = true
+  }
+
+  column "max_height_m" {
+    type = numeric(6,2)
+    null = true
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.parcel_affordance_id ]
+  }
+
+  foreign_key "fk_parcel_id" {
+    columns = [column.parcel_id]
+    ref_columns = [table.parcels.column.parcel_id]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_zoning_id" {
+    columns = [column.zoning_id]
+    ref_columns = [table.zoning.column.zoning_id]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_affordance_type_id" {
+    columns = [ column.affordance_type_id ]
+    ref_columns = [ table.affordance_types.column.affordance_type_id ]
+    on_delete = RESTRICT
+  }
+
+  index "idx_parcel_affordances_public_id" {
+    unique  = true
+    columns = [column.public_id]
+  }
+
+  check "chk_require_origin" {
+    expr = "zoning_id IS NOT NULL OR affordance_type_id != 1"
+  }
+
+  exclude "no_overlapping_zoning_affordance" {
+    type = GIST
+    on {
+      column = column.parcel_id
+      op = "="
+    }
+    on {
+      column = column.zoning_id
+      op = "="
+    }
+    on {
+      column = column.legal_valid_range
+      op = "&&"
+    }
+
+    # Ensure this check only applies to affordances based
+    # on zoning, as otherwise there will be unpredictable
+    # NULL = NULL behavior on the zoning ID check
+    where = "zoning_id IS NOT NULL"
+  }
+}
+
+table "parcel_affordances_history" {
+  schema = schema.public
+
+  column "parcel_affordance_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "parcel_affordance_id" {
+    type = bigint
+    null = false
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+  }
+
+  column "parcel_id" {
+    type = bigint
+    null = false
+  }
+
+  column "zoning_id" {
+    type = bigint
+    null = true
+  }
+
+  column "affordance_type_id" {
+    type = smallint
+    null = false
+  }
+
+  column "source" {
+    type = text
+    null = true
+  }
+
+  column "precedence_rank" {
+    type = int
+    null = false
+  }
+
+  column "max_far" {
+    type = numeric(6,2)
+    null = true
+  }
+
+  column "min_lot_size_sq_m" {
+    type = numeric(6,2)
+    null = true
+  }
+
+  column "max_height_m" {
+    type = numeric(6,2)
+    null = true
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.parcel_affordance_history_id ]
+  }
+
+  index "idx_parcel_affordances_history_parcel_affordance_id" {
+    columns = [column.parcel_affordance_id]
+  }
+
+  index "idx_parcel_affordances_history_parcel_id" {
+    columns = [column.parcel_id]
+  }
+}
+
 ##############################
 ### Improvements
+##############################
+
+// Domain Anchor
+table "improvements" {
+  schema = schema.public
+
+  column "improvement_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
+  }
+
+  column "is_voided" {
+    type = boolean
+    null = false
+    default = false
+  }
+
+  column "voided_at" {
+    type = timestamptz
+    null = true
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.improvement_id ]
+  }
+
+  index "idx_improvements_public_id" {
+    unique  = true
+    columns = [column.public_id]
+  }
+
+  check "chk_voided_logic" {
+    expr = "(is_voided = false AND voided_at IS NULL) OR (is_voided = true AND voided_at IS NOT NULL)"
+  }
+}
+
+table "improvements_history" {
+  schema = schema.public
+
+  column "improvement_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "improvement_id" {
+    type = bigint
+    null = false
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
+  }
+
+  column "is_voided" {
+    type = boolean
+    null = false
+  }
+
+  column "voided_at" {
+    type = timestamptz
+    null = true
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.improvement_history_id ]
+  }
+
+  index "idx_improvements_history_improvement_id" {
+    columns = [column.improvement_id]
+  }
+}
+
+// Geometry
+table "improvement_geometry" {
+  schema = schema.public
+
+  column "improvement_geometry_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "improvement_id" {
+    type = bigint
+    null = false
+  }
+
+  column "geom_web" {
+    type = sql("geometry(MultiPolygonZ, 4326)")
+    null = false
+  }
+
+  column "geom_legal" {
+    type = sql("geometry(MultiPolygonZ)")
+    null = true
+  }
+
+  column "local_horizontal_srid" {
+    type = int
+    null = true
+  }
+
+  column "local_vertical_datum" {
+    type = text
+    null = true
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.improvement_geometry_id ]
+  }
+
+  foreign_key "fk_improvement_id" {
+    columns = [ column.improvement_id ]
+    ref_columns = [ table.improvements.column.improvement_id ]
+    on_delete = RESTRICT
+  }
+
+  index "idx_geom_web_improvement_geometry" {
+    type = GIST
+
+    on {
+      column = column.geom_web
+    }
+  }
+
+  exclude "no_overlapping_improvement_geometry" {
+    type = GIST
+    on {
+      column = column.improvement_id
+      op = "="
+    }
+    on {
+      column = column.legal_valid_range
+      op = "&&"
+    }
+  }
+}
+
+table "improvement_geometry_history" {
+  schema = schema.public
+
+  column "improvement_geometry_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "improvement_geometry_id" {
+    type = bigint
+    null = false
+  }
+
+  column "improvement_id" {
+    type = bigint
+    null = false
+  }
+
+  column "geom_web" {
+    type = sql("geometry(MultiPolygonZ, 4326)")
+    null = false
+  }
+
+  column "geom_legal" {
+    type = sql("geometry(MultiPolygonZ)")
+    null = true
+  }
+
+  column "local_horizontal_srid" {
+    type = int
+    null = true
+  }
+
+  column "local_vertical_datum" {
+    type = text
+    null = true
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.improvement_geometry_history_id ]
+  }
+
+  index "idx_improvement_geometry_history_improvement_geometry_id" {
+    columns = [ column.improvement_geometry_id ]
+  }
+
+  index "idx_improvement_geometry_history_improvement_id" {
+    columns = [ column.improvement_id ]
+  }
+}
+
+// Attributes
+table "improvement_attributes" {
+  schema = schema.public
+
+  column "improvement_attribute_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "improvement_id" {
+    type = bigint
+    null = false
+  }
+
+  column "owner_id" {
+    type = bigint
+    null = false
+  }
+
+  column "address_id" {
+    type = bigint
+    null = false
+  }
+
+  column "area_sq_m" {
+    type = double_precision
+    null = true
+  }
+
+  column "bathrooms" {
+    type = int
+    null = true
+  }
+
+  column "bedrooms" {
+    type = int
+    null = true
+  }
+
+  column "year_built" {
+    type = int
+    null = true
+  }
+
+  column "condition_num" {
+    type = int
+    null = true
+  }
+  
+  column "units" {
+    type = int
+    null = true
+  }
+
+  column "properties" {
+    type = jsonb
+    null = true
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.improvement_attribute_id ]
+  }
+
+  foreign_key "fk_improvement_id" {
+    columns = [ column.improvement_id ]
+    ref_columns = [ table.improvements.column.improvement_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_owner_id" {
+    columns = [ column.owner_id ]
+    ref_columns = [ table.owners.column.owner_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_address_id" {
+    columns = [ column.address_id ]
+    ref_columns = [ table.addresses.column.address_id ]
+    on_delete = RESTRICT
+  }
+
+  exclude "no_overlapping_improvement_attributes" {
+    type = GIST
+    on {
+      column = column.improvement_id
+      op = "="
+    }
+    on {
+      column = column.legal_valid_range
+      op = "&&"
+    }
+  }
+}
+
+table "improvement_attributes_history" {
+  schema = schema.public
+
+  column "improvement_attribute_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "improvement_attribute_id" {
+    type = bigint
+    null = false
+  }
+
+  column "improvement_id" {
+    type = bigint
+    null = false
+  }
+
+  column "owner_id" {
+    type = bigint
+    null = false
+  }
+
+  column "address_id" {
+    type = bigint
+    null = false
+  }
+
+  column "area_sq_m" {
+    type = double_precision
+    null = true
+  }
+
+  column "bathrooms" {
+    type = int
+    null = true
+  }
+
+  column "bedrooms" {
+    type = int
+    null = true
+  }
+
+  column "year_built" {
+    type = int
+    null = true
+  }
+
+  column "condition_num" {
+    type = int
+    null = true
+  }
+  
+  column "units" {
+    type = int
+    null = true
+  }
+
+  column "properties" {
+    type = jsonb
+    null = true
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.improvement_attribute_history_id ]
+  }
+
+  index "idx_improvement_attributes_history_improvement_attribute_id" {
+    columns = [ column.improvement_attribute_id ]
+  }
+
+  index "idx_improvement_attributes_history_improvement_id" {
+    columns = [ column.improvement_id ]
+  }
+}
+
+##############################
+### Zoning
+##############################
+
+// Domain Anchor
+table "zoning" {
+  schema = schema.public
+
+  column "zoning_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
+  }
+
+  column "is_voided" {
+    type = boolean
+    null = false
+    default = false
+  }
+
+  column "voided_at" {
+    type = timestamptz
+    null = true
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.zoning_id ]
+  }
+
+  index "idx_zoning_public_id" {
+    unique  = true
+    columns = [ column.public_id ]
+  }
+
+  check "chk_voided_logic" {
+    expr = "(is_voided = false AND voided_at IS NULL) OR (is_voided = true AND voided_at IS NOT NULL)"
+  }
+}
+
+table "zoning_history" {
+  schema = schema.public
+
+  column "zoning_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "zoning_id" {
+    type = bigint
+    null = false
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
+  }
+
+  column "is_voided" {
+    type = boolean
+    null = false
+  }
+
+  column "voided_at" {
+    type = timestamptz
+    null = true
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.zoning_history_id ]
+  }
+
+  index "idx_zoning_history_zoning_id" {
+    columns = [column.zoning_id]
+  }
+}
+
+// Attributes
+table "zoning_attributes" {
+  schema = schema.public
+
+  column "zoning_attribute_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "zoning_id" {
+    type = bigint
+    null = false
+  } 
+
+  column "name" {
+    type = text
+    null = false
+  }
+
+  column "code" {
+    type = text
+    null = false
+  }
+
+  column "max_far" {
+    type = numeric(6,2)
+    null = true
+  }
+
+  column "min_lot_size_sq_m" {
+    type = numeric(6,2)
+    null = true
+  }
+
+  column "max_height_m" {
+    type = numeric(6,2)
+    null = true
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.zoning_attribute_id ]
+  }
+
+  foreign_key "fk_zoning_id" {
+    columns = [ column.zoning_id ]
+    ref_columns = [ table.zoning.column.zoning_id ]
+    on_delete = RESTRICT
+  }
+
+  exclude "no_overlapping_zoning_attributes" {
+    type = GIST
+    on {
+      column = column.zoning_id
+      op = "="
+    }
+    on {
+      column = column.legal_valid_range
+      op = "&&"
+    }
+  }
+}
+
+table "zoning_attributes_history" {
+  schema = schema.public
+
+  column "zoning_attribute_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "zoning_attribute_id" {
+    type = bigint
+    null = false
+  }
+
+  column "zoning_id" {
+    type = bigint
+    null = false
+  } 
+
+  column "name" {
+    type = text
+    null = false
+  }
+
+  column "code" {
+    type = text
+    null = false
+  }
+
+  column "max_far" {
+    type = numeric(6,2)
+    null = true
+  }
+
+  column "min_lot_size_sq_m" {
+    type = numeric(6,2)
+    null = true
+  }
+
+  column "max_height_m" {
+    type = numeric(6,2)
+    null = true
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.zoning_attribute_history_id ]
+  }
+
+  index "idx_zoning_attributes_history_zoning_attribute_id" {
+    columns = [ column.zoning_attribute_id ]
+  }
+
+  index "idx_zoning_attributes_history_zoning_id" {
+    columns = [ column.zoning_id ]
+  }  
+}
+
+##############################
+### Owners
+##############################
+
+// Domain Anchor
+
+// Attributes
+
+##############################
+### Addresses
+##############################
+
+// Domain Anchor
+
+// Attributes
+
+##############################
+### Sales
+##############################
+
+##############################
+### Valuations
+##############################
+
+##############################
+### Lookup Tables
 ##############################
 
 ##############################
@@ -399,6 +1538,167 @@ trigger "record_parcel_geometry_history" {
   }   
 }
 
+trigger "record_parcel_attributes_history" {
+  # Attach it to the current-state table
+  on = table.parcel_attributes
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_parcel_attributes_history
+  }
+}
+
+trigger "record_parcel_affordances_history" {
+  # Attach it to the current-state table
+  on = table.parcel_affordances
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_parcel_affordances_history
+  }  
+}
+
+trigger "record_improvements_history" {
+  # Attach it to the current-state table
+  on = table.improvements
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_improvements_history
+  }  
+}
+
+trigger "record_improvement_geometry_history" {
+  # Attach it to the current-state table
+  on = table.improvement_geometry
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_improvement_geometry_history
+  }  
+}
+
+trigger "record_improvement_attributes_history" {
+  # Attach it to the current-state table
+  on = table.improvement_attributes
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_improvement_attributes_history
+  }  
+}
+
+trigger "record_zoning_history" {
+  # Attach it to the current-state table
+  on = table.zoning
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_zoning_history
+  }
+}
+
+trigger "record_zoning_attributes_history" {
+  # Attach it to the current-state table
+  on = table.zoning_attributes
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_zoning_attributes_history
+  }
+}
+
 trigger "history_immutable" {
   execute {
     function = function.prevent_history_tampering
@@ -412,6 +1712,7 @@ function "record_system_settings_history" {
   schema = schema.public
   lang   = "plpgsql"
   return = "trigger"
+  security = DEFINER
   
   as = <<-SQL
       DECLARE
@@ -447,6 +1748,7 @@ function "record_parcels_history" {
   schema = schema.public
   lang   = "plpgsql"
   return = "trigger"
+  security = DEFINER
   
   as = <<-SQL
       DECLARE
@@ -488,6 +1790,7 @@ function "record_parcel_geometry_history" {
   schema = schema.public
   lang   = "plpgsql"
   return = "trigger"
+  security = DEFINER
   
   as = <<-SQL
       DECLARE
@@ -508,6 +1811,353 @@ function "record_parcel_geometry_history" {
             OLD.geom_web,
             OLD.geom_legal,
             OLD.local_srid,
+            OLD.legal_valid_range,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_parcel_attributes_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = "trigger"
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO parcel_attributes_history (
+            parcel_attribute_id,
+            parcel_id,
+            owner_id,
+            address_id,
+            land_area_sq_m,
+            land_use_id,
+            neighborhood_id,
+            market_area_id,
+            properties,
+            legal_valid_range,
+            system_valid_range
+          ) VALUES (
+            OLD.parcel_attribute_id,
+            OLD.parcel_id,
+            OLD.owner_id,
+            OLD.address_id,
+            OLD.land_area_sq_m,
+            OLD.land_use_id,
+            OLD.neighborhood_id,
+            OLD.market_area_id,
+            OLD.properties,
+            OLD.legal_valid_range,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_parcel_affordances_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = "trigger"
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO parcel_affordances_history (
+            parcel_affordance_id,
+            public_id,
+            parcel_id,
+            zoning_id,
+            affordance_type_id,
+            source,
+            precedence_rank,
+            max_far,
+            min_lot_size_sq_m,
+            max_height_m,
+            legal_valid_range,
+            system_valid_range
+          ) VALUES (
+            OLD.parcel_affordance_id,
+            OLD.public_id,
+            OLD.parcel_id,
+            OLD.zoning_id,
+            OLD.affordance_type_id,
+            OLD.source,
+            OLD.precedence_rank,
+            OLD.max_far,
+            OLD.min_lot_size_sq_m,
+            OLD.max_height_m,
+            OLD.legal_valid_range,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_improvements_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = "trigger"
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO improvements_history (
+            improvement_id,
+            public_id,
+            legacy_id,
+            is_voided,
+            voided_at,
+            system_valid_range
+          ) VALUES (
+            OLD.improvement_id,
+            OLD.public_id,
+            OLD.legacy_id,
+            OLD.is_voided,
+            OLD.voided_at,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_improvement_geometry_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = "trigger"
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO improvement_geometry_history (
+            improvement_geometry_id,
+            improvement_id,
+            geom_web,
+            geom_legal,
+            local_horizontal_srid,
+            local_vertical_datum,
+            legal_valid_range,
+            system_valid_range
+          ) VALUES (
+            OLD.improvement_geometry_id,
+            OLD.improvement_id,
+            OLD.geom_web,
+            OLD.geom_legal,
+            OLD.local_horizontal_srid,
+            OLD.local_vertical_datum,
+            OLD.legal_valid_range,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_improvement_attributes_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = "trigger"
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO improvement_attributes_history (
+            improvement_attribute_id,
+            improvement_id,
+            owner_id,
+            address_id,
+            area_sq_m,
+            bathrooms,
+            bedrooms,
+            year_built,
+            condition_num,
+            units,
+            properties,
+            legal_valid_range,
+            system_valid_range
+          ) VALUES (
+            OLD.improvement_attribute_id,
+            OLD.improvement_id,
+            OLD.owner_id,
+            OLD.address_id,
+            OLD.area_sq_m,
+            OLD.bathrooms,
+            OLD.bedrooms,
+            OLD.year_built,
+            OLD.condition_num,
+            OLD.units,
+            OLD.properties,
+            OLD.legal_valid_range,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_zoning_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = "trigger"
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO zoning_history (
+            zoning_id,
+            public_id,
+            legacy_id,
+            is_voided,
+            voided_at,
+            system_valid_range
+          ) VALUES (
+            OLD.zoning_id,
+            OLD.public_id,
+            OLD.legacy_id,
+            OLD.is_voided,
+            OLD.voided_at,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_zoning_attributes_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = "trigger"
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO zoning_attributes_history (
+            zoning_attribute_id,
+            zoning_id,
+            name,
+            code,
+            max_far,
+            min_lot_size_sq_m,
+            max_height_m,
+            legal_valid_range,
+            system_valid_range
+          ) VALUES (
+            OLD.zoning_attribute_id,
+            OLD.zoning_id,
+            OLD.name,
+            OLD.code,
+            OLD.max_far,
+            OLD.min_lot_size_sq_m,
+            OLD.max_height_m,
             OLD.legal_valid_range,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
           );

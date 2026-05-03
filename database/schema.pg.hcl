@@ -2150,7 +2150,7 @@ table "sales_history" {
 table "parcel_sales" {
   schema = schema.public
 
-  column "improvement_sale_id" {
+  column "parcel_sale_id" {
     type = bigint
     null = false
 
@@ -2159,7 +2159,7 @@ table "parcel_sales" {
     }
   }
 
-  column "improvement_id" {
+  column "parcel_id" {
     type = bigint
     null = false
   }
@@ -2176,12 +2176,12 @@ table "parcel_sales" {
   }
 
   primary_key {
-    columns = [ improvement_sale_id ]
+    columns = [ column.parcel_sale_id ]
   }
 
-  foreign_key "fk_improvement_id" {
-    columns = [ column.improvement_id ]
-    ref_columns = [ table.improvements.column.improvement_id ]
+  foreign_key "fk_parcel_id" {
+    columns = [ column.parcel_id ]
+    ref_columns = [ table.parcels.column.parcel_id ]
     on_delete = RESTRICT
   }
 
@@ -2191,10 +2191,59 @@ table "parcel_sales" {
     on_delete = RESTRICT
   }
 
-  index "idx_improvement_sales_improvement_id_sale_id" {
+  index "idx_parcel_sales_parcel_id_sale_id" {
     unique = true
-    columns = [ column.improvement_id, column.sale_id ]
+    columns = [ column.parcel_id, column.sale_id ]
   }
+}
+
+table "parcel_sales_history" {
+  schema = schema.public
+
+  column "parcel_sale_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "parcel_sale_id" {
+    type = bigint
+    null = false
+  }
+
+  column "parcel_id" {
+    type = bigint
+    null = false
+  }
+
+  column "sale_id" {
+    type = bigint
+    null = false
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.parcel_sale_history_id ]
+  }
+
+  index "idx_parcel_sales_history_parcel_sale_id" {
+    columns = [ column.parcel_sale_id ]
+  }  
+
+  index "idx_parcel_sales_history_parcel_id" {
+    columns = [ column.parcel_id ]
+  }  
+
+  index "idx_parcel_sales_history_sale_id" {
+    columns = [ column.sale_id ]
+  }  
 }
 
 table "improvement_sales" {
@@ -2299,6 +2348,378 @@ table "improvement_sales_history" {
 ##############################
 ### Valuations
 ##############################
+
+table "valuations" {
+  schema = schema.public
+
+  column "valuation_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
+  }
+
+  column "valuation_date" {
+    type = timestamptz
+    null = false
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.valuation_id ]
+  }
+
+  index "idx_valuations_public_id" {
+    unique  = true
+    columns = [column.public_id]
+  }
+}
+
+table "valuations_history" {
+  schema = schema.public
+
+  column "valuation_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "valuation_id" {
+    type = bigint
+    null = false
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
+  }
+
+  column "valuation_date" {
+    type = timestamptz
+    null = false
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.valuation_history_id ]
+  }
+
+  index "idx_valuations_history_valuation_id" {
+    columns = [column.valuation_id]
+  }
+}
+
+table "parcel_valuations" {
+  schema = schema.public
+
+  column "parcel_valuation_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "parcel_id" {
+    type = bigint
+    null = false
+  }
+
+  column "valuation_id" {
+    type = bigint
+    null = false
+  }
+
+  column "market_value" {
+    type = numeric(19, 4)
+    null = false
+  }
+
+  column "assessed_value" {
+    type = numeric(19, 4)
+    null = false
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.parcel_valuation_id ]
+  }
+
+  foreign_key "fk_parcel_id" {
+    columns = [ column.parcel_id ]
+    ref_columns = [ table.parcels.column.parcel_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_valuation_id" {
+    columns = [ column.valuation_id ]
+    ref_columns = [ table.valuations.column.valuation_id ]
+    on_delete = RESTRICT
+  }
+
+  index "idx_parcel_valuations_parcel_id_valuation_id" {
+    unique = true
+    columns = [ column.parcel_id, column.valuation_id ]
+  }
+
+  exclude "no_overlapping_parcel_valuations" {
+    type = GIST
+    on {
+      column = column.parcel_id
+      op = "="
+    }
+    on {
+      column = column.legal_valid_range
+      op = "&&"
+    }
+  }
+}
+
+table "parcel_valuations_history" {
+  schema = schema.public
+
+  column "parcel_valuation_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "parcel_valuation_id" {
+    type = bigint
+    null = false
+  }
+
+  column "parcel_id" {
+    type = bigint
+    null = false
+  }
+
+  column "valuation_id" {
+    type = bigint
+    null = false
+  }
+
+  column "market_value" {
+    type = numeric(19, 4)
+    null = false
+  }
+
+  column "assessed_value" {
+    type = numeric(19, 4)
+    null = false
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.parcel_valuation_history_id ]
+  }
+
+  index "idx_parcel_valuations_history_parcel_valuation_id" {
+    columns = [ column.parcel_valuation_id ]
+  }
+
+  index "idx_parcel_valuations_history_parcel_id" {
+    columns = [column.parcel_id]
+  }
+
+  index "idx_parcel_valuations_history_valuation_id" {
+    columns = [column.valuation_id]
+  }  
+}
+
+table "improvement_valuations" {
+  schema = schema.public
+
+  column "improvement_valuation_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "improvement_id" {
+    type = bigint
+    null = false
+  }
+
+  column "valuation_id" {
+    type = bigint
+    null = false
+  }
+
+  column "market_value" {
+    type = numeric(19, 4)
+    null = false
+  }
+
+  column "assessed_value" {
+    type = numeric(19, 4)
+    null = false
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.improvement_valuation_id ]
+  }
+
+  foreign_key "fk_improvement_id" {
+    columns = [ column.improvement_id ]
+    ref_columns = [ table.improvements.column.improvement_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_valuation_id" {
+    columns = [ column.valuation_id ]
+    ref_columns = [ table.valuations.column.valuation_id ]
+    on_delete = RESTRICT
+  }
+
+  index "idx_improvement_valuations_improvement_id_valuation_id" {
+    unique = true
+    columns = [ column.improvement_id, column.valuation_id ]
+  }
+
+  exclude "no_overlapping_improvement_valuations" {
+    type = GIST
+    on {
+      column = column.improvement_id
+      op = "="
+    }
+    on {
+      column = column.legal_valid_range
+      op = "&&"
+    }
+  }
+}
+
+table "improvement_valuations_history" {
+  schema = schema.public
+
+  column "improvement_valuation_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "improvement_valuation_id" {
+    type = bigint
+    null = false
+  }
+
+  column "improvement_id" {
+    type = bigint
+    null = false
+  }
+
+  column "valuation_id" {
+    type = bigint
+    null = false
+  }
+
+  column "market_value" {
+    type = numeric(19, 4)
+    null = false
+  }
+
+  column "assessed_value" {
+    type = numeric(19, 4)
+    null = false
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.improvement_valuation_history_id ]
+  }
+
+  index "idx_improvement_valuations_history_improvement_valuation_id" {
+    columns = [ column.improvement_valuation_id ]
+  }
+
+  index "idx_improvement_valuations_history_improvement_id" {
+    columns = [column.improvement_id]
+  }
+
+  index "idx_improvement_valuations_history_valuation_id" {
+    columns = [column.valuation_id]
+  }  
+}
 
 ##############################
 ### Lookup Tables
@@ -2652,6 +3073,29 @@ trigger "record_sales_history" {
   }
 }
 
+trigger "record_parcel_sales_history" {
+  # Attach it to the current-state table
+  on = table.parcel_sales
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_parcel_sales_history
+  }
+}
+
 trigger "record_improvement_sales_history" {
   # Attach it to the current-state table
   on = table.improvement_sales
@@ -2674,6 +3118,76 @@ trigger "record_improvement_sales_history" {
     function = function.record_improvement_sales_history
   }
 }
+
+trigger "record_valuations_history" {
+  # Attach it to the current-state table
+  on = table.valuations
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_valuations_history
+  }
+}
+
+trigger "record_parcel_valuations_history" {
+  # Attach it to the current-state table
+  on = table.parcel_valuations
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_parcel_valuations_history
+  }
+}
+
+trigger "record_improvement_valuations_history" {
+  # Attach it to the current-state table
+  on = table.improvement_valuations
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_improvement_valuations_history
+  }
+}
+
 
 trigger "history_immutable" {
   execute {
@@ -3351,6 +3865,45 @@ function "record_sales_history" {
     SQL  
 }
 
+function "record_parcel_sales_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = "trigger"
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO parcel_sales_history (
+            parcel_sale_id,
+            parcel_id,
+            sale_id,
+            system_valid_range
+          ) VALUES (
+            OLD.parcel_sale_id,
+            OLD.parcel_id,
+            OLD.sale_id,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
 function "record_improvement_sales_history" {
   schema = schema.public
   lang   = "plpgsql"
@@ -3372,6 +3925,137 @@ function "record_improvement_sales_history" {
             OLD.improvement_sale_id,
             OLD.improvement_id,
             OLD.sale_id,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_valuations_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = "trigger"
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO valuations_history (
+            valuation_id,
+            public_id,
+            legacy_id,
+            valuation_date,
+            system_valid_range
+          ) VALUES (
+            OLD.valuation_id,
+            OLD.public_id,
+            OLD.legacy_id,
+            OLD.valuation_date,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_parcel_valuations_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = "trigger"
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO parcel_valuations_history (
+            parcel_valuation_id,
+            parcel_id,
+            valuation_id,
+            market_value,
+            assessed_value,
+            legal_valid_range,
+            system_valid_range
+          ) VALUES (
+            OLD.parcel_valuation_id,
+            OLD.parcel_id,
+            OLD.valuation_id,
+            OLD.market_value,
+            OLD.assessed_value,
+            OLD.legal_valid_range,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_improvement_valuations_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = "trigger"
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO improvement_valuations_history (
+            improvement_valuation_id,
+            improvement_id,
+            valuation_id,
+            market_value,
+            assessed_value,
+            legal_valid_range,
+            system_valid_range
+          ) VALUES (
+            OLD.improvement_valuation_id,
+            OLD.improvement_id,
+            OLD.valuation_id,
+            OLD.market_value,
+            OLD.assessed_value,
+            OLD.legal_valid_range,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
           );
         END IF;

@@ -2725,6 +2725,123 @@ table "improvement_valuations_history" {
 ### Lookup Tables
 ##############################
 
+table "affordance_types" {
+  schema = schema.public
+
+  column "affordance_type_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "name" {
+    type = text
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.affordance_type_id ]
+  }
+}
+
+table "countries" {
+  schema = schema.public
+
+  column "country_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "code" {
+    type = varchar(2)
+    null = false
+  }
+
+  column "name" {
+    type = varchar(100)
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.country_id ]
+  }
+
+}
+
+table "land_uses" {
+  schema = schema.public
+
+  column "land_use_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "name" {
+    type = text
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.land_use_id ]
+  }
+}
+
+table "neighborhoods" {
+  schema = schema.public
+
+  column "neighborhood_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "name" {
+    type = text
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.neighborhood_id ]
+  }
+}
+
+table "market_areas" {
+  schema = schema.public
+
+  column "market_area_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "name" {
+    type = text
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.market_area_id ]
+  }
+}
+
+
 ##############################
 ### History Triggers
 ##############################
@@ -3188,8 +3305,27 @@ trigger "record_improvement_valuations_history" {
   }
 }
 
-
 trigger "history_immutable" {
+  for_each = [
+    table.parcels_history, table.parcel_geometry_history, table.parcel_attributes_history,
+    table.parcel_affordances_history, table.improvements_history, table.improvement_geometry_history,
+    table.improvement_attributes_history, table.zoning_history, table.zoning_attributes_history,
+    table.owners_history, table.owner_attributes_history, table.addresses_history,
+    table.address_attributes_history, table.sales_history, table.parcel_sales_history,
+    table.improvement_sales_history, table.valuations_history, table.parcel_valuations_history,
+    table.improvement_valuations_history
+  ]
+  on = each.value
+
+  before {
+    insert = false
+    update = true
+    delete = true
+    truncate = true
+  }
+
+  for = STATEMENT
+
   execute {
     function = function.prevent_history_tampering
   } 
@@ -3710,6 +3846,49 @@ function "record_owners_history" {
     SQL  
 }
 
+function "record_owner_attributes_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = "trigger"
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO owner_attributes_history (
+            owner_attribute_id,
+            owner_id,
+            name,
+            address_id,
+            legal_valid_range,
+            system_valid_range
+          ) VALUES (
+            OLD.owner_attribute_id,
+            OLD.owner_id,
+            OLD.name,
+            OLD.address_id,
+            OLD.legal_valid_range,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
 function "record_addresses_history" {
   schema = schema.public
   lang   = "plpgsql"
@@ -4081,7 +4260,7 @@ function "prevent_history_tampering" {
   
   as = <<-SQL
     BEGIN
-      RAISE EXCEPTION 'TAMPER ALERT: History tables are immutable, append-only ledgers. UPDATE and DELETE operations are strictly forbidden.';
+      RAISE EXCEPTION 'TAMPER ALERT: History tables are immutable, append-only ledgers. UPDATE, DELETE, and TRUNCATE operations are strictly forbidden.';
     END;
   SQL
 }

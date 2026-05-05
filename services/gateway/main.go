@@ -10,6 +10,7 @@ import (
 	"net/http/httputil"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -188,10 +189,27 @@ func CORSMiddleware(next http.Handler, verbose bool, logger *slog.Logger) http.H
 		}
 
 		// 1. ALWAYS set headers (Success, Failure, or Preflight)
-		// This guarantees the browser never sees a "Missing Header" error.
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", strings.Join([]string{
+			"Authorization",
+			"Content-Type",
+			"Connect-Protocol-Version",
+			"Connect-Timeout-Ms",
+			"Connect-Accept-Encoding",
+			"Connect-Content-Encoding",
+			"Grpc-Timeout",
+			"X-Grpc-Web",
+			"X-User-Agent",
+		}, ", "))
+		w.Header().Set("Access-Control-Expose-Headers", strings.Join([]string{
+			"Connect-Protocol-Version",
+			"Connect-Timeout-Ms",
+			"Grpc-Status",
+			"Grpc-Message",
+			"Grpc-Status-Details-Bin",
+		}, ", "))
+		w.Header().Set("Access-Control-Max-Age", "7200")
 
 		// 2. Handle Preflight
 		if r.Method == "OPTIONS" {

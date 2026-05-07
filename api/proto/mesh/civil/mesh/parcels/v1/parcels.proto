@@ -18,36 +18,20 @@ service ParcelsService {
 }
 
 message ParcelAffordances {
-  // Maximum Floor Area Ratio (FAR)
   optional double max_far = 1;
-
-  // Minimum lot size in square feet
   optional double min_lot_size_sq_ft = 2;
-
-  // Maximum legally permitted building height in feet
   optional double max_height_ft = 3;
 }
 
 message ParcelImprovementsSummary {
   repeated string improvement_ids = 1;
-
-  // Additives: Physically impossible to be negative
   optional double total_area_sq_ft = 2;
-
   optional int32 total_bathrooms = 3;
-
   optional int32 total_bedrooms = 4;
-
   optional int32 total_units = 5;
-
-  // Temporals: Bounded to realistic historical/future parameters
   optional int32 oldest_year_built = 6;
-
   optional int32 newest_year_built = 7;
-
-  // Qualitatives: Bounded to Civil's specific property condition ordinal scale
   optional int32 lowest_condition_num = 8;
-
   optional int32 highest_condition_num = 9;
 }
 

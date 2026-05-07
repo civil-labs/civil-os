@@ -57,29 +57,49 @@ service ParcelsService {
 }
 
 message ParcelAffordances {
+  repeated string affordance_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Communicate all will be unique
+      unique: true
+
+      // A single parcel will rarely have more than a
+      // handful of affordances
+      max_items: 50
+
+      // Communicate all are UUIDs
+      items: {
+        string: {uuid: true}
+      }
+    },
+
+    // Gnostic annotation updated to reflect an array format for the example
+    (gnostic.openapi.v3.property) = {
+      description: "A list of unique identifiers for the affordancces on the parcel."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
+    }
+  ];
+
   // Maximum Floor Area Ratio (FAR)
-  optional double max_far = 1 [(buf.validate.field).double = {gte: 0.0}];
+  optional double max_far = 2 [(buf.validate.field).double = {gte: 0.0}];
 
   // Minimum lot size in square feet
-  optional double min_lot_size_sq_ft = 2 [(buf.validate.field).double = {gte: 0.0}];
+  optional double min_lot_size_sq_ft = 3 [(buf.validate.field).double = {gte: 0.0}];
 
   // Maximum legally permitted building height in feet
-  optional double max_height_ft = 3 [(buf.validate.field).double = {gte: 0.0}];
+  optional double max_height_ft = 4 [(buf.validate.field).double = {gte: 0.0}];
 }
 
 message ParcelImprovementsSummary {
   repeated string improvement_ids = 1 [
     (buf.validate.field).repeated = {
-      // LIST-LEVEL VALIDATIONS
-      // Ensures no duplicate UUIDs are sent in the same array
+      // Communicate all will be unique
       unique: true
 
       // A single parcel will rarely have more than a
       // handful of improvements (e.g., House, Garage, Shed, Pool).
       max_items: 50
 
-      // ITEM-LEVEL VALIDATIONS
-      // This applies the UUID format check to every individual string in the array
+      // Communicate all are UUIDs
       items: {
         string: {uuid: true}
       }
@@ -172,55 +192,83 @@ message Parcel {
 
   double land_area_sq_ft = 7 [(buf.validate.field).double = {gte: 0.0}];
 
-  string land_use = 8 [(buf.validate.field).string = {
-    min_len: 1
-    max_len: 512
-  }];
+  string land_use_id = 8 [
+    (buf.validate.field).string.uuid = true,
 
-  optional string land_use_code = 9 [(buf.validate.field).string = {max_len: 32}];
-
-  optional string neighborhood = 10 [(buf.validate.field).string = {max_len: 512}];
-
-  optional string market_area = 11 [(buf.validate.field).string = {max_len: 512}];
-
-  repeated string zoning = 12 [(buf.validate.field).repeated = {
-    // Apply the string length limit to each individual item in the array
-    items: {
-      string: {max_len: 512}
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier for the parcel's land use."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
     }
-  }];
+  ];
 
-  repeated string zoning_codes = 13 [(buf.validate.field).repeated = {
-    items: {
-      string: {max_len: 32}
+  optional string neighborhood_id = 9 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier for the parcel's neighborhood."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
     }
-  }];
+  ];
 
-  string market_land_value = 14 [(buf.validate.field).string = {
+  optional string market_area_id = 10 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier for the parcel's market area."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+
+  repeated string zoning_ids = 11 [
+    (buf.validate.field).repeated = {
+      // Communicate all will be unique
+      unique: true
+
+      // A single parcel will rarely have more than a
+      // handful of improvements (e.g., House, Garage, Shed, Pool).
+      max_items: 50
+
+      // Communicate all are UUIDs
+      items: {
+        string: {uuid: true}
+      }
+    },
+
+    // Gnostic annotation updated to reflect an array format for the example
+    (gnostic.openapi.v3.property) = {
+      description: "A list of unique identifiers for the zoning overlays on the parcel."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
+    }
+  ];
+
+  string market_land_value = 12 [(buf.validate.field).string = {
     // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
     pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
   }];
 
-  string assessed_land_value = 15 [(buf.validate.field).string = {
+  string assessed_land_value = 13 [(buf.validate.field).string = {
     // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
     pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
   }];
 
-  string market_improvement_value = 16 [(buf.validate.field).string = {
+  string market_improvement_value = 14 [(buf.validate.field).string = {
     // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
     pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
   }];
 
-  string assessed_improvement_value = 17 [(buf.validate.field).string = {
+  string assessed_improvement_value = 15 [(buf.validate.field).string = {
     // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
     pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
   }];
 
-  ParcelAffordances affordances = 18;
+  ParcelAffordances affordances = 16;
 
-  ParcelImprovementsSummary improvement_summary = 19;
+  ParcelImprovementsSummary improvement_summary = 17;
 
-  string properties = 20 [(buf.validate.field).string = {
+  string properties = 18 [(buf.validate.field).string = {
     max_len: 1048576 // 1MB limit
   }];
 }

@@ -18,9 +18,10 @@ service ParcelsService {
 }
 
 message ParcelAffordances {
-  optional double max_far = 1;
-  optional double min_lot_size_sq_ft = 2;
-  optional double max_height_ft = 3;
+  repeated string affordance_ids = 1;
+  optional double max_far = 2;
+  optional double min_lot_size_sq_ft = 3;
+  optional double max_height_ft = 4;
 }
 
 message ParcelImprovementsSummary {
@@ -43,19 +44,17 @@ message Parcel {
   string owner_address = 5;
   string owner_id = 6;
   double land_area_sq_ft = 7;
-  string land_use = 8;
-  optional string land_use_code = 9;
-  optional string neighborhood = 10;
-  optional string market_area = 11;
-  repeated string zoning = 12;
-  repeated string zoning_codes = 13;
-  string market_land_value = 14;
-  string assessed_land_value = 15;
-  string market_improvement_value = 16;
-  string assessed_improvement_value = 17;
-  ParcelAffordances affordances = 18;
-  ParcelImprovementsSummary improvement_summary = 19;
-  string properties = 20;
+  string land_use_id = 8;
+  optional string neighborhood_id = 9;
+  optional string market_area_id = 10;
+  repeated string zoning_ids = 11;
+  string market_land_value = 12;
+  string assessed_land_value = 13;
+  string market_improvement_value = 14;
+  string assessed_improvement_value = 15;
+  ParcelAffordances affordances = 16;
+  ParcelImprovementsSummary improvement_summary = 17;
+  string properties = 18;
 }
 
 message GetParcelsByIdRequest {

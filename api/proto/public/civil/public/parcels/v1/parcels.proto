@@ -334,12 +334,12 @@ message UpdateParcelRequest {
 
   optional double land_area_sq_ft = 2 [(buf.validate.field).double = {gte: 0.0}];
 
-  string market_land_value = 3 [(buf.validate.field).string = {
+  optional string market_land_value = 3 [(buf.validate.field).string = {
     // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
     pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
   }];
 
-  string assessed_land_value = 4 [(buf.validate.field).string = {
+  optional string assessed_land_value = 4 [(buf.validate.field).string = {
     // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
     pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
   }];

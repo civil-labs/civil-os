@@ -79,10 +79,6 @@ message GetParcelResponse {
     min_len: 1
     max_len: 256
   }];
-
-  float parcel_area_sq_m
-
-  string parcel_owner
 }
 
 message GetParcelAttributesRequest {

@@ -4,13 +4,13 @@ package civil.public.parcels.v1;
 
 import "buf/validate/validate.proto";
 import "gnostic/openapi/v3/annotations.proto";
-import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
 
 //option go_package = "github.com/civil-labs/civil-api-go/civil/parcels/v1;parcelsv1";
 option (gnostic.openapi.v3.document) = {
   info: {
     title: "Civil API"
-    version: "0.0.2"
+    version: "0.0.3"
     description: "Public API description for the Civil platform. Auth token can be retrieved by prefixing \"auth-\" to the beginning of your jurisdiction's endpoint."
   }
 
@@ -37,113 +37,338 @@ option (gnostic.openapi.v3.document) = {
 };
 
 service ParcelsService {
-  // Updates a specified attribute for one or more parcels, identified by their parcel IDs.
-  rpc UpdateParcelsAttribute(UpdateParcelsAttributeRequest) returns (UpdateParcelsAttributeResponse) {}
-
   // Retrieves all of a specified parcel's attributes as an object.
-  rpc GetParcel(GetParcelRequest) returns (GetParcelResponse) {}
+  rpc GetParcelsById(GetParcelsByIdRequest) returns (GetParcelsByIdResponse) {
+    // Give connect the option to use GET requests, but don't advertise it in the Swagger
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
-  // Retrieves a specified attribute value for a given parcel.
-  rpc GetParcelAttribute(GetParcelAttributeRequest) returns (GetParcelAttributeResponse) {}
-
-  // Retrieves specificied attributes about a parcel as an object.
-  rpc GetParcelAttributes(GetParcelAttributesRequest) returns (GetParcelAttributesResponse) {}
+  rpc UpdateParcel(UpdateParcelRequest) returns (UpdateParcelResponse) {}
 
   // Retrieves a set of summary statistics about the specified numerical attribute for a specified list of parcels. Optionally returns the values as well
-  rpc GetNumericalStats(GetNumericalStatsRequest) returns (GetNumericalStatsResponse) {}
+  rpc GetNumericalParcelStatsById(GetNumericalParcelStatsByIdRequest) returns (GetNumericalParcelStatsByIdResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // Retrieves a set of summary statistics about the specified categorical attribute for a specified list of parcels. Optionally returns the values as well
-  rpc GetCategoricalStats(GetCategoricalStatsRequest) returns (GetCategoricalStatsResponse) {}
+  rpc GetCategoricalParcelStatsById(GetCategoricalParcelStatsByIdRequest) returns (GetCategoricalParcelStatsByIdResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
-message UpdateParcelsAttributeRequest {
-  repeated string parcel_ids = 1 [(buf.validate.field).repeated = {
-    min_items: 1
-    max_items: 1000
-    items: {
-      string: {
-        min_len: 1
-        max_len: 256
+message ParcelAffordances {
+  // Maximum Floor Area Ratio (FAR)
+  optional double max_far = 1 [(buf.validate.field).double = {gte: 0.0}];
+
+  // Minimum lot size in square feet
+  optional double min_lot_size_sq_ft = 2 [(buf.validate.field).double = {gte: 0.0}];
+
+  // Maximum legally permitted building height in feet
+  optional double max_height_ft = 3 [(buf.validate.field).double = {gte: 0.0}];
+}
+
+message ParcelImprovementsSummary {
+  repeated string improvement_ids = 1 [
+    (buf.validate.field).repeated = {
+      // LIST-LEVEL VALIDATIONS
+      // Ensures no duplicate UUIDs are sent in the same array
+      unique: true
+
+      // A single parcel will rarely have more than a
+      // handful of improvements (e.g., House, Garage, Shed, Pool).
+      max_items: 50
+
+      // ITEM-LEVEL VALIDATIONS
+      // This applies the UUID format check to every individual string in the array
+      items: {
+        string: {uuid: true}
       }
+    },
+
+    // Gnostic annotation updated to reflect an array format for the example
+    (gnostic.openapi.v3.property) = {
+      description: "A list of unique identifiers for the improvements on the parcel."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
+    }
+  ];
+
+  // Additives: Physically impossible to be negative
+  optional double total_area_sq_ft = 2 [(buf.validate.field).double = {gte: 0.0}];
+
+  optional int32 total_bathrooms = 3 [(buf.validate.field).int32 = {gte: 0}];
+
+  optional int32 total_bedrooms = 4 [(buf.validate.field).int32 = {gte: 0}];
+
+  optional int32 total_units = 5 [(buf.validate.field).int32 = {gte: 0}];
+
+  // Temporals: Bounded to realistic historical/future parameters
+  optional int32 oldest_year_built = 6 [(buf.validate.field).int32 = {
+    gte: -12000 /* Lower bound for any potential human-built structure on Earth */
+    lte: 2100 // Allows for planned construction currently in the permit phase and future proofs the spec for a while
+  }];
+
+  optional int32 newest_year_built = 7 [(buf.validate.field).int32 = {
+    gte: -12000 /* Lower bound for any potential human-built structure on Earth */
+    lte: 2100
+  }];
+
+  // Qualitatives: Bounded to Civil's specific property condition ordinal scale
+  optional int32 lowest_condition_num = 8 [(buf.validate.field).int32 = {
+    gte: 1 // Assuming a 1-10 grading scale
+    lte: 10
+  }];
+
+  optional int32 highest_condition_num = 9 [(buf.validate.field).int32 = {
+    gte: 1
+    lte: 10
+  }];
+}
+
+message Parcel {
+  string parcel_id = 1 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier for the parcel."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+
+  string address = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 1024
+  }];
+
+  string address_id = 3 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier for the parcel's address."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+
+  string owner_name = 4 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 512
+  }];
+
+  string owner_address = 5 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 1024
+  }];
+
+  string owner_id = 6 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier for the parcel owner."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+
+  double land_area_sq_ft = 7 [(buf.validate.field).double = {gte: 0.0}];
+
+  string land_use = 8 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 512
+  }];
+
+  optional string land_use_code = 9 [(buf.validate.field).string = {max_len: 32}];
+
+  optional string neighborhood = 10 [(buf.validate.field).string = {max_len: 512}];
+
+  optional string market_area = 11 [(buf.validate.field).string = {max_len: 512}];
+
+  repeated string zoning = 12 [(buf.validate.field).repeated = {
+    // Apply the string length limit to each individual item in the array
+    items: {
+      string: {max_len: 512}
     }
   }];
 
-  string attribute_name = 2 [(buf.validate.field).string = {
-    min_len: 1
-    max_len: 63
-  }];
-
-  string attribute_value = 3 [(buf.validate.field).string = {
-    min_len: 1
-    max_len: 256
-  }];
-}
-
-message UpdateParcelsAttributeResponse {}
-
-message GetParcelRequest {
-  string parcel_id = 1 [(buf.validate.field).string = {
-    min_len: 1
-    max_len: 256
-  }];
-}
-
-message GetParcelResponse {
-  google.protobuf.Struct parcel_attributes = 1;
-}
-
-message GetParcelAttributeRequest {
-  string parcel_id = 1 [(buf.validate.field).string = {
-    min_len: 1
-    max_len: 256
-  }];
-
-  string attribute_name = 2 [(buf.validate.field).string = {
-    min_len: 1
-    max_len: 63
-  }];
-}
-
-message GetParcelAttributeResponse {
-  string attribute_value = 3 [(buf.validate.field).string = {
-    min_len: 1
-    max_len: 256
-  }];
-}
-
-message GetParcelAttributesRequest {
-  string parcel_id = 1 [(buf.validate.field).string = {
-    min_len: 1
-    max_len: 256
-  }];
-
-  repeated string attribute_names = 2 [(buf.validate.field).repeated = {
-    min_items: 1
-    max_items: 100
+  repeated string zoning_codes = 13 [(buf.validate.field).repeated = {
     items: {
-      string: {
-        min_len: 1
-        max_len: 63
-      }
+      string: {max_len: 32}
     }
   }];
-}
 
-message GetParcelAttributesResponse {
-  google.protobuf.Struct parcel_attributes = 1;
-}
-
-message GetNumericalStatsRequest {
-  repeated string parcel_ids = 1 [(buf.validate.field).repeated = {
-    min_items: 1
-    max_items: 1000
-    items: {
-      string: {
-        min_len: 1
-        max_len: 256
-      }
-    }
+  string market_land_value = 14 [(buf.validate.field).string = {
+    // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
+    pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
   }];
+
+  string assessed_land_value = 15 [(buf.validate.field).string = {
+    // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
+    pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
+  }];
+
+  string market_improvement_value = 16 [(buf.validate.field).string = {
+    // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
+    pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
+  }];
+
+  string assessed_improvement_value = 17 [(buf.validate.field).string = {
+    // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
+    pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
+  }];
+
+  ParcelAffordances affordances = 18;
+
+  ParcelImprovementsSummary improvement_summary = 19;
+
+  string properties = 20 [(buf.validate.field).string = {
+    max_len: 1048576 // 1MB limit
+  }];
+}
+
+message GetParcelsByIdRequest {
+  repeated string parcel_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 100
+
+      // Apply the uuid rule to the items in the array
+      items: {
+        string: {uuid: true}
+      }
+    },
+
+    (gnostic.openapi.v3.property) = {
+      description: "A list of unique identifiers for the parcels."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
+    }
+  ];
+
+  // The historical or future effective date the user wants to view.
+  // If omitted, defaults to the current time.
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 1600 */
+    },
+    (gnostic.openapi.v3.property) = {description: "The real-world date to evaluate the parcel against. Defaults to now."}
+  ];
+
+  // The time to reset the database state to
+  // If omitted, defaults to the current time.
+  optional google.protobuf.Timestamp system_as_of = 3 [
+    (buf.validate.field).timestamp = {
+      // You cannot query the database's state as of tomorrow!
+      gt: {seconds: -1}
+      lt_now: true
+    },
+    (gnostic.openapi.v3.property) = {description: "The transaction time to evaluate the database state against. Defaults to now."}
+  ];
+}
+
+message GetParcelsByIdResponse {
+  // A map of parcel records, keyed by their public ID.
+  map<string, Parcel> parcels = 1 [(gnostic.openapi.v3.property) = {description: "A dictionary of parcels, keyed by their unique parcel_id."}];
+}
+
+message UpdateParcelRequest {
+  string parcel_id = 1 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier for the parcel."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+
+  optional double land_area_sq_ft = 2 [(buf.validate.field).double = {gte: 0.0}];
+
+  string market_land_value = 3 [(buf.validate.field).string = {
+    // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
+    pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
+  }];
+
+  string assessed_land_value = 4 [(buf.validate.field).string = {
+    // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
+    pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
+  }];
+
+  optional string address_id = 5 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier for the parcel's address."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+
+  optional string owner_id = 6 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier for the parcel owner."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+
+  optional string land_use_id = 7 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier for the parcel's land use."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+
+  optional string neighborhood_id = 8 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier for the parcel's neighborhood."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+
+  optional string market_area_id = 9 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier for the parcel's market area."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+}
+
+message UpdateParcelResponse {}
+
+message GetNumericalParcelStatsByIdRequest {
+  repeated string parcel_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+
+      // Apply the uuid rule to the items in the array
+      items: {
+        string: {uuid: true}
+      }
+    },
+
+    (gnostic.openapi.v3.property) = {
+      description: "A list of unique identifiers for the parcels."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
+    }
+  ];
 
   string attribute_name = 2 [(buf.validate.field).string = {
     min_len: 1
@@ -153,7 +378,7 @@ message GetNumericalStatsRequest {
   bool return_values = 3 [(buf.validate.field).bool = {}];
 }
 
-message GetNumericalStatsResponse {
+message GetNumericalParcelStatsByIdResponse {
   float mode = 1 [(buf.validate.field).float = {}];
   float minimum = 2 [(buf.validate.field).float = {}];
   float maximum = 3 [(buf.validate.field).float = {}];
@@ -170,37 +395,31 @@ message GetNumericalStatsResponse {
   float percentile_90 = 13 [(buf.validate.field).float.finite = true];
   float percentile_100 = 14 [(buf.validate.field).float.finite = true];
 
-  option (buf.validate.message).cel = {
-    id: "percentile_ordering"
-    message: "Percentiles must be in ascending order (10 <= 20 <= ... <= 100)"
-    expression:
-      "this.percentile_10 <= this.percentile_20 && "
-      "this.percentile_20 <= this.percentile_30 && "
-      "this.percentile_30 <= this.percentile_40 && "
-      "this.percentile_40 <= this.percentile_50 && "
-      "this.percentile_50 <= this.percentile_60 && "
-      "this.percentile_60 <= this.percentile_70 && "
-      "this.percentile_70 <= this.percentile_80 && "
-      "this.percentile_80 <= this.percentile_90 && "
-      "this.percentile_90 <= this.percentile_100"
-  };
-
   float mean = 15 [(buf.validate.field).float = {}];
   float standard_deviation = 16 [(buf.validate.field).float = {}];
   float coefficient_of_dispersion = 17 [(buf.validate.field).float = {}];
 }
 
-message GetCategoricalStatsRequest {
-  repeated string parcel_ids = 1 [(buf.validate.field).repeated = {
-    min_items: 1
-    max_items: 1000
-    items: {
-      string: {
-        min_len: 1
-        max_len: 256
+message GetCategoricalParcelStatsByIdRequest {
+  repeated string parcel_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+
+      // Apply the uuid rule to the items in the array
+      items: {
+        string: {uuid: true}
       }
+    },
+
+    (gnostic.openapi.v3.property) = {
+      description: "A list of unique identifiers for the parcels."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
     }
-  }];
+  ];
 
   string attribute_name = 2 [(buf.validate.field).string = {
     min_len: 1
@@ -210,7 +429,7 @@ message GetCategoricalStatsRequest {
   bool return_values = 3 [(buf.validate.field).bool = {}];
 }
 
-message GetCategoricalStatsResponse {
+message GetCategoricalParcelStatsByIdResponse {
   string mode = 1 [(buf.validate.field).string = {
     min_len: 1
     max_len: 256

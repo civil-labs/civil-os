@@ -251,7 +251,7 @@ message GetParcelsByIdRequest {
   optional google.protobuf.Timestamp legal_as_of = 2 [
     (buf.validate.field).timestamp = {
       // Bounded to prevent integer overflow or absurd historical queries
-      gt: {seconds: -62135596800} /* Approx Jan 1, 1600 */
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
     },
     (gnostic.openapi.v3.property) = {description: "The real-world date to evaluate the parcel against. Defaults to now."}
   ];

@@ -363,12 +363,12 @@ table "parcel_attributes" {
 
   column "neighborhood_id" {
     type = bigint
-    null = false
+    null = true
   }
 
   column "market_area_id" {
     type = bigint
-    null = false
+    null = true
   }
 
   column "properties" {
@@ -483,12 +483,12 @@ table "parcel_attributes_history" {
 
   column "neighborhood_id" {
     type = bigint
-    null = false
+    null = true
   }
 
   column "market_area_id" {
     type = bigint
-    null = false
+    null = true
   }
 
   column "properties" {
@@ -548,7 +548,7 @@ table "parcel_affordances" {
   }
 
   column "affordance_type_id" {
-    type = smallint
+    type = bigint
     null = false
   }
 
@@ -638,7 +638,7 @@ table "parcel_affordances" {
     # Ensure this check only applies to affordances based
     # on zoning, as otherwise there will be unpredictable
     # NULL = NULL behavior on the zoning ID check
-    where = "zoning_id IS NOT NULL"
+    where = "(zoning_id IS NOT NULL)"
   }
 }
 
@@ -675,7 +675,7 @@ table "parcel_affordances_history" {
   }
 
   column "affordance_type_id" {
-    type = smallint
+    type = bigint
     null = false
   }
 
@@ -2027,6 +2027,11 @@ table "sales" {
     null = false
   }
 
+  column "was_vacant" {
+    type = bool
+    null = true
+  }
+
   column "sale_deed_book" {
     type = text
     null = true
@@ -2115,6 +2120,11 @@ table "sales_history" {
   column "sale_price" {
     type = numeric(19, 4)
     null = false
+  }
+
+  column "was_vacant" {
+    type = bool
+    null = true
   }
 
   column "sale_deed_book" {
@@ -2787,6 +2797,11 @@ table "land_uses" {
     }
   }
 
+  column "code" {
+    type = text
+    null = true
+  }
+
   column "name" {
     type = text
     null = false
@@ -2841,6 +2856,63 @@ table "market_areas" {
   }
 }
 
+##############################
+### Geometry Functions
+##############################
+
+function "get_parcel_tiles" {
+  schema = schema.public
+  lang   = "plpgsql"
+
+  // Function Arguments
+  arg "z" {
+    type = integer
+  }
+  
+  arg "x" {
+    type = integer
+  }
+  
+  arg "y" {
+    type = integer
+  }
+
+  // Return Type
+  return = bytea
+
+  // Modifiers (Performance & Security)
+  volatility = STABLE
+  strict     = true
+  parallel   = SAFE
+
+  // The Execution Body
+  as = <<-SQL
+    DECLARE
+      mvt bytea;
+      bounds geometry := ST_TileEnvelope(z, x, y);
+
+    BEGIN
+      SELECT ST_AsMVT(tile, 'parcels', 4096, 'geom')
+      INTO mvt
+      FROM (
+        SELECT 
+            p.parcel_id,
+            pa.land_use_id,
+            -- Clip the geometry to the tile boundary for performance
+            ST_AsMVTGeom(ST_Transform(pg.geometry, 3857), bounds, 4096, 256, true) AS geom
+        FROM 
+            public.parcels p
+        JOIN 
+            public.parcel_attributes pa ON p.parcel_id = pa.parcel_id
+        JOIN
+            public.parcel_geometry pg ON p.parcel_id = pg.parcel_id
+        WHERE 
+            ST_Intersects(ST_Transform(pg.geometry, 3857), bounds)
+    ) AS tile;
+      RETURN mvt;
+    END;
+  SQL
+}
 
 ##############################
 ### History Triggers
@@ -3337,7 +3409,7 @@ trigger "history_immutable" {
 function "record_system_settings_history" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   security = DEFINER
   
   as = <<-SQL
@@ -3373,7 +3445,7 @@ function "record_system_settings_history" {
 function "record_parcels_history" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   security = DEFINER
   
   as = <<-SQL
@@ -3415,7 +3487,7 @@ function "record_parcels_history" {
 function "record_parcel_geometry_history" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   security = DEFINER
   
   as = <<-SQL
@@ -3459,7 +3531,7 @@ function "record_parcel_geometry_history" {
 function "record_parcel_attributes_history" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
   security = DEFINER 
   
@@ -3512,7 +3584,7 @@ function "record_parcel_attributes_history" {
 function "record_parcel_affordances_history" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
   security = DEFINER 
   
@@ -3567,7 +3639,7 @@ function "record_parcel_affordances_history" {
 function "record_improvements_history" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
   security = DEFINER 
   
@@ -3610,7 +3682,7 @@ function "record_improvements_history" {
 function "record_improvement_geometry_history" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
   security = DEFINER 
   
@@ -3657,7 +3729,7 @@ function "record_improvement_geometry_history" {
 function "record_improvement_attributes_history" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
   security = DEFINER 
   
@@ -3714,7 +3786,7 @@ function "record_improvement_attributes_history" {
 function "record_zoning_history" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
   security = DEFINER 
   
@@ -3757,7 +3829,7 @@ function "record_zoning_history" {
 function "record_zoning_attributes_history" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
   security = DEFINER 
   
@@ -3806,7 +3878,7 @@ function "record_zoning_attributes_history" {
 function "record_owners_history" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
   security = DEFINER 
   
@@ -3849,7 +3921,7 @@ function "record_owners_history" {
 function "record_owner_attributes_history" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
   security = DEFINER 
   
@@ -3892,7 +3964,7 @@ function "record_owner_attributes_history" {
 function "record_addresses_history" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
   security = DEFINER 
   
@@ -3935,7 +4007,7 @@ function "record_addresses_history" {
 function "record_address_attributes_history" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
   security = DEFINER 
   
@@ -3994,7 +4066,7 @@ function "record_address_attributes_history" {
 function "record_sales_history" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
   security = DEFINER 
   
@@ -4047,7 +4119,7 @@ function "record_sales_history" {
 function "record_parcel_sales_history" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
   security = DEFINER 
   
@@ -4086,7 +4158,7 @@ function "record_parcel_sales_history" {
 function "record_improvement_sales_history" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
   security = DEFINER 
   
@@ -4125,7 +4197,7 @@ function "record_improvement_sales_history" {
 function "record_valuations_history" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
   security = DEFINER 
   
@@ -4166,7 +4238,7 @@ function "record_valuations_history" {
 function "record_parcel_valuations_history" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
   security = DEFINER 
   
@@ -4211,7 +4283,7 @@ function "record_parcel_valuations_history" {
 function "record_improvement_valuations_history" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
   security = DEFINER 
   
@@ -4256,7 +4328,7 @@ function "record_improvement_valuations_history" {
 function "prevent_history_tampering" {
   schema = schema.public
   lang   = "plpgsql"
-  return = "trigger"
+  return = trigger
   
   as = <<-SQL
     BEGIN

@@ -65,6 +65,7 @@ func (s *ParcelServer) GetParcelsById(
 			AssessedImprovementValue: meshParcel.AssessedImprovementValue,
 
 			Affordances: &publicparcelsv1.ParcelAffordances{
+				AffordanceIds:  meshParcel.Affordances.AffordanceIds,
 				MaxFar:         meshParcel.Affordances.MaxFar,
 				MinLotSizeSqFt: meshParcel.Affordances.MinLotSizeSqFt,
 				MaxHeightFt:    meshParcel.Affordances.MaxHeightFt,

@@ -22,7 +22,7 @@ func (s *ParcelServer) GetParcelsById(
 	req *connect.Request[publicparcelsv1.GetParcelsByIdRequest],
 ) (*connect.Response[publicparcelsv1.GetParcelsByIdResponse], error) {
 
-	s.logger.Debug("received GetParcels request")
+	s.logger.Debug("received GetParcelsById request")
 
 	meshReq := connect.NewRequest(&meshparcelsv1.GetParcelsByIdRequest{
 		ParcelIds:  req.Msg.ParcelIds,

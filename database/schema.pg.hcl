@@ -2747,6 +2747,12 @@ table "affordance_types" {
     }
   }
 
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
+  }
+
   column "name" {
     type = text
     null = false
@@ -2754,6 +2760,11 @@ table "affordance_types" {
 
   primary_key {
     columns = [ column.affordance_type_id ]
+  }
+
+  index "idx_affordance_types_public_id" {
+    unique  = true
+    columns = [ column.public_id ]
   }
 }
 
@@ -2767,6 +2778,12 @@ table "countries" {
     identity {
       generated = ALWAYS
     }
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
   }
 
   column "code" {
@@ -2783,6 +2800,11 @@ table "countries" {
     columns = [ column.country_id ]
   }
 
+  index "idx_countries_public_id" {
+    unique  = true
+    columns = [ column.public_id ]
+  }
+
 }
 
 table "land_uses" {
@@ -2795,6 +2817,12 @@ table "land_uses" {
     identity {
       generated = ALWAYS
     }
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
   }
 
   column "code" {
@@ -2810,6 +2838,11 @@ table "land_uses" {
   primary_key {
     columns = [ column.land_use_id ]
   }
+
+  index "idx_land_uses_public_id" {
+    unique  = true
+    columns = [ column.public_id ]
+  }  
 }
 
 table "neighborhoods" {
@@ -2824,6 +2857,12 @@ table "neighborhoods" {
     }
   }
 
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
+  }
+
   column "name" {
     type = text
     null = false
@@ -2831,6 +2870,11 @@ table "neighborhoods" {
 
   primary_key {
     columns = [ column.neighborhood_id ]
+  }
+
+  index "idx_neighborhoods_public_id" {
+    unique  = true
+    columns = [ column.public_id ]
   }
 }
 
@@ -2846,6 +2890,12 @@ table "market_areas" {
     }
   }
 
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
+  }
+
   column "name" {
     type = text
     null = false
@@ -2853,6 +2903,11 @@ table "market_areas" {
 
   primary_key {
     columns = [ column.market_area_id ]
+  }
+
+  index "idx_market_areas_public_id" {
+    unique  = true
+    columns = [ column.public_id ]
   }
 }
 

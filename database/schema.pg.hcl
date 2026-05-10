@@ -414,18 +414,6 @@ table "parcel_attributes" {
     on_delete = RESTRICT
   }
 
-  foreign_key "fk_neighborhood_id" {
-    columns = [ column.neighborhood_id ]
-    ref_columns = [ table.neighborhoods.column.neighborhood_id ]
-    on_delete = RESTRICT
-  }
-
-  foreign_key "fk_market_area_id" {
-    columns = [ column.market_area_id ]
-    ref_columns = [ table.market_areas.column.market_area_id ]
-    on_delete = RESTRICT
-  }
-
   exclude "no_overlapping_parcel_attributes" {
     type = GIST
     on {
@@ -724,6 +712,170 @@ table "parcel_affordances_history" {
 
   index "idx_parcel_affordances_history_parcel_id" {
     columns = [column.parcel_id]
+  }
+}
+
+table "parcel_neighborhood_definitions" {
+  schema = schema.public
+
+  column "parcel_neighborhood_definition_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "parcel_id" {
+    type = bigint
+    null = false
+  }
+
+  column "neighborhood_id" {
+    type = bigint
+    null = false
+  }
+
+  column "neighborhood_definition_id" {
+    type = bigint
+    null = false
+  }
+
+  column "is_legal" {
+    type = boolean
+    null = false
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = true
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.parcel_neighborhood_definition_id ]
+  }
+
+  foreign_key "fk_parcel_id" {
+    columns = [ column.parcel_id ]
+    ref_columns = [ table.parcels.column.parcel_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_neighborhood_id" {
+    columns = [ column.neighborhood_id ]
+    ref_columns = [ table.neighborhoods.column.neighborhood_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_neighborhood_definition_id" {
+    columns = [ column.neighborhood_definition_id, column.is_legal ]
+    ref_columns = [ table.neighborhood_definitions.column.neighborhood_definition_id, table.neighborhood_definitions.column.is_legal ]
+    on_delete = RESTRICT
+  }
+
+  check "chk_legal_must_have_time" {
+    expr = "(is_legal = false) OR (is_legal = true AND legal_valid_range IS NOT NULL)"
+  }
+
+  // This check only applies to parcel groupings with a legal meaning
+  exclude "no_overlapping_legal_parcel_neighborhood_definitions" {
+    type = GIST
+    on {
+      column = column.parcel_id
+      op = "="
+    }
+    on {
+      column = column.neighborhood_definition_id
+      op = "="
+    }
+    on {
+      column = column.legal_valid_range
+      op = "&&"
+    }
+
+    where = "(is_legal = true)"
+  }
+
+  // This check only applies to parcel groupings without a legal meaning
+  index "idx_unique_non_legal_parcel_neighborhood" {
+    unique = true
+    columns = [ column.parcel_id, column.neighborhood_definition_id ]
+    where   = "(is_legal = false)"
+  }
+}
+
+table "parcel_neighborhood_definitions_history" {
+  schema = schema.public
+
+  column "parcel_neighborhood_definition_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "parcel_neighborhood_definition_id" {
+    type = bigint
+    null = false
+  }
+
+  column "parcel_id" {
+    type = bigint
+    null = false
+  }
+
+  column "neighborhood_id" {
+    type = bigint
+    null = false
+  }
+
+  column "neighborhood_definition_id" {
+    type = bigint
+    null = false
+  }
+
+  column "is_legal" {
+    type = boolean
+    null = false
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = true
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.parcel_neighborhood_definition_history_id ]
+  }
+
+  index "idx_parcel_neighborhood_definitions_history_parcel_neighborhood_definition_id" {
+    columns = [column.parcel_neighborhood_definition_id]
+  }
+
+  index "idx_parcel_neighborhood_definitions_history_parcel_id" {
+    columns = [column.parcel_id]
+  }
+
+  index "idx_parcel_neighborhood_definitions_history_neighborhood_id" {
+    columns = [column.neighborhood_id]
+  }
+
+  index "idx_parcel_neighborhood_definitions_history_neighborhood_definition_id" {
+    columns = [column.neighborhood_definition_id]
   }
 }
 
@@ -2732,6 +2884,187 @@ table "improvement_valuations_history" {
 }
 
 ##############################
+### Neighborhoods
+##############################
+
+table "neighborhood_definitions" {
+  schema = schema.public
+
+  column "neighborhood_definition_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
+  }
+
+  column "name" {
+    type = text
+    null = false
+  }
+
+  column "is_legal" {
+    type = boolean
+    null = false
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.neighborhood_definition_id ]
+  }
+
+  # Required to allow the parcel_neighborhood_definition table's composite foreign key 
+  # to safely reference the is_legal flag.
+  index "idx_neighborhood_definitions_id_is_legal" {
+    unique  = true
+    columns = [ column.neighborhood_definition_id, column.is_legal ]
+  }
+
+  index "idx_neighborhood_definitions_public_id" {
+    unique  = true
+    columns = [ column.public_id ]
+  }
+}
+
+table "neighborhood_definitions_history" {
+  schema = schema.public
+
+  column "neighborhood_definition_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "neighborhood_definition_id" {
+    type = bigint
+    null = false
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+  }
+
+  column "name" {
+    type = text
+    null = false
+  }
+
+  column "is_legal" {
+    type = boolean
+    null = false
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.neighborhood_definition_history_id ]
+  }
+
+  index "idx_neighborhood_definitions_history_neighborhood_definition_id" {
+    columns = [column.neighborhood_definition_id]
+  }
+}
+
+table "neighborhoods" {
+  schema = schema.public
+
+  column "neighborhood_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
+  }
+
+  column "name" {
+    type = text
+    null = false
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.neighborhood_id ]
+  }
+
+  index "idx_neighborhoods_public_id" {
+    unique  = true
+    columns = [ column.public_id ]
+  }
+}
+
+table "neighborhoods_history" {
+  schema = schema.public
+
+  column "neighborhood_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "neighborhood_id" {
+    type = bigint
+    null = false
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+  }
+
+  column "name" {
+    type = text
+    null = false
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.neighborhood_history_id ]
+  }
+
+  index "idx_neighborhoods_history_neighborhood_id" {
+    columns = [ column.neighborhood_id ]
+  }
+}
+
+##############################
 ### Lookup Tables
 ##############################
 
@@ -2845,71 +3178,9 @@ table "land_uses" {
   }  
 }
 
-table "neighborhoods" {
-  schema = schema.public
 
-  column "neighborhood_id" {
-    type = bigint
-    null = false
 
-    identity {
-      generated = ALWAYS
-    }
-  }
 
-  column "public_id" {
-    type = uuid
-    null = false
-    default = sql("gen_random_uuid()")
-  }
-
-  column "name" {
-    type = text
-    null = false
-  }
-
-  primary_key {
-    columns = [ column.neighborhood_id ]
-  }
-
-  index "idx_neighborhoods_public_id" {
-    unique  = true
-    columns = [ column.public_id ]
-  }
-}
-
-table "market_areas" {
-  schema = schema.public
-
-  column "market_area_id" {
-    type = bigint
-    null = false
-
-    identity {
-      generated = ALWAYS
-    }
-  }
-
-  column "public_id" {
-    type = uuid
-    null = false
-    default = sql("gen_random_uuid()")
-  }
-
-  column "name" {
-    type = text
-    null = false
-  }
-
-  primary_key {
-    columns = [ column.market_area_id ]
-  }
-
-  index "idx_market_areas_public_id" {
-    unique  = true
-    columns = [ column.public_id ]
-  }
-}
 
 ##############################
 ### Geometry Functions
@@ -3084,6 +3355,29 @@ trigger "record_parcel_affordances_history" {
   # Point to the function that has the archive logic
   execute {
     function = function.record_parcel_affordances_history
+  }  
+}
+
+trigger "record_parcel_neighborhood_definitions_history" {
+  # Attach it to the current-state table
+  on = table.parcel_neighborhood_definitions
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_parcel_neighborhood_definitions_history
   }  
 }
 
@@ -3432,15 +3726,62 @@ trigger "record_improvement_valuations_history" {
   }
 }
 
+trigger "record_neighborhood_definitions_history" {
+  # Attach it to the current-state table
+  on = table.neighborhood_definitions
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_neighborhood_definitions_history
+  }
+}
+
+trigger "record_neighborhoods_history" {
+  # Attach it to the current-state table
+  on = table.neighborhoods
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_neighborhoods_history
+  }
+}
+
 trigger "history_immutable" {
   for_each = [
     table.parcels_history, table.parcel_geometry_history, table.parcel_attributes_history,
-    table.parcel_affordances_history, table.improvements_history, table.improvement_geometry_history,
+    table.parcel_affordances_history, table.parcel_neighborhood_definitions_history, table.improvements_history, 
+    table.improvement_geometry_history,
     table.improvement_attributes_history, table.zoning_history, table.zoning_attributes_history,
     table.owners_history, table.owner_attributes_history, table.addresses_history,
     table.address_attributes_history, table.sales_history, table.parcel_sales_history,
     table.improvement_sales_history, table.valuations_history, table.parcel_valuations_history,
-    table.improvement_valuations_history
+    table.improvement_valuations_history, table.neighborhood_definitions_history, table.neighborhoods_history
   ]
   on = each.value
 
@@ -3672,6 +4013,51 @@ function "record_parcel_affordances_history" {
             OLD.max_far,
             OLD.min_lot_size_sq_m,
             OLD.max_height_m,
+            OLD.legal_valid_range,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_parcel_neighborhood_definitions_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = trigger
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO parcel_neighborhood_definitions_history (
+            parcel_neighborhood_definition_id,
+            parcel_id,
+            neighborhood_id,
+            neighborhood_definition_id,
+            is_legal,
+            legal_valid_range,
+            system_valid_range
+          ) VALUES (
+            OLD.parcel_neighborhood_definition_id,
+            OLD.parcel_id,
+            OLD.neighborhood_id,
+            OLD.neighborhood_definition_id,
+            OLD.is_legal,
             OLD.legal_valid_range,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
           );
@@ -4362,6 +4748,86 @@ function "record_improvement_valuations_history" {
             OLD.market_value,
             OLD.assessed_value,
             OLD.legal_valid_range,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_neighborhood_definitions_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = trigger
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO neighborhood_definitions_history (
+            neighborhood_definition_id,
+            public_id,
+            name,
+            is_legal,
+            system_valid_range
+          ) VALUES (
+            OLD.neighborhood_definition_id,
+            OLD.public_id,
+            OLD.name,
+            OLD.is_legal,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_neighborhoods_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = trigger
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO neighborhoods_history (
+            neighborhood_id,
+            public_id,
+            name,
+            system_valid_range
+          ) VALUES (
+            OLD.neighborhood_id,
+            OLD.public_id,
+            OLD.name,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
           );
         END IF;

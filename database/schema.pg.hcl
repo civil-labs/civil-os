@@ -1956,8 +1956,8 @@ table "address_attributes" {
     null = false
   }
 
-  column "administrative_area" {
-    type = text
+  column "administrative_area_id" {
+    type = bigint
     null = true
   }
 
@@ -2028,6 +2028,12 @@ table "address_attributes" {
     on_delete = RESTRICT
   }
 
+  foreign_key "fk_administrative_area_id" {
+    columns = [ column.administrative_area_id ]
+    ref_columns = [ table.administrative_areas.column.administrative_area_id ]
+    on_delete = RESTRICT
+  }
+
   exclude "no_overlapping_address_attributes" {
     type = GIST
     on {
@@ -2068,8 +2074,8 @@ table "address_attributes_history" {
     null = false
   }
 
-  column "administrative_area" {
-    type = text
+  column "administrative_area_id" {
+    type = bigint
     null = true
   }
 
@@ -3002,6 +3008,11 @@ table "neighborhoods" {
     default = sql("gen_random_uuid()")
   }
 
+  column "legacy_id" {
+    type = text
+    null = true
+  }
+
   column "name" {
     type = text
     null = false
@@ -3043,6 +3054,11 @@ table "neighborhoods_history" {
   column "public_id" {
     type = uuid
     null = false
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
   }
 
   column "name" {
@@ -3140,6 +3156,45 @@ table "countries" {
 
 }
 
+table "administrative_areas" {
+  schema = schema.public
+
+  column "administrative_area_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
+  }
+
+  column "code" {
+    type = varchar(20)
+    null = false
+  }
+
+  column "name" {
+    type = varchar(100)
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.administrative_area_id ]
+  }
+
+  index "idx_administrative_areas_public_id" {
+    unique  = true
+    columns = [ column.public_id ]
+  }
+
+}
+
 table "land_uses" {
   schema = schema.public
 
@@ -3156,6 +3211,11 @@ table "land_uses" {
     type = uuid
     null = false
     default = sql("gen_random_uuid()")
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
   }
 
   column "code" {
@@ -3177,10 +3237,6 @@ table "land_uses" {
     columns = [ column.public_id ]
   }  
 }
-
-
-
-
 
 ##############################
 ### Geometry Functions
@@ -4461,7 +4517,7 @@ function "record_address_attributes_history" {
             address_attribute_id,
             address_id,
             country_id,
-            administrative_area,
+            administrative_area_id,
             locality,
             sublocality,
             postal_code,
@@ -4476,7 +4532,7 @@ function "record_address_attributes_history" {
             OLD.address_attribute_id,
             OLD.address_id,
             OLD.country_id,
-            OLD.administrative_area,
+            OLD.administrative_area_id,
             OLD.locality,
             OLD.sublocality,
             OLD.postal_code,
@@ -4822,11 +4878,13 @@ function "record_neighborhoods_history" {
           INSERT INTO neighborhoods_history (
             neighborhood_id,
             public_id,
+            legacy_id,
             name,
             system_valid_range
           ) VALUES (
             OLD.neighborhood_id,
             OLD.public_id,
+            OLD.legacy_id,
             OLD.name,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
           );

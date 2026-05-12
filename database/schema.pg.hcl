@@ -2513,6 +2513,279 @@ table "improvement_sales_history" {
   }  
 }
 
+table "sales_sale_codes" {
+  schema = schema.public
+
+  column "sales_sale_code_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "sale_id" {
+    type = bigint
+    null = false
+  }
+
+  column "sale_code_id" {
+    type = bigint
+    null = false
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.sales_sale_code_id ]
+  }
+
+  foreign_key "fk_sale_id" {
+    columns = [ column.sale_id ]
+    ref_columns = [ table.sales.column.sale_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_sale_code_id" {
+    columns = [ column.sale_code_id ]
+    ref_columns = [ table.sale_codes.column.sale_code_id ]
+    on_delete = RESTRICT
+  }
+
+  index "idx_sales_sale_codes_sale_id_sale_code_id" {
+    unique = true
+    columns = [ column.sale_id, column.sale_code_id ]
+  }  
+}
+
+table "sales_sale_codes_history" {
+  schema = schema.public
+
+  column "sales_sale_code_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "sales_sale_code_id" {
+    type = bigint
+    null = false
+  }
+
+  column "sale_id" {
+    type = bigint
+    null = false
+  }
+
+  column "sale_code_id" {
+    type = bigint
+    null = false
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.sales_sale_code_history_id ]
+  }
+
+  index "idx_sales_sale_codes_history_sales_sale_code_id" {
+    columns = [ column.sales_sale_code_id ]
+  }  
+
+  index "idx_sales_sale_codes_history_sale_id" {
+    columns = [ column.sale_id ]
+  }  
+
+  index "idx_sales_sale_codes_history_sale_code_id" {
+    columns = [ column.sale_code_id ]
+  }  
+}
+
+table "sale_codes" {
+  schema = schema.public
+
+  column "sale_code_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "sale_code_type_id" {
+    type = bigint
+    null = false
+  }
+
+  column "name" {
+    type = text
+    null = false
+  }
+
+  column "description" {
+    type = text
+    null = true
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.sale_code_id ]
+  }
+
+  foreign_key "fk_sale_code_types_id" {
+    columns = [ column.sale_code_type_id ]
+    ref_columns = [ table.sale_code_types.column.sale_code_type_id ]
+    on_delete = RESTRICT
+  }
+
+  index "idx_sale_codes_sale_code_type_id_name" {
+    unique  = true
+    columns = [column.sale_code_type_id, column.name]
+  }
+}
+
+table "sale_codes_history" {
+  schema = schema.public
+
+  column "sale_code_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "sale_code_id" {
+    type = bigint
+    null = false
+  }
+
+  column "sale_code_type_id" {
+    type = bigint
+    null = false
+  }
+
+  column "name" {
+    type = text
+    null = false
+  }
+
+  column "description" {
+    type = text
+    null = true
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.sale_code_history_id ]
+  }
+
+  index "idx_sale_codes_history_sale_code_id" {
+    columns = [ column.sale_code_id ]
+  } 
+}
+
+table "sale_code_types" {
+  schema = schema.public
+
+  column "sale_code_type_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "name" {
+    type = text
+    null = false
+  }
+
+  column "description" {
+    type = text
+    null = true
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.sale_code_type_id ]
+  }
+
+  index "idx_sale_code_types_name" {
+    unique  = true
+    columns = [column.name]
+  }
+}
+
+table "sale_code_types_history" {
+  schema = schema.public
+
+  column "sale_code_type_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "sale_code_type_id" {
+    type = bigint
+    null = false
+  }
+
+  column "name" {
+    type = text
+    null = false
+  }
+
+  column "description" {
+    type = text
+    null = true
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.sale_code_type_history_id ]
+  }
+
+  index "idx_sale_code_types_history_sale_code_type_id" {
+    columns = [ column.sale_code_type_id ]
+  } 
+}
+
 ##############################
 ### Valuations
 ##############################
@@ -3713,6 +3986,75 @@ trigger "record_improvement_sales_history" {
   }
 }
 
+trigger "record_sales_sale_codes_history" {
+  # Attach it to the current-state table
+  on = table.sales_sale_codes
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_sales_sale_codes_history
+  }
+}
+
+trigger "record_sale_codes_history" {
+  # Attach it to the current-state table
+  on = table.sale_codes
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_sale_codes_history
+  }
+}
+
+trigger "record_sale_code_types_history" {
+  # Attach it to the current-state table
+  on = table.sale_code_types
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_sale_code_types_history
+  }
+}
+
 trigger "record_valuations_history" {
   # Attach it to the current-state table
   on = table.valuations
@@ -3836,7 +4178,8 @@ trigger "history_immutable" {
     table.improvement_attributes_history, table.zoning_history, table.zoning_attributes_history,
     table.owners_history, table.owner_attributes_history, table.addresses_history,
     table.address_attributes_history, table.sales_history, table.parcel_sales_history,
-    table.improvement_sales_history, table.valuations_history, table.parcel_valuations_history,
+    table.improvement_sales_history, table.sales_sale_codes_history, table.sale_codes_history,
+    table.sale_code_types_history, table.valuations_history, table.parcel_valuations_history,
     table.improvement_valuations_history, table.neighborhood_definitions_history, table.neighborhoods_history
   ]
   on = each.value
@@ -4675,6 +5018,125 @@ function "record_improvement_sales_history" {
             OLD.improvement_sale_id,
             OLD.improvement_id,
             OLD.sale_id,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_sales_sale_codes_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = trigger
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO sales_sale_codes_history (
+            sales_sale_code_id,
+            sale_id,
+            sale_code_id,
+            system_valid_range
+          ) VALUES (
+            OLD.sales_sale_code_id,
+            OLD.sale_id,
+            OLD.sale_code_id,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_sale_codes_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = trigger
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO sale_codes_history (
+            sale_code_id,
+            sale_code_type_id,
+            name,
+            description,
+            system_valid_range
+          ) VALUES (
+            OLD.sale_code_id,
+            OLD.sale_code_type_id,
+            OLD.name,
+            OLD.description,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_sale_code_types_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = trigger
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO sale_code_types_history (
+            sale_code_type_id,
+            name,
+            description,
+            system_valid_range
+          ) VALUES (
+            OLD.sale_code_type_id,
+            OLD.name,
+            OLD.description,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
           );
         END IF;

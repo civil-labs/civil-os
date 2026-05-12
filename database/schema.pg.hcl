@@ -2185,11 +2185,6 @@ table "sales" {
     null = false
   }
 
-  column "is_vacant" {
-    type = bool
-    null = true
-  }
-
   column "sale_deed_book" {
     type = text
     null = true
@@ -2278,11 +2273,6 @@ table "sales_history" {
   column "sale_price" {
     type = numeric(19, 4)
     null = false
-  }
-
-  column "is_vacant" {
-    type = bool
-    null = true
   }
 
   column "sale_deed_book" {
@@ -2624,6 +2614,17 @@ table "sale_codes" {
     }
   }
 
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
+  }
+
   column "sale_code_type_id" {
     type = bigint
     null = false
@@ -2653,6 +2654,11 @@ table "sale_codes" {
     columns = [ column.sale_code_type_id ]
     ref_columns = [ table.sale_code_types.column.sale_code_type_id ]
     on_delete = RESTRICT
+  }
+
+  index "idx_valuations_public_id" {
+    unique  = true
+    columns = [column.public_id]
   }
 
   index "idx_sale_codes_sale_code_type_id_name" {
@@ -2719,6 +2725,17 @@ table "sale_code_types" {
     }
   }
 
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
+  }
+
   column "name" {
     type = text
     null = false
@@ -2737,6 +2754,11 @@ table "sale_code_types" {
 
   primary_key {
     columns = [ column.sale_code_type_id ]
+  }
+
+  index "idx_valuations_public_id" {
+    unique  = true
+    columns = [column.public_id]
   }
 
   index "idx_sale_code_types_name" {
@@ -4923,7 +4945,6 @@ function "record_sales_history" {
             buyer_id,
             sale_date,
             sale_price,
-            is_vacant,
             sale_deed_book,
             sale_deed_page,
             sale_deed_uri,
@@ -4936,7 +4957,6 @@ function "record_sales_history" {
             OLD.buyer_id,
             OLD.sale_date,
             OLD.sale_price,
-            OLD.is_vacant,
             OLD.sale_deed_book,
             OLD.sale_deed_page,
             OLD.sale_deed_uri,

@@ -2185,7 +2185,7 @@ table "sales" {
     null = false
   }
 
-  column "was_vacant" {
+  column "is_vacant" {
     type = bool
     null = true
   }
@@ -2280,7 +2280,7 @@ table "sales_history" {
     null = false
   }
 
-  column "was_vacant" {
+  column "is_vacant" {
     type = bool
     null = true
   }
@@ -4580,6 +4580,7 @@ function "record_sales_history" {
             buyer_id,
             sale_date,
             sale_price,
+            is_vacant,
             sale_deed_book,
             sale_deed_page,
             sale_deed_uri,
@@ -4592,6 +4593,7 @@ function "record_sales_history" {
             OLD.buyer_id,
             OLD.sale_date,
             OLD.sale_price,
+            OLD.is_vacant,
             OLD.sale_deed_book,
             OLD.sale_deed_page,
             OLD.sale_deed_uri,

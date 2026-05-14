@@ -147,6 +147,11 @@ table "parcels" {
     columns = [column.public_id]
   }
 
+  index "idx_parcels_legacy_id" {
+    unique  = true
+    columns = [column.legacy_id]
+  }
+
   check "chk_voided_logic" {
     expr = "(is_voided = false AND voided_at IS NULL) OR (is_voided = true AND voided_at IS NOT NULL)"
   }

@@ -1444,6 +1444,7 @@ table "improvement_attributes_history" {
 ### Improvement Conditions
 ##############################
 
+// Domain Anchor
 table "improvement_conditions" {
   schema = schema.public
 
@@ -1559,6 +1560,7 @@ table "improvement_conditions_history" {
   }
 }
 
+// Attributes
 table "improvement_condition_attributes" {
   schema = schema.public
 
@@ -1676,11 +1678,11 @@ table "improvement_condition_attributes_history" {
     columns = [ column.improvement_condition_attribute_history_id ]
   }
 
-  index "idx_improvement_condition_attributes_history_improvement_condition_attribute_id" {
+  index "idx_impr_cond_attr_history_impr_cond_attr_id" {
     columns = [ column.improvement_condition_attribute_id ]
   }
 
-  index "idx_improvement_condition_attributes_history_improvement_condition_id" {
+  index "idx_impr_cond_attr_history_impr_cond_id" {
     columns = [ column.improvement_condition_id ]
   }
 
@@ -3114,7 +3116,7 @@ table "sale_codes" {
     on_delete = RESTRICT
   }
 
-  index "idx_valuations_public_id" {
+  index "idx_sale_codes_public_id" {
     unique  = true
     columns = [column.public_id]
   }
@@ -3224,7 +3226,7 @@ table "sale_code_types" {
     columns = [ column.sale_code_type_id ]
   }
 
-  index "idx_valuations_public_id" {
+  index "idx_sale_code_types_public_id" {
     unique  = true
     columns = [column.public_id]
   }

@@ -7,6 +7,9 @@ schema "public" {
 
 extension "postgis" {
   schema = schema.public
+
+  // Specifying the schema here doesn't work for some reason. Need to revisit this at some point
+  // It defaults to 3.5.2
 }
 
 extension "btree_gist" {
@@ -1003,6 +1006,11 @@ table "improvements" {
     columns = [column.public_id]
   }
 
+  index "idx_improvements_legacy_id" {
+    unique  = true
+    columns = [column.legacy_id]
+  }
+
   check "chk_voided_logic" {
     expr = "(is_voided = false AND voided_at IS NULL) OR (is_voided = true AND voided_at IS NOT NULL)"
   }
@@ -1504,6 +1512,11 @@ table "improvement_conditions" {
     columns = [column.public_id]
   }
 
+  index "idx_improvement_conditions_legacy_id" {
+    unique  = true
+    columns = [column.legacy_id]
+  }
+
   check "chk_voided_logic" {
     expr = "(is_voided = false AND voided_at IS NULL) OR (is_voided = true AND voided_at IS NOT NULL)"
   }  
@@ -1750,6 +1763,11 @@ table "zoning" {
   index "idx_zoning_public_id" {
     unique  = true
     columns = [ column.public_id ]
+  }
+
+  index "idx_zoning_legacy_id" {
+    unique  = true
+    columns = [column.legacy_id]
   }
 
   check "chk_voided_logic" {
@@ -2029,6 +2047,11 @@ table "owners" {
     columns = [ column.public_id ]
   }
 
+  index "idx_owners_legacy_id" {
+    unique  = true
+    columns = [column.legacy_id]
+  }
+
   check "chk_voided_logic" {
     expr = "(is_voided = false AND voided_at IS NULL) OR (is_voided = true AND voided_at IS NOT NULL)"
   }
@@ -2280,6 +2303,11 @@ table "addresses" {
   index "idx_addresses_public_id" {
     unique  = true
     columns = [ column.public_id ]
+  }
+
+  index "idx_addresses_legacy_id" {
+    unique  = true
+    columns = [column.legacy_id]
   }
 
   check "chk_voided_logic" {
@@ -2651,6 +2679,11 @@ table "sales" {
     unique  = true
     columns = [column.public_id]
   }
+
+  index "idx_sales_legacy_id" {
+    unique  = true
+    columns = [column.legacy_id]
+  } 
 }
 
 table "sales_history" {
@@ -3126,6 +3159,11 @@ table "sale_codes" {
     columns = [column.public_id]
   }
 
+  index "idx_sale_codes_legacy_id" {
+    unique  = true
+    columns = [column.legacy_id]
+  }
+
   index "idx_sale_codes_sale_code_type_id_name" {
     unique  = true
     columns = [column.sale_code_type_id, column.name]
@@ -3147,6 +3185,17 @@ table "sale_codes_history" {
   column "sale_code_id" {
     type = bigint
     null = false
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
   }
 
   column "sale_code_type_id" {
@@ -3236,6 +3285,11 @@ table "sale_code_types" {
     columns = [column.public_id]
   }
 
+  index "idx_sale_code_types_legacy_id" {
+    unique  = true
+    columns = [column.legacy_id]
+  }
+
   index "idx_sale_code_types_name" {
     unique  = true
     columns = [column.name]
@@ -3252,6 +3306,17 @@ table "sale_code_types_history" {
     identity {
       generated = ALWAYS
     }
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
   }
 
   column "sale_code_type_id" {
@@ -3339,6 +3404,12 @@ table "valuations" {
     unique  = true
     columns = [column.public_id]
   }
+
+  index "idx_valuations_legacy_id" {
+    unique  = true
+    columns = [column.legacy_id]
+  }
+
 }
 
 table "valuations_history" {
@@ -3852,6 +3923,11 @@ table "neighborhoods" {
     unique  = true
     columns = [ column.public_id ]
   }
+
+  index "idx_neighborhoods_legacy_id" {
+    unique  = true
+    columns = [column.legacy_id]
+  }  
 }
 
 table "neighborhoods_history" {
@@ -4110,6 +4186,11 @@ table "land_uses" {
     unique  = true
     columns = [ column.public_id ]
   }  
+
+  index "idx_land_uses_legacy_id" {
+    unique  = true
+    columns = [column.legacy_id]
+  }
 }
 
 table "improvement_types" {
@@ -4168,7 +4249,12 @@ table "improvement_types" {
   index "idx_improvement_types_public_id" {
     unique  = true
     columns = [ column.public_id ]
-  }    
+  }
+
+  index "idx_improvement_types_legacy_id" {
+    unique  = true
+    columns = [column.legacy_id]
+  }  
 }
 
 ##############################
@@ -5921,6 +6007,8 @@ function "record_sale_codes_history" {
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
           INSERT INTO sale_codes_history (
             sale_code_id,
+            public_id,
+            legacy_id,
             sale_code_type_id,
             name,
             description,
@@ -5928,6 +6016,8 @@ function "record_sale_codes_history" {
             trace_id
           ) VALUES (
             OLD.sale_code_id,
+            OLD.public_id,
+            OLD.legacy_id,
             OLD.sale_code_type_id,
             OLD.name,
             OLD.description,
@@ -5964,12 +6054,16 @@ function "record_sale_code_types_history" {
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
           INSERT INTO sale_code_types_history (
             sale_code_type_id,
+            public_id,
+            legacy_id,
             name,
             description,
             system_valid_range,
             trace_id
           ) VALUES (
             OLD.sale_code_type_id,
+            OLD.public_id,
+            OLD.legacy_id,
             OLD.name,
             OLD.description,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),

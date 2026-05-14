@@ -1162,6 +1162,16 @@ table "improvement_attributes" {
     null = false
   }
 
+  column "improvement_type_id" {
+    type = bigint
+    null = false
+  }
+
+  column "improvement_condition_id" {
+    type = bigint
+    null = true
+  }
+
   column "area_sq_m" {
     type = double_precision
     null = true
@@ -1182,11 +1192,6 @@ table "improvement_attributes" {
     null = true
   }
 
-  column "condition_num" {
-    type = int
-    null = true
-  }
-  
   column "units" {
     type = int
     null = true
@@ -1227,6 +1232,18 @@ table "improvement_attributes" {
   foreign_key "fk_address_id" {
     columns = [ column.address_id ]
     ref_columns = [ table.addresses.column.address_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_improvement_type_id" {
+    columns = [ column.improvement_type_id ]
+    ref_columns = [ table.improvement_types.column.improvement_type_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_improvement_condition_id" {
+    columns = [ column.improvement_condition_id ]
+    ref_columns = [ table.improvement_conditions.column.improvement_condition_id ]
     on_delete = RESTRICT
   }
 
@@ -1331,6 +1348,232 @@ table "improvement_attributes_history" {
   index "idx_improvement_attributes_history_improvement_id" {
     columns = [ column.improvement_id ]
   }
+}
+
+##############################
+### Improvement Conditions
+##############################
+
+table "improvement_conditions" {
+  schema = schema.public
+
+  column "improvement_condition_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  } 
+
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
+  }
+
+  column "is_voided" {
+    type = boolean
+    null = false
+    default = false
+  }
+
+  column "voided_at" {
+    type = timestamptz
+    null = true
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.improvement_condition_id ]
+  }
+
+  index "idx_improvement_conditions_public_id" {
+    unique  = true
+    columns = [column.public_id]
+  }
+
+  check "chk_voided_logic" {
+    expr = "(is_voided = false AND voided_at IS NULL) OR (is_voided = true AND voided_at IS NOT NULL)"
+  }  
+}
+
+table "improvement_conditions_history" {
+  schema = schema.public
+
+  column "improvement_condition_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  } 
+
+  column "improvement_condition_id" {
+    type = bigint
+    null = false
+  } 
+
+  column "public_id" {
+    type = uuid
+    null = false
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
+  }
+
+  column "is_voided" {
+    type = boolean
+    null = false
+  }
+
+  column "voided_at" {
+    type = timestamptz
+    null = true
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.improvement_condition_history_id ]
+  }
+
+  index "idx_improvement_condition_history_improvement_condition_id" {
+    columns = [column.improvement_condition_id]
+  }
+}
+
+table "improvement_condition_attributes" {
+  schema = schema.public
+
+  column "improvement_condition_attribute_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  } 
+
+  column "improvement_condition_id" {
+    type = bigint
+    null = false
+  } 
+
+  column "name" {
+    type = text
+    null = false
+  }
+
+  column "depreciation_modifier" {
+    type = numeric(5,4)
+    null = false
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  primary_key {
+    columns = [ column.improvement_condition_attribute_id ]
+  }
+
+  foreign_key "fk_improvement_condition_id" {
+    columns = [ column.improvement_condition_id ]
+    ref_columns = [ table.improvement_conditions.column.improvement_condition_id ]
+    on_delete = RESTRICT
+  }
+
+  exclude "no_overlapping_improvement_conditions" {
+    type = GIST
+    on {
+      column = column.improvement_condition_id
+      op = "="
+    }
+    on {
+      column = column.legal_valid_range
+      op = "&&"
+    }
+  }
+}
+
+table "improvement_condition_attributes_history" {
+  schema = schema.public
+
+  column "improvement_condition_attribute_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  } 
+
+  column "improvement_condition_attribute_id" {
+    type = bigint
+    null = false
+  } 
+
+  column "improvement_condition_id" {
+    type = bigint
+    null = false
+  } 
+
+  column "name" {
+    type = text
+    null = false
+  }
+
+  column "depreciation_modifier" {
+    type = numeric(5,4)
+    null = false
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  primary_key {
+    columns = [ column.improvement_condition_attribute_history_id ]
+  }
+
+  index "idx_improvement_condition_attributes_history_improvement_condition_attribute_id" {
+    columns = [ column.improvement_condition_attribute_id ]
+  }
+
+  index "idx_improvement_condition_attributes_history_improvement_condition_id" {
+    columns = [ column.improvement_condition_id ]
+  }
+
 }
 
 ##############################
@@ -3470,7 +3713,7 @@ table "administrative_areas" {
   }
 
   column "code" {
-    type = varchar(20)
+    type = varchar(10)
     null = false
   }
 
@@ -3523,6 +3766,11 @@ table "land_uses" {
     null = false
   }
 
+  column "description" {
+    type = text
+    null = true
+  }
+
   primary_key {
     columns = [ column.land_use_id ]
   }
@@ -3531,6 +3779,54 @@ table "land_uses" {
     unique  = true
     columns = [ column.public_id ]
   }  
+}
+
+table "improvement_types" {
+  schema = schema.public
+
+  column "improvement_type_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
+  }
+
+  column "code" {
+    type = text
+    null = true
+  }
+
+  column "name" {
+    type = text
+    null = false
+  }
+
+  column "description" {
+    type = text
+    null = true
+  }
+
+  primary_key {
+    columns = [ column.improvement_type_id ]
+  }
+
+  index "idx_improvement_types_public_id" {
+    unique  = true
+    columns = [ column.public_id ]
+  }    
 }
 
 ##############################
@@ -3798,6 +4094,52 @@ trigger "record_improvement_attributes_history" {
   # Point to the function that has the archive logic
   execute {
     function = function.record_improvement_attributes_history
+  }  
+}
+
+trigger "record_improvement_conditions_history" {
+  # Attach it to the current-state table
+  on = table.improvement_conditions
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_improvement_conditions_history
+  }  
+}
+
+trigger "record_improvement_condition_attributes_history" {
+  # Attach it to the current-state table
+  on = table.improvement_condition_attributes
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_improvement_condition_attributes_history
   }  
 }
 
@@ -4196,8 +4538,8 @@ trigger "history_immutable" {
   for_each = [
     table.parcels_history, table.parcel_geometry_history, table.parcel_attributes_history,
     table.parcel_affordances_history, table.parcel_neighborhood_definitions_history, table.improvements_history, 
-    table.improvement_geometry_history,
-    table.improvement_attributes_history, table.zoning_history, table.zoning_attributes_history,
+    table.improvement_geometry_history, table.improvement_attributes_history, table.improvement_conditions_history,
+    table.improvement_condition_attributes_history, table.zoning_history, table.zoning_attributes_history,
     table.owners_history, table.owner_attributes_history, table.addresses_history,
     table.address_attributes_history, table.sales_history, table.parcel_sales_history,
     table.improvement_sales_history, table.sales_sale_codes_history, table.sale_codes_history,
@@ -4626,6 +4968,92 @@ function "record_improvement_attributes_history" {
             OLD.condition_num,
             OLD.units,
             OLD.properties,
+            OLD.legal_valid_range,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_improvement_conditions_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = trigger
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO improvement_conditions_history (
+            improvement_condition_id,
+            public_id,
+            legacy_id,
+            is_voided,
+            voided_at,
+            system_valid_range
+          ) VALUES (
+            OLD.improvement_condition_id,
+            OLD.public_id,
+            OLD.legacy_id,
+            OLD.is_voided,
+            OLD.voided_at,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_improvement_condition_attributes_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = trigger
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO improvement_condition_attributes_history (
+            improvement_condition_attribute_id,
+            improvement_condition_id,
+            name,
+            depreciation_modifier,
+            legal_valid_range,
+            system_valid_range
+          ) VALUES (
+            OLD.improvement_condition_attribute_id,
+            OLD.improvement_condition_id,
+            OLD.name,
+            OLD.depreciation_modifier,
             OLD.legal_valid_range,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
           );

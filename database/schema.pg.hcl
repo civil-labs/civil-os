@@ -37,6 +37,11 @@ table "system_settings" {
     default = sql("now()")
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }
+
   primary_key {
     columns = [column.system_setting_id]
   }
@@ -72,6 +77,11 @@ table "system_settings_history" {
     type = tstzrange
     null = false
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [column.system_setting_history_id]
@@ -122,6 +132,11 @@ table "parcels" {
     null = false
     default = sql("now()")
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.parcel_id ]
@@ -179,6 +194,11 @@ table "parcels_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.parcel_history_id ]
   }
@@ -231,6 +251,11 @@ table "parcel_geometry" {
     null = false
     default = sql("now()")
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.parcel_geometry_id ]
@@ -310,6 +335,11 @@ table "parcel_geometry_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.parcel_geometry_history_id ]
   }
@@ -385,6 +415,11 @@ table "parcel_attributes" {
     null = false
     default = sql("now()")
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.parcel_attribute_id ]
@@ -493,6 +528,11 @@ table "parcel_attributes_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.parcel_attribute_history_id ]
   }
@@ -576,6 +616,11 @@ table "parcel_affordances" {
     null = false
     default = sql("now()")
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.parcel_affordance_id ]
@@ -702,6 +747,11 @@ table "parcel_affordances_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.parcel_affordance_history_id ]
   }
@@ -757,6 +807,11 @@ table "parcel_neighborhood_definitions" {
     null = false
     default = sql("now()")
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.parcel_neighborhood_definition_id ]
@@ -858,6 +913,11 @@ table "parcel_neighborhood_definitions_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.parcel_neighborhood_definition_history_id ]
   }
@@ -928,6 +988,11 @@ table "improvements" {
     columns = [ column.improvement_id ]
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   index "idx_improvements_public_id" {
     unique  = true
     columns = [column.public_id]
@@ -979,6 +1044,11 @@ table "improvements_history" {
     type = tstzrange
     null = false
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.improvement_history_id ]
@@ -1037,6 +1107,11 @@ table "improvement_geometry" {
     null = false
     default = sql("now()")
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.improvement_geometry_id ]
@@ -1120,6 +1195,11 @@ table "improvement_geometry_history" {
     type = tstzrange
     null = false
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.improvement_geometry_history_id ]
@@ -1211,6 +1291,11 @@ table "improvement_attributes" {
     type = timestamptz
     null = false
     default = sql("now()")
+  }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
   }
 
   primary_key {
@@ -1337,6 +1422,11 @@ table "improvement_attributes_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.improvement_attribute_history_id ]
   }
@@ -1394,6 +1484,11 @@ table "improvement_conditions" {
     default = sql("now()")
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.improvement_condition_id ]
   }
@@ -1450,6 +1545,11 @@ table "improvement_conditions_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.improvement_condition_history_id ]
   }
@@ -1496,6 +1596,11 @@ table "improvement_condition_attributes" {
     null = false
     default = sql("now()")
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.improvement_condition_attribute_id ]
@@ -1562,6 +1667,11 @@ table "improvement_condition_attributes_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.improvement_condition_attribute_history_id ]
   }
@@ -1621,6 +1731,11 @@ table "zoning" {
     default = sql("now()")
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.zoning_id ]
   }
@@ -1676,6 +1791,11 @@ table "zoning_history" {
     type = tstzrange
     null = false
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.zoning_history_id ]
@@ -1739,6 +1859,11 @@ table "zoning_attributes" {
     null = false
     default = sql("now()")
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.zoning_attribute_id ]
@@ -1820,6 +1945,11 @@ table "zoning_attributes_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.zoning_attribute_history_id ]
   }
@@ -1878,6 +2008,11 @@ table "owners" {
     default = sql("now()")
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.owner_id ]
   }  
@@ -1934,6 +2069,11 @@ table "owners_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.owner_history_id ]
   }
@@ -1981,6 +2121,11 @@ table "owner_attributes" {
     null = false
     default = sql("now()")
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.owner_attribute_id ]
@@ -2053,6 +2198,11 @@ table "owner_attributes_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.owner_attribute_history_id ]
   }
@@ -2111,6 +2261,11 @@ table "addresses" {
     default = sql("now()")
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.address_id ]
   }  
@@ -2166,6 +2321,11 @@ table "addresses_history" {
     type = tstzrange
     null = false
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.address_history_id ]
@@ -2254,6 +2414,11 @@ table "address_attributes" {
     null = false
     default = sql("now()")
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.address_attribute_id ]
@@ -2367,6 +2532,11 @@ table "address_attributes_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.address_attribute_history_id ]
   }
@@ -2448,6 +2618,11 @@ table "sales" {
     null = false
     default = sql("now()")
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.sale_id ]
@@ -2538,6 +2713,11 @@ table "sales_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.sale_history_id ]
   }
@@ -2575,6 +2755,11 @@ table "parcel_sales" {
     null = false
     default = sql("now()")
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.parcel_sale_id ]
@@ -2630,6 +2815,11 @@ table "parcel_sales_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.parcel_sale_history_id ]
   }
@@ -2674,6 +2864,11 @@ table "improvement_sales" {
     null = false
     default = sql("now()")
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.improvement_sale_id ]
@@ -2729,6 +2924,11 @@ table "improvement_sales_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.improvement_sale_history_id ]
   }
@@ -2773,6 +2973,11 @@ table "sales_sale_codes" {
     null = false
     default = sql("now()")
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.sales_sale_code_id ]
@@ -2828,6 +3033,11 @@ table "sales_sale_codes_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.sales_sale_code_history_id ]
   }
@@ -2881,13 +3091,18 @@ table "sale_codes" {
   column "description" {
     type = text
     null = true
-  }
+  } 
 
   column "system_updated_at" {
     type = timestamptz
     null = false
     default = sql("now()")
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  } 
 
   primary_key {
     columns = [ column.sale_code_id ]
@@ -2947,6 +3162,11 @@ table "sale_codes_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.sale_code_history_id ]
   }
@@ -2995,6 +3215,11 @@ table "sale_code_types" {
     default = sql("now()")
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.sale_code_type_id ]
   }
@@ -3041,6 +3266,11 @@ table "sale_code_types_history" {
     type = tstzrange
     null = false
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.sale_code_type_history_id ]
@@ -3089,6 +3319,11 @@ table "valuations" {
     default = sql("now()")
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.valuation_id ]
   }
@@ -3135,6 +3370,11 @@ table "valuations_history" {
     type = tstzrange
     null = false
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.valuation_history_id ]
@@ -3187,6 +3427,11 @@ table "parcel_valuations" {
     null = false
     default = sql("now()")
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.parcel_valuation_id ]
@@ -3269,6 +3514,11 @@ table "parcel_valuations_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.parcel_valuation_history_id ]
   }
@@ -3328,6 +3578,11 @@ table "improvement_valuations" {
     null = false
     default = sql("now()")
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.improvement_valuation_id ]
@@ -3410,6 +3665,11 @@ table "improvement_valuations_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.improvement_valuation_history_id ]
   }
@@ -3465,6 +3725,11 @@ table "neighborhood_definitions" {
     default = sql("now()")
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.neighborhood_definition_id ]
   }
@@ -3519,6 +3784,11 @@ table "neighborhood_definitions_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.neighborhood_definition_history_id ]
   }
@@ -3561,6 +3831,11 @@ table "neighborhoods" {
     null = false
     default = sql("now()")
   }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.neighborhood_id ]
@@ -3609,6 +3884,11 @@ table "neighborhoods_history" {
     null = false
   }
 
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.neighborhood_history_id ]
   }
@@ -3644,6 +3924,17 @@ table "affordance_types" {
     type = text
     null = false
   }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.affordance_type_id ]
@@ -3683,6 +3974,17 @@ table "countries" {
     null = false
   }
 
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.country_id ]
   }
@@ -3721,6 +4023,17 @@ table "administrative_areas" {
     type = varchar(100)
     null = false
   }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.administrative_area_id ]
@@ -3771,6 +4084,17 @@ table "land_uses" {
     null = true
   }
 
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
   primary_key {
     columns = [ column.land_use_id ]
   }
@@ -3818,6 +4142,17 @@ table "improvement_types" {
     type = text
     null = true
   }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
 
   primary_key {
     columns = [ column.improvement_type_id ]
@@ -4579,11 +4914,13 @@ function "record_system_settings_history" {
           INSERT INTO system_settings_history (
             system_setting_id,
             base_currency,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.system_setting_id,
             OLD.base_currency,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -4618,14 +4955,16 @@ function "record_parcels_history" {
             legacy_id,
             is_voided,
             voided_at,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.parcel_id,
             OLD.public_id,
             OLD.legacy_id,
             OLD.is_voided,
             OLD.voided_at,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -4661,7 +5000,8 @@ function "record_parcel_geometry_history" {
             geom_legal,
             local_srid,
             legal_valid_range,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.parcel_geometry_id,
             OLD.parcel_id,
@@ -4669,7 +5009,8 @@ function "record_parcel_geometry_history" {
             OLD.geom_legal,
             OLD.local_srid,
             OLD.legal_valid_range,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -4710,7 +5051,8 @@ function "record_parcel_attributes_history" {
             market_area_id,
             properties,
             legal_valid_range,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.parcel_attribute_id,
             OLD.parcel_id,
@@ -4722,7 +5064,8 @@ function "record_parcel_attributes_history" {
             OLD.market_area_id,
             OLD.properties,
             OLD.legal_valid_range,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -4764,7 +5107,8 @@ function "record_parcel_affordances_history" {
             min_lot_size_sq_m,
             max_height_m,
             legal_valid_range,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.parcel_affordance_id,
             OLD.public_id,
@@ -4777,7 +5121,8 @@ function "record_parcel_affordances_history" {
             OLD.min_lot_size_sq_m,
             OLD.max_height_m,
             OLD.legal_valid_range,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -4814,7 +5159,8 @@ function "record_parcel_neighborhood_definitions_history" {
             neighborhood_definition_id,
             is_legal,
             legal_valid_range,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.parcel_neighborhood_definition_id,
             OLD.parcel_id,
@@ -4822,7 +5168,8 @@ function "record_parcel_neighborhood_definitions_history" {
             OLD.neighborhood_definition_id,
             OLD.is_legal,
             OLD.legal_valid_range,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -4858,14 +5205,16 @@ function "record_improvements_history" {
             legacy_id,
             is_voided,
             voided_at,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.improvement_id,
             OLD.public_id,
             OLD.legacy_id,
             OLD.is_voided,
             OLD.voided_at,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -4903,7 +5252,8 @@ function "record_improvement_geometry_history" {
             local_horizontal_srid,
             local_vertical_datum,
             legal_valid_range,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.improvement_geometry_id,
             OLD.improvement_id,
@@ -4912,7 +5262,8 @@ function "record_improvement_geometry_history" {
             OLD.local_horizontal_srid,
             OLD.local_vertical_datum,
             OLD.legal_valid_range,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -4955,7 +5306,8 @@ function "record_improvement_attributes_history" {
             units,
             properties,
             legal_valid_range,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.improvement_attribute_id,
             OLD.improvement_id,
@@ -4969,7 +5321,8 @@ function "record_improvement_attributes_history" {
             OLD.units,
             OLD.properties,
             OLD.legal_valid_range,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -5005,14 +5358,16 @@ function "record_improvement_conditions_history" {
             legacy_id,
             is_voided,
             voided_at,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.improvement_condition_id,
             OLD.public_id,
             OLD.legacy_id,
             OLD.is_voided,
             OLD.voided_at,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -5048,14 +5403,16 @@ function "record_improvement_condition_attributes_history" {
             name,
             depreciation_modifier,
             legal_valid_range,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.improvement_condition_attribute_id,
             OLD.improvement_condition_id,
             OLD.name,
             OLD.depreciation_modifier,
             OLD.legal_valid_range,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -5091,14 +5448,16 @@ function "record_zoning_history" {
             legacy_id,
             is_voided,
             voided_at,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.zoning_id,
             OLD.public_id,
             OLD.legacy_id,
             OLD.is_voided,
             OLD.voided_at,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -5137,7 +5496,8 @@ function "record_zoning_attributes_history" {
             min_lot_size_sq_m,
             max_height_m,
             legal_valid_range,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.zoning_attribute_id,
             OLD.zoning_id,
@@ -5147,7 +5507,8 @@ function "record_zoning_attributes_history" {
             OLD.min_lot_size_sq_m,
             OLD.max_height_m,
             OLD.legal_valid_range,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -5183,14 +5544,16 @@ function "record_owners_history" {
             legacy_id,
             is_voided,
             voided_at,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.owner_id,
             OLD.public_id,
             OLD.legacy_id,
             OLD.is_voided,
             OLD.voided_at,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -5226,14 +5589,16 @@ function "record_owner_attributes_history" {
             name,
             address_id,
             legal_valid_range,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.owner_attribute_id,
             OLD.owner_id,
             OLD.name,
             OLD.address_id,
             OLD.legal_valid_range,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -5269,14 +5634,16 @@ function "record_addresses_history" {
             legacy_id,
             is_voided,
             voided_at,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.address_id,
             OLD.public_id,
             OLD.legacy_id,
             OLD.is_voided,
             OLD.voided_at,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -5320,7 +5687,8 @@ function "record_address_attributes_history" {
             formatted_address,
             coordinates,
             legal_valid_range,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.address_attribute_id,
             OLD.address_id,
@@ -5335,7 +5703,8 @@ function "record_address_attributes_history" {
             OLD.formatted_address,
             OLD.coordinates,
             OLD.legal_valid_range,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -5376,7 +5745,8 @@ function "record_sales_history" {
             sale_deed_book,
             sale_deed_page,
             sale_deed_uri,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.sale_id,
             OLD.public_id,
@@ -5388,7 +5758,8 @@ function "record_sales_history" {
             OLD.sale_deed_book,
             OLD.sale_deed_page,
             OLD.sale_deed_uri,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -5422,12 +5793,14 @@ function "record_parcel_sales_history" {
             parcel_sale_id,
             parcel_id,
             sale_id,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.parcel_sale_id,
             OLD.parcel_id,
             OLD.sale_id,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -5461,12 +5834,14 @@ function "record_improvement_sales_history" {
             improvement_sale_id,
             improvement_id,
             sale_id,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.improvement_sale_id,
             OLD.improvement_id,
             OLD.sale_id,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -5500,12 +5875,14 @@ function "record_sales_sale_codes_history" {
             sales_sale_code_id,
             sale_id,
             sale_code_id,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.sales_sale_code_id,
             OLD.sale_id,
             OLD.sale_code_id,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -5540,13 +5917,15 @@ function "record_sale_codes_history" {
             sale_code_type_id,
             name,
             description,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.sale_code_id,
             OLD.sale_code_type_id,
             OLD.name,
             OLD.description,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -5580,12 +5959,14 @@ function "record_sale_code_types_history" {
             sale_code_type_id,
             name,
             description,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.sale_code_type_id,
             OLD.name,
             OLD.description,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -5620,13 +6001,15 @@ function "record_valuations_history" {
             public_id,
             legacy_id,
             valuation_date,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.valuation_id,
             OLD.public_id,
             OLD.legacy_id,
             OLD.valuation_date,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -5663,7 +6046,8 @@ function "record_parcel_valuations_history" {
             market_value,
             assessed_value,
             legal_valid_range,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.parcel_valuation_id,
             OLD.parcel_id,
@@ -5671,7 +6055,8 @@ function "record_parcel_valuations_history" {
             OLD.market_value,
             OLD.assessed_value,
             OLD.legal_valid_range,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -5708,7 +6093,8 @@ function "record_improvement_valuations_history" {
             market_value,
             assessed_value,
             legal_valid_range,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.improvement_valuation_id,
             OLD.improvement_id,
@@ -5716,7 +6102,8 @@ function "record_improvement_valuations_history" {
             OLD.market_value,
             OLD.assessed_value,
             OLD.legal_valid_range,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -5751,13 +6138,15 @@ function "record_neighborhood_definitions_history" {
             public_id,
             name,
             is_legal,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.neighborhood_definition_id,
             OLD.public_id,
             OLD.name,
             OLD.is_legal,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           
@@ -5792,13 +6181,15 @@ function "record_neighborhoods_history" {
             public_id,
             legacy_id,
             name,
-            system_valid_range
+            system_valid_range,
+            trace_id
           ) VALUES (
             OLD.neighborhood_id,
             OLD.public_id,
             OLD.legacy_id,
             OLD.name,
-            tstzrange(OLD.system_updated_at, current_transaction_time, '[)')
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
           );
         END IF;
           

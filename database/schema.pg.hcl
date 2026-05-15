@@ -3825,6 +3825,11 @@ table "neighborhood_definitions" {
     unique  = true
     columns = [ column.public_id ]
   }
+
+  index "idx_neighborhood_definitions_name" {
+    unique  = true
+    columns = [ column.name ]
+  }
 }
 
 table "neighborhood_definitions_history" {

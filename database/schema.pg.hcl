@@ -3933,8 +3933,13 @@ table "neighborhoods" {
 
   index "idx_neighborhoods_legacy_id" {
     unique  = true
-    columns = [column.legacy_id]
+    columns = [column.legacy_id] 
   }  
+
+  index "idx_neighborhoods_name" {
+    unique  = true
+    columns = [ column.name ]
+  }
 }
 
 table "neighborhoods_history" {
@@ -4198,6 +4203,11 @@ table "land_uses" {
     unique  = true
     columns = [column.legacy_id]
   }
+
+  index "idx_land_uses_name" {
+    unique  = true
+    columns = [ column.name ]
+  }
 }
 
 table "improvement_types" {
@@ -4261,7 +4271,12 @@ table "improvement_types" {
   index "idx_improvement_types_legacy_id" {
     unique  = true
     columns = [column.legacy_id]
-  }  
+  }
+
+  index "idx_improvement_types_name" {
+    unique  = true
+    columns = [ column.name ]
+  }
 }
 
 ##############################

@@ -391,25 +391,25 @@ table "parcel_attributes" {
     null = false
   }
 
-  column "land_area_sq_m" {
-    type = double_precision
-    null = false
-  }
-
   column "land_use_id" {
     type = bigint
     null = false
   }
 
-  column "neighborhood_id" {
-    type = bigint
+  column "land_area_sq_m" {
+    type = double_precision
     null = true
   }
 
-  column "market_area_id" {
-    type = bigint
+  column "frontage_m" {
+    type = double_precision
     null = true
   }
+
+  column "depth_m" {
+    type = double_precision
+    null = true
+  }  
 
   column "properties" {
     type = jsonb
@@ -506,22 +506,22 @@ table "parcel_attributes_history" {
 
   column "land_area_sq_m" {
     type = double_precision
-    null = false
+    null = true
   }
+
+  column "frontage_m" {
+    type = double_precision
+    null = true
+  }
+
+  column "depth_m" {
+    type = double_precision
+    null = true
+  }  
 
   column "land_use_id" {
     type = bigint
     null = false
-  }
-
-  column "neighborhood_id" {
-    type = bigint
-    null = true
-  }
-
-  column "market_area_id" {
-    type = bigint
-    null = true
   }
 
   column "properties" {

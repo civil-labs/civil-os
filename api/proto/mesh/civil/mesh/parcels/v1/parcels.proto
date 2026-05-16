@@ -51,8 +51,8 @@ message Parcel {
   optional double frontage_m = 10;
   optional double depth_m = 11;
   repeated string zoning_ids = 12;
-  string market_land_value = 13;
-  string assessed_land_value = 14;
+  optional string market_land_value = 13;
+  optional string assessed_land_value = 14;
   ParcelAffordances affordances = 15;
   ParcelImprovementsSummary improvement_summary = 16;
   string properties = 17;

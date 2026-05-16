@@ -326,7 +326,7 @@ message GetParcelsByIdRequest {
   // If omitted, defaults to the current time.
   optional google.protobuf.Timestamp system_as_of = 3 [
     (buf.validate.field).timestamp = {
-      // You cannot query the database's state as of tomorrow!
+      // From the Unix Epoch till now
       gt: {seconds: -1}
       lt_now: true
     },

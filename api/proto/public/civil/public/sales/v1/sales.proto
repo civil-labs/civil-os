@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package civil.sales.parcels.v1;
+
+import "buf/validate/validate.proto";
+import "gnostic/openapi/v3/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+service SalesService {
+  // Retrieves all of a specified parcel's attributes as an object.
+  rpc GetSalesByParcelId(GetSalesByParcelIdRequest) returns (GetSalesByParcelIdResponse) {
+    // Give connect the option to use GET requests, but don't advertise it in the Swagger
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Retrieves a set of summary statistics about the specified numerical attribute for a specified list of parcels. Optionally returns the values as well
+  rpc GetSalesByPolygon(GetSalesByPolygonRequest) returns (GetSalesByPolygonResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message Sale {
+    string sale_id = 1 [
+        (buf.validate.field).string.uuid = true,
+
+        // Gnostic annotation for example
+        (gnostic.openapi.v3.property) = {
+            description: "The unique identifier of a sale."
+            example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+        }
+    ];
+
+    google.protobuf.Timestamp sale_timestamp = 2 [
+        (buf.validate.field).timestamp = {
+        // Bounded to prevent integer overflow or absurd historical queries
+            gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+        },
+
+        (gnostic.openapi.v3.property) = {description: "The time the sale occured at."}
+    ];
+
+    string sale_price = 3 [
+        (buf.validate.field).string = {
+            // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
+            pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
+        },
+    ]
+
+    string sale_deed_book = 4;
+    string sale_deed_page = 5;
+    string sale_deed_uri = 6;
+
+    string seller_name = 7;
+    string seller_address = 8;
+    string seller_id = 9;
+
+    string buyer_name = 7;
+    string buyer_address = 8;
+    string buyer_id = 9;
+}
+
+message GetSalesByParcelIdRequest {
+
+    
+
+    optional google.protobuf.Timestamp system_as_of = 3 [
+        (buf.validate.field).timestamp = {
+            // From the Unix Epoch till now
+            gt: {seconds: -1}
+            lt_now: true
+        },
+        (gnostic.openapi.v3.property) = {description: "The transaction time to evaluate the database state against. Defaults to now."}
+    ];
+}
+
+message GetSalesByParcelIdResponse {
+
+}
+
+message GetSalesByPolygonRequest {
+
+}
+
+message GetSalesByPolygonResponse {
+
+}

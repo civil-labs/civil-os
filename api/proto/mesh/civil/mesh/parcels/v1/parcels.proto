@@ -32,8 +32,8 @@ message ParcelImprovementsSummary {
   int32 total_units = 5;
   optional int32 oldest_year_built = 6;
   optional int32 newest_year_built = 7;
-  optional int32 worst_condition_id = 8;
-  optional int32 best_condition_id = 9;
+  optional string worst_condition_id = 8;
+  optional string best_condition_id = 9;
   optional string market_improvement_value = 10;
   optional string assessed_improvement_value = 11;
 }

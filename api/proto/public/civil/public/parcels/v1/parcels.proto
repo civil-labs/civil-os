@@ -74,7 +74,7 @@ message ParcelAffordances {
 
     // Gnostic annotation updated to reflect an array format for the example
     (gnostic.openapi.v3.property) = {
-      description: "A list of unique identifiers for the affordancces on the parcel."
+      description: "A list of unique identifiers for the affordances on the parcel."
       example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
     }
   ];
@@ -112,16 +112,16 @@ message ParcelImprovementsSummary {
     }
   ];
 
-  // Additives: Physically impossible to be negative
-  optional double total_area_sq_ft = 2 [(buf.validate.field).double = {gte: 0.0}];
+  // Physically impossible to be negative
+  double total_area_sq_ft = 2 [(buf.validate.field).double = {gte: 0.0}];
 
-  optional int32 total_bathrooms = 3 [(buf.validate.field).int32 = {gte: 0}];
+  int32 total_bathrooms = 3 [(buf.validate.field).int32 = {gte: 0}];
 
-  optional int32 total_bedrooms = 4 [(buf.validate.field).int32 = {gte: 0}];
+  int32 total_bedrooms = 4 [(buf.validate.field).int32 = {gte: 0}];
 
-  optional int32 total_units = 5 [(buf.validate.field).int32 = {gte: 0}];
+  int32 total_units = 5 [(buf.validate.field).int32 = {gte: 0}];
 
-  // Temporals: Bounded to realistic historical/future parameters
+  // Bounded to realistic historical/future parameters
   optional int32 oldest_year_built = 6 [(buf.validate.field).int32 = {
     gte: -12000 /* Lower bound for any potential human-built structure on Earth */
     lte: 2100 // Allows for planned construction currently in the permit phase and future proofs the spec for a while
@@ -132,16 +132,44 @@ message ParcelImprovementsSummary {
     lte: 2100
   }];
 
-  // Qualitatives: Bounded to Civil's specific property condition ordinal scale
-  optional int32 lowest_condition_num = 8 [(buf.validate.field).int32 = {
-    gte: 1 // Assuming a 1-10 grading scale
-    lte: 10
-  }];
+  // Worst and best based on the conditions' depreciation factors
+  optional string worst_condition_id = 8 [
+    (buf.validate.field).string.uuid = true,
 
-  optional int32 highest_condition_num = 9 [(buf.validate.field).int32 = {
-    gte: 1
-    lte: 10
-  }];
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier for the parcel owner."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+
+  optional string best_condition_id = 9 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier for the parcel owner."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+
+  optional string market_improvement_value = 10 [
+    (buf.validate.field).string = {
+      // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
+      pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
+    },
+
+    (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for improvements attached to this parcel"}
+  ];
+
+  optional string assessed_improvement_value = 11 [
+    (buf.validate.field).string = {
+      // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
+      pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
+    },
+
+    (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for improvements attached to this parcel"}
+  ];
 }
 
 message Parcel {
@@ -190,9 +218,7 @@ message Parcel {
     }
   ];
 
-  double land_area_sq_ft = 7 [(buf.validate.field).double = {gte: 0.0}];
-
-  string land_use_id = 8 [
+  string land_use_id = 7 [
     (buf.validate.field).string.uuid = true,
 
     // Gnostic annotation for example
@@ -202,33 +228,27 @@ message Parcel {
     }
   ];
 
-  optional string neighborhood_id = 9 [
+  optional string neighborhood_id = 8 [
     (buf.validate.field).string.uuid = true,
 
     // Gnostic annotation for example
     (gnostic.openapi.v3.property) = {
-      description: "The unique identifier for the parcel's neighborhood."
+      description: "The unique identifier for the parcel's neighborhood. Will only populate if a neighborhood definition ID is provided, and the parcel has a neighborhood for that definition."
       example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
     }
   ];
 
-  optional string market_area_id = 10 [
-    (buf.validate.field).string.uuid = true,
+  optional double land_area_sq_ft = 9 [(buf.validate.field).double = {gte: 0.0}];
 
-    // Gnostic annotation for example
-    (gnostic.openapi.v3.property) = {
-      description: "The unique identifier for the parcel's market area."
-      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
-    }
-  ];
+  optional double frontage_m = 10 [(buf.validate.field).double = {gte: 0.0}];
 
-  repeated string zoning_ids = 11 [
+  optional double depth_m = 11 [(buf.validate.field).double = {gte: 0.0}];
+
+  repeated string zoning_ids = 12 [
     (buf.validate.field).repeated = {
       // Communicate all will be unique
       unique: true
 
-      // A single parcel will rarely have more than a
-      // handful of improvements (e.g., House, Garage, Shed, Pool).
       max_items: 50
 
       // Communicate all are UUIDs
@@ -244,31 +264,29 @@ message Parcel {
     }
   ];
 
-  string market_land_value = 12 [(buf.validate.field).string = {
-    // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
-    pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
-  }];
+  optional string market_land_value = 13 [
+    (buf.validate.field).string = {
+      // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
+      pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
+    },
 
-  string assessed_land_value = 13 [(buf.validate.field).string = {
-    // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
-    pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
-  }];
+    (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for this parcel"}
+  ];
 
-  string market_improvement_value = 14 [(buf.validate.field).string = {
-    // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
-    pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
-  }];
+  optional string assessed_land_value = 14 [
+    (buf.validate.field).string = {
+      // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
+      pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
+    },
 
-  string assessed_improvement_value = 15 [(buf.validate.field).string = {
-    // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
-    pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
-  }];
+    (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for this parcel"}
+  ];
 
-  ParcelAffordances affordances = 16;
+  ParcelAffordances affordances = 15;
 
-  ParcelImprovementsSummary improvement_summary = 17;
+  ParcelImprovementsSummary improvement_summary = 16;
 
-  string properties = 18 [(buf.validate.field).string = {
+  string properties = 17 [(buf.validate.field).string = {
     max_len: 1048576 // 1MB limit
   }];
 }
@@ -313,6 +331,26 @@ message GetParcelsByIdRequest {
       lt_now: true
     },
     (gnostic.openapi.v3.property) = {description: "The transaction time to evaluate the database state against. Defaults to now."}
+  ];
+
+  optional string valuation_id = 4 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier of a valuation."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+
+  optional string neighborhood_definition_id = 5 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier of a neighborhood definition."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
   ];
 }
 

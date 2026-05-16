@@ -26,14 +26,16 @@ message ParcelAffordances {
 
 message ParcelImprovementsSummary {
   repeated string improvement_ids = 1;
-  optional double total_area_sq_ft = 2;
-  optional int32 total_bathrooms = 3;
-  optional int32 total_bedrooms = 4;
-  optional int32 total_units = 5;
+  double total_area_sq_ft = 2;
+  int32 total_bathrooms = 3;
+  int32 total_bedrooms = 4;
+  int32 total_units = 5;
   optional int32 oldest_year_built = 6;
   optional int32 newest_year_built = 7;
-  optional int32 lowest_condition_num = 8;
-  optional int32 highest_condition_num = 9;
+  optional int32 worst_condition_id = 8;
+  optional int32 best_condition_id = 9;
+  optional string market_improvement_value = 10;
+  optional string assessed_improvement_value = 11;
 }
 
 message Parcel {
@@ -43,24 +45,25 @@ message Parcel {
   string owner_name = 4;
   string owner_address = 5;
   string owner_id = 6;
-  double land_area_sq_ft = 7;
-  string land_use_id = 8;
-  optional string neighborhood_id = 9;
-  optional string market_area_id = 10;
-  repeated string zoning_ids = 11;
-  string market_land_value = 12;
-  string assessed_land_value = 13;
-  string market_improvement_value = 14;
-  string assessed_improvement_value = 15;
-  ParcelAffordances affordances = 16;
-  ParcelImprovementsSummary improvement_summary = 17;
-  string properties = 18;
+  string land_use_id = 7;
+  optional string neighborhood_id = 8;
+  optional double land_area_sq_ft = 9;
+  optional double frontage_m = 10;
+  optional double depth_m = 11;
+  repeated string zoning_ids = 12;
+  string market_land_value = 13;
+  string assessed_land_value = 14;
+  ParcelAffordances affordances = 15;
+  ParcelImprovementsSummary improvement_summary = 16;
+  string properties = 17;
 }
 
 message GetParcelsByIdRequest {
   repeated string parcel_ids = 1;
   optional google.protobuf.Timestamp legal_as_of = 2;
   optional google.protobuf.Timestamp system_as_of = 3;
+  optional string valuation_id = 4;
+  optional string neighborhood_definition_id = 5;
 }
 
 message GetParcelsByIdResponse {

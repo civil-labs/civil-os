@@ -122,15 +122,9 @@ message ParcelImprovementsSummary {
   int32 total_units = 5 [(buf.validate.field).int32 = {gte: 0}];
 
   // Bounded to realistic historical/future parameters
-  optional int32 oldest_year_built = 6 [(buf.validate.field).int32 = {
-    gte: -12000 /* Lower bound for any potential human-built structure on Earth */
-    lte: 2100 // Allows for planned construction currently in the permit phase and future proofs the spec for a while
-  }];
+  optional int32 oldest_year_built = 6 [(buf.validate.field).int32 = {}];
 
-  optional int32 newest_year_built = 7 [(buf.validate.field).int32 = {
-    gte: -12000 /* Lower bound for any potential human-built structure on Earth */
-    lte: 2100
-  }];
+  optional int32 newest_year_built = 7 [(buf.validate.field).int32 = {}];
 
   // Worst and best based on the conditions' depreciation factors
   optional string worst_condition_id = 8 [
@@ -184,7 +178,7 @@ message Parcel {
   ];
 
   optional string address = 2 [(buf.validate.field).string = {
-    min_len: 1
+    min_len: 0
     max_len: 1024
   }];
 
@@ -199,12 +193,12 @@ message Parcel {
   ];
 
   optional string owner_name = 4 [(buf.validate.field).string = {
-    min_len: 1
+    min_len: 0
     max_len: 512
   }];
 
   optional string owner_address = 5 [(buf.validate.field).string = {
-    min_len: 1
+    min_len: 0
     max_len: 1024
   }];
 

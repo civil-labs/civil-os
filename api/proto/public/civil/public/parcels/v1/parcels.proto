@@ -128,8 +128,8 @@ message ParcelImprovementsSummary {
 
   optional weighted_average_depreciation_modifier = 8 [
     (buf.validate.field).string = {
-        // Requires exactly one optional minus sign, one digit, a decimal, and up to 4 digits.
-        pattern: "^-?[0-9]\\.[0-9]{1,4}$"
+        // Matches 0, 0.0000 -> 0.9999, 1, and 1.0000
+        pattern: "^(0(\\.[0-9]{1,4})?|1(\\.0{1,4})?)$"
     }
 
     (gnostic.openapi.v3.property) = {

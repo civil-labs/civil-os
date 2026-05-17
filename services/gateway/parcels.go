@@ -25,16 +25,17 @@ func (s *ParcelServer) GetParcelsById(
 	s.logger.Debug("received GetParcelsById request")
 
 	meshReq := connect.NewRequest(&meshparcelsv1.GetParcelsByIdRequest{
-		ParcelIds:  req.Msg.ParcelIds,
-		LegalAsOf:  req.Msg.LegalAsOf,
-		SystemAsOf: req.Msg.SystemAsOf,
+		ParcelIds:                req.Msg.ParcelIds,
+		LegalAsOf:                req.Msg.LegalAsOf,
+		SystemAsOf:               req.Msg.SystemAsOf,
+		NeighborhoodDefinitionId: req.Msg.NeighborhoodDefinitionId,
 	})
 
 	meshRes, err := s.dbReaderClient.GetParcelsById(ctx, meshReq)
 	if err != nil {
 		// ConnectRPC automatically handles wrapping standard gRPC error codes
 		// You might want to log the internal error here, but return a sanitized error to the public client
-		slog.Error("upstream GetParcesls request failed", slog.Any("error", err))
+		s.logger.Error("upstream GetParcelsById request failed", slog.Any("error", err))
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 

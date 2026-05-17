@@ -2625,7 +2625,7 @@ table "sales" {
     null = false
   }
 
-  column "sale_date" {
+  column "sale_timestamp" {
     type = timestamptz
     null = false
   }
@@ -2725,7 +2725,7 @@ table "sales_history" {
     null = false
   }
 
-  column "sale_date" {
+  column "sale_timestamp" {
     type = timestamptz
     null = false
   }
@@ -5855,7 +5855,7 @@ function "record_sales_history" {
             legacy_id,
             seller_id,
             buyer_id,
-            sale_date,
+            sale_timestamp,
             sale_price,
             sale_deed_book,
             sale_deed_page,
@@ -5868,7 +5868,7 @@ function "record_sales_history" {
             OLD.legacy_id,
             OLD.seller_id,
             OLD.buyer_id,
-            OLD.sale_date,
+            OLD.sale_timestamp,
             OLD.sale_price,
             OLD.sale_deed_book,
             OLD.sale_deed_page,

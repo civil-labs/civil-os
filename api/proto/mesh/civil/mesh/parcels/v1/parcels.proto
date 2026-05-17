@@ -55,7 +55,7 @@ message Parcel {
   optional string assessed_land_value = 14;
   ParcelAffordances affordances = 15;
   ParcelImprovementsSummary improvement_summary = 16;
-  string properties = 17;
+  optional string properties = 17;
 }
 
 message GetParcelsByIdRequest {

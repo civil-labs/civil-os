@@ -44,7 +44,7 @@ message Sale {
             // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
             pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
         }
-    ]
+    ];
 
     string sale_deed_book = 4;
     string sale_deed_page = 5;

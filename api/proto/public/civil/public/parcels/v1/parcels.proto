@@ -183,12 +183,12 @@ message Parcel {
     }
   ];
 
-  string address = 2 [(buf.validate.field).string = {
+  optional string address = 2 [(buf.validate.field).string = {
     min_len: 1
     max_len: 1024
   }];
 
-  string address_id = 3 [
+  optional string address_id = 3 [
     (buf.validate.field).string.uuid = true,
 
     // Gnostic annotation for example
@@ -198,17 +198,17 @@ message Parcel {
     }
   ];
 
-  string owner_name = 4 [(buf.validate.field).string = {
+  optional string owner_name = 4 [(buf.validate.field).string = {
     min_len: 1
     max_len: 512
   }];
 
-  string owner_address = 5 [(buf.validate.field).string = {
+  optional string owner_address = 5 [(buf.validate.field).string = {
     min_len: 1
     max_len: 1024
   }];
 
-  string owner_id = 6 [
+  optional string owner_id = 6 [
     (buf.validate.field).string.uuid = true,
 
     // Gnostic annotation for example
@@ -218,7 +218,7 @@ message Parcel {
     }
   ];
 
-  string land_use_id = 7 [
+  optional string land_use_id = 7 [
     (buf.validate.field).string.uuid = true,
 
     // Gnostic annotation for example

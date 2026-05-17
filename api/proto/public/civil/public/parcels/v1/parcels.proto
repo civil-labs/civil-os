@@ -126,28 +126,39 @@ message ParcelImprovementsSummary {
 
   optional int32 newest_year_built = 7 [(buf.validate.field).int32 = {}];
 
+  optional weighted_average_depreciation_modifier = 8 [
+    (buf.validate.field).string = {
+        // Requires exactly one optional minus sign, one digit, a decimal, and up to 4 digits.
+        pattern: "^-?[0-9]\\.[0-9]{1,4}$"
+    }
+
+    (gnostic.openapi.v3.property) = {
+      description: "The average of the depreciation modifiers of the conditions of every improvement on this parcel, as weighted by their floor areas"
+    }
+  ];
+
   // Worst and best based on the conditions' depreciation factors
-  optional string worst_condition_id = 8 [
+  optional string worst_condition_id = 9 [
     (buf.validate.field).string.uuid = true,
 
     // Gnostic annotation for example
     (gnostic.openapi.v3.property) = {
-      description: "The unique identifier for the parcel owner."
+      description: "The worst condition of an improvement on this parcel, as sorted by their depreciation modifiers."
       example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
     }
   ];
 
-  optional string best_condition_id = 9 [
+  optional string best_condition_id = 10 [
     (buf.validate.field).string.uuid = true,
 
     // Gnostic annotation for example
     (gnostic.openapi.v3.property) = {
-      description: "The unique identifier for the parcel owner."
+      description: "The best condition of an improvement on this parcel, as sorted by their depreciation modifiers."
       example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
     }
   ];
 
-  optional string market_improvement_value = 10 [
+  optional string market_improvement_value = 11 [
     (buf.validate.field).string = {
       // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
       pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
@@ -156,7 +167,7 @@ message ParcelImprovementsSummary {
     (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for improvements attached to this parcel"}
   ];
 
-  optional string assessed_improvement_value = 11 [
+  optional string assessed_improvement_value = 12 [
     (buf.validate.field).string = {
       // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
       pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"

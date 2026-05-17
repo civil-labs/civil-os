@@ -126,11 +126,11 @@ message ParcelImprovementsSummary {
 
   optional int32 newest_year_built = 7 [(buf.validate.field).int32 = {}];
 
-  optional weighted_average_depreciation_modifier = 8 [
+  optional string weighted_average_depreciation_modifier = 8 [
     (buf.validate.field).string = {
         // Matches 0, 0.0000 -> 0.9999, 1, and 1.0000
         pattern: "^(0(\\.[0-9]{1,4})?|1(\\.0{1,4})?)$"
-    }
+    },
 
     (gnostic.openapi.v3.property) = {
       description: "The average of the depreciation modifiers of the conditions of every improvement on this parcel, as weighted by their floor areas"

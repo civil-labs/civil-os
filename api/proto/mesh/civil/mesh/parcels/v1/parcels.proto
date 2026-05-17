@@ -32,10 +32,11 @@ message ParcelImprovementsSummary {
   int32 total_units = 5;
   optional int32 oldest_year_built = 6;
   optional int32 newest_year_built = 7;
-  optional string worst_condition_id = 8;
-  optional string best_condition_id = 9;
-  optional string market_improvement_value = 10;
-  optional string assessed_improvement_value = 11;
+  optional string weighted_average_depreciation_modifier = 8;
+  optional string worst_condition_id = 9;
+  optional string best_condition_id = 10;
+  optional string market_improvement_value = 11;
+  optional string assessed_improvement_value = 12;
 }
 
 message Parcel {

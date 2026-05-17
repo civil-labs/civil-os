@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package civil.sales.parcels.v1;
+package civil.public.sales.v1;
 
 import "buf/validate/validate.proto";
 import "gnostic/openapi/v3/annotations.proto";
@@ -54,9 +54,9 @@ message Sale {
     string seller_address = 8;
     string seller_id = 9;
 
-    string buyer_name = 7;
-    string buyer_address = 8;
-    string buyer_id = 9;
+    string buyer_name = 10;
+    string buyer_address = 11;
+    string buyer_id = 12;
 }
 
 message GetSalesByParcelIdRequest {

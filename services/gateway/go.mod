@@ -4,11 +4,12 @@ go 1.26.1
 
 require (
 	connectrpc.com/connect v1.19.1
+	connectrpc.com/grpchealth v1.4.0
 	connectrpc.com/validate v0.6.0
 	github.com/aws/aws-sdk-go-v2 v1.41.1
 	github.com/aws/aws-sdk-go-v2/config v1.32.7
 	github.com/aws/aws-sdk-go-v2/service/servicediscovery v1.39.22
-	github.com/civil-labs/civil-api-go v0.0.0-20260319125358-0607a6143bab
+	github.com/civil-labs/civil-api-go v0.0.0-20260517145310-deee9bfe5384
 	github.com/coreos/go-oidc/v3 v3.17.0
 	google.golang.org/protobuf v1.36.11
 )

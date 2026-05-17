@@ -1,28 +1,33 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
+	"strconv"
 	"strings"
 )
 
 // Config holds all the runtime configuration
 type Config struct {
-	Namespace               string
-	TileServerLocalHostName string
-	Port                    string
-	IDPLocalPort            string
-	IDPLocalHostName        string
-	Verbose                 string
+	Verbose           bool
+	Port              uint16
+	AuthServer        string
+	IDPHost           string // Use local address here. Its where the gateway will make requests for JWKS
+	DBReaderHost      string
+	TileServerHost    string
+	AllowedClientsIds []string
 }
 
-func LoadConfig() (*Config, error) {
+func LoadConfig(logger *slog.Logger) (*Config, error) {
 	// Define the list of required environment variables
 	required := []string{
-		"CIVIL_CLOUD_MAP_NAMESPACE",
-		"CIVIL_TILE_SERVER_LOCAL_HOSTNAME",
-		"CIVIL_IDP_LOCAL_HOSTNAME",
-		"CIVIL_IDP_LOCAL_PORT",
+		"CIVIL_AUTH_SERVER",
+		"CIVIL_IDP_HOST",
+		"CIVIL_TILE_SERVER_HOST",
+		"CIVIL_ALLOWED_CLIENT_IDS",
+		"CIVIL_DB_READER_HOST",
 	}
 
 	// Loop through and check for missing ones
@@ -41,12 +46,13 @@ func LoadConfig() (*Config, error) {
 	// Return the populated config struct
 	// You can also set defaults here for optional vars (like Port)
 	return &Config{
-		Port:                    getEnv("PORT", "8080"),
-		Verbose:                 getEnv("CIVIL_VERBOSE", "false"),
-		Namespace:               os.Getenv("CIVIL_CLOUD_MAP_NAMESPACE"),
-		TileServerLocalHostName: os.Getenv("CIVIL_TILE_SERVER_LOCAL_HOSTNAME"),
-		IDPLocalHostName:        os.Getenv("CIVIL_IDP_LOCAL_HOSTNAME"),
-		IDPLocalPort:            os.Getenv("CIVIL_IDP_LOCAL_PORT"),
+		Verbose:           getVerboseEnv(),
+		Port:              getPortEnv("CIVIL_PORT", 8080, logger),
+		AuthServer:        os.Getenv("CIVIL_AUTH_SERVER"),
+		IDPHost:           os.Getenv("CIVIL_IDP_HOST"),
+		TileServerHost:    os.Getenv("CIVIL_TILE_SERVER_HOST"),
+		DBReaderHost:      os.Getenv("CIVIL_DB_READER_HOST"),
+		AllowedClientsIds: getAllowedClientIdsEnv(),
 	}, nil
 }
 
@@ -56,4 +62,55 @@ func getEnv(key, fallback string) string {
 		return value
 	}
 	return fallback
+}
+
+func getVerboseEnv() bool {
+	if value, exists := os.LookupEnv("CIVIL_VERBOSE"); exists {
+		verbose, err := strconv.ParseBool(value)
+
+		if err != nil {
+			slog.Error("Failure in parsing CIVIL_VERBOSE. Defaulting to false", slog.Any("error", err))
+			return false
+		}
+
+		return verbose
+	}
+
+	return false
+}
+
+func getPortEnv(key string, fallback uint16, logger *slog.Logger) uint16 {
+	if value, exists := os.LookupEnv(key); exists {
+		var intValue, err = strconv.ParseUint(value, 10, 16)
+
+		if err != nil {
+			logger.Warn("Failure in parsing integer. Falling back to default", slog.Any("error", err), slog.Int("applied_default", int(fallback)))
+			return fallback
+		}
+
+		return uint16(intValue)
+	} else {
+		return fallback
+	}
+
+}
+
+func getAllowedClientIdsEnv() []string {
+	if value, exists := os.LookupEnv("CIVIL_ALLOWED_CLIENT_IDS"); exists {
+		var clientIds []string
+
+		if value != "" {
+			// Unmarshal the JSON string directly into the slice
+			err := json.Unmarshal([]byte(value), &clientIds)
+			if err != nil {
+				slog.Error("Failed to parse CIVIL_ALLOWED_CLIENT_IDS. Defaulting to empty slice", slog.Any("error", err))
+				return []string{}
+			}
+		}
+
+		return clientIds
+	}
+
+	slog.Error("Can't find required environment variable CIVIL_ALLOWED_CLIENT_IDS. Defaulting to empty slice")
+	return []string{}
 }

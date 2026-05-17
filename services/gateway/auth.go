@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"log"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -25,19 +26,19 @@ type Claims struct {
 }
 
 // RequireAuth is the middleware wrapper
-func RequireAuth(verbose bool, localHostName string, localPort string, namespace string, allowedClientIDs []string) (func(http.Handler) http.Handler, error) {
+func RequireAuth(verbose bool, authServer string, idpHost string, allowedClientIDs []string, logger *slog.Logger) (func(http.Handler) http.Handler, error) {
 
 	providerConfig := oidc.ProviderConfig{
-		IssuerURL:   "https://auth.civillabs.app",
-		AuthURL:     "https://auth.civillabs.app",
-		TokenURL:    "https://auth.civillabs.app/token",
-		UserInfoURL: "https://auth.civillabs.app/userinfo",
-		JWKSURL:     "http://" + localHostName + "." + namespace + ":" + localPort + "/keys",
+		IssuerURL:   "https://" + authServer,
+		AuthURL:     "https://" + authServer,
+		TokenURL:    "https://" + authServer + "/token",
+		UserInfoURL: "https://" + authServer + "/userinfo",
+		JWKSURL:     "http://" + idpHost + "/keys",
 		Algorithms:  []string{"RS256"}, // Dex uses RS256 by default
 	}
 
 	if verbose {
-		DumpRawJWKS(providerConfig.JWKSURL)
+		DumpRawJWKS(providerConfig.JWKSURL, logger)
 	}
 
 	// Initialize the Provider to securely fetch the JWKS keys from Dex
@@ -59,7 +60,7 @@ func RequireAuth(verbose bool, localHostName string, localPort string, namespace
 				http.Error(w, "Unauthorized: Missing or invalid Bearer token", http.StatusUnauthorized)
 
 				if verbose {
-					log.Println("Unauthorized: Missing or invalid Bearer token")
+					logger.Debug("Unauthorized: Missing or invalid Bearer token")
 				}
 
 				return
@@ -73,10 +74,10 @@ func RequireAuth(verbose bool, localHostName string, localPort string, namespace
 			// Verify the cryptographic signature and expiration
 			idToken, err := verifier.Verify(r.Context(), rawIDToken)
 			if err != nil {
-				log.Printf("Unauthorized: Invalid or expired token. Error: %v", err)
+				http.Error(w, "Unauthorized: Invalid or expired token", http.StatusUnauthorized)
 
 				if verbose {
-					http.Error(w, "Unauthorized: Invalid or expired token", http.StatusUnauthorized)
+					logger.Debug("Unauthorized: Invalid or expired token", slog.Any("error", err))
 				}
 
 				return
@@ -99,7 +100,7 @@ func RequireAuth(verbose bool, localHostName string, localPort string, namespace
 				http.Error(w, "Unauthorized: Unrecognized client application", http.StatusUnauthorized)
 
 				if verbose {
-					log.Println("Unauthorized: Unrecognized client application")
+					logger.Debug("Unauthorized: Unrecognized client application")
 				}
 
 				return
@@ -111,7 +112,7 @@ func RequireAuth(verbose bool, localHostName string, localPort string, namespace
 				http.Error(w, "Internal Error: Failed to parse identity claims", http.StatusInternalServerError)
 
 				if verbose {
-					log.Printf("Unauthorized: Failed to parse identity claims. Error: %v", err)
+					logger.Debug("Unauthorized: Failed to parse identity claims", slog.Any("error", err))
 				}
 
 				return
@@ -120,6 +121,10 @@ func RequireAuth(verbose bool, localHostName string, localPort string, namespace
 			// 4. Inject the claims into the request context
 			ctx := context.WithValue(r.Context(), userContextKey, claims)
 
+			if verbose {
+				slog.Debug("authentication successful")
+			}
+
 			// Pass the request down the chain with the newly populated context
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
@@ -127,22 +132,21 @@ func RequireAuth(verbose bool, localHostName string, localPort string, namespace
 }
 
 // DumpRawJWKS makes a raw HTTP request to the IDP and prints the exact response body.
-func DumpRawJWKS(jwksURL string) {
-	log.Printf("🕵️ DEBUG: Attempting to fetch raw keys from %s", jwksURL)
+func DumpRawJWKS(jwksURL string, logger *slog.Logger) {
+	logger.Debug("attempting to fetch raw keys from %s", jwksURL)
 
 	resp, err := http.Get(jwksURL)
 	if err != nil {
-		log.Printf("🚨 DEBUG FATAL: Network request failed: %v", err)
+		logger.Debug("network request failed", slog.Any("error", err))
 		return
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("🚨 DEBUG FATAL: Failed to read response body: %v", err)
+		logger.Debug("failed to read JWKS response body", slog.Any("error", err))
 		return
 	}
 
-	log.Printf("🕵️ DEBUG: HTTP Status %d", resp.StatusCode)
-	log.Printf("🕵️ DEBUG: RAW JWKS PAYLOAD:\n%s", string(body))
+	logger.Debug("JWKS response", slog.Any("status", resp.StatusCode), slog.Any("payload", string(body)))
 }

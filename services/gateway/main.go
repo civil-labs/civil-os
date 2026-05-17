@@ -2,53 +2,47 @@ package main
 
 import (
 	"context"
-	"log"
+	"errors"
+	"fmt"
+	"log/slog"
+	"net"
 	"net/http"
 	"net/http/httputil"
-	"net/url"
-	"strconv"
+	"os"
+	"os/signal"
+	"strings"
+	"syscall"
 	"time"
 
-	"github.com/civil-labs/civil-api-go/civil/parcels/v1/parcelsv1connect"
+	"github.com/civil-labs/civil-api-go/civil/public/parcels/v1/parcelsv1connect"
+
+	meshparcelsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/parcels/v1/parcelsv1connect"
 
 	"connectrpc.com/connect"
+	"connectrpc.com/grpchealth"
 	"connectrpc.com/validate"
 )
 
 func main() {
-	cfg, err := LoadConfig()
+	// Create context, logger, and config first
+	_, cancelApp := context.WithCancel(context.Background())
+	defer cancelApp()
+
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
+	config, err := LoadConfig(logger)
 	if err != nil {
-		// Log fatal ensures the app exits with a non-zero status code
-		log.Fatalf("Configuration Error: %v", err)
+		logger.Error("failed to load config", slog.Any("error", err))
+		os.Exit(1)
 	}
 
-	log.Printf("Starting proxy on port %s for Service: %s in Namespace: %s",
-		cfg.Port, cfg.TileServerLocalHostName, cfg.Namespace)
-
-	//
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	// Replace with your actual Cloud Map details
-	tileServers, err := NewBackendManager(ctx, cfg.Namespace, cfg.TileServerLocalHostName)
-	if err != nil {
-		log.Fatalf("Failed to init tile service load balancer: %v", err)
+	if config.Verbose {
+		logger.Info("Starting proxy", slog.Any("address", config.TileServerHost))
 	}
 
-	// Poll AWS every 30 seconds
-	tileServers.StartPolling(ctx, 30*time.Second)
-
-	// 2. Create the Reverse Proxy with a custom Director
+	// Create the Reverse Proxy for the Tile Server with a custom Director
 	proxy := &httputil.ReverseProxy{
 		Director: func(req *http.Request) {
-			// Get next target from our load balancer
-			targetStr, err := tileServers.NextEndpoint()
-			if err != nil {
-				// If no backends, we can't really fail gracefully inside Director
-				// best effort is to log. The handler will eventually error out.
-				log.Printf("Proxy error: %v", err)
-				return
-			}
 
 			originalHost := req.Host
 
@@ -56,30 +50,30 @@ func main() {
 				originalHost = req.URL.Host // Fallback
 			}
 
-			// Parse the target URL (e.g. "http://10.0.1.5:8080")
-			// In a real app, you might parse these once and cache them,
-			// but parsing here is negligible for most tile loads.
-			targetURL, _ := url.Parse(targetStr)
+			// Rewrite the request to target the tile server
+			req.URL.Scheme = "http"
+			req.URL.Host = config.TileServerHost
 
-			// Rewrite the request to target the backend
-			req.URL.Scheme = targetURL.Scheme
-			req.URL.Host = targetURL.Host
+			// Update the Host header so the tile server accepts it
+			req.Host = config.TileServerHost
 
-			// Important: Update the Host header so the backend accepts it
-			req.Host = targetURL.Host
-
-			// 3. TELL THE BACKEND THE TRUTH
-			// "The user actually typed 'civillabs.app'"
+			// TELL THE BACKEND THE TRUTH
+			// "The real host"
 			req.Header.Set("X-Forwarded-Host", originalHost)
 
 			// "The user is using HTTPS (even if we are talking HTTP right now)"
 			req.Header.Set("X-Forwarded-Proto", "https")
 
-			// "This is the user's real IP" (Optional but good for logs)
-			req.Header.Set("X-Real-IP", req.RemoteAddr)
+			// The user's real IP (Optional but good for logs)
+			// Safely extract JUST the IP address, dropping the ephemeral port
+			ip, _, err := net.SplitHostPort(req.RemoteAddr)
+			if err == nil {
+				req.Header.Set("X-Real-IP", ip)
+			} else {
+				// Fallback if RemoteAddr was somehow just an IP without a port
+				req.Header.Set("X-Real-IP", req.RemoteAddr)
+			}
 
-			// Note: We do NOT touch req.URL.Path here.
-			// It has already been stripped by the middleware below.
 		},
 
 		// This is needed to strip off any conflicting header details that the Tile Server attaches
@@ -95,63 +89,127 @@ func main() {
 		},
 	}
 
-	// Handle the bool parse here, as the config function
-	// should pass it straight
-	verbose, err := strconv.ParseBool(cfg.Verbose)
+	auth, err := RequireAuth(config.Verbose, config.AuthServer, config.IDPHost, config.AllowedClientsIds, logger)
 
-	if err != nil {
-		log.Fatal(err)
+	dbReaderAddress := "http://" + config.DBReaderHost
+
+	meshClient := meshparcelsv1connect.NewParcelsServiceClient(
+		http.DefaultClient,
+		dbReaderAddress, // The Envoy-routable address for the db-reader service
+	)
+
+	parcelsServer := &ParcelServer{
+		dbReaderClient: meshClient,
+		logger:         logger,
 	}
-
-	allowedClientIDs := []string{"civil-prototype-frontend"}
-
-	auth, err := RequireAuth(verbose, cfg.IDPLocalHostName, cfg.IDPLocalPort, cfg.Namespace, allowedClientIDs)
-
-	parcelsServer := &ParcelServer{}
 
 	mux := http.NewServeMux()
 
-	path, handler := parcelsv1connect.NewParcelsServiceHandler(
+	parcelsPath, parcelsHandler := parcelsv1connect.NewParcelsServiceHandler(
 		parcelsServer,
 		connect.WithInterceptors(validate.NewInterceptor()),
 	)
 
-	mux.Handle(path, handler)
+	mux.Handle(parcelsPath, CORSMiddleware(parcelsHandler, config.Verbose, logger))
 
-	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), verbose))
-	mux.HandleFunc("/health", HealthCheckHandler(tileServers))
+	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), config.Verbose, logger))
+	mux.HandleFunc("/health", HealthCheckHandler(config.Verbose))
+
+	// Pass the fully qualified name of the service so the health check
+	// can report on this specific service, as well as the global server status.
+	checker := grpchealth.NewStaticChecker(
+		parcelsv1connect.ParcelsServiceName,
+	)
+
+	healthPath, healthHandler := grpchealth.NewHandler(checker)
+	mux.Handle(healthPath, healthHandler)
+
+	listenPort := fmt.Sprintf(":%d", config.Port)
 
 	p := new(http.Protocols)
 	p.SetHTTP1(true)
-	
+
 	// Use h2c so we can serve HTTP/2 without TLS.
 	p.SetUnencryptedHTTP2(true)
-	s := http.Server{
-		Addr:      ":" + cfg.Port,
+	httpSrv := http.Server{
+		Addr:      listenPort,
 		Handler:   mux,
 		Protocols: p,
 	}
 
-	log.Printf("Server listening on :%s", cfg.Port)
+	shutdownSig := make(chan os.Signal, 1)
+	signal.Notify(shutdownSig, os.Interrupt, syscall.SIGTERM)
 
-	if err := s.ListenAndServe(); err != nil {
-		log.Fatal(err)
+	serverErr := make(chan error, 1)
+
+	// Start the HTTP server in a background goroutine
+	go func() {
+		logger.Info("starting connect server", slog.Int("port", int(config.Port)))
+		serverErr <- httpSrv.ListenAndServe()
+	}()
+
+	// This is inited by default to go's int zero value, zero
+	var exitCode int
+
+	// Block main() until something happens
+	select {
+	case err := <-serverErr:
+		// The server crashed prematurely
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			logger.Error("server crashed", slog.Any("error", err))
+			exitCode = 1
+		}
+	case sig := <-shutdownSig:
+		// Graceful shutdown signal received
+		logger.Info("received shutdown signal", slog.String("signal", sig.String()))
+
+		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 15*time.Second)
+		defer shutdownCancel()
+
+		if err := httpSrv.Shutdown(shutdownCtx); err != nil {
+			logger.Error("HTTP graceful shutdown failed", slog.Any("error", err))
+			exitCode = 1
+		}
 	}
+
+	// This block runs no matter how the select statement unblocked.
+	slog.Info("stopping background workers...")
+	cancelApp()
+
+	slog.Info("teardown complete. exiting.")
+	os.Exit(exitCode)
 
 }
 
-func CORSMiddleware(next http.Handler, verbose bool) http.Handler {
+func CORSMiddleware(next http.Handler, verbose bool, logger *slog.Logger) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		if verbose {
-			log.Println("CORS middleware activated")
+			logger.Info("CORS middleware activated")
 		}
 
 		// 1. ALWAYS set headers (Success, Failure, or Preflight)
-		// This guarantees the browser never sees a "Missing Header" error.
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", strings.Join([]string{
+			"Authorization",
+			"Content-Type",
+			"Connect-Protocol-Version",
+			"Connect-Timeout-Ms",
+			"Connect-Accept-Encoding",
+			"Connect-Content-Encoding",
+			"Grpc-Timeout",
+			"X-Grpc-Web",
+			"X-User-Agent",
+		}, ", "))
+		w.Header().Set("Access-Control-Expose-Headers", strings.Join([]string{
+			"Connect-Protocol-Version",
+			"Connect-Timeout-Ms",
+			"Grpc-Status",
+			"Grpc-Message",
+			"Grpc-Status-Details-Bin",
+		}, ", "))
+		w.Header().Set("Access-Control-Max-Age", "7200")
 
 		// 2. Handle Preflight
 		if r.Method == "OPTIONS" {

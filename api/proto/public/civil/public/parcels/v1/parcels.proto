@@ -46,12 +46,12 @@ service ParcelsService {
   rpc UpdateParcel(UpdateParcelRequest) returns (UpdateParcelResponse) {}
 
   // Retrieves a set of summary statistics about the specified numerical attribute for a specified list of parcels. Optionally returns the values as well
-  rpc GetNumericalParcelStatsById(GetNumericalParcelStatsByIdRequest) returns (GetNumericalParcelStatsByIdResponse) {
+  rpc GetNumericalParcelAttributeStatsById(GetNumericalParcelAttributeStatsByIdRequest) returns (GetNumericalParcelAttributeStatsByIdResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
   // Retrieves a set of summary statistics about the specified categorical attribute for a specified list of parcels. Optionally returns the values as well
-  rpc GetCategoricalParcelStatsById(GetCategoricalParcelStatsByIdRequest) returns (GetCategoricalParcelStatsByIdResponse) {
+  rpc GetCategoricalAttributeParcelStatsById(GetCategoricalAttributeParcelStatsByIdRequest) returns (GetCategoricalAttributeParcelStatsByIdResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
@@ -160,8 +160,8 @@ message ParcelImprovementsSummary {
 
   optional string market_improvement_value = 11 [
     (buf.validate.field).string = {
-      // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
-      pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
+      // Strictly caps digits to 15 before the decimal, and up to 4 after. Matches the source DB column, which is numeric(19,4)
+      pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"
     },
 
     (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for improvements attached to this parcel"}
@@ -169,8 +169,8 @@ message ParcelImprovementsSummary {
 
   optional string assessed_improvement_value = 12 [
     (buf.validate.field).string = {
-      // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
-      pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
+      // Strictly caps digits to 15 before the decimal, and up to 4 after. Matches the source DB column, which is numeric(19,4)
+      pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"
     },
 
     (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for improvements attached to this parcel"}
@@ -271,8 +271,8 @@ message Parcel {
 
   optional string market_land_value = 13 [
     (buf.validate.field).string = {
-      // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
-      pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
+      // Strictly caps digits to 15 before the decimal, and up to 4 after. Matches the source DB column, which is numeric(19,4)
+      pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"
     },
 
     (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for this parcel"}
@@ -280,8 +280,8 @@ message Parcel {
 
   optional string assessed_land_value = 14 [
     (buf.validate.field).string = {
-      // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
-      pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
+      // Strictly caps digits to 15 before the decimal, and up to 4 after. Matches the source DB column, which is numeric(19,4)
+      pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"
     },
 
     (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for this parcel"}
@@ -292,7 +292,7 @@ message Parcel {
   ParcelImprovementsSummary improvement_summary = 16;
 
   optional string properties = 17 [(buf.validate.field).string = {
-    max_len: 1048576 // 1MB limit
+    max_bytes: 5120 // 5 KB limit (5 * 1024 bytes)
   }];
 }
 
@@ -440,7 +440,15 @@ message UpdateParcelRequest {
 
 message UpdateParcelResponse {}
 
-message GetNumericalParcelStatsByIdRequest {
+enum ParcelAttribute {
+  PARCEL_ATTRIBUTE_UNSPECIFIED = 0;
+  PARCEL_ATTRIBUTE_LAND_AREA_SQ_FT = 1;
+  PARCEL_ATTRIBUTE_FRONTAGE_FT = 2;
+  PARCEL_ATTRIBUTE_DEPTH_FT = 3;
+  PARCEL_ATTRIBUTE_LAND_USE_ID = 4;
+}
+
+message GetNumericalParcelAttributeStatsByIdRequest {
   repeated string parcel_ids = 1 [
     (buf.validate.field).repeated = {
       // Enforce uniqueness at the API edge
@@ -461,15 +469,34 @@ message GetNumericalParcelStatsByIdRequest {
     }
   ];
 
-  string attribute_name = 2 [(buf.validate.field).string = {
-    min_len: 1
-    max_len: 63
+  ParcelAttribute attribute = 2 [(buf.validate.field).enum = {
+    defined_only: true,
+    in: [1, 2, 3]
   }];
 
-  bool return_values = 3 [(buf.validate.field).bool = {}];
+  // The historical or future effective date the user wants to view.
+  // If omitted, defaults to the current time.
+  optional google.protobuf.Timestamp legal_as_of = 3 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The real-world date to evaluate the parcel against. Defaults to now."}
+  ];
+
+  // The time to reset the database state to
+  // If omitted, defaults to the current time.
+  optional google.protobuf.Timestamp system_as_of = 4 [
+    (buf.validate.field).timestamp = {
+      // From the Unix Epoch till now
+      gt: {seconds: -1}
+      lt_now: true
+    },
+    (gnostic.openapi.v3.property) = {description: "The transaction time to evaluate the database state against. Defaults to now."}
+  ];  
 }
 
-message GetNumericalParcelStatsByIdResponse {
+message GetNumericalParcelAttributeStatsByIdResponse {
   float mode = 1 [(buf.validate.field).float = {}];
   float minimum = 2 [(buf.validate.field).float = {}];
   float maximum = 3 [(buf.validate.field).float = {}];
@@ -491,7 +518,7 @@ message GetNumericalParcelStatsByIdResponse {
   float coefficient_of_dispersion = 17 [(buf.validate.field).float = {}];
 }
 
-message GetCategoricalParcelStatsByIdRequest {
+message GetCategoricalAttributeParcelStatsByIdRequest {
   repeated string parcel_ids = 1 [
     (buf.validate.field).repeated = {
       // Enforce uniqueness at the API edge
@@ -512,15 +539,34 @@ message GetCategoricalParcelStatsByIdRequest {
     }
   ];
 
-  string attribute_name = 2 [(buf.validate.field).string = {
-    min_len: 1
-    max_len: 63
+  ParcelAttribute attribute = 2 [(buf.validate.field).enum = {
+    defined_only: true,
+    in: [4]
   }];
 
-  bool return_values = 3 [(buf.validate.field).bool = {}];
+  // The historical or future effective date the user wants to view.
+  // If omitted, defaults to the current time.
+  optional google.protobuf.Timestamp legal_as_of = 3 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The real-world date to evaluate the parcel against. Defaults to now."}
+  ];
+
+  // The time to reset the database state to
+  // If omitted, defaults to the current time.
+  optional google.protobuf.Timestamp system_as_of = 4 [
+    (buf.validate.field).timestamp = {
+      // From the Unix Epoch till now
+      gt: {seconds: -1}
+      lt_now: true
+    },
+    (gnostic.openapi.v3.property) = {description: "The transaction time to evaluate the database state against. Defaults to now."}
+  ];  
 }
 
-message GetCategoricalParcelStatsByIdResponse {
+message GetCategoricalAttributeParcelStatsByIdResponse {
   string mode = 1 [(buf.validate.field).string = {
     min_len: 1
     max_len: 256

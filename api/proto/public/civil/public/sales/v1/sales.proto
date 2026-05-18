@@ -41,27 +41,72 @@ message Sale {
 
     string sale_price = 3 [
         (buf.validate.field).string = {
-            // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
-            pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
+            // Strictly caps digits to 15 before the decimal, and up to 4 after. Matches the source DB column, which is numeric(19,4)
+            pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"
         }
     ];
 
-    string sale_deed_book = 4;
-    string sale_deed_page = 5;
-    string sale_deed_uri = 6;
+    optional string seller_name = 4 [(buf.validate.field).string = {
+        min_len: 0
+        max_len: 128
+    }];
 
-    string seller_name = 7;
-    string seller_address = 8;
-    string seller_id = 9;
+    optional string seller_address = 5 [(buf.validate.field).string = {
+        min_len: 0
+        max_len: 256
+    }];
 
-    string buyer_name = 10;
-    string buyer_address = 11;
-    string buyer_id = 12;
+    string seller_id = 6 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier for the seller."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+
+    optional string buyer_name = 7 [(buf.validate.field).string = {
+        min_len: 0
+        max_len: 128
+    }];
+
+    optional string buyer_address = 8 [(buf.validate.field).string = {
+        min_len: 0
+        max_len: 256
+    }];
+
+    string buyer_id = 12 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier for the buyer."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
 }
 
 message GetSalesByParcelIdRequest {
+    repeated string parcel_ids = 1 [
+        (buf.validate.field).repeated = {
+        // Enforce uniqueness at the API edge
+        unique: true
 
-    
+        min_items: 1
+        max_items: 100
+
+        // Apply the uuid rule to the items in the array
+        items: {
+            string: {uuid: true}
+        }
+        },
+
+        (gnostic.openapi.v3.property) = {
+        description: "A list of unique identifiers for the parcels."
+        example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
+        }
+    ];
 
     optional google.protobuf.Timestamp system_as_of = 3 [
         (buf.validate.field).timestamp = {

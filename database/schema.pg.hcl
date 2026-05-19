@@ -470,6 +470,10 @@ table "parcel_attributes" {
       op = "&&"
     }
   }
+
+  check "properties_size_limit" {
+    expr = "pg_column_size(properties) <= 5000"
+  }
 }
 
 table "parcel_attributes_history" {
@@ -1357,6 +1361,10 @@ table "improvement_attributes" {
       column = column.legal_valid_range
       op = "&&"
     }
+  }
+
+  check "properties_size_limit" {
+    expr = "pg_column_size(properties) <= 5000"
   }
 }
 
@@ -2393,7 +2401,7 @@ table "address_attributes" {
 
   column "country_id" {
     type = bigint
-    null = false
+    null = true
   }
 
   column "administrative_area_id" {

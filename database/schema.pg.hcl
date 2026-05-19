@@ -1251,7 +1251,7 @@ table "improvement_attributes" {
     null = false
   }
 
-  column "owner_id" {
+  column "party_id" {
     type = bigint
     null = false
   }
@@ -1327,9 +1327,9 @@ table "improvement_attributes" {
     on_delete = RESTRICT
   }
 
-  foreign_key "fk_owner_id" {
-    columns = [ column.owner_id ]
-    ref_columns = [ table.owners.column.owner_id ]
+  foreign_key "fk_party_id" {
+    columns = [ column.party_id ]
+    ref_columns = [ table.parties.column.party_id ]
     on_delete = RESTRICT
   }
 
@@ -1386,11 +1386,6 @@ table "improvement_attributes_history" {
   }
 
   column "improvement_id" {
-    type = bigint
-    null = false
-  }
-
-  column "owner_id" {
     type = bigint
     null = false
   }
@@ -2596,14 +2591,14 @@ table "address_attributes_history" {
 }
 
 ##############################
-### Sales
+### Real Property Transfers
 ##############################
 
-# Sales
-table "sales" {
+# Real Property Transfers
+table "real_property_transfers" {
   schema = schema.public
 
-  column "sale_id" {
+  column "real_property_transfer_id" {
     type = bigint
     null = false
 
@@ -2623,37 +2618,27 @@ table "sales" {
     null = true
   }
 
-  column "seller_id" {
-    type = bigint
-    null = false
-  }
-
-  column "buyer_id" {
-    type = bigint
-    null = false
-  }
-
-  column "sale_timestamp" {
+  column "transfer_timestamp" {
     type = timestamptz
     null = false
   }
 
-  column "sale_price" {
+  column "transfer_amount" {
     type = numeric(19, 4)
-    null = false
+    null = true
   }
 
-  column "sale_deed_book" {
+  column "deed_book" {
     type = text
     null = true
   }
 
-  column "sale_deed_page" {
+  column "deed_page" {
     type = text
     null = true
   }
 
-  column "sale_deed_uri" {
+  column "deed_uri" {
     type = text
     null = true
   }
@@ -2670,36 +2655,24 @@ table "sales" {
   }  
 
   primary_key {
-    columns = [ column.sale_id ]
+    columns = [ column.real_property_transfer_id ]
   }
 
-  foreign_key "fk_seller_id" {
-    columns = [ column.seller_id ]
-    ref_columns = [ table.owners.column.owner_id ]
-    on_delete = RESTRICT
-  }
-
-  foreign_key "fk_buyer_id" {
-    columns = [ column.buyer_id ]
-    ref_columns = [ table.owners.column.owner_id ]
-    on_delete = RESTRICT
-  }
-
-  index "idx_sales_public_id" {
+  index "idx_real_property_transfers_public_id" {
     unique  = true
     columns = [column.public_id]
   }
 
-  index "idx_sales_legacy_id" {
+  index "idx_real_property_transfers_legacy_id" {
     unique  = true
     columns = [column.legacy_id]
   } 
 }
 
-table "sales_history" {
+table "real_property_transfers_history" {
   schema = schema.public
 
-  column "sale_history_id" {
+  column "real_property_transfer_history_id" {
     type = bigint
     null = false
 
@@ -2708,7 +2681,7 @@ table "sales_history" {
     }
   }
 
-  column "sale_id" {
+  column "real_property_transfer_id" {
     type = bigint
     null = false
   }
@@ -2723,37 +2696,27 @@ table "sales_history" {
     null = true
   }
 
-  column "seller_id" {
-    type = bigint
-    null = false
-  }
-
-  column "buyer_id" {
-    type = bigint
-    null = false
-  }
-
-  column "sale_timestamp" {
+  column "transfer_timestamp" {
     type = timestamptz
     null = false
   }
 
-  column "sale_price" {
+  column "transfer_amount" {
     type = numeric(19, 4)
-    null = false
+    null = true
   }
 
-  column "sale_deed_book" {
+  column "deed_book" {
     type = text
     null = true
   }
 
-  column "sale_deed_page" {
+  column "deed_page" {
     type = text
     null = true
   }
 
-  column "sale_deed_uri" {
+  column "deed_uri" {
     type = text
     null = true
   }
@@ -2769,19 +2732,19 @@ table "sales_history" {
   }  
 
   primary_key {
-    columns = [ column.sale_history_id ]
+    columns = [ column.real_property_transfer_history_id ]
   }
 
-  index "idx_sales_history_sale_id" {
-    columns = [ column.sale_id ]
+  index "idx_real_property_transfers_history_real_property_transfer_id" {
+    columns = [ column.real_property_transfer_id ]
   }
 }
 
 # Linking Tables
-table "parcel_sales" {
+table "real_property_transfer_party_parcels" {
   schema = schema.public
 
-  column "parcel_sale_id" {
+  column "real_property_transfer_party_parcel_id" {
     type = bigint
     null = false
 
@@ -2795,9 +2758,25 @@ table "parcel_sales" {
     null = false
   }
 
-  column "sale_id" {
+  column "real_property_transfer_id" {
     type = bigint
     null = false
+  }
+
+  column "party_id" {
+    type = bigint
+    null = false
+  }
+
+  # If false, implies they are the grantee
+  column "is_grantor" {
+    type = boolean
+    null = false
+  }
+
+  column "transferred_share" {
+    type = numeric(5,4)
+    null = false    
   }
 
   column "system_updated_at" {
@@ -2812,7 +2791,7 @@ table "parcel_sales" {
   }  
 
   primary_key {
-    columns = [ column.parcel_sale_id ]
+    columns = [ column.real_property_transfer_party_parcel_id ]
   }
 
   foreign_key "fk_parcel_id" {
@@ -2821,22 +2800,35 @@ table "parcel_sales" {
     on_delete = RESTRICT
   }
 
-  foreign_key "fk_sale_id" {
-    columns = [ column.sale_id ]
-    ref_columns = [ table.sales.column.sale_id ]
+  foreign_key "fk_real_property_transfer_id" {
+    columns = [ column.real_property_transfer_id ]
+    ref_columns = [ table.real_property_transfers.column.real_property_transfer_id ]
     on_delete = RESTRICT
   }
 
-  index "idx_parcel_sales_parcel_id_sale_id" {
+  foreign_key "fk_party_id" {
+    columns = [ column.party_id ]
+    ref_columns = [ table.parties.column.party_id ]
+    on_delete = RESTRICT
+  }
+
+  check "valid_share_transfer" {
+    expr = "transferred_share > 0 AND transferred_share <= 1.0000"
+  }
+
+  # Without is_grantor being included in the column, a party can only be a grantor or grantee
+  # in a transfer, not both. That should cover almost every case, and if cases pop up where
+  # that must be broken its time to start looking at a more robut solution for municipal clerks' offices
+  index "idx_rpt_party_parcels_unique_party" {
     unique = true
-    columns = [ column.parcel_id, column.sale_id ]
+    columns = [ column.parcel_id, column.real_property_transfer_id, column.party_id ]
   }
 }
 
-table "parcel_sales_history" {
+table "real_property_transfer_party_parcels_history" {
   schema = schema.public
 
-  column "parcel_sale_history_id" {
+  column "real_property_transfer_party_parcel_history_id" {
     type = bigint
     null = false
 
@@ -2845,7 +2837,7 @@ table "parcel_sales_history" {
     }
   }
 
-  column "parcel_sale_id" {
+  column "real_property_transfer_party_parcel_id" {
     type = bigint
     null = false
   }
@@ -2855,9 +2847,24 @@ table "parcel_sales_history" {
     null = false
   }
 
-  column "sale_id" {
+  column "real_property_transfer_id" {
     type = bigint
     null = false
+  }  
+
+  column "party_id" {
+    type = bigint
+    null = false
+  }
+
+  column "is_grantor" {
+    type = boolean
+    null = false
+  }
+
+  column "transferred_share" {
+    type = numeric(5,4)
+    null = false    
   }
 
   column "system_valid_range" {
@@ -2871,26 +2878,30 @@ table "parcel_sales_history" {
   }  
 
   primary_key {
-    columns = [ column.parcel_sale_history_id ]
+    columns = [ column.real_property_transfer_party_parcel_history_id ]
   }
 
-  index "idx_parcel_sales_history_parcel_sale_id" {
-    columns = [ column.parcel_sale_id ]
+  index "idx_rpt_party_parcels_hist_id" {
+    columns = [ column.real_property_transfer_party_parcel_id ]
   }  
 
-  index "idx_parcel_sales_history_parcel_id" {
+  index "idx_rpt_party_parcels_hist_parcel_id" {
     columns = [ column.parcel_id ]
   }  
 
-  index "idx_parcel_sales_history_sale_id" {
-    columns = [ column.sale_id ]
+  index "idx_rpt_party_parcels_hist_transfer_id" {
+    columns = [ column.real_property_transfer_id ]
   }  
+
+  index "idx_rpt_party_parcels_hist_party_id" {
+    columns = [ column.party_id ]
+  }   
 }
 
-table "improvement_sales" {
+table "real_property_transfer_party_improvements" {
   schema = schema.public
 
-  column "improvement_sale_id" {
+  column "real_property_transfer_party_improvement_id" {
     type = bigint
     null = false
 
@@ -2904,8 +2915,23 @@ table "improvement_sales" {
     null = false
   }
 
-  column "sale_id" {
+  column "real_property_transfer_id" {
     type = bigint
+    null = false
+  }
+
+  column "party_id" {
+    type = bigint
+    null = false
+  }
+
+  column "is_grantor" {
+    type = boolean
+    null = false
+  }
+
+  column "transferred_share" {
+    type = numeric(5,4)
     null = false
   }
 
@@ -2921,7 +2947,7 @@ table "improvement_sales" {
   }  
 
   primary_key {
-    columns = [ column.improvement_sale_id ]
+    columns = [ column.real_property_transfer_party_improvement_id ]
   }
 
   foreign_key "fk_improvement_id" {
@@ -2930,22 +2956,35 @@ table "improvement_sales" {
     on_delete = RESTRICT
   }
 
-  foreign_key "fk_sale_id" {
-    columns = [ column.sale_id ]
-    ref_columns = [ table.sales.column.sale_id ]
+  foreign_key "fk_real_property_transfer_id" {
+    columns = [ column.real_property_transfer_id ]
+    ref_columns = [ table.real_property_transfers.column.real_property_transfer_id ]
     on_delete = RESTRICT
   }
 
-  index "idx_improvement_sales_improvement_id_sale_id" {
+  foreign_key "fk_party_id" {
+    columns = [ column.party_id ]
+    ref_columns = [ table.parties.column.party_id ]
+    on_delete = RESTRICT
+  }
+
+  check "valid_share_transfer" {
+    expr = "transferred_share > 0 AND transferred_share <= 1.0000"
+  }
+
+  # Without is_grantor being included in the column, a party can only be a grantor or grantee
+  # in a transfer, not both. That should cover almost every case, and if cases pop up where
+  # that must be broken its time to start looking at a more robut solution for municipal clerks' offices
+  index "idx_rpt_party_improvements_unique_party" {
     unique = true
-    columns = [ column.improvement_id, column.sale_id ]
+    columns = [ column.improvement_id, column.real_property_transfer_id, column.party_id ]
   }
 }
 
-table "improvement_sales_history" {
+table "real_property_transfer_party_improvements_history" {
   schema = schema.public
 
-  column "improvement_sale_history_id" {
+  column "real_property_transfer_party_improvement_history_id" {
     type = bigint
     null = false
 
@@ -2954,7 +2993,7 @@ table "improvement_sales_history" {
     }
   }
 
-  column "improvement_sale_id" {
+  column "real_property_transfer_party_improvement_id" {
     type = bigint
     null = false
   }
@@ -2964,9 +3003,24 @@ table "improvement_sales_history" {
     null = false
   }
 
-  column "sale_id" {
+  column "real_property_transfer_id" {
     type = bigint
     null = false
+  }  
+
+  column "party_id" {
+    type = bigint
+    null = false
+  }
+
+  column "is_grantor" {
+    type = boolean
+    null = false
+  }
+
+  column "transferred_share" {
+    type = numeric(5,4)
+    null = false    
   }
 
   column "system_valid_range" {
@@ -2980,26 +3034,30 @@ table "improvement_sales_history" {
   }  
 
   primary_key {
-    columns = [ column.improvement_sale_history_id ]
+    columns = [ column.real_property_transfer_party_improvement_history_id ]
   }
 
-  index "idx_improvement_sales_history_improvement_sale_id" {
-    columns = [ column.improvement_sale_id ]
+  index "idx_rpt_party_improvements_hist_id" {
+    columns = [ column.real_property_transfer_party_improvement_id ]
   }  
 
-  index "idx_improvement_sales_history_improvement_id" {
+  index "idx_rpt_party_improvements_hist_improvement_id" {
     columns = [ column.improvement_id ]
   }  
 
-  index "idx_improvement_sales_history_sale_id" {
-    columns = [ column.sale_id ]
+  index "idx_rpt_party_improvements_hist_transfer_id" {
+    columns = [ column.real_property_transfer_id ]
   }  
+
+  index "idx_rpt_party_improvements_hist_party_id" {
+    columns = [ column.party_id ]
+  } 
 }
 
-table "sales_sale_codes" {
+table "real_property_transfer_code_assignments" {
   schema = schema.public
 
-  column "sales_sale_code_id" {
+  column "real_property_transfer_code_assignment_id" {
     type = bigint
     null = false
 
@@ -3008,12 +3066,12 @@ table "sales_sale_codes" {
     }
   }
 
-  column "sale_id" {
+  column "real_property_transfer_id" {
     type = bigint
     null = false
   }
 
-  column "sale_code_id" {
+  column "real_property_transfer_code_id" {
     type = bigint
     null = false
   }
@@ -3030,31 +3088,31 @@ table "sales_sale_codes" {
   }  
 
   primary_key {
-    columns = [ column.sales_sale_code_id ]
+    columns = [ column.real_property_transfer_code_assignment_id ]
   }
 
-  foreign_key "fk_sale_id" {
-    columns = [ column.sale_id ]
-    ref_columns = [ table.sales.column.sale_id ]
+  foreign_key "fk_real_property_transfer_id" {
+    columns = [ column.real_property_transfer_id ]
+    ref_columns = [ table.real_property_transfers.column.real_property_transfer_id ]
     on_delete = RESTRICT
   }
 
-  foreign_key "fk_sale_code_id" {
-    columns = [ column.sale_code_id ]
-    ref_columns = [ table.sale_codes.column.sale_code_id ]
+  foreign_key "fk_real_property_transfer_code_id" {
+    columns = [ column.real_property_transfer_code_id ]
+    ref_columns = [ table.real_property_transfer_codes.column.real_property_transfer_code_id ]
     on_delete = RESTRICT
   }
 
-  index "idx_sales_sale_codes_sale_id_sale_code_id" {
+  index "idx_rpt_code_assignments_id_code_id" {
     unique = true
-    columns = [ column.sale_id, column.sale_code_id ]
+    columns = [ column.real_property_transfer_id, column.real_property_transfer_code_id ]
   }  
 }
 
-table "sales_sale_codes_history" {
+table "real_property_transfer_code_assignments_history" {
   schema = schema.public
 
-  column "sales_sale_code_history_id" {
+  column "real_property_transfer_code_assignment_history_id" {
     type = bigint
     null = false
 
@@ -3063,17 +3121,17 @@ table "sales_sale_codes_history" {
     }
   }
 
-  column "sales_sale_code_id" {
+  column "real_property_transfer_code_assignment_id" {
     type = bigint
     null = false
   }
 
-  column "sale_id" {
+  column "real_property_transfer_id" {
     type = bigint
     null = false
   }
 
-  column "sale_code_id" {
+  column "real_property_transfer_code_id" {
     type = bigint
     null = false
   }
@@ -3089,26 +3147,27 @@ table "sales_sale_codes_history" {
   }  
 
   primary_key {
-    columns = [ column.sales_sale_code_history_id ]
+    columns = [ column.real_property_transfer_code_assignment_history_id ]
   }
 
-  index "idx_sales_sale_codes_history_sales_sale_code_id" {
-    columns = [ column.sales_sale_code_id ]
+  index "idx_rpt_code_assignments_hist_id" {
+    columns = [ column.real_property_transfer_code_assignment_id ]
   }  
 
-  index "idx_sales_sale_codes_history_sale_id" {
-    columns = [ column.sale_id ]
+  index "idx_rpt_code_assignments_hist_rpt_id" {
+    columns = [ column.real_property_transfer_id ]
   }  
 
-  index "idx_sales_sale_codes_history_sale_code_id" {
-    columns = [ column.sale_code_id ]
+  index "idx_rpt_code_assignments_hist_rpt_code_id" {
+    columns = [ column.real_property_transfer_code_id ]
   }  
 }
 
-table "sale_codes" {
+# Codes/Code Types
+table "real_property_transfer_codes" {
   schema = schema.public
 
-  column "sale_code_id" {
+  column "real_property_transfer_code_id" {
     type = bigint
     null = false
 
@@ -3128,7 +3187,7 @@ table "sale_codes" {
     null = true
   }
 
-  column "sale_code_type_id" {
+  column "real_property_transfer_code_type_id" {
     type = bigint
     null = false
   }
@@ -3155,35 +3214,35 @@ table "sale_codes" {
   } 
 
   primary_key {
-    columns = [ column.sale_code_id ]
+    columns = [ column.real_property_transfer_code_id ]
   }
 
-  foreign_key "fk_sale_code_types_id" {
-    columns = [ column.sale_code_type_id ]
-    ref_columns = [ table.sale_code_types.column.sale_code_type_id ]
+  foreign_key "fk_rpt_code_type_id" {
+    columns = [ column.real_property_transfer_code_type_id ]
+    ref_columns = [ table.real_property_transfer_code_types.column.real_property_transfer_code_type_id ]
     on_delete = RESTRICT
   }
 
-  index "idx_sale_codes_public_id" {
+  index "idx_rpt_codes_public_id" {
     unique  = true
     columns = [column.public_id]
   }
 
-  index "idx_sale_codes_legacy_id" {
+  index "idx_rpt_codes_legacy_id" {
     unique  = true
     columns = [column.legacy_id]
   }
 
-  index "idx_sale_codes_sale_code_type_id_name" {
+  index "idx_rpt_codes_unique_name" {
     unique  = true
-    columns = [column.sale_code_type_id, column.name]
+    columns = [column.real_property_transfer_code_type_id, column.name]
   }
 }
 
-table "sale_codes_history" {
+table "real_property_transfer_codes_history" {
   schema = schema.public
 
-  column "sale_code_history_id" {
+  column "real_property_transfer_code_history_id" {
     type = bigint
     null = false
 
@@ -3192,7 +3251,7 @@ table "sale_codes_history" {
     }
   }
 
-  column "sale_code_id" {
+  column "real_property_transfer_code_id" {
     type = bigint
     null = false
   }
@@ -3200,7 +3259,6 @@ table "sale_codes_history" {
   column "public_id" {
     type = uuid
     null = false
-    default = sql("gen_random_uuid()")
   }
 
   column "legacy_id" {
@@ -3208,7 +3266,7 @@ table "sale_codes_history" {
     null = true
   }
 
-  column "sale_code_type_id" {
+  column "real_property_transfer_code_type_id" {
     type = bigint
     null = false
   }
@@ -3234,18 +3292,18 @@ table "sale_codes_history" {
   }  
 
   primary_key {
-    columns = [ column.sale_code_history_id ]
+    columns = [ column.real_property_transfer_code_history_id ]
   }
 
-  index "idx_sale_codes_history_sale_code_id" {
-    columns = [ column.sale_code_id ]
+  index "idx_rpt_transfer_codes_history_id" {
+    columns = [ column.real_property_transfer_code_id ]
   } 
 }
 
-table "sale_code_types" {
+table "real_property_transfer_code_types" {
   schema = schema.public
 
-  column "sale_code_type_id" {
+  column "real_property_transfer_code_type_id" {
     type = bigint
     null = false
 
@@ -3287,29 +3345,29 @@ table "sale_code_types" {
   }  
 
   primary_key {
-    columns = [ column.sale_code_type_id ]
+    columns = [ column.real_property_transfer_code_type_id ]
   }
 
-  index "idx_sale_code_types_public_id" {
+  index "idx_rpt_code_types_public_id" {
     unique  = true
     columns = [column.public_id]
   }
 
-  index "idx_sale_code_types_legacy_id" {
+  index "idx_rpt_code_types_legacy_id" {
     unique  = true
     columns = [column.legacy_id]
   }
 
-  index "idx_sale_code_types_name" {
+  index "idx_rpt_code_types_name" {
     unique  = true
     columns = [column.name]
   }
 }
 
-table "sale_code_types_history" {
+table "real_property_transfer_code_types_history" {
   schema = schema.public
 
-  column "sale_code_type_history_id" {
+  column "real_property_transfer_code_type_history_id" {
     type = bigint
     null = false
 
@@ -3318,20 +3376,19 @@ table "sale_code_types_history" {
     }
   }
 
+  column "real_property_transfer_code_type_id" {
+    type = bigint
+    null = false
+  }
+
   column "public_id" {
     type = uuid
     null = false
-    default = sql("gen_random_uuid()")
   }
 
   column "legacy_id" {
     type = text
     null = true
-  }
-
-  column "sale_code_type_id" {
-    type = bigint
-    null = false
   }
 
   column "name" {
@@ -3355,11 +3412,11 @@ table "sale_code_types_history" {
   }  
 
   primary_key {
-    columns = [ column.sale_code_type_history_id ]
+    columns = [ column.real_property_transfer_code_type_history_id ]
   }
 
-  index "idx_sale_code_types_history_sale_code_type_id" {
-    columns = [ column.sale_code_type_id ]
+  index "idx_rpt_code_types_history_id" {
+    columns = [ column.real_property_transfer_code_type_id ]
   } 
 }
 
@@ -4739,9 +4796,9 @@ trigger "record_address_attributes_history" {
   }
 }
 
-trigger "record_sales_history" {
+trigger "record_real_property_transfers_history" {
   # Attach it to the current-state table
-  on = table.sales
+  on = table.real_property_transfers
   
   # Fire before the transaction is validated, as only that
   # allows commiting the new system_updated_at value
@@ -4758,13 +4815,13 @@ trigger "record_sales_history" {
   
   # Point to the function that has the archive logic
   execute {
-    function = function.record_sales_history
+    function = function.record_real_property_transfers_history
   }
 }
 
-trigger "record_parcel_sales_history" {
+trigger "record_real_property_transfer_party_parcels_history" {
   # Attach it to the current-state table
-  on = table.parcel_sales
+  on = table.real_property_transfer_party_parcels
   
   # Fire before the transaction is validated, as only that
   # allows commiting the new system_updated_at value
@@ -4781,13 +4838,13 @@ trigger "record_parcel_sales_history" {
   
   # Point to the function that has the archive logic
   execute {
-    function = function.record_parcel_sales_history
+    function = function.record_real_property_transfer_party_parcels_history
   }
 }
 
-trigger "record_improvement_sales_history" {
+trigger "record_real_property_transfer_party_improvements_history" {
   # Attach it to the current-state table
-  on = table.improvement_sales
+  on = table.real_property_transfer_party_improvements
   
   # Fire before the transaction is validated, as only that
   # allows commiting the new system_updated_at value
@@ -4804,13 +4861,13 @@ trigger "record_improvement_sales_history" {
   
   # Point to the function that has the archive logic
   execute {
-    function = function.record_improvement_sales_history
+    function = function.record_real_property_transfer_party_improvements_history
   }
 }
 
-trigger "record_sales_sale_codes_history" {
+trigger "record_real_property_transfer_code_assignments_history" {
   # Attach it to the current-state table
-  on = table.sales_sale_codes
+  on = table.real_property_transfer_code_assignments
   
   # Fire before the transaction is validated, as only that
   # allows commiting the new system_updated_at value
@@ -4827,13 +4884,13 @@ trigger "record_sales_sale_codes_history" {
   
   # Point to the function that has the archive logic
   execute {
-    function = function.record_sales_sale_codes_history
+    function = function.record_real_property_transfer_code_assignments_history
   }
 }
 
-trigger "record_sale_codes_history" {
+trigger "record_real_property_transfer_codes_history" {
   # Attach it to the current-state table
-  on = table.sale_codes
+  on = table.real_property_transfer_codes
   
   # Fire before the transaction is validated, as only that
   # allows commiting the new system_updated_at value
@@ -4850,13 +4907,13 @@ trigger "record_sale_codes_history" {
   
   # Point to the function that has the archive logic
   execute {
-    function = function.record_sale_codes_history
+    function = function.record_real_property_transfer_codes_history
   }
 }
 
-trigger "record_sale_code_types_history" {
+trigger "record_real_property_transfer_code_types_history" {
   # Attach it to the current-state table
-  on = table.sale_code_types
+  on = table.real_property_transfer_code_types
   
   # Fire before the transaction is validated, as only that
   # allows commiting the new system_updated_at value
@@ -4873,7 +4930,7 @@ trigger "record_sale_code_types_history" {
   
   # Point to the function that has the archive logic
   execute {
-    function = function.record_sale_code_types_history
+    function = function.record_real_property_transfer_code_types_history
   }
 }
 
@@ -4998,10 +5055,10 @@ trigger "history_immutable" {
     table.parcel_affordances_history, table.parcel_neighborhood_definitions_history, table.improvements_history, 
     table.improvement_geometry_history, table.improvement_attributes_history, table.improvement_conditions_history,
     table.improvement_condition_attributes_history, table.zoning_history, table.zoning_attributes_history,
-    table.owners_history, table.owner_attributes_history, table.addresses_history,
-    table.address_attributes_history, table.sales_history, table.parcel_sales_history,
-    table.improvement_sales_history, table.sales_sale_codes_history, table.sale_codes_history,
-    table.sale_code_types_history, table.valuations_history, table.parcel_valuations_history,
+    table.parties_history, table.party_attributes_history, table.addresses_history,
+    table.address_attributes_history, table.real_property_transfers_history, table.real_property_transfer_party_parcels_history,
+    table.real_property_transfer_party_improvements_history, table.real_property_transfer_code_assignments_history, table.real_property_transfer_codes_history,
+    table.real_property_transfer_code_types_history, table.valuations_history, table.parcel_valuations_history,
     table.improvement_valuations_history, table.neighborhood_definitions_history, table.neighborhoods_history
   ]
   on = each.value
@@ -5166,7 +5223,6 @@ function "record_parcel_attributes_history" {
           INSERT INTO parcel_attributes_history (
             parcel_attribute_id,
             parcel_id,
-            owner_id,
             address_id,
             land_area_sq_m,
             land_use_id,
@@ -5179,7 +5235,6 @@ function "record_parcel_attributes_history" {
           ) VALUES (
             OLD.parcel_attribute_id,
             OLD.parcel_id,
-            OLD.owner_id,
             OLD.address_id,
             OLD.land_area_sq_m,
             OLD.land_use_id,
@@ -5845,7 +5900,7 @@ function "record_address_attributes_history" {
     SQL  
 }
 
-function "record_sales_history" {
+function "record_real_property_transfers_history" {
   schema = schema.public
   lang   = "plpgsql"
   return = trigger
@@ -5857,30 +5912,26 @@ function "record_sales_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO sales_history (
-            sale_id,
+          INSERT INTO real_property_transfers_history (
+            real_property_transfer_id,
             public_id,
             legacy_id,
-            seller_id,
-            buyer_id,
-            sale_timestamp,
-            sale_price,
-            sale_deed_book,
-            sale_deed_page,
-            sale_deed_uri,
+            transfer_timestamp,
+            transfer_amount,
+            deed_book,
+            deed_page,
+            deed_uri,
             system_valid_range,
             trace_id
           ) VALUES (
-            OLD.sale_id,
+            OLD.real_property_transfer_id,
             OLD.public_id,
             OLD.legacy_id,
-            OLD.seller_id,
-            OLD.buyer_id,
-            OLD.sale_timestamp,
-            OLD.sale_price,
-            OLD.sale_deed_book,
-            OLD.sale_deed_page,
-            OLD.sale_deed_uri,
+            OLD.transfer_timestamp,
+            OLD.transfer_amount,
+            OLD.deed_book,
+            OLD.deed_page,
+            OLD.deed_uri,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
             OLD.trace_id
           );
@@ -5900,7 +5951,7 @@ function "record_sales_history" {
     SQL  
 }
 
-function "record_parcel_sales_history" {
+function "record_real_property_transfer_party_parcels_history" {
   schema = schema.public
   lang   = "plpgsql"
   return = trigger
@@ -5912,16 +5963,22 @@ function "record_parcel_sales_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO parcel_sales_history (
-            parcel_sale_id,
+          INSERT INTO real_property_transfer_party_parcels_history (
+            real_property_transfer_party_parcel_id,
             parcel_id,
-            sale_id,
+            real_property_transfer_id,
+            party_id,
+            is_grantor,
+            transferred_share,
             system_valid_range,
             trace_id
           ) VALUES (
-            OLD.parcel_sale_id,
+            OLD.real_property_transfer_party_parcel_id,
             OLD.parcel_id,
-            OLD.sale_id,
+            OLD.real_property_transfer_id,
+            OLD.party_id,
+            OLD.is_grantor,
+            OLD.transferred_share,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
             OLD.trace_id
           );
@@ -5941,7 +5998,7 @@ function "record_parcel_sales_history" {
     SQL  
 }
 
-function "record_improvement_sales_history" {
+function "record_real_property_transfer_party_improvements_history" {
   schema = schema.public
   lang   = "plpgsql"
   return = trigger
@@ -5953,16 +6010,22 @@ function "record_improvement_sales_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO improvement_sales_history (
-            improvement_sale_id,
+          INSERT INTO real_property_transfer_party_improvements_history (
+            real_property_transfer_party_improvement_id,
             improvement_id,
-            sale_id,
+            real_property_transfer_id,
+            party_id,
+            is_grantor,
+            transferred_share,
             system_valid_range,
             trace_id
           ) VALUES (
-            OLD.improvement_sale_id,
+            OLD.real_property_transfer_party_improvement_id,
             OLD.improvement_id,
-            OLD.sale_id,
+            OLD.real_property_transfer_id,
+            OLD.party_id,
+            OLD.is_grantor,
+            OLD.transferred_share,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
             OLD.trace_id
           );
@@ -5982,7 +6045,7 @@ function "record_improvement_sales_history" {
     SQL  
 }
 
-function "record_sales_sale_codes_history" {
+function "record_real_property_transfer_code_assignments_history" {
   schema = schema.public
   lang   = "plpgsql"
   return = trigger
@@ -5994,16 +6057,16 @@ function "record_sales_sale_codes_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO sales_sale_codes_history (
-            sales_sale_code_id,
-            sale_id,
-            sale_code_id,
+          INSERT INTO real_property_transfer_code_assignments_history (
+            real_property_transfer_code_assignment_id,
+            real_property_transfer_id,
+            real_property_transfer_code_id,
             system_valid_range,
             trace_id
           ) VALUES (
-            OLD.sales_sale_code_id,
-            OLD.sale_id,
-            OLD.sale_code_id,
+            OLD.real_property_transfer_code_assignment_id,
+            OLD.real_property_transfer_id,
+            OLD.real_property_transfer_code_id,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
             OLD.trace_id
           );
@@ -6023,7 +6086,7 @@ function "record_sales_sale_codes_history" {
     SQL  
 }
 
-function "record_sale_codes_history" {
+function "record_real_property_transfer_codes_history" {
   schema = schema.public
   lang   = "plpgsql"
   return = trigger
@@ -6035,20 +6098,20 @@ function "record_sale_codes_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO sale_codes_history (
-            sale_code_id,
+          INSERT INTO real_property_transfer_codes_history (
+            real_property_transfer_code_id,
             public_id,
             legacy_id,
-            sale_code_type_id,
+            real_property_transfer_code_type_id,
             name,
             description,
             system_valid_range,
             trace_id
           ) VALUES (
-            OLD.sale_code_id,
+            OLD.real_property_transfer_code_id,
             OLD.public_id,
             OLD.legacy_id,
-            OLD.sale_code_type_id,
+            OLD.real_property_transfer_code_type_id,
             OLD.name,
             OLD.description,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
@@ -6070,7 +6133,7 @@ function "record_sale_codes_history" {
     SQL  
 }
 
-function "record_sale_code_types_history" {
+function "record_real_property_transfer_code_types_history" {
   schema = schema.public
   lang   = "plpgsql"
   return = trigger
@@ -6082,8 +6145,8 @@ function "record_sale_code_types_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO sale_code_types_history (
-            sale_code_type_id,
+          INSERT INTO real_property_transfer_code_types_history (
+            real_property_transfer_code_type_id,
             public_id,
             legacy_id,
             name,
@@ -6091,7 +6154,7 @@ function "record_sale_code_types_history" {
             system_valid_range,
             trace_id
           ) VALUES (
-            OLD.sale_code_type_id,
+            OLD.real_property_transfer_code_type_id,
             OLD.public_id,
             OLD.legacy_id,
             OLD.name,

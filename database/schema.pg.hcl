@@ -1999,14 +1999,14 @@ table "zoning_attributes_history" {
 }
 
 ##############################
-### Owners
+### Parties
 ##############################
 
 // Domain Anchor
-table "owners" {
+table "parties" {
   schema = schema.public
 
-  column "owner_id" {
+  column "party_id" {
     type = bigint
     null = false
 
@@ -2049,15 +2049,15 @@ table "owners" {
   }  
 
   primary_key {
-    columns = [ column.owner_id ]
+    columns = [ column.party_id ]
   }  
 
-  index "idx_owners_public_id" {
+  index "idx_parties_public_id" {
     unique  = true
     columns = [ column.public_id ]
   }
 
-  index "idx_owners_legacy_id" {
+  index "idx_parties_legacy_id" {
     unique  = true
     columns = [column.legacy_id]
   }
@@ -2067,10 +2067,10 @@ table "owners" {
   }
 }
 
-table "owners_history" {
+table "parties_history" {
   schema = schema.public
 
-  column "owner_history_id" {
+  column "party_history_id" {
     type = bigint
     null = false
 
@@ -2079,7 +2079,7 @@ table "owners_history" {
     }
   }
 
-  column "owner_id" {
+  column "party_id" {
     type = bigint
     null = false
   }
@@ -2115,19 +2115,19 @@ table "owners_history" {
   }  
 
   primary_key {
-    columns = [ column.owner_history_id ]
+    columns = [ column.party_history_id ]
   }
 
-  index "idx_owners_history_owner_id" {
-    columns = [column.owner_id]
+  index "idx_parties_history_party_id" {
+    columns = [column.party_id]
   }
 }
 
 // Attributes
-table "owner_attributes" {
+table "party_attributes" {
   schema = schema.public
 
-  column "owner_attribute_id" {
+  column "party_attribute_id" {
     type = bigint
     null = false
 
@@ -2136,7 +2136,7 @@ table "owner_attributes" {
     }
   }
 
-  column "owner_id" {
+  column "party_id" {
     type = bigint
     null = false
   }
@@ -2168,12 +2168,12 @@ table "owner_attributes" {
   }  
 
   primary_key {
-    columns = [ column.owner_attribute_id ]
+    columns = [ column.party_attribute_id ]
   }
 
-  foreign_key "fk_owner_id" {
-    columns = [ column.owner_id ]
-    ref_columns = [ table.owners.column.owner_id ]
+  foreign_key "fk_party_id" {
+    columns = [ column.party_id ]
+    ref_columns = [ table.parties.column.party_id ]
     on_delete = RESTRICT
   }
 
@@ -2183,10 +2183,10 @@ table "owner_attributes" {
     on_delete = RESTRICT
   }
 
-  exclude "no_overlapping_owner_attributes" {
+  exclude "no_overlapping_party_attributes" {
     type = GIST
     on {
-      column = column.owner_id
+      column = column.party_id
       op = "="
     }
     on {
@@ -2196,10 +2196,10 @@ table "owner_attributes" {
   }
 }
 
-table "owner_attributes_history" {
+table "party_attributes_history" {
   schema = schema.public
 
-  column "owner_attribute_history_id" {
+  column "party_attribute_history_id" {
     type = bigint
     null = false
 
@@ -2208,12 +2208,12 @@ table "owner_attributes_history" {
     }
   }
 
-  column "owner_attribute_id" {
+  column "party_attribute_id" {
     type = bigint
     null = false
   }
 
-  column "owner_id" {
+  column "party_id" {
     type = bigint
     null = false
   }
@@ -2244,15 +2244,15 @@ table "owner_attributes_history" {
   }  
 
   primary_key {
-    columns = [ column.owner_attribute_history_id ]
+    columns = [ column.party_attribute_history_id ]
   }
 
-  index "idx_owner_attributes_history_owner_attribute_id" {
-    columns = [ column.owner_attribute_id ]
+  index "idx_party_attributes_history_party_attribute_id" {
+    columns = [ column.party_attribute_id ]
   }
 
-  index "idx_owner_attributes_history_owner_id" {
-    columns = [ column.owner_id ]
+  index "idx_party_attributes_history_party_id" {
+    columns = [ column.party_id ]
   }  
 }
 
@@ -4647,9 +4647,9 @@ trigger "record_zoning_attributes_history" {
   }
 }
 
-trigger "record_owners_history" {
+trigger "record_parties_history" {
   # Attach it to the current-state table
-  on = table.owners
+  on = table.parties
   
   # Fire before the transaction is validated, as only that
   # allows commiting the new system_updated_at value
@@ -4666,13 +4666,13 @@ trigger "record_owners_history" {
   
   # Point to the function that has the archive logic
   execute {
-    function = function.record_owners_history
+    function = function.record_parties_history
   }
 }
 
-trigger "record_owner_attributes_history" {
+trigger "record_party_attributes_history" {
   # Attach it to the current-state table
-  on = table.owner_attributes
+  on = table.party_attributes
   
   # Fire before the transaction is validated, as only that
   # allows commiting the new system_updated_at value
@@ -4689,7 +4689,7 @@ trigger "record_owner_attributes_history" {
   
   # Point to the function that has the archive logic
   execute {
-    function = function.record_owner_attributes_history
+    function = function.record_party_attributes_history
   }
 }
 
@@ -5649,7 +5649,7 @@ function "record_zoning_attributes_history" {
     SQL  
 }
 
-function "record_owners_history" {
+function "record_parties_history" {
   schema = schema.public
   lang   = "plpgsql"
   return = trigger
@@ -5661,8 +5661,8 @@ function "record_owners_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO owners_history (
-            owner_id,
+          INSERT INTO parties_history (
+            party_id,
             public_id,
             legacy_id,
             is_voided,
@@ -5670,7 +5670,7 @@ function "record_owners_history" {
             system_valid_range,
             trace_id
           ) VALUES (
-            OLD.owner_id,
+            OLD.party_id,
             OLD.public_id,
             OLD.legacy_id,
             OLD.is_voided,
@@ -5694,7 +5694,7 @@ function "record_owners_history" {
     SQL  
 }
 
-function "record_owner_attributes_history" {
+function "record_party_attributes_history" {
   schema = schema.public
   lang   = "plpgsql"
   return = trigger
@@ -5706,17 +5706,17 @@ function "record_owner_attributes_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO owner_attributes_history (
-            owner_attribute_id,
-            owner_id,
+          INSERT INTO party_attributes_history (
+            party_attribute_id,
+            party_id,
             name,
             address_id,
             legal_valid_range,
             system_valid_range,
             trace_id
           ) VALUES (
-            OLD.owner_attribute_id,
-            OLD.owner_id,
+            OLD.party_attribute_id,
+            OLD.party_id,
             OLD.name,
             OLD.address_id,
             OLD.legal_valid_range,

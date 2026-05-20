@@ -530,7 +530,7 @@ message GetNumericalParcelAttributeStatsByIdResponse {
   float coefficient_of_dispersion = 17 [(buf.validate.field).float = {}];
 }
 
-message GetCategoricalAttributeParcelStatsByIdRequest {
+message GetCategoricalParcelAttributeStatsByIdRequest {
   repeated string parcel_ids = 1 [
     (buf.validate.field).repeated = {
       // Enforce uniqueness at the API edge
@@ -578,7 +578,7 @@ message GetCategoricalAttributeParcelStatsByIdRequest {
   ];  
 }
 
-message GetCategoricalAttributeParcelStatsByIdResponse {
+message GetCategoricalParcelAttributeStatsByIdResponse {
   string mode = 1 [(buf.validate.field).string = {
     min_len: 1
     max_len: 256

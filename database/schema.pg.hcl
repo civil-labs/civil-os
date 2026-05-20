@@ -381,11 +381,6 @@ table "parcel_attributes" {
     null = false
   }
 
-  column "owner_id" {
-    type = bigint
-    null = false
-  }
-
   column "address_id" {
     type = bigint
     null = false
@@ -441,12 +436,6 @@ table "parcel_attributes" {
     on_delete = RESTRICT
   }
 
-  foreign_key "fk_owner_id" {
-    columns = [ column.owner_id ]
-    ref_columns = [ table.owners.column.owner_id ]
-    on_delete = RESTRICT
-  }
-
   foreign_key "fk_address_id" {
     columns = [ column.address_id ]
     ref_columns = [ table.addresses.column.address_id ]
@@ -494,11 +483,6 @@ table "parcel_attributes_history" {
   }
 
   column "parcel_id" {
-    type = bigint
-    null = false
-  }
-
-  column "owner_id" {
     type = bigint
     null = false
   }
@@ -557,6 +541,151 @@ table "parcel_attributes_history" {
 
   index "idx_parcel_attributes_history_parcel_id" {
     columns = [column.parcel_id]
+  }
+}
+
+// Parties
+table "parcel_parties" {
+  schema = schema.public
+
+  column "parcel_party_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "parcel_id" {
+    type = bigint
+    null = false
+  }
+
+  column "party_id" {
+    type = bigint
+    null = false
+  }
+
+  column "ownership_share" {
+    type = numeric(5,4)
+    null = false
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
+  primary_key {
+    columns = [ column.parcel_party_id ]
+  }
+
+  foreign_key "fk_parcel_id" {
+    columns = [ column.parcel_id ]
+    ref_columns = [ table.parcels.column.parcel_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_party_id" {
+    columns = [ column.party_id ]
+    ref_columns = [ table.parties.column.party_id ]
+    on_delete = RESTRICT
+  }
+
+  exclude "no_overlapping_parcel_parties" {
+    type = GIST
+    on {
+      column = column.parcel_id
+      op = "="
+    }
+    on {
+      column = column.party_id
+      op = "="
+    }
+    on {
+      column = column.legal_valid_range
+      op = "&&"
+    }
+  }
+
+  check "valid_parcel_ownership" {
+    expr = "ownership_share > 0 AND ownership_share <= 1.0000"
+  }
+}
+
+table "parcel_parties_history" {
+  schema = schema.public
+
+  column "parcel_party_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "parcel_party_id" {
+    type = bigint
+    null = false
+  }
+
+  column "parcel_id" {
+    type = bigint
+    null = false
+  }
+
+  column "party_id" {
+    type = bigint
+    null = false
+  }
+
+  column "ownership_share" {
+    type = numeric(5,4)
+    null = false
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
+  primary_key {
+    columns = [ column.parcel_party_history_id ]
+  }
+
+  index "idx_parcel_parties_history_parcel_party_id" {
+    columns = [column.parcel_party_id]
+  }
+
+  index "idx_parcel_parties_history_parcel_id" {
+    columns = [column.parcel_id]
+  }
+
+  index "idx_parcel_parties_history_party_id" {
+    columns = [column.party_id]
   }
 }
 
@@ -1455,6 +1584,151 @@ table "improvement_attributes_history" {
 
   index "idx_improvement_attributes_history_improvement_id" {
     columns = [ column.improvement_id ]
+  }
+}
+
+// Parties
+table "improvement_parties" {
+  schema = schema.public
+
+  column "improvement_party_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "improvement_id" {
+    type = bigint
+    null = false
+  }
+
+  column "party_id" {
+    type = bigint
+    null = false
+  }
+
+  column "ownership_share" {
+    type = numeric(5,4)
+    null = false
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
+  primary_key {
+    columns = [ column.improvement_party_id ]
+  }
+
+  foreign_key "fk_improvement_id" {
+    columns = [ column.improvement_id ]
+    ref_columns = [ table.improvements.column.improvement_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_party_id" {
+    columns = [ column.party_id ]
+    ref_columns = [ table.parties.column.party_id ]
+    on_delete = RESTRICT
+  }
+
+  exclude "no_overlapping_improvement_parties" {
+    type = GIST
+    on {
+      column = column.improvement_id
+      op = "="
+    }
+    on {
+      column = column.party_id
+      op = "="
+    }
+    on {
+      column = column.legal_valid_range
+      op = "&&"
+    }
+  }
+
+  check "valid_improvement_ownership" {
+    expr = "ownership_share > 0 AND ownership_share <= 1.0000"
+  }
+}
+
+table "improvement_parties_history" {
+  schema = schema.public
+
+  column "improvement_party_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "improvement_party_id" {
+    type = bigint
+    null = false
+  }
+
+  column "improvement_id" {
+    type = bigint
+    null = false
+  }
+
+  column "party_id" {
+    type = bigint
+    null = false
+  }
+
+  column "ownership_share" {
+    type = numeric(5,4)
+    null = false
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
+  primary_key {
+    columns = [ column.improvement_party_history_id ]
+  }
+
+  index "idx_improvement_parties_history_improvement_party_id" {
+    columns = [column.improvement_party_id]
+  }
+
+  index "idx_improvement_parties_history_improvement_id" {
+    columns = [column.improvement_id]
+  }
+
+  index "idx_improvement_parties_history_party_id" {
+    columns = [column.party_id]
   }
 }
 
@@ -4497,6 +4771,29 @@ trigger "record_parcel_attributes_history" {
   }
 }
 
+trigger "record_parcel_parties_history" {
+  # Attach it to the current-state table
+  on = table.parcel_parties
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_parcel_parties_history
+  }
+}
+
 trigger "record_parcel_affordances_history" {
   # Attach it to the current-state table
   on = table.parcel_affordances
@@ -4610,6 +4907,29 @@ trigger "record_improvement_attributes_history" {
   execute {
     function = function.record_improvement_attributes_history
   }  
+}
+
+trigger "record_improvement_parties_history" {
+  # Attach it to the current-state table
+  on = table.improvement_parties
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_improvement_parties_history
+  }
 }
 
 trigger "record_improvement_conditions_history" {
@@ -5261,6 +5581,51 @@ function "record_parcel_attributes_history" {
     SQL  
 }
 
+function "record_parcel_parties_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = trigger
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO parcel_parties_history (
+            parcel_party_id,
+            parcel_id,
+            party_id,
+            ownership_share,
+            legal_valid_range,
+            system_valid_range,
+            trace_id
+          ) VALUES (
+            OLD.parcel_party_id,
+            OLD.parcel_id,
+            OLD.party_id,
+            OLD.ownership_share,
+            OLD.legal_valid_range,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
 function "record_parcel_affordances_history" {
   schema = schema.public
   lang   = "plpgsql"
@@ -5474,7 +5839,7 @@ function "record_improvement_attributes_history" {
           INSERT INTO improvement_attributes_history (
             improvement_attribute_id,
             improvement_id,
-            owner_id,
+            party_id,
             address_id,
             area_sq_m,
             bathrooms,
@@ -5489,7 +5854,7 @@ function "record_improvement_attributes_history" {
           ) VALUES (
             OLD.improvement_attribute_id,
             OLD.improvement_id,
-            OLD.owner_id,
+            OLD.party_id,
             OLD.address_id,
             OLD.area_sq_m,
             OLD.bathrooms,
@@ -5498,6 +5863,51 @@ function "record_improvement_attributes_history" {
             OLD.condition_num,
             OLD.units,
             OLD.properties,
+            OLD.legal_valid_range,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_improvement_parties_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = trigger
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO improvement_parties_history (
+            improvement_party_id,
+            improvement_id,
+            party_id,
+            ownership_share,
+            legal_valid_range,
+            system_valid_range,
+            trace_id
+          ) VALUES (
+            OLD.improvement_party_id,
+            OLD.improvement_id,
+            OLD.party_id,
+            OLD.ownership_share,
             OLD.legal_valid_range,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
             OLD.trace_id

@@ -203,23 +203,35 @@ message Parcel {
     }
   ];
 
-  optional string owner_name = 4 [(buf.validate.field).string = {
+  optional string primary_owner_name = 4 [(buf.validate.field).string = {
     min_len: 0
     max_len: 512
   }];
 
-  optional string owner_address = 5 [(buf.validate.field).string = {
+  optional string primary_owner_address = 5 [(buf.validate.field).string = {
     min_len: 0
     max_len: 1024
   }];
 
-  optional string owner_id = 6 [
-    (buf.validate.field).string.uuid = true,
+  repeated string party_ids = 6 [
+    (buf.validate.field).repeated = {
+      // Communicate all will be unique
+      unique: true
 
-    // Gnostic annotation for example
+      // A single parcel will rarely have more than a
+      // handful of owners
+      max_items: 10
+
+      // Communicate all are UUIDs
+      items: {
+        string: {uuid: true}
+      }
+    },
+
+    // Gnostic annotation updated to reflect an array format for the example
     (gnostic.openapi.v3.property) = {
-      description: "The unique identifier for the parcel owner."
-      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+      description: "A list of unique identifiers for the parties that own this parcel."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
     }
   ];
 

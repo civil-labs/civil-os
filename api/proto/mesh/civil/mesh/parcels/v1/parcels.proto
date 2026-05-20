@@ -43,8 +43,8 @@ message Parcel {
   string parcel_id = 1;
   optional string address = 2;
   optional string address_id = 3;
-  optional string owner_name = 4;
-  optional string owner_address = 5;
+  optional string primary_owner_name = 4;
+  optional string primary_owner_address = 5;
   repeated string party_ids = 6;
   optional string land_use_id = 7;
   optional string neighborhood_id = 8;

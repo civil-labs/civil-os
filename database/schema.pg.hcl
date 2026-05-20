@@ -3463,7 +3463,7 @@ table "real_property_transfer_codes" {
 
   column "real_property_transfer_code_type_id" {
     type = bigint
-    null = false
+    null = true
   }
 
   column "name" {
@@ -3542,7 +3542,7 @@ table "real_property_transfer_codes_history" {
 
   column "real_property_transfer_code_type_id" {
     type = bigint
-    null = false
+    null = true
   }
 
   column "name" {
@@ -4503,6 +4503,11 @@ table "land_uses" {
     null = true
   }
 
+  column "land_use_type_id" {
+    type = bigint
+    null = true
+  }
+
   column "code" {
     type = text
     null = true
@@ -4533,6 +4538,12 @@ table "land_uses" {
     columns = [ column.land_use_id ]
   }
 
+  foreign_key "fk_land_use_type_id" {
+    columns = [ column.land_use_type_id ]
+    ref_columns = [ table.land_use_types.column.land_use_type_id ]
+    on_delete = RESTRICT
+  }
+
   index "idx_land_uses_public_id" {
     unique  = true
     columns = [ column.public_id ]
@@ -4544,6 +4555,75 @@ table "land_uses" {
   }
 
   index "idx_land_uses_name" {
+    unique  = true
+    columns = [ column.name ]
+  }
+}
+
+table "land_use_types" {
+  schema = schema.public
+
+  column "land_use_type_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "public_id" {
+    type = uuid
+    null = false
+    default = sql("gen_random_uuid()")
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
+  }
+
+  column "code" {
+    type = text
+    null = true
+  }
+
+  column "name" {
+    type = text
+    null = false
+  }
+
+  column "description" {
+    type = text
+    null = true
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
+  primary_key {
+    columns = [ column.land_use_type_id ]
+  }
+
+  index "idx_land_use_types_public_id" {
+    unique  = true
+    columns = [ column.public_id ]
+  }  
+
+  index "idx_land_use_types_legacy_id" {
+    unique  = true
+    columns = [column.legacy_id]
+  }
+
+  index "idx_land_use_types_name" {
     unique  = true
     columns = [ column.name ]
   }

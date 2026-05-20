@@ -51,7 +51,7 @@ service ParcelsService {
   }
 
   // Retrieves a set of summary statistics about the specified categorical attribute for a specified list of parcels. Optionally returns the values as well
-  rpc GetCategoricalAttributeParcelStatsById(GetCategoricalAttributeParcelStatsByIdRequest) returns (GetCategoricalAttributeParcelStatsByIdResponse) {
+  rpc GetCategoricalParcelAttributeStatsById(GetCategoricalParcelAttributeStatsByIdRequest) returns (GetCategoricalParcelAttributeStatsByIdResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
@@ -190,7 +190,7 @@ message Parcel {
 
   optional string address = 2 [(buf.validate.field).string = {
     min_len: 0
-    max_len: 1024
+    max_len: 256
   }];
 
   optional string address_id = 3 [
@@ -205,12 +205,12 @@ message Parcel {
 
   optional string primary_owner_name = 4 [(buf.validate.field).string = {
     min_len: 0
-    max_len: 512
+    max_len: 128
   }];
 
   optional string primary_owner_address = 5 [(buf.validate.field).string = {
     min_len: 0
-    max_len: 1024
+    max_len: 256
   }];
 
   repeated string party_ids = 6 [

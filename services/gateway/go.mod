@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.41.1
 	github.com/aws/aws-sdk-go-v2/config v1.32.7
 	github.com/aws/aws-sdk-go-v2/service/servicediscovery v1.39.22
-	github.com/civil-labs/civil-api-go v0.0.0-20260517202152-340f853d10e5
+	github.com/civil-labs/civil-api-go v0.0.0-20260520011053-58137bac891d
 	github.com/coreos/go-oidc/v3 v3.17.0
 	google.golang.org/protobuf v1.36.11
 )

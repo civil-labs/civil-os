@@ -49,20 +49,20 @@ func (s *ParcelServer) GetParcelsById(
 		}
 
 		publicParcels[id] = &publicparcelsv1.Parcel{
-			ParcelId:          meshParcel.ParcelId,
-			Address:           meshParcel.Address,
-			AddressId:         meshParcel.AddressId,
-			OwnerName:         meshParcel.OwnerName,
-			OwnerAddress:      meshParcel.OwnerAddress,
-			OwnerId:           meshParcel.OwnerId,
-			LandUseId:         meshParcel.LandUseId,
-			NeighborhoodId:    meshParcel.NeighborhoodId,
-			LandAreaSqFt:      meshParcel.LandAreaSqFt,
-			FrontageFt:        meshParcel.FrontageFt,
-			DepthFt:           meshParcel.DepthFt,
-			ZoningIds:         meshParcel.ZoningIds,
-			MarketLandValue:   meshParcel.MarketLandValue,
-			AssessedLandValue: meshParcel.AssessedLandValue,
+			ParcelId:            meshParcel.ParcelId,
+			Address:             meshParcel.Address,
+			AddressId:           meshParcel.AddressId,
+			PrimaryOwnerName:    meshParcel.PrimaryOwnerName,
+			PrimaryOwnerAddress: meshParcel.PrimaryOwnerAddress,
+			PartyIds:            meshParcel.PartyIds,
+			LandUseId:           meshParcel.LandUseId,
+			NeighborhoodId:      meshParcel.NeighborhoodId,
+			LandAreaSqFt:        meshParcel.LandAreaSqFt,
+			FrontageFt:          meshParcel.FrontageFt,
+			DepthFt:             meshParcel.DepthFt,
+			ZoningIds:           meshParcel.ZoningIds,
+			MarketLandValue:     meshParcel.MarketLandValue,
+			AssessedLandValue:   meshParcel.AssessedLandValue,
 
 			Affordances: &publicparcelsv1.ParcelAffordances{
 				AffordanceIds:  meshParcel.Affordances.AffordanceIds,
@@ -105,11 +105,11 @@ func (s *ParcelServer) UpdateParcel(
 	return connect.NewResponse(publicRes), nil
 }
 
-func (s *ParcelServer) GetCategoricalParcelStatsById(
+func (s *ParcelServer) GetCategoricalParcelAttributeStatsById(
 	_ context.Context,
-	req *connect.Request[publicparcelsv1.GetCategoricalParcelStatsByIdRequest],
-) (*connect.Response[publicparcelsv1.GetCategoricalParcelStatsByIdResponse], error) {
-	res := &publicparcelsv1.GetCategoricalParcelStatsByIdResponse{
+	req *connect.Request[publicparcelsv1.GetCategoricalParcelAttributeStatsByIdRequest],
+) (*connect.Response[publicparcelsv1.GetCategoricalParcelAttributeStatsByIdResponse], error) {
+	res := &publicparcelsv1.GetCategoricalParcelAttributeStatsByIdResponse{
 		Mode: "example",
 		UniqueValues: map[string]int32{
 			"value1": 12,
@@ -119,11 +119,11 @@ func (s *ParcelServer) GetCategoricalParcelStatsById(
 	return connect.NewResponse(res), nil
 }
 
-func (s *ParcelServer) GetNumericalParcelStatsById(
+func (s *ParcelServer) GetNumericalParcelAttributeStatsById(
 	_ context.Context,
-	req *connect.Request[publicparcelsv1.GetNumericalParcelStatsByIdRequest],
-) (*connect.Response[publicparcelsv1.GetNumericalParcelStatsByIdResponse], error) {
-	res := &publicparcelsv1.GetNumericalParcelStatsByIdResponse{
+	req *connect.Request[publicparcelsv1.GetNumericalParcelAttributeStatsByIdRequest],
+) (*connect.Response[publicparcelsv1.GetNumericalParcelAttributeStatsByIdResponse], error) {
+	res := &publicparcelsv1.GetNumericalParcelAttributeStatsByIdResponse{
 		Mode:                    5,
 		Minimum:                 1,
 		Maximum:                 10,

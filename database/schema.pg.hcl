@@ -1453,12 +1453,6 @@ table "improvement_attributes" {
     on_delete = RESTRICT
   }
 
-  foreign_key "fk_party_id" {
-    columns = [ column.party_id ]
-    ref_columns = [ table.parties.column.party_id ]
-    on_delete = RESTRICT
-  }
-
   foreign_key "fk_address_id" {
     columns = [ column.address_id ]
     ref_columns = [ table.addresses.column.address_id ]
@@ -5916,7 +5910,6 @@ function "record_improvement_attributes_history" {
           INSERT INTO improvement_attributes_history (
             improvement_attribute_id,
             improvement_id,
-            party_id,
             address_id,
             area_sq_m,
             bathrooms,
@@ -5931,7 +5924,6 @@ function "record_improvement_attributes_history" {
           ) VALUES (
             OLD.improvement_attribute_id,
             OLD.improvement_id,
-            OLD.party_id,
             OLD.address_id,
             OLD.area_sq_m,
             OLD.bathrooms,

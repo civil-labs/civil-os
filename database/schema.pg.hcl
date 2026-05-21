@@ -408,6 +408,7 @@ table "parcel_attributes" {
 
   column "properties" {
     type = jsonb
+    null = true
   }
 
   column "legal_valid_range" {
@@ -514,6 +515,7 @@ table "parcel_attributes_history" {
 
   column "properties" {
     type = jsonb
+    null = true
   }
 
   column "legal_valid_range" {
@@ -1376,11 +1378,6 @@ table "improvement_attributes" {
   }
 
   column "improvement_id" {
-    type = bigint
-    null = false
-  }
-
-  column "party_id" {
     type = bigint
     null = false
   }

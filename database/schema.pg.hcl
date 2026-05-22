@@ -2802,6 +2802,11 @@ table "address_attributes_history" {
     null = true
   }
 
+  column "postal_code" {
+    type = text
+    null = true
+  }
+
   column "address_line_1" {
     type = text
     null = true
@@ -4119,6 +4124,11 @@ table "neighborhood_definitions" {
     default = sql("gen_random_uuid()")
   }
 
+  column "legacy_id" {
+    type = text
+    null = true
+  }
+
   column "name" {
     type = text
     null = false
@@ -4160,6 +4170,11 @@ table "neighborhood_definitions" {
     unique  = true
     columns = [ column.name ]
   }
+
+  index "idx_neighborhood_definitions_legacy_id" {
+    unique  = true
+    columns = [column.legacy_id]
+  }
 }
 
 table "neighborhood_definitions_history" {
@@ -4182,6 +4197,11 @@ table "neighborhood_definitions_history" {
   column "public_id" {
     type = uuid
     null = false
+  }
+
+  column "legacy_id" {
+    type = text
+    null = true
   }
 
   column "name" {
@@ -6809,6 +6829,7 @@ function "record_neighborhood_definitions_history" {
           INSERT INTO neighborhood_definitions_history (
             neighborhood_definition_id,
             public_id,
+            legacy_id,
             name,
             is_legal,
             system_valid_range,
@@ -6816,6 +6837,7 @@ function "record_neighborhood_definitions_history" {
           ) VALUES (
             OLD.neighborhood_definition_id,
             OLD.public_id,
+            OLD.legacy_id,
             OLD.name,
             OLD.is_legal,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),

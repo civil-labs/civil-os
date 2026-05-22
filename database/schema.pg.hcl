@@ -2784,7 +2784,7 @@ table "address_attributes_history" {
 
   column "country_id" {
     type = bigint
-    null = false
+    null = true
   }
 
   column "administrative_area_id" {

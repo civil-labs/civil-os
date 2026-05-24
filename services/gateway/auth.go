@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"io"
-	"log"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -68,7 +67,7 @@ func RequireAuth(verbose bool, authServer string, idpHost string, allowedClientI
 			rawIDToken := strings.TrimPrefix(authHeader, "Bearer ")
 
 			if verbose {
-				log.Println("ID Token: " + rawIDToken)
+				logger.Debug("Request contains token", slog.String("token", rawIDToken))
 			}
 
 			// Verify the cryptographic signature and expiration
@@ -133,7 +132,7 @@ func RequireAuth(verbose bool, authServer string, idpHost string, allowedClientI
 
 // DumpRawJWKS makes a raw HTTP request to the IDP and prints the exact response body.
 func DumpRawJWKS(jwksURL string, logger *slog.Logger) {
-	logger.Debug("attempting to fetch raw keys from %s", jwksURL)
+	logger.Debug("attempting to fetch raw keys", slog.String("url", jwksURL))
 
 	resp, err := http.Get(jwksURL)
 	if err != nil {

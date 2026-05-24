@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 )
 
@@ -15,10 +14,6 @@ type HealthResponse struct {
 // do further health introspection to downstream services
 func HealthCheckHandler(verbose bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		if verbose {
-			log.Printf("Health check hit")
-		}
 
 		// Prepare the response
 		resp := HealthResponse{

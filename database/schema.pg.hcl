@@ -4752,7 +4752,7 @@ function "get_parcel_tiles" {
             p.parcel_id,
             pa.land_use_id,
             -- Clip the geometry to the tile boundary for performance
-            ST_AsMVTGeom(ST_Transform(pg.geometry, 3857), bounds, 4096, 256, true) AS geom
+            ST_AsMVTGeom(ST_Transform(pg.geom_web, 3857), bounds, 4096, 256, true) AS geom
         FROM 
             public.parcels p
         JOIN 
@@ -4760,7 +4760,7 @@ function "get_parcel_tiles" {
         JOIN
             public.parcel_geometry pg ON p.parcel_id = pg.parcel_id
         WHERE 
-            ST_Intersects(ST_Transform(pg.geometry, 3857), bounds)
+            ST_Intersects(ST_Transform(pg.geom_web, 3857), bounds)
     ) AS tile;
       RETURN mvt;
     END;

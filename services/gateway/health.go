@@ -12,7 +12,7 @@ type HealthResponse struct {
 
 // HealthCheckHandler returns 200 if we have backends, In the future may
 // do further health introspection to downstream services
-func HealthCheckHandler(verbose bool) http.HandlerFunc {
+func HealthCheckHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		// Prepare the response

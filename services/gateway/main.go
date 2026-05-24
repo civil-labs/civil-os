@@ -28,7 +28,13 @@ func main() {
 	_, cancelApp := context.WithCancel(context.Background())
 	defer cancelApp()
 
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	var programLevel = new(slog.LevelVar)
+
+	programLevel.Set(slog.LevelInfo)
+
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: programLevel,
+	}))
 
 	config, err := LoadConfig(logger)
 	if err != nil {
@@ -37,8 +43,10 @@ func main() {
 	}
 
 	if config.Verbose {
-		logger.Info("Starting proxy", slog.Any("address", config.TileServerHost))
+		programLevel.Set(slog.LevelDebug)
 	}
+
+	logger.Info("Starting proxy", slog.Any("address", config.TileServerHost))
 
 	// Create the Reverse Proxy for the Tile Server with a custom Director
 	proxy := &httputil.ReverseProxy{
@@ -89,7 +97,7 @@ func main() {
 		},
 	}
 
-	auth, err := RequireAuth(config.Verbose, config.AuthServer, config.IDPHost, config.AllowedClientsIds, logger)
+	auth, err := RequireAuth(config.AuthServer, config.IDPHost, config.AllowedClientsIds, logger)
 
 	dbReaderAddress := "http://" + config.DBReaderHost
 
@@ -110,10 +118,10 @@ func main() {
 		connect.WithInterceptors(validate.NewInterceptor()),
 	)
 
-	mux.Handle(parcelsPath, CORSMiddleware(parcelsHandler, config.Verbose, logger))
+	mux.Handle(parcelsPath, CORSMiddleware(parcelsHandler, logger))
 
-	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), config.Verbose, logger))
-	mux.HandleFunc("/health", HealthCheckHandler(config.Verbose))
+	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), logger))
+	mux.HandleFunc("/health", HealthCheckHandler())
 
 	// Pass the fully qualified name of the service so the health check
 	// can report on this specific service, as well as the global server status.
@@ -181,12 +189,10 @@ func main() {
 
 }
 
-func CORSMiddleware(next http.Handler, verbose bool, logger *slog.Logger) http.Handler {
+func CORSMiddleware(next http.Handler, logger *slog.Logger) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		if verbose {
-			logger.Info("CORS middleware activated")
-		}
+		logger.Info("CORS middleware activated")
 
 		// 1. ALWAYS set headers (Success, Failure, or Preflight)
 		w.Header().Set("Access-Control-Allow-Origin", "*")

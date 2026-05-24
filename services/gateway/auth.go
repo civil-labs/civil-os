@@ -25,7 +25,7 @@ type Claims struct {
 }
 
 // RequireAuth is the middleware wrapper
-func RequireAuth(verbose bool, authServer string, idpHost string, allowedClientIDs []string, logger *slog.Logger) (func(http.Handler) http.Handler, error) {
+func RequireAuth(authServer string, idpHost string, allowedClientIDs []string, logger *slog.Logger) (func(http.Handler) http.Handler, error) {
 
 	providerConfig := oidc.ProviderConfig{
 		IssuerURL:   "https://" + authServer,
@@ -36,9 +36,7 @@ func RequireAuth(verbose bool, authServer string, idpHost string, allowedClientI
 		Algorithms:  []string{"RS256"}, // Dex uses RS256 by default
 	}
 
-	if verbose {
-		DumpRawJWKS(providerConfig.JWKSURL, logger)
-	}
+	DumpRawJWKS(providerConfig.JWKSURL, logger)
 
 	// Initialize the Provider to securely fetch the JWKS keys from Dex
 	provider := providerConfig.NewProvider(context.Background())
@@ -58,26 +56,20 @@ func RequireAuth(verbose bool, authServer string, idpHost string, allowedClientI
 			if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
 				http.Error(w, "Unauthorized: Missing or invalid Bearer token", http.StatusUnauthorized)
 
-				if verbose {
-					logger.Debug("Unauthorized: Missing or invalid Bearer token")
-				}
+				logger.Debug("Unauthorized: Missing or invalid Bearer token")
 
 				return
 			}
 			rawIDToken := strings.TrimPrefix(authHeader, "Bearer ")
 
-			if verbose {
-				logger.Debug("Request contains token", slog.String("token", rawIDToken))
-			}
+			logger.Debug("Request contains token", slog.String("token", rawIDToken))
 
 			// Verify the cryptographic signature and expiration
 			idToken, err := verifier.Verify(r.Context(), rawIDToken)
 			if err != nil {
 				http.Error(w, "Unauthorized: Invalid or expired token", http.StatusUnauthorized)
 
-				if verbose {
-					logger.Debug("Unauthorized: Invalid or expired token", slog.Any("error", err))
-				}
+				logger.Debug("Unauthorized: Invalid or expired token", slog.Any("error", err))
 
 				return
 			}
@@ -98,9 +90,7 @@ func RequireAuth(verbose bool, authServer string, idpHost string, allowedClientI
 			if !isValidAudience {
 				http.Error(w, "Unauthorized: Unrecognized client application", http.StatusUnauthorized)
 
-				if verbose {
-					logger.Debug("Unauthorized: Unrecognized client application")
-				}
+				logger.Debug("Unauthorized: Unrecognized client application")
 
 				return
 			}
@@ -110,9 +100,7 @@ func RequireAuth(verbose bool, authServer string, idpHost string, allowedClientI
 			if err := idToken.Claims(&claims); err != nil {
 				http.Error(w, "Internal Error: Failed to parse identity claims", http.StatusInternalServerError)
 
-				if verbose {
-					logger.Debug("Unauthorized: Failed to parse identity claims", slog.Any("error", err))
-				}
+				logger.Debug("Unauthorized: Failed to parse identity claims", slog.Any("error", err))
 
 				return
 			}
@@ -120,9 +108,7 @@ func RequireAuth(verbose bool, authServer string, idpHost string, allowedClientI
 			// 4. Inject the claims into the request context
 			ctx := context.WithValue(r.Context(), userContextKey, claims)
 
-			if verbose {
-				slog.Debug("authentication successful")
-			}
+			slog.Debug("authentication successful")
 
 			// Pass the request down the chain with the newly populated context
 			next.ServeHTTP(w, r.WithContext(ctx))

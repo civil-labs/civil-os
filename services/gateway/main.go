@@ -118,7 +118,7 @@ func main() {
 		connect.WithInterceptors(validate.NewInterceptor()),
 	)
 
-	mux.Handle(parcelsPath, CORSMiddleware(parcelsHandler, logger))
+	mux.Handle(parcelsPath, CORSMiddleware(auth(parcelsHandler), logger))
 
 	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), logger))
 	mux.HandleFunc("/health", HealthCheckHandler())

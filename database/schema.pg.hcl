@@ -4742,9 +4742,15 @@ function "get_parcel_tiles" {
   as = <<-SQL
     DECLARE
       mvt bytea;
-      bounds geometry := ST_TileEnvelope(z, x, y);
-
+      bounds geometry;
     BEGIN
+       -- Guard against invalid zoom levels causing ST_TileEnvelope to overflow
+      IF z < 0 OR z > 24 THEN
+          RETURN NULL;
+      END IF;
+      
+      bounds := ST_TileEnvelope(z, x, y);
+      
       SELECT ST_AsMVT(tile, 'parcels', 4096, 'geom')
       INTO mvt
       FROM (
@@ -4755,12 +4761,13 @@ function "get_parcel_tiles" {
             ST_AsMVTGeom(ST_Transform(pg.geom_web, 3857), bounds, 4096, 256, true) AS geom
         FROM 
             public.parcels p
-        JOIN 
+        LEFT JOIN 
             public.parcel_attributes pa ON p.parcel_id = pa.parcel_id
         JOIN
             public.parcel_geometry pg ON p.parcel_id = pg.parcel_id
         WHERE 
-            ST_Intersects(ST_Transform(pg.geom_web, 3857), bounds)
+            p.is_voided = false AND
+            ST_Intersects(pg.geom_web, ST_Transform(bounds, 4326))
     ) AS tile;
       RETURN mvt;
     END;

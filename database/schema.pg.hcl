@@ -1515,6 +1515,16 @@ table "improvement_attributes_history" {
     null = false
   }
 
+  column "improvement_type_id" {
+    type = bigint
+    null = false
+  }
+
+  column "improvement_condition_id" {
+    type = bigint
+    null = true
+  }
+
   column "area_sq_m" {
     type = double_precision
     null = true
@@ -1535,11 +1545,6 @@ table "improvement_attributes_history" {
     null = true
   }
 
-  column "condition_num" {
-    type = int
-    null = true
-  }
-  
   column "units" {
     type = int
     null = true
@@ -5938,11 +5943,12 @@ function "record_improvement_attributes_history" {
             improvement_attribute_id,
             improvement_id,
             address_id,
+            improvement_condition_id,
+            improvement_type_id,
             area_sq_m,
             bathrooms,
             bedrooms,
             year_built,
-            condition_num,
             units,
             properties,
             legal_valid_range,
@@ -5952,11 +5958,12 @@ function "record_improvement_attributes_history" {
             OLD.improvement_attribute_id,
             OLD.improvement_id,
             OLD.address_id,
+            OLD.improvement_condition_id,
+            OLD.improvement_type_id,
             OLD.area_sq_m,
             OLD.bathrooms,
             OLD.bedrooms,
             OLD.year_built,
-            OLD.condition_num,
             OLD.units,
             OLD.properties,
             OLD.legal_valid_range,

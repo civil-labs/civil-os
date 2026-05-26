@@ -1982,6 +1982,140 @@ table "improvement_condition_attributes_history" {
 }
 
 ##############################
+### Parcel Improvements
+##############################
+
+table "parcel_improvements" {
+  schema = schema.public
+
+  column "parcel_improvement_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "parcel_id" {
+    type = bigint
+    null = false
+  }
+
+  column "improvement_id" {
+    type = bigint
+    null = false
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_updated_at" {
+    type = timestamptz
+    null = false
+    default = sql("now()")
+  }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
+  primary_key {
+    columns = [ column.parcel_improvement_id ]
+  }
+
+  foreign_key "fk_parcel_id" {
+    columns = [ column.parcel_id ]
+    ref_columns = [ table.parcels.column.parcel_id ]
+    on_delete = RESTRICT
+  }
+
+  foreign_key "fk_improvement_id" {
+    columns = [ column.improvement_id ]
+    ref_columns = [ table.improvements.column.improvement_id ]
+    on_delete = RESTRICT
+  }
+
+  exclude "no_overlapping_parcel_improvements" {
+    type = GIST
+    on {
+      column = column.parcel_id
+      op = "="
+    }
+    on {
+      column = column.improvement_id
+      op = "="
+    }
+    on {
+      column = column.legal_valid_range
+      op = "&&"
+    }
+  }
+}
+
+table "parcel_improvement_history" {
+  schema = schema.public
+
+  column "parcel_improvement_history_id" {
+    type = bigint
+    null = false
+
+    identity {
+      generated = ALWAYS
+    }
+  }
+
+  column "parcel_improvement_id" {
+    type = bigint
+    null = false
+  }
+
+  column "parcel_id" {
+    type = bigint
+    null = false
+  }
+
+  column "improvement_id" {
+    type = bigint
+    null = false
+  }
+
+  column "legal_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "system_valid_range" {
+    type = tstzrange
+    null = false
+  }
+
+  column "trace_id" {
+    type = varchar(32)
+    null = false
+  }  
+
+  primary_key {
+    columns = [ column.parcel_improvement_id ]
+  }
+
+  index "idx_parcel_improvements_history_parcel_improvement_id" {
+    columns = [column.parcel_improvement_id]
+  }
+
+  index "idx_parcel_improvements_history_parcel_id" {
+    columns = [column.parcel_id]
+  }
+
+  index "idx_parcel_improvements_history_improvement_id" {
+    columns = [column.improvement_id]
+  }
+}
+
+##############################
 ### Zoning
 ##############################
 
@@ -5081,6 +5215,29 @@ trigger "record_improvement_condition_attributes_history" {
   }  
 }
 
+trigger "record_parcel_improvements_history" {
+  # Attach it to the current-state table
+  on = table.parcel_improvements
+  
+  # Fire before the transaction is validated, as only that
+  # allows commiting the new system_updated_at value
+  # to the new base table record. If the base table update
+  # then fails because of data type issues, it's fine because
+  # the whole transaction will be rolled back
+  before {
+    insert = false
+    update = true
+    delete = true
+  }
+
+  for = ROW
+  
+  # Point to the function that has the archive logic
+  execute {
+    function = function.record_parcel_improvements_history
+  }
+}
+
 trigger "record_zoning_history" {
   # Attach it to the current-state table
   on = table.zoning
@@ -5477,7 +5634,8 @@ trigger "history_immutable" {
     table.parcels_history, table.parcel_geometry_history, table.parcel_attributes_history,
     table.parcel_affordances_history, table.parcel_neighborhood_definitions_history, table.improvements_history, 
     table.improvement_geometry_history, table.improvement_attributes_history, table.improvement_conditions_history,
-    table.improvement_condition_attributes_history, table.zoning_history, table.zoning_attributes_history,
+    table.improvement_condition_attributes_history, table.parcel_improvement_history,
+    table.zoning_history, table.zoning_attributes_history,
     table.parties_history, table.party_attributes_history, table.addresses_history,
     table.address_attributes_history, table.real_property_transfers_history, table.real_property_transfer_party_parcels_history,
     table.real_property_transfer_party_improvements_history, table.real_property_transfer_code_assignments_history, table.real_property_transfer_codes_history,
@@ -6101,6 +6259,49 @@ function "record_improvement_condition_attributes_history" {
             OLD.improvement_condition_id,
             OLD.name,
             OLD.depreciation_modifier,
+            OLD.legal_valid_range,
+            tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+            OLD.trace_id
+          );
+        END IF;
+          
+        -- Safely route the return pointer
+        IF (TG_OP = 'UPDATE') THEN
+            -- Ensures the record's system log is updated for the proper time
+            NEW.system_updated_at = current_transaction_time;
+            RETURN NEW;
+        ELSIF (TG_OP = 'DELETE') THEN
+            RETURN OLD;
+        END IF;
+        
+        RETURN NULL;
+      END;
+    SQL  
+}
+
+function "record_parcel_improvements_history" {
+  schema = schema.public
+  lang   = "plpgsql"
+  return = trigger
+  # Use the creator's role, as the caller shouldn't have insert privileges
+  security = DEFINER 
+  
+  as = <<-SQL
+      DECLARE
+        current_transaction_time timestamptz := now();
+      BEGIN
+        IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+          INSERT INTO parcel_improvements_history (
+            parcel_improvement_id,
+            parcel_id,
+            improvement_id,
+            legal_valid_range,
+            system_valid_range,
+            trace_id
+          ) VALUES (
+            OLD.parcel_improvement_id,
+            OLD.party_id,
+            OLD.improvement_id,
             OLD.legal_valid_range,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
             OLD.trace_id

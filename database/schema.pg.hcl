@@ -2056,7 +2056,7 @@ table "parcel_improvements" {
   }
 }
 
-table "parcel_improvement_history" {
+table "parcel_improvements_history" {
   schema = schema.public
 
   column "parcel_improvement_history_id" {
@@ -2099,7 +2099,7 @@ table "parcel_improvement_history" {
   }  
 
   primary_key {
-    columns = [ column.parcel_improvement_id ]
+    columns = [ column.parcel_improvement_history_id ]
   }
 
   index "idx_parcel_improvements_history_parcel_improvement_id" {
@@ -5634,7 +5634,7 @@ trigger "history_immutable" {
     table.parcels_history, table.parcel_geometry_history, table.parcel_attributes_history,
     table.parcel_affordances_history, table.parcel_neighborhood_definitions_history, table.improvements_history, 
     table.improvement_geometry_history, table.improvement_attributes_history, table.improvement_conditions_history,
-    table.improvement_condition_attributes_history, table.parcel_improvement_history,
+    table.improvement_condition_attributes_history, table.parcel_improvements_history,
     table.zoning_history, table.zoning_attributes_history,
     table.parties_history, table.party_attributes_history, table.addresses_history,
     table.address_attributes_history, table.real_property_transfers_history, table.real_property_transfer_party_parcels_history,
@@ -6300,7 +6300,7 @@ function "record_parcel_improvements_history" {
             trace_id
           ) VALUES (
             OLD.parcel_improvement_id,
-            OLD.party_id,
+            OLD.parcel_id,
             OLD.improvement_id,
             OLD.legal_valid_range,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),

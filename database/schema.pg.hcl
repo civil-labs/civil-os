@@ -751,6 +751,16 @@ table "parcel_affordances" {
     null = true
   }
 
+  column "max_dwelling_units_per_hectare" {
+    type = numeric(6,2)
+    null = true
+  }
+
+  column "max_lot_coverage_pct" {
+    type = numeric(5,4)
+    null = true
+  }
+
   column "legal_valid_range" {
     type = tstzrange
     null = false
@@ -818,6 +828,10 @@ table "parcel_affordances" {
     # NULL = NULL behavior on the zoning ID check
     where = "(zoning_id IS NOT NULL)"
   }
+
+  check "valid_max_lot_coverage" {
+    expr = "max_lot_coverage_pct > 0 AND max_lot_coverage_pct <= 1.0000"
+  }
 }
 
 table "parcel_affordances_history" {
@@ -879,6 +893,16 @@ table "parcel_affordances_history" {
 
   column "max_height_m" {
     type = numeric(6,2)
+    null = true
+  }
+
+  column "max_dwelling_units_per_hectare" {
+    type = numeric(6,2)
+    null = true
+  }
+
+  column "max_lot_coverage_pct" {
+    type = numeric(5,4)
     null = true
   }
 
@@ -2283,6 +2307,16 @@ table "zoning_attributes" {
     null = true
   }
 
+  column "max_dwelling_units_per_hectare" {
+    type = numeric(6,2)
+    null = true
+  }
+
+  column "max_lot_coverage_pct" {
+    type = numeric(5,4)
+    null = true
+  }
+
   column "legal_valid_range" {
     type = tstzrange
     null = false
@@ -2319,6 +2353,10 @@ table "zoning_attributes" {
       column = column.legal_valid_range
       op = "&&"
     }
+  }
+
+  check "valid_max_lot_coverage" {
+    expr = "max_lot_coverage_pct > 0 AND max_lot_coverage_pct <= 1.0000"
   }
 }
 
@@ -2366,6 +2404,16 @@ table "zoning_attributes_history" {
 
   column "max_height_m" {
     type = numeric(6,2)
+    null = true
+  }
+
+  column "max_dwelling_units_per_hectare" {
+    type = numeric(6,2)
+    null = true
+  }
+
+  column "max_lot_coverage_pct" {
+    type = numeric(5,4)
     null = true
   }
 
@@ -5910,6 +5958,8 @@ function "record_parcel_affordances_history" {
             max_far,
             min_lot_size_sq_m,
             max_height_m,
+            max_dwelling_units_per_hectare,
+            max_lot_coverage_pct,
             legal_valid_range,
             system_valid_range,
             trace_id
@@ -5924,6 +5974,8 @@ function "record_parcel_affordances_history" {
             OLD.max_far,
             OLD.min_lot_size_sq_m,
             OLD.max_height_m,
+            OLD.max_dwelling_units_per_hectare,
+            OLD.max_lot_coverage_pct,
             OLD.legal_valid_range,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
             OLD.trace_id
@@ -6387,6 +6439,8 @@ function "record_zoning_attributes_history" {
             max_far,
             min_lot_size_sq_m,
             max_height_m,
+            max_dwelling_units_per_hectare,
+            max_lot_coverage_pct,
             legal_valid_range,
             system_valid_range,
             trace_id
@@ -6398,6 +6452,8 @@ function "record_zoning_attributes_history" {
             OLD.max_far,
             OLD.min_lot_size_sq_m,
             OLD.max_height_m,
+            OLD.max_dwelling_units_per_hectare,
+            OLD.max_lot_coverage_pct,
             OLD.legal_valid_range,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
             OLD.trace_id

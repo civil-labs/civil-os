@@ -65,10 +65,12 @@ func (s *ParcelServer) GetParcelsById(
 			AssessedLandValue:   meshParcel.AssessedLandValue,
 
 			Affordances: &publicparcelsv1.ParcelAffordances{
-				AffordanceIds:  meshParcel.Affordances.AffordanceIds,
-				MaxFar:         meshParcel.Affordances.MaxFar,
-				MinLotSizeSqFt: meshParcel.Affordances.MinLotSizeSqFt,
-				MaxHeightFt:    meshParcel.Affordances.MaxHeightFt,
+				AffordanceIds:           meshParcel.Affordances.AffordanceIds,
+				MaxFar:                  meshParcel.Affordances.MaxFar,
+				MinLotSizeSqFt:          meshParcel.Affordances.MinLotSizeSqFt,
+				MaxHeightFt:             meshParcel.Affordances.MaxHeightFt,
+				MaxDwellingUnitsPerAcre: meshParcel.Affordances.MaxDwellingUnitsPerAcre,
+				MaxLotCoveragePct:       meshParcel.Affordances.MaxLotCoveragePct,
 			},
 
 			ImprovementSummary: &publicparcelsv1.ParcelImprovementsSummary{

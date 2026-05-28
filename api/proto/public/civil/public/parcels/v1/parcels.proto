@@ -88,7 +88,7 @@ message ParcelAffordances {
   // Maximum legally permitted building height in feet
   optional double max_height_ft = 4 [(buf.validate.field).double = {gte: 0.0}];
 
-  optional double max_dwelling_units_per_hectare = 5 [(buf.validate.field).double = {gte: 0.0}];
+  optional double max_dwelling_units_per_acre = 5 [(buf.validate.field).double = {gte: 0.0}];
 
   optional double max_lot_coverage_pct = 6 [(buf.validate.field).double = {gte: 0.0}];
 }

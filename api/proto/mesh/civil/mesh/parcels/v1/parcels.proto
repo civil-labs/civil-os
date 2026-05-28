@@ -22,7 +22,7 @@ message ParcelAffordances {
   optional double max_far = 2;
   optional double min_lot_size_sq_ft = 3;
   optional double max_height_ft = 4;
-  optional double max_dwelling_units_per_hectare = 5;
+  optional double max_dwelling_units_per_acre = 5;
   optional double max_lot_coverage_pct = 6;
 }
 

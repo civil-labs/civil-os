@@ -87,6 +87,10 @@ message ParcelAffordances {
 
   // Maximum legally permitted building height in feet
   optional double max_height_ft = 4 [(buf.validate.field).double = {gte: 0.0}];
+
+  optional double max_dwelling_units_per_hectare = 5 [(buf.validate.field).double = {gte: 0.0}];
+
+  optional double max_lot_coverage_pct = 6 [(buf.validate.field).double = {gte: 0.0}];
 }
 
 message ParcelImprovementsSummary {
@@ -128,13 +132,11 @@ message ParcelImprovementsSummary {
 
   optional string weighted_average_depreciation_modifier = 8 [
     (buf.validate.field).string = {
-        // Matches 0, 0.0000 -> 0.9999, 1, and 1.0000
-        pattern: "^(0(\\.[0-9]{1,4})?|1(\\.0{1,4})?)$"
+      // Matches 0, 0.0000 -> 0.9999, 1, and 1.0000
+      pattern: "^(0(\\.[0-9]{1,4})?|1(\\.0{1,4})?)$"
     },
 
-    (gnostic.openapi.v3.property) = {
-      description: "The average of the depreciation modifiers of the conditions of every improvement on this parcel, as weighted by their floor areas"
-    }
+    (gnostic.openapi.v3.property) = {description: "The average of the depreciation modifiers of the conditions of every improvement on this parcel, as weighted by their floor areas"}
   ];
 
   // Worst and best based on the conditions' depreciation factors
@@ -482,8 +484,12 @@ message GetNumericalParcelAttributeStatsByIdRequest {
   ];
 
   ParcelAttribute attribute = 2 [(buf.validate.field).enum = {
-    defined_only: true,
-    in: [1, 2, 3]
+    defined_only: true
+    in: [
+      1,
+      2,
+      3
+    ]
   }];
 
   // The historical or future effective date the user wants to view.
@@ -505,7 +511,7 @@ message GetNumericalParcelAttributeStatsByIdRequest {
       lt_now: true
     },
     (gnostic.openapi.v3.property) = {description: "The transaction time to evaluate the database state against. Defaults to now."}
-  ];  
+  ];
 }
 
 message GetNumericalParcelAttributeStatsByIdResponse {
@@ -552,7 +558,7 @@ message GetCategoricalParcelAttributeStatsByIdRequest {
   ];
 
   ParcelAttribute attribute = 2 [(buf.validate.field).enum = {
-    defined_only: true,
+    defined_only: true
     in: [4]
   }];
 
@@ -575,7 +581,7 @@ message GetCategoricalParcelAttributeStatsByIdRequest {
       lt_now: true
     },
     (gnostic.openapi.v3.property) = {description: "The transaction time to evaluate the database state against. Defaults to now."}
-  ];  
+  ];
 }
 
 message GetCategoricalParcelAttributeStatsByIdResponse {

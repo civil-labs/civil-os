@@ -29,6 +29,7 @@ func (s *ParcelServer) GetParcelsById(
 		LegalAsOf:                req.Msg.LegalAsOf,
 		SystemAsOf:               req.Msg.SystemAsOf,
 		NeighborhoodDefinitionId: req.Msg.NeighborhoodDefinitionId,
+		ValuationId:              req.Msg.ValuationId,
 	})
 
 	meshRes, err := s.dbReaderClient.GetParcelsById(ctx, meshReq)

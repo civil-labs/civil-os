@@ -4942,8 +4942,7 @@ function "get_parcel_tiles" {
       INTO mvt
       FROM (
         SELECT 
-            p.parcel_id,
-            pa.land_use_id,
+            p.public_id,
             -- Clip the geometry to the tile boundary for performance
             ST_AsMVTGeom(ST_Transform(pg.geom_web, 3857), bounds, 4096, 256, true) AS geom
         FROM 

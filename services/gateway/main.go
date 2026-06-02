@@ -127,9 +127,8 @@ func main() {
 	// Create gRPC connection to Dex if an address is provided
 	if config.DexGrpcAddress != "" {
 
-		dexGrpcAddress := "http://" + config.DexGrpcAddress
-
-		conn, err := grpc.NewClient(dexGrpcAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		// Native gRPC expects just the hostname and port, not the protocol
+		conn, err := grpc.NewClient(config.DexGrpcAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 		if err != nil {
 

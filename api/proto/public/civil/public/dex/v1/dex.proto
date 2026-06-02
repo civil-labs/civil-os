@@ -4,7 +4,10 @@ package civil.public.dex.v1;
 
 service DexService {
   // GetClient gets a client.
-  rpc GetClient(GetClientRequest) returns (GetClientResponse) {}
+  rpc GetClient(GetClientRequest) returns (GetClientResponse) {
+    // Give connect the option to use GET requests, but don't advertise it in the Swagger
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
   // CreateClient creates a client.
   rpc CreateClient(CreateClientRequest) returns (CreateClientResponse) {}
   // UpdateClient updates an existing client
@@ -12,11 +15,20 @@ service DexService {
   // DeleteClient deletes the provided client.
   rpc DeleteClient(DeleteClientRequest) returns (DeleteClientResponse) {}
   // ListClients lists all client entries.
-  rpc ListClients(ListClientsRequest) returns (ListClientsResponse) {}
+  rpc ListClients(ListClientsRequest) returns (ListClientsResponse) {
+    // Give connect the option to use GET requests, but don't advertise it in the Swagger
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
   // GetVersion returns version information of the server.
-  rpc GetVersion(GetVersionRequest) returns (GetVersionResponse) {}
+  rpc GetVersion(GetVersionRequest) returns (GetVersionResponse) {
+    // Give connect the option to use GET requests, but don't advertise it in the Swagger
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
   // ListRefresh lists all the refresh token entries for a particular user.
-  rpc ListRefresh(ListRefreshRequest) returns (ListRefreshResponse) {}
+  rpc ListRefresh(ListRefreshRequest) returns (ListRefreshResponse) {
+    // Give connect the option to use GET requests, but don't advertise it in the Swagger
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
   // RevokeRefresh revokes the refresh token for the provided user-client pair.
   //
   // Note that each user-client pair can have only one refresh token at a time.

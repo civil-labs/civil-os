@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+package civil.public.dex.v1;
+
+service DexService {
+  // GetClient gets a client.
+  rpc GetClient(GetClientRequest) returns (GetClientResponse) {}
+  // CreateClient creates a client.
+  rpc CreateClient(CreateClientRequest) returns (CreateClientResponse) {}
+  // UpdateClient updates an existing client
+  rpc UpdateClient(UpdateClientRequest) returns (UpdateClientResponse) {}
+  // DeleteClient deletes the provided client.
+  rpc DeleteClient(DeleteClientRequest) returns (DeleteClientResponse) {}
+  // ListClients lists all client entries.
+  rpc ListClients(ListClientsRequest) returns (ListClientsResponse) {}
+  // GetVersion returns version information of the server.
+  rpc GetVersion(GetVersionRequest) returns (GetVersionResponse) {}
+  // ListRefresh lists all the refresh token entries for a particular user.
+  rpc ListRefresh(ListRefreshRequest) returns (ListRefreshResponse) {}
+  // RevokeRefresh revokes the refresh token for the provided user-client pair.
+  //
+  // Note that each user-client pair can have only one refresh token at a time.
+  rpc RevokeRefresh(RevokeRefreshRequest) returns (RevokeRefreshResponse) {}
+}
+
+message Client {
+  string id = 1;
+  string secret = 2;
+  repeated string redirect_uris = 3;
+  repeated string trusted_peers = 4;
+  bool public = 5;
+  string name = 6;
+  string logo_url = 7;
+  repeated string allowed_connectors = 8;
+  repeated string sso_shared_with = 9;
+}
+
+// ClientInfo represents an OAuth2 client without sensitive information.
+message ClientInfo {
+  string id = 1;
+  repeated string redirect_uris = 2;
+  repeated string trusted_peers = 3;
+  bool public = 4;
+  string name = 5;
+  string logo_url = 6;
+  repeated string allowed_connectors = 7;
+  repeated string sso_shared_with = 8;
+}
+
+// GetClientReq is a request to retrieve client details.
+message GetClientRequest {
+  // The ID of the client.
+  string id = 1;
+}
+
+// GetClientResp returns the client details.
+message GetClientResponse {
+  Client client = 1;
+}
+
+// CreateClientReq is a request to make a client.
+message CreateClientRequest {
+  Client client = 1;
+}
+
+// CreateClientResp returns the response from creating a client.
+message CreateClientResponse {
+  bool already_exists = 1;
+  Client client = 2;
+}
+
+// DeleteClientReq is a request to delete a client.
+message DeleteClientRequest {
+  // The ID of the client.
+  string id = 1;
+}
+
+// DeleteClientResp determines if the client is deleted successfully.
+message DeleteClientResponse {
+  bool not_found = 1;
+}
+
+// UpdateClientReq is a request to update an existing client.
+message UpdateClientRequest {
+  string id = 1;
+  repeated string redirect_uris = 2;
+  repeated string trusted_peers = 3;
+  string name = 4;
+  string logo_url = 5;
+  repeated string allowed_connectors = 6;
+  repeated string sso_shared_with = 7;
+}
+
+// UpdateClientResp returns the response from updating a client.
+message UpdateClientResponse {
+  bool not_found = 1;
+}
+
+// ListClientReq is a request to enumerate clients.
+message ListClientsRequest {}
+
+// ListClientResp returns a list of clients.
+message ListClientsResponse {
+  repeated ClientInfo clients = 1;
+}
+
+// VersionReq is a request to fetch version info.
+message GetVersionRequest {}
+
+// VersionResp holds the version info of components.
+message GetVersionResponse {
+  // Semantic version of the server.
+  string server = 1;
+  // Numeric version of the API. It increases every time a new call is added to the API.
+  // Clients should use this info to determine if the server supports specific features.
+  int32 api = 2;
+}
+
+// RefreshTokenRef contains the metadata for a refresh token that is managed by the storage.
+message RefreshTokenRef {
+  // ID of the refresh token.
+  string id = 1;
+  string client_id = 2;
+  int64 created_at = 5;
+  int64 last_used = 6;
+}
+
+// ListRefreshReq is a request to enumerate the refresh tokens of a user.
+message ListRefreshRequest {
+  // The "sub" claim returned in the ID Token.
+  string user_id = 1;
+}
+
+// ListRefreshResp returns a list of refresh tokens for a user.
+message ListRefreshResponse {
+  repeated RefreshTokenRef refresh_tokens = 1;
+}
+
+// RevokeRefreshReq is a request to revoke the refresh token of the user-client pair.
+message RevokeRefreshRequest {
+  // The "sub" claim returned in the ID Token.
+  string user_id = 1;
+  string client_id = 2;
+}
+
+// RevokeRefreshResp determines if the refresh token is revoked successfully.
+message RevokeRefreshResponse {
+  // Set to true is refresh token was not found and token could not be revoked.
+  bool not_found = 1;
+}

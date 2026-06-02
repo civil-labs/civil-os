@@ -127,7 +127,9 @@ func main() {
 	// Create gRPC connection to Dex if an address is provided
 	if config.DexGrpcAddress != "" {
 
-		conn, err := grpc.NewClient(config.DexGrpcAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		dexGrpcAddress := "http://" + config.DexGrpcAddress
+
+		conn, err := grpc.NewClient(dexGrpcAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 		if err != nil {
 

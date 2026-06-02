@@ -11,7 +11,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/servicediscovery v1.39.22
 	github.com/civil-labs/civil-api-go v0.0.0-20260602125535-fe54b95be871
 	github.com/coreos/go-oidc/v3 v3.17.0
-	google.golang.org/protobuf v1.36.11
+	github.com/dexidp/dex/api/v2 v2.4.0
+	google.golang.org/grpc v1.75.0
 )
 
 require (
@@ -31,7 +32,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.35.13 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.41.6 // indirect
 	github.com/aws/smithy-go v1.24.0 // indirect
-	github.com/dexidp/dex/api/v2 v2.4.0 // indirect
 	github.com/go-jose/go-jose/v4 v4.1.3 // indirect
 	github.com/google/cel-go v0.26.1 // indirect
 	github.com/google/gnostic v0.7.1 // indirect
@@ -45,5 +45,5 @@ require (
 	golang.org/x/text v0.29.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260316180232-0b37fe3546d5 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260311181403-84a4fc48630c // indirect
-	google.golang.org/grpc v1.75.0 // indirect
+	google.golang.org/protobuf v1.36.11 // indirect
 )

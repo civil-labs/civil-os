@@ -1,5 +1,8 @@
 [tools]
 go = "1.26.1"
 
-[tasks.update-api]
+[tasks.update-civil-api]
 run = "GOPROXY=direct go get github.com/civil-labs/civil-api-go@latest"
+
+[tasks.update-dex-api]
+run = "GOPROXY=direct go get github.com/dexidp/dex/api/v2@latest"

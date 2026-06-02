@@ -21,7 +21,28 @@ func (s *DexServer) GetClient(
 ) (*connect.Response[dexv1.GetClientResponse], error) {
 	s.logger.Debug("Received GetClient request")
 
-	res := &dexv1.GetClientResponse{}
+	dexReq := &api.GetClientReq{
+		Id: req.Msg.Id,
+	}
+
+	dexRes, err := s.dexClient.GetClient(ctx, dexReq)
+
+	if err != nil {
+		s.logger.Error("upstream dex GetClient request failed", slog.Any("error", err))
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	res := &dexv1.GetClientResponse{
+		Client: &dexv1.Client{
+			Id:           dexRes.Client.Id,
+			Secret:       dexRes.Client.Secret, // Perhaps drop this in the future. Returning the secret does not seem like great prod practice
+			RedirectUris: dexRes.Client.RedirectUris,
+			TrustedPeers: dexRes.Client.TrustedPeers,
+			Public:       dexRes.Client.Public,
+			Name:         dexRes.Client.Name,
+			LogoUrl:      dexRes.Client.LogoUrl,
+		},
+	}
 
 	return connect.NewResponse(res), nil
 }

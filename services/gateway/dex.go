@@ -6,11 +6,13 @@ import (
 
 	"connectrpc.com/connect"
 	dexv1 "github.com/civil-labs/civil-api-go/civil/public/dex/v1"
+
+	"github.com/dexidp/dex/api/v2"
 )
 
 type DexServer struct {
-	dexGrpcAddress string
-	logger         *slog.Logger
+	dexClient api.DexClient
+	logger    *slog.Logger
 }
 
 func (s *DexServer) GetClient(

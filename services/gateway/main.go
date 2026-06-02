@@ -14,6 +14,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/civil-labs/civil-api-go/civil/public/dex/v1/dexv1connect"
 	"github.com/civil-labs/civil-api-go/civil/public/parcels/v1/parcelsv1connect"
 
 	meshparcelsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/parcels/v1/parcelsv1connect"
@@ -106,19 +107,30 @@ func main() {
 		dbReaderAddress, // The Envoy-routable address for the db-reader service
 	)
 
+	mux := http.NewServeMux()
+
 	parcelsServer := &ParcelServer{
 		dbReaderClient: meshClient,
 		logger:         logger,
 	}
-
-	mux := http.NewServeMux()
 
 	parcelsPath, parcelsHandler := parcelsv1connect.NewParcelsServiceHandler(
 		parcelsServer,
 		connect.WithInterceptors(validate.NewInterceptor()),
 	)
 
+	dexServer := &DexServer{
+		dbReaderClient: meshClient,
+		logger:         logger,
+	}
+
+	dexPath, dexHandler := dexv1connect.NewDexServiceHandler(
+		dexServer,
+		connect.WithInterceptors(validate.NewInterceptor()),
+	)
+
 	mux.Handle(parcelsPath, CORSMiddleware(auth(parcelsHandler), logger))
+	mux.Handle(dexPath, CORSMiddleware(auth(dexHandler), logger))
 
 	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), logger))
 	mux.HandleFunc("/health", HealthCheckHandler())

@@ -18,6 +18,7 @@ import (
 	"github.com/civil-labs/civil-api-go/civil/public/parcels/v1/parcelsv1connect"
 	"github.com/dexidp/dex/api/v2"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	meshparcelsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/parcels/v1/parcelsv1connect"
 
@@ -126,25 +127,28 @@ func main() {
 	// Create gRPC connection to Dex if an address is provided
 	if config.DexGrpcAddress != "" {
 
-		conn, err := grpc.NewClient(config.DexGrpcAddress)
+		conn, err := grpc.NewClient(config.DexGrpcAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 		if err != nil {
 
-			logger.Error("failed to connect to Dex's gRPC endpoint", slog.Any("error", err))
+			logger.Error("failed to connect to the dex instance's gRPC endpoint", slog.Any("error", err))
 
+		} else {
+
+			logger.Debug("connected to the dex instance's gRPC endpoint")
+
+			dexServer := &DexServer{
+				dexClient: api.NewDexClient(conn),
+				logger:    logger,
+			}
+
+			dexPath, dexHandler := dexv1connect.NewDexServiceHandler(
+				dexServer,
+				connect.WithInterceptors(validate.NewInterceptor()),
+			)
+
+			mux.Handle(dexPath, CORSMiddleware(auth(dexHandler), logger))
 		}
-
-		dexServer := &DexServer{
-			dexClient: api.NewDexClient(conn),
-			logger:    logger,
-		}
-
-		dexPath, dexHandler := dexv1connect.NewDexServiceHandler(
-			dexServer,
-			connect.WithInterceptors(validate.NewInterceptor()),
-		)
-
-		mux.Handle(dexPath, CORSMiddleware(auth(dexHandler), logger))
 
 	}
 

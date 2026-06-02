@@ -128,7 +128,7 @@ func main() {
 	if config.DexGrpcAddress != "" {
 
 		// Native gRPC expects just the hostname and port, not the protocol
-		conn, err := grpc.NewClient(config.DexGrpcAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		conn, err := grpc.NewClient(config.DexGrpcAddress, grpc.WithAuthority("idp"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 		if err != nil {
 

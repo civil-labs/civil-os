@@ -132,20 +132,19 @@ func main() {
 
 			logger.Error("failed to connect to Dex's gRPC endpoint", slog.Any("error", err))
 
-		} else {
-
-			dexServer := &DexServer{
-				dexClient: api.NewDexClient(conn),
-				logger:    logger,
-			}
-
-			dexPath, dexHandler := dexv1connect.NewDexServiceHandler(
-				dexServer,
-				connect.WithInterceptors(validate.NewInterceptor()),
-			)
-
-			mux.Handle(dexPath, CORSMiddleware(auth(dexHandler), logger))
 		}
+
+		dexServer := &DexServer{
+			dexClient: api.NewDexClient(conn),
+			logger:    logger,
+		}
+
+		dexPath, dexHandler := dexv1connect.NewDexServiceHandler(
+			dexServer,
+			connect.WithInterceptors(validate.NewInterceptor()),
+		)
+
+		mux.Handle(dexPath, CORSMiddleware(auth(dexHandler), logger))
 
 	}
 

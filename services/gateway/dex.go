@@ -86,7 +86,37 @@ func (s *DexServer) ListClients(
 ) (*connect.Response[dexv1.ListClientsResponse], error) {
 	s.logger.Debug("Received ListClients request")
 
-	res := &dexv1.ListClientsResponse{}
+	dexReq := &api.ListClientReq{}
+
+	dexRes, err := s.dexClient.ListClients(ctx, dexReq)
+
+	if err != nil {
+		s.logger.Error("upstream dex ListClients request failed", slog.Any("error", err))
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	clients := make([]*dexv1.ClientInfo, 0, len(dexRes.Clients))
+
+	for _, client := range dexRes.Clients {
+		if client == nil {
+			continue
+		}
+
+		newClient := &dexv1.ClientInfo{
+			Id:           client.Id,
+			RedirectUris: client.RedirectUris,
+			TrustedPeers: client.TrustedPeers,
+			Public:       client.Public,
+			Name:         client.Name,
+			LogoUrl:      client.LogoUrl,
+		}
+
+		clients = append(clients, newClient)
+	}
+
+	res := &dexv1.ListClientsResponse{
+		Clients: clients,
+	}
 
 	return connect.NewResponse(res), nil
 }

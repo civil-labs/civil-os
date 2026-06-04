@@ -53,7 +53,37 @@ func (s *DexServer) CreateClient(
 ) (*connect.Response[dexv1.CreateClientResponse], error) {
 	s.logger.Debug("Received CreateClient request")
 
-	res := &dexv1.CreateClientResponse{}
+	dexReq := &api.CreateClientReq{
+		Client: &api.Client{
+			Id:           req.Msg.Client.Id,
+			Secret:       req.Msg.Client.Secret,
+			RedirectUris: req.Msg.Client.RedirectUris,
+			TrustedPeers: req.Msg.Client.TrustedPeers,
+			Public:       req.Msg.Client.Public,
+			Name:         req.Msg.Client.Name,
+			LogoUrl:      req.Msg.Client.LogoUrl,
+		},
+	}
+
+	dexRes, err := s.dexClient.CreateClient(ctx, dexReq)
+
+	if err != nil {
+		s.logger.Error("upstream dex CreateClient request failed", slog.Any("error", err))
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	res := &dexv1.CreateClientResponse{
+		AlreadyExists: dexRes.AlreadyExists,
+		Client: &dexv1.Client{
+			Id:           dexRes.Client.Id,
+			Secret:       dexRes.Client.Secret, // Perhaps drop this in the future. Returning the secret does not seem like great prod practice
+			RedirectUris: dexRes.Client.RedirectUris,
+			TrustedPeers: dexRes.Client.TrustedPeers,
+			Public:       dexRes.Client.Public,
+			Name:         dexRes.Client.Name,
+			LogoUrl:      dexRes.Client.LogoUrl,
+		},
+	}
 
 	return connect.NewResponse(res), nil
 }
@@ -64,7 +94,24 @@ func (s *DexServer) UpdateClient(
 ) (*connect.Response[dexv1.UpdateClientResponse], error) {
 	s.logger.Debug("Received UpdateClient request")
 
-	res := &dexv1.UpdateClientResponse{}
+	dexReq := &api.UpdateClientReq{
+		Id:           req.Msg.Id,
+		RedirectUris: req.Msg.RedirectUris,
+		TrustedPeers: req.Msg.TrustedPeers,
+		Name:         req.Msg.Name,
+		LogoUrl:      req.Msg.LogoUrl,
+	}
+
+	dexRes, err := s.dexClient.UpdateClient(ctx, dexReq)
+
+	if err != nil {
+		s.logger.Error("upstream dex UpdateClient request failed", slog.Any("error", err))
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	res := &dexv1.UpdateClientResponse{
+		NotFound: dexRes.NotFound,
+	}
 
 	return connect.NewResponse(res), nil
 }
@@ -75,7 +122,20 @@ func (s *DexServer) DeleteClient(
 ) (*connect.Response[dexv1.DeleteClientResponse], error) {
 	s.logger.Debug("Received DeleteClient request")
 
-	res := &dexv1.DeleteClientResponse{}
+	dexReq := &api.DeleteClientReq{
+		Id: req.Msg.Id,
+	}
+
+	dexRes, err := s.dexClient.DeleteClient(ctx, dexReq)
+
+	if err != nil {
+		s.logger.Error("upstream dex DeleteClient request failed", slog.Any("error", err))
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	res := &dexv1.DeleteClientResponse{
+		NotFound: dexRes.NotFound,
+	}
 
 	return connect.NewResponse(res), nil
 }
@@ -138,7 +198,37 @@ func (s *DexServer) ListRefresh(
 ) (*connect.Response[dexv1.ListRefreshResponse], error) {
 	s.logger.Debug("Received ListRefresh request")
 
-	res := &dexv1.ListRefreshResponse{}
+	dexReq := &api.ListRefreshReq{
+		UserId: req.Msg.UserId,
+	}
+
+	dexRes, err := s.dexClient.ListRefresh(ctx, dexReq)
+
+	if err != nil {
+		s.logger.Error("upstream dex ListRefresh request failed", slog.Any("error", err))
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	refreshTokens := make([]*dexv1.RefreshTokenRef, 0, len(dexRes.RefreshTokens))
+
+	for _, refreshToken := range dexRes.RefreshTokens {
+		if refreshToken == nil {
+			continue
+		}
+
+		newRefreshToken := &dexv1.RefreshTokenRef{
+			Id:        refreshToken.Id,
+			ClientId:  refreshToken.ClientId,
+			CreatedAt: refreshToken.CreatedAt,
+			LastUsed:  refreshToken.LastUsed,
+		}
+
+		refreshTokens = append(refreshTokens, newRefreshToken)
+	}
+
+	res := &dexv1.ListRefreshResponse{
+		RefreshTokens: refreshTokens,
+	}
 
 	return connect.NewResponse(res), nil
 }
@@ -149,7 +239,21 @@ func (s *DexServer) RevokeRefresh(
 ) (*connect.Response[dexv1.RevokeRefreshResponse], error) {
 	s.logger.Debug("Received RevokeRefresh request")
 
-	res := &dexv1.RevokeRefreshResponse{}
+	dexReq := &api.RevokeRefreshReq{
+		UserId:   req.Msg.UserId,
+		ClientId: req.Msg.ClientId,
+	}
+
+	dexRes, err := s.dexClient.RevokeRefresh(ctx, dexReq)
+
+	if err != nil {
+		s.logger.Error("upstream dex RevokeRefresh request failed", slog.Any("error", err))
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	res := &dexv1.RevokeRefreshResponse{
+		NotFound: dexRes.NotFound,
+	}
 
 	return connect.NewResponse(res), nil
 }

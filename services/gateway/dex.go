@@ -181,17 +181,6 @@ func (s *DexServer) ListClients(
 	return connect.NewResponse(res), nil
 }
 
-func (s *DexServer) GetVersion(
-	ctx context.Context,
-	req *connect.Request[dexv1.GetVersionRequest],
-) (*connect.Response[dexv1.GetVersionResponse], error) {
-	s.logger.Debug("Received GetVersion request")
-
-	res := &dexv1.GetVersionResponse{}
-
-	return connect.NewResponse(res), nil
-}
-
 func (s *DexServer) ListRefresh(
 	ctx context.Context,
 	req *connect.Request[dexv1.ListRefreshRequest],

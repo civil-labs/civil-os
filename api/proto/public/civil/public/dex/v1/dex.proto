@@ -13,8 +13,6 @@ service DexService {
   rpc DeleteClient(DeleteClientRequest) returns (DeleteClientResponse) {}
   // ListClients lists all client entries.
   rpc ListClients(ListClientsRequest) returns (ListClientsResponse) {}
-  // GetVersion returns version information of the server.
-  rpc GetVersion(GetVersionRequest) returns (GetVersionResponse) {}
   // ListRefresh lists all the refresh token entries for a particular user.
   rpc ListRefresh(ListRefreshRequest) returns (ListRefreshResponse) {}
   // RevokeRefresh revokes the refresh token for the provided user-client pair.
@@ -31,8 +29,6 @@ message Client {
   bool public = 5;
   string name = 6;
   string logo_url = 7;
-  repeated string allowed_connectors = 8;
-  repeated string sso_shared_with = 9;
 }
 
 // ClientInfo represents an OAuth2 client without sensitive information.
@@ -43,8 +39,6 @@ message ClientInfo {
   bool public = 4;
   string name = 5;
   string logo_url = 6;
-  repeated string allowed_connectors = 7;
-  repeated string sso_shared_with = 8;
 }
 
 // GetClientReq is a request to retrieve client details.
@@ -87,8 +81,6 @@ message UpdateClientRequest {
   repeated string trusted_peers = 3;
   string name = 4;
   string logo_url = 5;
-  repeated string allowed_connectors = 6;
-  repeated string sso_shared_with = 7;
 }
 
 // UpdateClientResp returns the response from updating a client.
@@ -102,18 +94,6 @@ message ListClientsRequest {}
 // ListClientResp returns a list of clients.
 message ListClientsResponse {
   repeated ClientInfo clients = 1;
-}
-
-// VersionReq is a request to fetch version info.
-message GetVersionRequest {}
-
-// VersionResp holds the version info of components.
-message GetVersionResponse {
-  // Semantic version of the server.
-  string server = 1;
-  // Numeric version of the API. It increases every time a new call is added to the API.
-  // Clients should use this info to determine if the server supports specific features.
-  int32 api = 2;
 }
 
 // RefreshTokenRef contains the metadata for a refresh token that is managed by the storage.

@@ -5,6 +5,7 @@ package civil.public.sales.v1;
 import "buf/validate/validate.proto";
 import "gnostic/openapi/v3/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "google/type/interval.proto";
 
 service SalesService {
   // Retrieves all of a specified parcel's attributes as an object.
@@ -20,43 +21,41 @@ service SalesService {
 }
 
 message Sale {
-    string sale_id = 1 [
-        (buf.validate.field).string.uuid = true,
+  string sale_id = 1 [
+    (buf.validate.field).string.uuid = true,
 
-        // Gnostic annotation for example
-        (gnostic.openapi.v3.property) = {
-            description: "The unique identifier of a sale."
-            example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
-        }
-    ];
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier of a sale."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
 
-    google.protobuf.Timestamp sale_timestamp = 2 [
-        (buf.validate.field).timestamp = {
-        // Bounded to prevent integer overflow or absurd historical queries
-            gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
-        },
+  google.protobuf.Timestamp sale_timestamp = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
 
-        (gnostic.openapi.v3.property) = {description: "The time the sale occured at."}
-    ];
+    (gnostic.openapi.v3.property) = {description: "The time the sale occured at."}
+  ];
 
-    string sale_price = 3 [
-        (buf.validate.field).string = {
-            // Strictly caps digits to 15 before the decimal, and up to 4 after. Matches the source DB column, which is numeric(19,4)
-            pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"
-        }
-    ];
+  string sale_price = 3 [(buf.validate.field).string = {
+    // Strictly caps digits to 15 before the decimal, and up to 4 after. Matches the source DB column, which is numeric(19,4)
+    pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"
+  }];
 
-    optional string seller_name = 4 [(buf.validate.field).string = {
-        min_len: 0
-        max_len: 128
-    }];
+  optional string seller_name = 4 [(buf.validate.field).string = {
+    min_len: 0
+    max_len: 128
+  }];
 
-    optional string seller_address = 5 [(buf.validate.field).string = {
-        min_len: 0
-        max_len: 256
-    }];
+  optional string seller_address = 5 [(buf.validate.field).string = {
+    min_len: 0
+    max_len: 256
+  }];
 
-    string seller_id = 6 [
+  string seller_id = 6 [
     (buf.validate.field).string.uuid = true,
 
     // Gnostic annotation for example
@@ -66,17 +65,17 @@ message Sale {
     }
   ];
 
-    optional string buyer_name = 7 [(buf.validate.field).string = {
-        min_len: 0
-        max_len: 128
-    }];
+  optional string buyer_name = 7 [(buf.validate.field).string = {
+    min_len: 0
+    max_len: 128
+  }];
 
-    optional string buyer_address = 8 [(buf.validate.field).string = {
-        min_len: 0
-        max_len: 256
-    }];
+  optional string buyer_address = 8 [(buf.validate.field).string = {
+    min_len: 0
+    max_len: 256
+  }];
 
-    string buyer_id = 12 [
+  string buyer_id = 12 [
     (buf.validate.field).string.uuid = true,
 
     // Gnostic annotation for example
@@ -88,44 +87,61 @@ message Sale {
 }
 
 message GetSalesByParcelIdRequest {
-    repeated string parcel_ids = 1 [
-        (buf.validate.field).repeated = {
-        // Enforce uniqueness at the API edge
-        unique: true
+  string parcel_id = 1 [
+    (buf.validate.field).string.uuid = true,
 
-        min_items: 1
-        max_items: 100
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier for the parcel."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
 
-        // Apply the uuid rule to the items in the array
-        items: {
-            string: {uuid: true}
-        }
-        },
-
-        (gnostic.openapi.v3.property) = {
-        description: "A list of unique identifiers for the parcels."
-        example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
-        }
-    ];
-
-    optional google.protobuf.Timestamp system_as_of = 3 [
-        (buf.validate.field).timestamp = {
-            // From the Unix Epoch till now
-            gt: {seconds: -1}
-            lt_now: true
-        },
-        (gnostic.openapi.v3.property) = {description: "The transaction time to evaluate the database state against. Defaults to now."}
-    ];
+  optional google.protobuf.Timestamp system_as_of = 3 [
+    (buf.validate.field).timestamp = {
+      // From the Unix Epoch till now
+      gt: {seconds: -1}
+      lt_now: true
+    },
+    (gnostic.openapi.v3.property) = {description: "The transaction time to evaluate the database state against. Defaults to now."}
+  ];
 }
 
 message GetSalesByParcelIdResponse {
-
+  repeated Sale sales = 1 [(buf.validate.field).repeated = {
+    // Only return the most recent 10 sales for the parcel
+    max_items: 10
+  }];
 }
 
 message GetSalesByPolygonRequest {
+  string wkt_polygon = 1 [(buf.validate.field).string = {
+    // This regex ensures it starts with a valid WKT type and contains parentheses
+    pattern: "^(?i)(POINT|LINESTRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION)\\s*(Z|M|ZM)?\\s*\\(.*\\)$"
+    max_len: 10000
+  }];
 
+  google.type.Interval time_range = 2 [(buf.validate.field).cel = {
+    id: "valid_time_range"
+    message: "start_time must be before end_time"
+    // Ensures the start is strictly before the end, assuming both are provided
+    expression: "!has(this.start_time) || !has(this.end_time) || this.start_time < this.end_time"
+  }];
+
+  string min_sale_price = 3 [(buf.validate.field).string = {
+    // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
+    pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
+  }];
+
+  string max_sale_price = 4 [(buf.validate.field).string = {
+    // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
+    pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
+  }];
 }
 
 message GetSalesByPolygonResponse {
-
+  repeated Sale sales = 1 [(buf.validate.field).repeated = {
+    // Return up to 100 of the most recent sales for the nearby comparable parcels
+    max_items: 100
+  }];
 }

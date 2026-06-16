@@ -73,14 +73,64 @@ message GetParcelsByIdResponse {
   map<string, Parcel> parcels = 1;
 }
 
-message UpdateParcelRequest {}
+message UpdateParcelRequest {
+  string parcel_id = 1;
+  optional string address_id = 2;
+  optional string land_use_id = 3;
+  optional double land_area_sq_ft = 4;
+  optional double frontage_ft = 5;
+  optional double depth_ft = 6;
+  optional string properties = 7;
+}
 
 message UpdateParcelResponse {}
 
-message GetNumericalParcelStatsByIdRequest {}
+enum ParcelAttribute {
+  PARCEL_ATTRIBUTE_UNSPECIFIED = 0;
+  PARCEL_ATTRIBUTE_LAND_AREA_SQ_FT = 1;
+  PARCEL_ATTRIBUTE_FRONTAGE_FT = 2;
+  PARCEL_ATTRIBUTE_DEPTH_FT = 3;
+  PARCEL_ATTRIBUTE_LAND_USE_ID = 4;
+}
 
-message GetNumericalParcelStatsByIdResponse {}
+message GetNumericalParcelStatsByIdRequest {
+  repeated string parcel_ids = 1;
+  ParcelAttribute attribute = 2;
+  optional google.protobuf.Timestamp legal_as_of = 3;
+  optional google.protobuf.Timestamp system_as_of = 4;
+}
 
-message GetCategoricalParcelStatsByIdRequest {}
+message GetNumericalParcelStatsByIdResponse {
+  float mode = 1;
+  float minimum = 2;
+  float maximum = 3;
+  float range = 4;
 
-message GetCategoricalParcelStatsByIdResponse {}
+  float percentile_10 = 5;
+  float percentile_20 = 6;
+  float percentile_30 = 7;
+  float percentile_40 = 8;
+  float percentile_50 = 9;
+  float percentile_60 = 10;
+  float percentile_70 = 11;
+  float percentile_80 = 12;
+  float percentile_90 = 13;
+  float percentile_100 = 14;
+
+  float mean = 15;
+  float standard_deviation = 16;
+  float coefficient_of_dispersion = 17;
+}
+
+message GetCategoricalParcelStatsByIdRequest {
+  repeated string parcel_ids = 1;
+  ParcelAttribute attribute = 2;
+  optional google.protobuf.Timestamp legal_as_of = 3;
+  optional google.protobuf.Timestamp system_as_of = 4;
+}
+
+message GetCategoricalParcelStatsByIdResponse {
+  string mode = 1;
+
+  map<string, int32> unique_values = 2;
+}

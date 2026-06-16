@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package civil.mesh.sales.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/type/interval.proto";
+
+service SalesService {
+  // Retrieves all of a specified parcel's attributes as an object.
+  rpc GetSalesByParcelId(GetSalesByParcelIdRequest) returns (GetSalesByParcelIdResponse) {
+    // Give connect the option to use GET requests, but don't advertise it in the Swagger
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Retrieves a set of summary statistics about the specified numerical attribute for a specified list of parcels. Optionally returns the values as well
+  rpc GetSalesByPolygon(GetSalesByPolygonRequest) returns (GetSalesByPolygonResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message Sale {
+  string sale_id = 1;
+  google.protobuf.Timestamp sale_timestamp = 2;
+  string sale_price = 3;
+  optional string seller_name = 4;
+  optional string seller_address = 5;
+  string seller_id = 6;
+  optional string buyer_name = 7;
+  optional string buyer_address = 8;
+  string buyer_id = 9;
+}
+
+message GetSalesByParcelIdRequest {
+  string parcel_id = 1;
+}
+
+message GetSalesByParcelIdResponse {
+  repeated Sale sales = 1;
+}
+
+message GetSalesByPolygonRequest {
+  string wkt_polygon = 1;
+
+  google.type.Interval time_range = 2;
+
+  string min_sale_price = 3;
+
+  string max_sale_price = 4;
+}
+
+message GetSalesByPolygonResponse {
+  repeated Sale sales = 1;
+}

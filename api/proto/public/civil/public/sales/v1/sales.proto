@@ -36,7 +36,6 @@ message Sale {
       // Bounded to prevent integer overflow or absurd historical queries
       gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
     },
-
     (gnostic.openapi.v3.property) = {description: "The time the sale occured at."}
   ];
 
@@ -75,7 +74,7 @@ message Sale {
     max_len: 256
   }];
 
-  string buyer_id = 12 [
+  string buyer_id = 9 [
     (buf.validate.field).string.uuid = true,
 
     // Gnostic annotation for example

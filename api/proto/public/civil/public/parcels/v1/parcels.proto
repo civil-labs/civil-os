@@ -33,7 +33,8 @@ option (gnostic.openapi.v3.document) = {
 
   servers: [
     {url: "https://leepa.civillabs.app"},
-    {url: "https://louisville.civillabs.app"}]
+    {url: "https://louisville.civillabs.app"}
+  ]
 };
 
 service ParcelsService {
@@ -67,11 +68,8 @@ message ParcelAffordances {
       max_items: 50
 
       // Communicate all are UUIDs
-      items: {
-        string: {uuid: true}
-      }
+      items: {string: {uuid: true}}
     },
-
     // Gnostic annotation updated to reflect an array format for the example
     (gnostic.openapi.v3.property) = {
       description: "A list of unique identifiers for the affordances on the parcel."
@@ -104,11 +102,8 @@ message ParcelImprovementsSummary {
       max_items: 50
 
       // Communicate all are UUIDs
-      items: {
-        string: {uuid: true}
-      }
+      items: {string: {uuid: true}}
     },
-
     // Gnostic annotation updated to reflect an array format for the example
     (gnostic.openapi.v3.property) = {
       description: "A list of unique identifiers for the improvements on the parcel."
@@ -135,7 +130,6 @@ message ParcelImprovementsSummary {
       // Matches 0, 0.0000 -> 0.9999, 1, and 1.0000
       pattern: "^(0(\\.[0-9]{1,4})?|1(\\.0{1,4})?)$"
     },
-
     (gnostic.openapi.v3.property) = {description: "The average of the depreciation modifiers of the conditions of every improvement on this parcel, as weighted by their floor areas"}
   ];
 
@@ -165,7 +159,6 @@ message ParcelImprovementsSummary {
       // Strictly caps digits to 15 before the decimal, and up to 4 after. Matches the source DB column, which is numeric(19,4)
       pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"
     },
-
     (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for improvements attached to this parcel"}
   ];
 
@@ -174,7 +167,6 @@ message ParcelImprovementsSummary {
       // Strictly caps digits to 15 before the decimal, and up to 4 after. Matches the source DB column, which is numeric(19,4)
       pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"
     },
-
     (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for improvements attached to this parcel"}
   ];
 }
@@ -225,11 +217,8 @@ message Parcel {
       max_items: 10
 
       // Communicate all are UUIDs
-      items: {
-        string: {uuid: true}
-      }
+      items: {string: {uuid: true}}
     },
-
     // Gnostic annotation updated to reflect an array format for the example
     (gnostic.openapi.v3.property) = {
       description: "A list of unique identifiers for the parties that own this parcel."
@@ -271,11 +260,8 @@ message Parcel {
       max_items: 50
 
       // Communicate all are UUIDs
-      items: {
-        string: {uuid: true}
-      }
+      items: {string: {uuid: true}}
     },
-
     // Gnostic annotation updated to reflect an array format for the example
     (gnostic.openapi.v3.property) = {
       description: "A list of unique identifiers for the zoning overlays on the parcel."
@@ -288,7 +274,6 @@ message Parcel {
       // Strictly caps digits to 15 before the decimal, and up to 4 after. Matches the source DB column, which is numeric(19,4)
       pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"
     },
-
     (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for this parcel"}
   ];
 
@@ -297,7 +282,6 @@ message Parcel {
       // Strictly caps digits to 15 before the decimal, and up to 4 after. Matches the source DB column, which is numeric(19,4)
       pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"
     },
-
     (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for this parcel"}
   ];
 
@@ -320,11 +304,8 @@ message GetParcelsByIdRequest {
       max_items: 100
 
       // Apply the uuid rule to the items in the array
-      items: {
-        string: {uuid: true}
-      }
+      items: {string: {uuid: true}}
     },
-
     (gnostic.openapi.v3.property) = {
       description: "A list of unique identifiers for the parcels."
       example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
@@ -389,19 +370,7 @@ message UpdateParcelRequest {
     }
   ];
 
-  optional double land_area_sq_ft = 2 [(buf.validate.field).double = {gte: 0.0}];
-
-  optional string market_land_value = 3 [(buf.validate.field).string = {
-    // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
-    pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
-  }];
-
-  optional string assessed_land_value = 4 [(buf.validate.field).string = {
-    // Regex enforces an optional negative sign, numbers, and up to 4 decimal places
-    pattern: "^-?[0-9]+(\\.[0-9]{1,4})?$"
-  }];
-
-  optional string address_id = 5 [
+  optional string address_id = 2 [
     (buf.validate.field).string.uuid = true,
 
     // Gnostic annotation for example
@@ -411,17 +380,7 @@ message UpdateParcelRequest {
     }
   ];
 
-  optional string owner_id = 6 [
-    (buf.validate.field).string.uuid = true,
-
-    // Gnostic annotation for example
-    (gnostic.openapi.v3.property) = {
-      description: "The unique identifier for the parcel owner."
-      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
-    }
-  ];
-
-  optional string land_use_id = 7 [
+  optional string land_use_id = 3 [
     (buf.validate.field).string.uuid = true,
 
     // Gnostic annotation for example
@@ -431,25 +390,15 @@ message UpdateParcelRequest {
     }
   ];
 
-  optional string neighborhood_id = 8 [
-    (buf.validate.field).string.uuid = true,
+  optional double land_area_sq_ft = 4 [(buf.validate.field).double = {gte: 0.0}];
 
-    // Gnostic annotation for example
-    (gnostic.openapi.v3.property) = {
-      description: "The unique identifier for the parcel's neighborhood."
-      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
-    }
-  ];
+  optional double frontage_ft = 5 [(buf.validate.field).double = {gte: 0.0}];
 
-  optional string market_area_id = 9 [
-    (buf.validate.field).string.uuid = true,
+  optional double depth_ft = 6 [(buf.validate.field).double = {gte: 0.0}];
 
-    // Gnostic annotation for example
-    (gnostic.openapi.v3.property) = {
-      description: "The unique identifier for the parcel's market area."
-      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
-    }
-  ];
+  optional string properties = 7 [(buf.validate.field).string = {
+    max_bytes: 5120 // 5 KB limit (5 * 1024 bytes)
+  }];
 }
 
 message UpdateParcelResponse {}
@@ -472,11 +421,8 @@ message GetNumericalParcelAttributeStatsByIdRequest {
       max_items: 1000
 
       // Apply the uuid rule to the items in the array
-      items: {
-        string: {uuid: true}
-      }
+      items: {string: {uuid: true}}
     },
-
     (gnostic.openapi.v3.property) = {
       description: "A list of unique identifiers for the parcels."
       example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
@@ -546,11 +492,8 @@ message GetCategoricalParcelAttributeStatsByIdRequest {
       max_items: 1000
 
       // Apply the uuid rule to the items in the array
-      items: {
-        string: {uuid: true}
-      }
+      items: {string: {uuid: true}}
     },
-
     (gnostic.openapi.v3.property) = {
       description: "A list of unique identifiers for the parcels."
       example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
@@ -592,6 +535,7 @@ message GetCategoricalParcelAttributeStatsByIdResponse {
 
   map<string, int32> unique_values = 2 [(buf.validate.field).map = {
     min_pairs: 1 // Require at least one entry (prevents empty objects)
+
     max_pairs: 50 // Prevent "unbounded" objects that could crash your DB
 
     // Validate the keys (Strings)

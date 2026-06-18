@@ -56,6 +56,14 @@ service ParcelsService {
   rpc GetCategoricalParcelAttributeStatsById(GetCategoricalParcelAttributeStatsByIdRequest) returns (GetCategoricalParcelAttributeStatsByIdResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+
+  rpc GetEquityComparables(GetEquityComparablesRequest) returns (GetEquityComparablesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  rpc GetSalesComparables(GetSalesComparablesRequest) returns (GetSalesComparablesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 message ParcelAffordances {

@@ -16,6 +16,10 @@ service ParcelsService {
 
   // Retrieves a set of summary statistics about the specified categorical attribute for a specified list of parcels. Optionally returns the values as well
   rpc GetCategoricalParcelStatsById(GetCategoricalParcelStatsByIdRequest) returns (GetCategoricalParcelStatsByIdResponse) {}
+
+  rpc GetEquityComparables(GetEquityComparablesRequest) returns (GetEquityComparablesResponse) {}
+
+  rpc GetSalesComparables(GetSalesComparablesRequest) returns (GetSalesComparablesResponse) {}
 }
 
 message ParcelAffordances {

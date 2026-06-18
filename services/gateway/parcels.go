@@ -156,7 +156,11 @@ func (s *ParcelServer) GetEquityComparables(
 
 	s.logger.Debug("received GetEquityComparables request")
 
-	meshReq := connect.NewRequest(&meshparcelsv1.GetEquityComparablesRequest{})
+	meshReq := connect.NewRequest(&meshparcelsv1.GetEquityComparablesRequest{
+		WktPolygon:        req.Msg.WktPolygon,
+		Criteria:          mapCriteria(req.Msg.Criteria),
+		SelectedParcelIds: req.Msg.SelectedParcelIds,
+	})
 
 	meshRes, err := s.dbReaderClient.GetEquityComparables(ctx, meshReq)
 
@@ -165,7 +169,9 @@ func (s *ParcelServer) GetEquityComparables(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	publicRes := &publicparcelsv1.GetEquityComparablesResponse{}
+	publicRes := &publicparcelsv1.GetEquityComparablesResponse{
+		Parcels: mapEquityComparableParcels(meshRes.Msg.Parcels),
+	}
 
 	return connect.NewResponse(publicRes), nil
 }
@@ -177,7 +183,12 @@ func (s *ParcelServer) GetSalesComparables(
 
 	s.logger.Debug("received GetSalesComparables request")
 
-	meshReq := connect.NewRequest(&meshparcelsv1.GetSalesComparablesRequest{})
+	meshReq := connect.NewRequest(&meshparcelsv1.GetSalesComparablesRequest{
+		WktPolygon:        req.Msg.WktPolygon,
+		Criteria:          mapCriteria(req.Msg.Criteria),
+		SelectedParcelIds: req.Msg.SelectedParcelIds,
+		TimeRange:         req.Msg.TimeRange,
+	})
 
 	meshRes, err := s.dbReaderClient.GetSalesComparables(ctx, meshReq)
 
@@ -186,7 +197,86 @@ func (s *ParcelServer) GetSalesComparables(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	publicRes := &publicparcelsv1.GetSalesComparablesResponse{}
+	publicRes := &publicparcelsv1.GetSalesComparablesResponse{
+		Parcels: mapSaleComparableParcels(meshRes.Msg.Parcels),
+	}
 
 	return connect.NewResponse(publicRes), nil
 }
+
+func mapCriteria(publicCriteria []*publicparcelsv1.ComparableCriteria) []*meshparcelsv1.ComparableCriteria {
+	if publicCriteria == nil {
+		return nil
+	}
+	meshCriteria := make([]*meshparcelsv1.ComparableCriteria, len(publicCriteria))
+	for i, pc := range publicCriteria {
+		if pc == nil {
+			continue
+		}
+		meshCriteria[i] = &meshparcelsv1.ComparableCriteria{
+			Attribute:            meshparcelsv1.ParcelAttribute(pc.Attribute),
+			NumericalTolerance:   pc.NumericalTolerance,
+			CategoricalTolerance: pc.CategoricalTolerance,
+		}
+	}
+	return meshCriteria
+}
+
+func mapComparableAttributes(meshAttrs []*meshparcelsv1.ComparableAttribute) []*publicparcelsv1.ComparableAttribute {
+	if meshAttrs == nil {
+		return nil
+	}
+	publicAttrs := make([]*publicparcelsv1.ComparableAttribute, len(meshAttrs))
+	for i, ma := range meshAttrs {
+		if ma == nil {
+			continue
+		}
+		publicAttrs[i] = &publicparcelsv1.ComparableAttribute{
+			Attribute:        publicparcelsv1.ParcelAttribute(ma.Attribute),
+			NumericalValue:   ma.NumericalValue,
+			CategoricalValue: ma.CategoricalValue,
+		}
+	}
+	return publicAttrs
+}
+
+func mapEquityComparableParcels(meshParcels map[string]*meshparcelsv1.EquityComparableParcel) map[string]*publicparcelsv1.EquityComparableParcel {
+	if meshParcels == nil {
+		return nil
+	}
+	publicParcels := make(map[string]*publicparcelsv1.EquityComparableParcel, len(meshParcels))
+	for id, mp := range meshParcels {
+		if mp == nil {
+			continue
+		}
+		publicParcels[id] = &publicparcelsv1.EquityComparableParcel{
+			ParcelId:         mp.ParcelId,
+			AddressId:        mp.AddressId,
+			FormattedAddress: mp.FormattedAddress,
+			Attributes:       mapComparableAttributes(mp.Attributes),
+		}
+	}
+	return publicParcels
+}
+
+func mapSaleComparableParcels(meshParcels map[string]*meshparcelsv1.SaleComparableParcel) map[string]*publicparcelsv1.SaleComparableParcel {
+	if meshParcels == nil {
+		return nil
+	}
+	publicParcels := make(map[string]*publicparcelsv1.SaleComparableParcel, len(meshParcels))
+	for id, mp := range meshParcels {
+		if mp == nil {
+			continue
+		}
+		publicParcels[id] = &publicparcelsv1.SaleComparableParcel{
+			ParcelId:         mp.ParcelId,
+			AddressId:        mp.AddressId,
+			FormattedAddress: mp.FormattedAddress,
+			SaleTime:         mp.SaleTime,
+			SalePrice:        mp.SalePrice,
+			Attributes:       mapComparableAttributes(mp.Attributes),
+		}
+	}
+	return publicParcels
+}
+

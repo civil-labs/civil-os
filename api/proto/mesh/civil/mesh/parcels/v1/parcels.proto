@@ -43,7 +43,7 @@ message ParcelImprovementsSummary {
 
 message Parcel {
   string parcel_id = 1;
-  optional string address = 2;
+  optional string formatted_address = 2;
   optional string address_id = 3;
   optional string primary_owner_name = 4;
   optional string primary_owner_address = 5;

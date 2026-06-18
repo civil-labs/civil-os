@@ -3,6 +3,7 @@ syntax = "proto3";
 package civil.mesh.parcels.v1;
 
 import "google/protobuf/timestamp.proto";
+import "google/type/interval.proto";
 
 service ParcelsService {
   // Retrieves the value for a specified attribute for a given parcel
@@ -133,4 +134,53 @@ message GetCategoricalParcelStatsByIdResponse {
   string mode = 1;
 
   map<string, int32> unique_values = 2;
+}
+
+message ComparableCriteria {
+  ParcelAttribute attribute = 1;
+  optional double numerical_tolerance = 2;
+  repeated string categorical_tolerance = 3;
+}
+
+message ComparableAttribute {
+  ParcelAttribute attribute = 1;
+  optional double numerical_value = 2;
+  optional string categorical_value = 3;
+}
+
+message EquityComparableParcel {
+  string parcel_id = 1;
+  string address_id = 2;
+  string formatted_address = 3;
+  repeated ComparableAttribute attributes = 4;
+}
+
+message SaleComparableParcel {
+  string parcel_id = 1;
+  string address_id = 2;
+  string formatted_address = 3;
+  google.protobuf.Timestamp sale_time = 4;
+  string sale_price = 5;
+  repeated ComparableAttribute attributes = 6;
+}
+
+message GetEquityComparablesRequest {
+  string wkt_polygon = 1;
+  repeated ComparableCriteria criteria = 2;
+  repeated string selected_parcel_ids = 3;
+}
+
+message GetEquityComparablesResponse {
+  map<string, EquityComparableParcel> parcels = 1;
+}
+
+message GetSalesComparablesRequest {
+  string wkt_polygon = 1;
+  repeated ComparableCriteria criteria = 2;
+  repeated string selected_parcel_ids = 3;
+  google.type.Interval time_range = 4;
+}
+
+message GetSalesComparablesResponse {
+  map<string, SaleComparableParcel> parcels = 1;
 }

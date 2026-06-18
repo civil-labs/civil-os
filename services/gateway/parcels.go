@@ -51,7 +51,7 @@ func (s *ParcelServer) GetParcelsById(
 
 		publicParcels[id] = &publicparcelsv1.Parcel{
 			ParcelId:            meshParcel.ParcelId,
-			Address:             meshParcel.Address,
+			FormattedAddress:    meshParcel.FormattedAddress,
 			AddressId:           meshParcel.AddressId,
 			PrimaryOwnerName:    meshParcel.PrimaryOwnerName,
 			PrimaryOwnerAddress: meshParcel.PrimaryOwnerAddress,
@@ -147,4 +147,46 @@ func (s *ParcelServer) GetNumericalParcelAttributeStatsById(
 		CoefficientOfDispersion: 3,
 	}
 	return connect.NewResponse(res), nil
+}
+
+func (s *ParcelServer) GetEquityComparables(
+	ctx context.Context,
+	req *connect.Request[publicparcelsv1.GetEquityComparablesRequest],
+) (*connect.Response[publicparcelsv1.GetEquityComparablesResponse], error) {
+
+	s.logger.Debug("received GetEquityComparables request")
+
+	meshReq := connect.NewRequest(&meshparcelsv1.GetEquityComparablesRequest{})
+
+	meshRes, err := s.dbReaderClient.GetEquityComparables(ctx, meshReq)
+
+	if err != nil {
+		s.logger.Error("upstream GetEquityComparables request failed", slog.Any("error", err))
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	publicRes := &publicparcelsv1.GetEquityComparablesResponse{}
+
+	return connect.NewResponse(publicRes), nil
+}
+
+func (s *ParcelServer) GetSalesComparables(
+	ctx context.Context,
+	req *connect.Request[publicparcelsv1.GetSalesComparablesRequest],
+) (*connect.Response[publicparcelsv1.GetSalesComparablesResponse], error) {
+
+	s.logger.Debug("received GetSalesComparables request")
+
+	meshReq := connect.NewRequest(&meshparcelsv1.GetSalesComparablesRequest{})
+
+	meshRes, err := s.dbReaderClient.GetSalesComparables(ctx, meshReq)
+
+	if err != nil {
+		s.logger.Error("upstream GetSalesComparables request failed", slog.Any("error", err))
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	publicRes := &publicparcelsv1.GetSalesComparablesResponse{}
+
+	return connect.NewResponse(publicRes), nil
 }

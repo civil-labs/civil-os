@@ -34,8 +34,7 @@ option (gnostic.openapi.v3.document) = {
 
   servers: [
     {url: "https://leepa.civillabs.app"},
-    {url: "https://louisville.civillabs.app"}
-  ]
+    {url: "https://louisville.civillabs.app"}]
 };
 
 service ParcelsService {
@@ -77,7 +76,9 @@ message ParcelAffordances {
       max_items: 50
 
       // Communicate all are UUIDs
-      items: {string: {uuid: true}}
+      items: {
+        string: {uuid: true}
+      }
     },
     // Gnostic annotation updated to reflect an array format for the example
     (gnostic.openapi.v3.property) = {
@@ -111,7 +112,9 @@ message ParcelImprovementsSummary {
       max_items: 50
 
       // Communicate all are UUIDs
-      items: {string: {uuid: true}}
+      items: {
+        string: {uuid: true}
+      }
     },
     // Gnostic annotation updated to reflect an array format for the example
     (gnostic.openapi.v3.property) = {
@@ -226,7 +229,9 @@ message Parcel {
       max_items: 10
 
       // Communicate all are UUIDs
-      items: {string: {uuid: true}}
+      items: {
+        string: {uuid: true}
+      }
     },
     // Gnostic annotation updated to reflect an array format for the example
     (gnostic.openapi.v3.property) = {
@@ -269,7 +274,9 @@ message Parcel {
       max_items: 50
 
       // Communicate all are UUIDs
-      items: {string: {uuid: true}}
+      items: {
+        string: {uuid: true}
+      }
     },
     // Gnostic annotation updated to reflect an array format for the example
     (gnostic.openapi.v3.property) = {
@@ -313,7 +320,9 @@ message GetParcelsByIdRequest {
       max_items: 100
 
       // Apply the uuid rule to the items in the array
-      items: {string: {uuid: true}}
+      items: {
+        string: {uuid: true}
+      }
     },
     (gnostic.openapi.v3.property) = {
       description: "A list of unique identifiers for the parcels."
@@ -420,12 +429,13 @@ enum ParcelAttribute {
   PARCEL_ATTRIBUTE_LAND_USE_ID = 4;
   PARCEL_ATTRIBUTE_ZONING_ID = 5;
   PARCEL_ATTRIBUTE_IMPROVEMENT_AREA_SQ_FT = 6;
-  PARCEL_ATTRIBUTE_IMPROVEMENT_YEAR = 7;
-  PARCEL_ATTRIBUTE_BEDROOMS = 8;
-  PARCEL_ATTRIBUTE_BATHROOMS = 9;
-  PARCEL_ATTRIBUTE_UNITS = 10;
-  PARCEL_ATTRIBUTE_CONDITION_ID = 11;
-  PARCEL_ATTRIBUTE_IMPROVEMENT_TYPE_ID = 12;
+  PARCEL_ATTRIBUTE_IMPROVEMENT_YEAR_BUILT = 7;
+  PARCEL_ATTRIBUTE_IMPROVEMENT_EFFECTIVE_YEAR_BUILT = 8;
+  PARCEL_ATTRIBUTE_BEDROOMS = 9;
+  PARCEL_ATTRIBUTE_BATHROOMS = 10;
+  PARCEL_ATTRIBUTE_UNITS = 11;
+  PARCEL_ATTRIBUTE_CONDITION_ID = 12;
+  PARCEL_ATTRIBUTE_IMPROVEMENT_TYPE_ID = 13;
 }
 
 message GetNumericalParcelAttributeStatsByIdRequest {
@@ -438,7 +448,9 @@ message GetNumericalParcelAttributeStatsByIdRequest {
       max_items: 1000
 
       // Apply the uuid rule to the items in the array
-      items: {string: {uuid: true}}
+      items: {
+        string: {uuid: true}
+      }
     },
     (gnostic.openapi.v3.property) = {
       description: "A list of unique identifiers for the parcels."
@@ -509,7 +521,9 @@ message GetCategoricalParcelAttributeStatsByIdRequest {
       max_items: 1000
 
       // Apply the uuid rule to the items in the array
-      items: {string: {uuid: true}}
+      items: {
+        string: {uuid: true}
+      }
     },
     (gnostic.openapi.v3.property) = {
       description: "A list of unique identifiers for the parcels."
@@ -574,8 +588,9 @@ message GetCategoricalParcelAttributeStatsByIdResponse {
 
 message ComparableCriteria {
   ParcelAttribute attribute = 1;
-  optional double numerical_tolerance = 2;
-  repeated string categorical_tolerance = 3;
+  optional double min_numerical_tolerance = 2;
+  optional double max_numerical_tolerance = 3;
+  repeated string categorical_tolerance = 4;
 }
 
 message ComparableAttribute {

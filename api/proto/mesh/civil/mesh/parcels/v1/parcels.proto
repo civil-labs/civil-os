@@ -151,8 +151,9 @@ message GetCategoricalParcelStatsByIdResponse {
 
 message ComparableCriteria {
   ParcelAttribute attribute = 1;
-  optional double numerical_tolerance = 2;
-  repeated string categorical_tolerance = 3;
+  optional double min_numerical_tolerance = 2;
+  optional double max_numerical_tolerance = 3;
+  repeated string categorical_tolerance = 4;
 }
 
 message ComparableAttribute {

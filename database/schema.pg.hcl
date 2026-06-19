@@ -1441,6 +1441,11 @@ table "improvement_attributes" {
     null = true
   }
 
+  column "effective_year_built" {
+    type = int
+    null = true
+  }
+
   column "units" {
     type = int
     null = true
@@ -1565,6 +1570,11 @@ table "improvement_attributes_history" {
   }
 
   column "year_built" {
+    type = int
+    null = true
+  }
+
+  column "effective_year_built" {
     type = int
     null = true
   }
@@ -6158,6 +6168,7 @@ function "record_improvement_attributes_history" {
             bathrooms,
             bedrooms,
             year_built,
+            effective_year_built,
             units,
             properties,
             legal_valid_range,
@@ -6173,6 +6184,7 @@ function "record_improvement_attributes_history" {
             OLD.bathrooms,
             OLD.bedrooms,
             OLD.year_built,
+            OLD.effective_year_built,
             OLD.units,
             OLD.properties,
             OLD.legal_valid_range,

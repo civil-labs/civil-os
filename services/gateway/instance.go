@@ -54,6 +54,9 @@ func (s *InstanceServer) GetInstanceMetadata(
 		key = filepath.Base(u.Path)
 	} else {
 		bucketURL = u.Scheme + "://" + u.Host
+		if u.RawQuery != "" {
+			bucketURL += "?" + u.RawQuery
+		}
 		key = strings.TrimPrefix(u.Path, "/")
 	}
 

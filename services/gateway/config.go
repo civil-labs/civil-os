@@ -11,14 +11,15 @@ import (
 
 // Config holds all the runtime configuration
 type Config struct {
-	Verbose           bool
-	Port              uint16
-	AuthServer        string
-	IDPHost           string // Use local address here. Its where the gateway will make requests for JWKS
-	DBReaderHost      string
-	TileServerHost    string
-	DexGrpcAddress    string
-	AllowedClientsIds []string
+	Verbose             bool
+	Port                uint16
+	AuthServer          string
+	IDPHost             string // Use local address here. Its where the gateway will make requests for JWKS
+	DBReaderHost        string
+	TileServerHost      string
+	DexGrpcAddress      string
+	AllowedClientsIds   []string
+	InstanceMetadataUri string
 }
 
 func LoadConfig(logger *slog.Logger) (*Config, error) {
@@ -29,6 +30,7 @@ func LoadConfig(logger *slog.Logger) (*Config, error) {
 		"CIVIL_TILE_SERVER_HOST",
 		"CIVIL_ALLOWED_CLIENT_IDS",
 		"CIVIL_DB_READER_HOST",
+		"CIVIL_INSTANCE_METADATA_URI",
 	}
 
 	// Loop through and check for missing ones
@@ -47,24 +49,25 @@ func LoadConfig(logger *slog.Logger) (*Config, error) {
 	// Return the populated config struct
 	// You can also set defaults here for optional vars (like Port)
 	return &Config{
-		Verbose:           getVerboseEnv(),
-		Port:              getPortEnv("CIVIL_PORT", 8080, logger),
-		AuthServer:        os.Getenv("CIVIL_AUTH_SERVER"),
-		IDPHost:           os.Getenv("CIVIL_IDP_HOST"),
-		TileServerHost:    os.Getenv("CIVIL_TILE_SERVER_HOST"),
-		DBReaderHost:      os.Getenv("CIVIL_DB_READER_HOST"),
-		DexGrpcAddress:    os.Getenv("CIVIL_DEX_GRPC_ADDRESS"),
-		AllowedClientsIds: getAllowedClientIdsEnv(),
+		Verbose:             getVerboseEnv(),
+		Port:                getPortEnv("CIVIL_PORT", 8080, logger),
+		AuthServer:          os.Getenv("CIVIL_AUTH_SERVER"),
+		IDPHost:             os.Getenv("CIVIL_IDP_HOST"),
+		TileServerHost:      os.Getenv("CIVIL_TILE_SERVER_HOST"),
+		DBReaderHost:        os.Getenv("CIVIL_DB_READER_HOST"),
+		DexGrpcAddress:      os.Getenv("CIVIL_DEX_GRPC_ADDRESS"),
+		AllowedClientsIds:   getAllowedClientIdsEnv(),
+		InstanceMetadataUri: os.Getenv("CIVIL_INSTANCE_METADATA_URI"),
 	}, nil
 }
 
 // Helper for optional variables
-func getEnv(key, fallback string) string {
-	if value, exists := os.LookupEnv(key); exists {
-		return value
-	}
-	return fallback
-}
+// func getEnv(key, fallback string) string {
+// 	if value, exists := os.LookupEnv(key); exists {
+// 		return value
+// 	}
+// 	return fallback
+// }
 
 func getVerboseEnv() bool {
 	if value, exists := os.LookupEnv("CIVIL_VERBOSE"); exists {

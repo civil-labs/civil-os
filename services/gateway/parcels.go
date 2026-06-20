@@ -214,9 +214,10 @@ func mapCriteria(publicCriteria []*publicparcelsv1.ComparableCriteria) []*meshpa
 			continue
 		}
 		meshCriteria[i] = &meshparcelsv1.ComparableCriteria{
-			Attribute:            meshparcelsv1.ParcelAttribute(pc.Attribute),
-			NumericalTolerance:   pc.NumericalTolerance,
-			CategoricalTolerance: pc.CategoricalTolerance,
+			Attribute:             meshparcelsv1.ParcelAttribute(pc.Attribute),
+			MinNumericalTolerance: pc.MinNumericalTolerance,
+			MaxNumericalTolerance: pc.MaxNumericalTolerance,
+			CategoricalTolerance:  pc.CategoricalTolerance,
 		}
 	}
 	return meshCriteria
@@ -279,4 +280,3 @@ func mapSaleComparableParcels(meshParcels map[string]*meshparcelsv1.SaleComparab
 	}
 	return publicParcels
 }
-

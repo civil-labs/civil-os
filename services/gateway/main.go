@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/civil-labs/civil-api-go/civil/public/dex/v1/dexv1connect"
+	"github.com/civil-labs/civil-api-go/civil/public/instance/v1/instancev1connect"
 	"github.com/civil-labs/civil-api-go/civil/public/parcels/v1/parcelsv1connect"
 	"github.com/dexidp/dex/api/v2"
 	"google.golang.org/grpc"
@@ -123,6 +124,18 @@ func main() {
 	)
 
 	mux.Handle(parcelsPath, CORSMiddleware(auth(parcelsHandler), logger))
+
+	instanceServer := &InstanceServer{
+		config: *config,
+		logger: logger,
+	}
+
+	instancePath, instanceHandler := instancev1connect.NewInstanceServiceHandler(
+		instanceServer,
+		connect.WithInterceptors(validate.NewInterceptor()),
+	)
+
+	mux.Handle(instancePath, CORSMiddleware(instanceHandler, logger))
 
 	// Create gRPC connection to Dex if an address is provided
 	if config.DexGrpcAddress != "" {

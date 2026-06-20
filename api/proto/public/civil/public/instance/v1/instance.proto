@@ -14,4 +14,5 @@ message GetInstanceMetadataRequest {}
 
 message GetInstanceMetadataResponse {
     google.protobuf.Struct metadata = 1;
+    string auth_issuer_url = 2;
 }

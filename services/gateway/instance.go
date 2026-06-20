@@ -31,16 +31,16 @@ func (s *InstanceServer) GetInstanceMetadata(
 ) (*connect.Response[instancev1.GetInstanceMetadataResponse], error) {
 	s.logger.Debug("received GetInstanceMetadata request")
 
-	uriStr := s.config.InstanceMetadataUri
+	uriStr := s.config.InstanceMetadataUrl
 	if uriStr == "" {
-		s.logger.Error("InstanceMetadataUri is empty in config")
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("instance metadata URI is not configured"))
+		s.logger.Error("InstanceMetadataUrl is empty in config")
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("instance metadata URL is not configured"))
 	}
 
 	u, err := url.Parse(uriStr)
 	if err != nil {
-		s.logger.Error("failed to parse InstanceMetadataUri", slog.String("uri", uriStr), slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("invalid instance metadata URI configuration"))
+		s.logger.Error("failed to parse InstanceMetadataUrl", slog.String("uri", uriStr), slog.Any("error", err))
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("invalid instance metadata URL configuration"))
 	}
 
 	var bucketURL string
@@ -88,7 +88,8 @@ func (s *InstanceServer) GetInstanceMetadata(
 	}
 
 	res := &instancev1.GetInstanceMetadataResponse{
-		Metadata: structValue,
+		Metadata:      structValue,
+		AuthIssuerUrl: s.config.AuthServer,
 	}
 
 	return connect.NewResponse(res), nil

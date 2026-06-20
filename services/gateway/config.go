@@ -19,7 +19,7 @@ type Config struct {
 	TileServerHost      string
 	DexGrpcAddress      string
 	AllowedClientsIds   []string
-	InstanceMetadataUri string
+	InstanceMetadataUrl string
 }
 
 func LoadConfig(logger *slog.Logger) (*Config, error) {
@@ -30,7 +30,7 @@ func LoadConfig(logger *slog.Logger) (*Config, error) {
 		"CIVIL_TILE_SERVER_HOST",
 		"CIVIL_ALLOWED_CLIENT_IDS",
 		"CIVIL_DB_READER_HOST",
-		"CIVIL_INSTANCE_METADATA_URI",
+		"CIVIL_INSTANCE_METADATA_URL",
 	}
 
 	// Loop through and check for missing ones
@@ -57,7 +57,7 @@ func LoadConfig(logger *slog.Logger) (*Config, error) {
 		DBReaderHost:        os.Getenv("CIVIL_DB_READER_HOST"),
 		DexGrpcAddress:      os.Getenv("CIVIL_DEX_GRPC_ADDRESS"),
 		AllowedClientsIds:   getAllowedClientIdsEnv(),
-		InstanceMetadataUri: os.Getenv("CIVIL_INSTANCE_METADATA_URI"),
+		InstanceMetadataUrl: os.Getenv("CIVIL_INSTANCE_METADATA_URL"),
 	}, nil
 }
 

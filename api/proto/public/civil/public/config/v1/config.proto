@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package civil.public.config.v1;
+
+import "google/protobuf/struct.proto";
+
+service ConfigService {
+    rpc GetInstanceMetadata(GetInstanceMetadataRequest) returns (GetInstanceMetadataResponse) {}
+}
+
+message GetInstanceMetadataRequest {}
+
+message GetInstanceMetadataResponse {
+    google.protobuf.Struct metadata = 1;
+}

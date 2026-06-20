@@ -2,17 +2,19 @@ syntax = "proto3";
 
 package civil.public.instance.v1;
 
+import "gnostic/openapi/v3/annotations.proto";
 import "google/protobuf/struct.proto";
 
 service InstanceService {
-    rpc GetInstanceMetadata(GetInstanceMetadataRequest) returns (GetInstanceMetadataResponse) {
-        option idempotency_level = NO_SIDE_EFFECTS;
-    }
+  rpc GetInstanceMetadata(GetInstanceMetadataRequest) returns (GetInstanceMetadataResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 message GetInstanceMetadataRequest {}
 
 message GetInstanceMetadataResponse {
-    google.protobuf.Struct metadata = 1;
-    string auth_issuer_url = 2;
+  google.protobuf.Struct metadata = 1;
+
+  string auth_issuer_url = 2 [(gnostic.openapi.v3.property) = {description: "The issuer URL of the OpenID Connect (OIDC) identity provider. Frontend apps should append `/.well-known/openid-configuration` to this URL to discover OIDC endpoints."}];
 }

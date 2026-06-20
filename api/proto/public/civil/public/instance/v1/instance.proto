@@ -5,7 +5,9 @@ package civil.public.instance.v1;
 import "google/protobuf/struct.proto";
 
 service InstanceService {
-    rpc GetInstanceMetadata(GetInstanceMetadataRequest) returns (GetInstanceMetadataResponse) {}
+    rpc GetInstanceMetadata(GetInstanceMetadataRequest) returns (GetInstanceMetadataResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
 }
 
 message GetInstanceMetadataRequest {}

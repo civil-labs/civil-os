@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package civil.public.config.v1;
+package civil.public.instance.v1;
 
 import "google/protobuf/struct.proto";
 
-service ConfigService {
+service InstanceService {
     rpc GetInstanceMetadata(GetInstanceMetadataRequest) returns (GetInstanceMetadataResponse) {}
 }
 

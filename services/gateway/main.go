@@ -19,6 +19,7 @@ import (
 	"github.com/civil-labs/civil-api-go/civil/public/instance/v1/instancev1connect"
 	"github.com/civil-labs/civil-api-go/civil/public/landuses/v1/landusesv1connect"
 	"github.com/civil-labs/civil-api-go/civil/public/parcels/v1/parcelsv1connect"
+	"github.com/civil-labs/civil-api-go/civil/public/zoning/v1/zoningv1connect"
 	"github.com/dexidp/dex/api/v2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -26,6 +27,7 @@ import (
 	meshimprovementsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/improvements/v1/improvementsv1connect"
 	meshlandusesv1connect "github.com/civil-labs/civil-api-go/civil/mesh/landuses/v1/landusesv1connect"
 	meshparcelsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/parcels/v1/parcelsv1connect"
+	meshzoningv1connect "github.com/civil-labs/civil-api-go/civil/mesh/zoning/v1/zoningv1connect"
 
 	"connectrpc.com/connect"
 	"connectrpc.com/grpchealth"
@@ -125,6 +127,11 @@ func main() {
 		dbReaderAddress,
 	)
 
+	meshZoningClient := meshzoningv1connect.NewZoningServiceClient(
+		http.DefaultClient,
+		dbReaderAddress,
+	)
+
 	mux := http.NewServeMux()
 
 	parcelsServer := &ParcelServer{
@@ -174,6 +181,18 @@ func main() {
 	)
 
 	mux.Handle(landUsesPath, CORSMiddleware(auth(landUsesHandler), logger))
+
+	zoningServer := &ZoningServer{
+		dbReaderClient: meshZoningClient,
+		logger:         logger,
+	}
+
+	zoningPath, zoningHandler := zoningv1connect.NewZoningServiceHandler(
+		zoningServer,
+		connect.WithInterceptors(validate.NewInterceptor()),
+	)
+
+	mux.Handle(zoningPath, CORSMiddleware(auth(zoningHandler), logger))
 
 	// Create gRPC connection to Dex if an address is provided
 	if config.DexGrpcAddress != "" {

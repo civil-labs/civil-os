@@ -17,12 +17,14 @@ import (
 	"github.com/civil-labs/civil-api-go/civil/public/dex/v1/dexv1connect"
 	"github.com/civil-labs/civil-api-go/civil/public/improvements/v1/improvementsv1connect"
 	"github.com/civil-labs/civil-api-go/civil/public/instance/v1/instancev1connect"
+	"github.com/civil-labs/civil-api-go/civil/public/landuses/v1/landusesv1connect"
 	"github.com/civil-labs/civil-api-go/civil/public/parcels/v1/parcelsv1connect"
 	"github.com/dexidp/dex/api/v2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
 	meshimprovementsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/improvements/v1/improvementsv1connect"
+	meshlandusesv1connect "github.com/civil-labs/civil-api-go/civil/mesh/landuses/v1/landusesv1connect"
 	meshparcelsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/parcels/v1/parcelsv1connect"
 
 	"connectrpc.com/connect"
@@ -118,6 +120,11 @@ func main() {
 		dbReaderAddress,
 	)
 
+	meshLandUsesClient := meshlandusesv1connect.NewLandUsesServiceClient(
+		http.DefaultClient,
+		dbReaderAddress,
+	)
+
 	mux := http.NewServeMux()
 
 	parcelsServer := &ParcelServer{
@@ -155,6 +162,18 @@ func main() {
 	)
 
 	mux.Handle(improvementsPath, CORSMiddleware(auth(improvementsHandler), logger))
+
+	landUsesServer := &LandUseServer{
+		dbReaderClient: meshLandUsesClient,
+		logger:         logger,
+	}
+
+	landUsesPath, landUsesHandler := landusesv1connect.NewLandUsesServiceHandler(
+		landUsesServer,
+		connect.WithInterceptors(validate.NewInterceptor()),
+	)
+
+	mux.Handle(landUsesPath, CORSMiddleware(auth(landUsesHandler), logger))
 
 	// Create gRPC connection to Dex if an address is provided
 	if config.DexGrpcAddress != "" {

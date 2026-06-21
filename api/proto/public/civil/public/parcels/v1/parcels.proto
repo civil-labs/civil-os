@@ -463,7 +463,13 @@ message GetNumericalParcelAttributeStatsByIdRequest {
     in: [
       1,
       2,
-      3
+      3,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
     ]
   }];
 
@@ -533,7 +539,12 @@ message GetCategoricalParcelAttributeStatsByIdRequest {
 
   ParcelAttribute attribute = 2 [(buf.validate.field).enum = {
     defined_only: true
-    in: [4]
+    in: [
+      4,
+      5,
+      12,
+      13
+    ]
   }];
 
   // The historical or future effective date the user wants to view.

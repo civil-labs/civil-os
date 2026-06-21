@@ -15,12 +15,14 @@ import (
 	"time"
 
 	"github.com/civil-labs/civil-api-go/civil/public/dex/v1/dexv1connect"
+	"github.com/civil-labs/civil-api-go/civil/public/improvements/v1/improvementsv1connect"
 	"github.com/civil-labs/civil-api-go/civil/public/instance/v1/instancev1connect"
 	"github.com/civil-labs/civil-api-go/civil/public/parcels/v1/parcelsv1connect"
 	"github.com/dexidp/dex/api/v2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
+	meshimprovementsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/improvements/v1/improvementsv1connect"
 	meshparcelsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/parcels/v1/parcelsv1connect"
 
 	"connectrpc.com/connect"
@@ -111,6 +113,11 @@ func main() {
 		dbReaderAddress, // The Envoy-routable address for the db-reader service
 	)
 
+	meshImprovementsClient := meshimprovementsv1connect.NewImprovementsServiceClient(
+		http.DefaultClient,
+		dbReaderAddress,
+	)
+
 	mux := http.NewServeMux()
 
 	parcelsServer := &ParcelServer{
@@ -136,6 +143,18 @@ func main() {
 	)
 
 	mux.Handle(instancePath, CORSMiddleware(instanceHandler, logger))
+
+	improvementsServer := &ImprovementServer{
+		dbReaderClient: meshImprovementsClient,
+		logger:         logger,
+	}
+
+	improvementsPath, improvementsHandler := improvementsv1connect.NewImprovementsServiceHandler(
+		improvementsServer,
+		connect.WithInterceptors(validate.NewInterceptor()),
+	)
+
+	mux.Handle(improvementsPath, CORSMiddleware(auth(improvementsHandler), logger))
 
 	// Create gRPC connection to Dex if an address is provided
 	if config.DexGrpcAddress != "" {

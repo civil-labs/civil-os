@@ -16,5 +16,8 @@ message GetInstanceMetadataRequest {}
 message GetInstanceMetadataResponse {
   google.protobuf.Struct metadata = 1;
 
-  string auth_issuer_url = 2 [(gnostic.openapi.v3.property) = {description: "The issuer URL of the OpenID Connect (OIDC) identity provider. Frontend apps should append `/.well-known/openid-configuration` to this URL to discover OIDC endpoints."}];
+  string auth_issuer_url = 2 [(gnostic.openapi.v3.property) = {
+    description: "The issuer URL of the OpenID Connect (OIDC) identity provider. Guranteed to return with a transport scheme prepended to it. Frontend apps should append `/.well-known/openid-configuration` to this URL to discover OIDC endpoints."
+    example: {yaml: "https://civil.example.com"}
+  }];
 }

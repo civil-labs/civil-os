@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package civil.public.improvements.v1;
 
-service ImprovementService {
+service ImprovementsService {
   rpc GetImprovementTypes(GetImprovementTypesRequest) returns (GetImprovementTypesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }

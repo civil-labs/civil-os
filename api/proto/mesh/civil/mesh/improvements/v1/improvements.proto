@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package civil.mesh.improvements.v1;
+
+service ImprovementService {
+  rpc GetImprovementTypes(GetImprovementTypesRequest) returns (GetImprovementTypesResponse) {}
+
+  rpc GetImprovementConditions(GetImprovementConditionsRequest) returns (GetImprovementConditionsResponse) {}
+}
+
+message ImprovementType {
+  string id = 1;
+  string name = 2;
+  string code = 3;
+  string description = 4;
+}
+
+message GetImprovementTypesRequest {}
+
+message GetImprovementTypesResponse {
+  map<string, ImprovementType> improvement_types = 1;
+}
+
+message ImprovementCondition {
+  string id = 1;
+  string name = 2;
+  float depcreciation_modifier = 3;
+}
+
+message GetImprovementConditionsRequest {}
+
+message GetImprovementConditionsResponse {
+  map<string, ImprovementCondition> improvement_conditions = 1;
+}

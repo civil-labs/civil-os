@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package civil.mesh.improvements.v1;
 
-service ImprovementService {
+service ImprovementsService {
   rpc GetImprovementTypes(GetImprovementTypesRequest) returns (GetImprovementTypesResponse) {}
 
   rpc GetImprovementConditions(GetImprovementConditionsRequest) returns (GetImprovementConditionsResponse) {}

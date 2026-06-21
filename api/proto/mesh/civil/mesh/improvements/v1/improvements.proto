@@ -25,7 +25,7 @@ message ImprovementCondition {
   string id = 1;
   string name = 2;
   // Set to optional to allow it to properly pass zero values
-  optional float depcreciation_modifier = 3;
+  optional float depreciation_modifier = 3;
 }
 
 message GetImprovementConditionsRequest {}

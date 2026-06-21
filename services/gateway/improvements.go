@@ -84,9 +84,9 @@ func mapImprovementConditions(meshConditions map[string]*meshimprovementsv1.Impr
 			continue
 		}
 		publicConditions[k] = &publicimprovementsv1.ImprovementCondition{
-			Id:                    v.Id,
-			Name:                  v.Name,
-			DepcreciationModifier: v.DepcreciationModifier,
+			Id:                   v.Id,
+			Name:                 v.Name,
+			DepreciationModifier: v.DepreciationModifier,
 		}
 	}
 	return publicConditions

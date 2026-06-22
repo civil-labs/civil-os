@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
 	"connectrpc.com/connect"
@@ -21,6 +22,10 @@ func (s *DexServer) GetClient(
 ) (*connect.Response[dexv1.GetClientResponse], error) {
 	s.logger.Debug("Received GetClient request")
 
+	if req == nil || req.Msg == nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("request is required"))
+	}
+
 	dexReq := &api.GetClientReq{
 		Id: req.Msg.Id,
 	}
@@ -32,8 +37,13 @@ func (s *DexServer) GetClient(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	res := &dexv1.GetClientResponse{
-		Client: &dexv1.Client{
+	if dexRes == nil {
+		return nil, connect.NewError(connect.CodeInternal, errors.New("empty response from upstream dex"))
+	}
+
+	res := &dexv1.GetClientResponse{}
+	if dexRes.Client != nil {
+		res.Client = &dexv1.Client{
 			Id:           dexRes.Client.Id,
 			Secret:       dexRes.Client.Secret, // Perhaps drop this in the future. Returning the secret does not seem like great prod practice
 			RedirectUris: dexRes.Client.RedirectUris,
@@ -41,7 +51,7 @@ func (s *DexServer) GetClient(
 			Public:       dexRes.Client.Public,
 			Name:         dexRes.Client.Name,
 			LogoUrl:      dexRes.Client.LogoUrl,
-		},
+		}
 	}
 
 	return connect.NewResponse(res), nil
@@ -52,6 +62,10 @@ func (s *DexServer) CreateClient(
 	req *connect.Request[dexv1.CreateClientRequest],
 ) (*connect.Response[dexv1.CreateClientResponse], error) {
 	s.logger.Debug("Received CreateClient request")
+
+	if req == nil || req.Msg == nil || req.Msg.Client == nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("client configuration is required"))
+	}
 
 	dexReq := &api.CreateClientReq{
 		Client: &api.Client{
@@ -72,9 +86,15 @@ func (s *DexServer) CreateClient(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
+	if dexRes == nil {
+		return nil, connect.NewError(connect.CodeInternal, errors.New("empty response from upstream dex"))
+	}
+
 	res := &dexv1.CreateClientResponse{
 		AlreadyExists: dexRes.AlreadyExists,
-		Client: &dexv1.Client{
+	}
+	if dexRes.Client != nil {
+		res.Client = &dexv1.Client{
 			Id:           dexRes.Client.Id,
 			Secret:       dexRes.Client.Secret, // Perhaps drop this in the future. Returning the secret does not seem like great prod practice
 			RedirectUris: dexRes.Client.RedirectUris,
@@ -82,7 +102,7 @@ func (s *DexServer) CreateClient(
 			Public:       dexRes.Client.Public,
 			Name:         dexRes.Client.Name,
 			LogoUrl:      dexRes.Client.LogoUrl,
-		},
+		}
 	}
 
 	return connect.NewResponse(res), nil
@@ -93,6 +113,10 @@ func (s *DexServer) UpdateClient(
 	req *connect.Request[dexv1.UpdateClientRequest],
 ) (*connect.Response[dexv1.UpdateClientResponse], error) {
 	s.logger.Debug("Received UpdateClient request")
+
+	if req == nil || req.Msg == nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("request is required"))
+	}
 
 	dexReq := &api.UpdateClientReq{
 		Id:           req.Msg.Id,
@@ -109,6 +133,10 @@ func (s *DexServer) UpdateClient(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
+	if dexRes == nil {
+		return nil, connect.NewError(connect.CodeInternal, errors.New("empty response from upstream dex"))
+	}
+
 	res := &dexv1.UpdateClientResponse{
 		NotFound: dexRes.NotFound,
 	}
@@ -122,6 +150,10 @@ func (s *DexServer) DeleteClient(
 ) (*connect.Response[dexv1.DeleteClientResponse], error) {
 	s.logger.Debug("Received DeleteClient request")
 
+	if req == nil || req.Msg == nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("request is required"))
+	}
+
 	dexReq := &api.DeleteClientReq{
 		Id: req.Msg.Id,
 	}
@@ -131,6 +163,10 @@ func (s *DexServer) DeleteClient(
 	if err != nil {
 		s.logger.Error("upstream dex DeleteClient request failed", slog.Any("error", err))
 		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	if dexRes == nil {
+		return nil, connect.NewError(connect.CodeInternal, errors.New("empty response from upstream dex"))
 	}
 
 	res := &dexv1.DeleteClientResponse{
@@ -153,6 +189,10 @@ func (s *DexServer) ListClients(
 	if err != nil {
 		s.logger.Error("upstream dex ListClients request failed", slog.Any("error", err))
 		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	if dexRes == nil {
+		return nil, connect.NewError(connect.CodeInternal, errors.New("empty response from upstream dex"))
 	}
 
 	clients := make([]*dexv1.ClientInfo, 0, len(dexRes.Clients))
@@ -187,6 +227,10 @@ func (s *DexServer) ListRefresh(
 ) (*connect.Response[dexv1.ListRefreshResponse], error) {
 	s.logger.Debug("Received ListRefresh request")
 
+	if req == nil || req.Msg == nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("request is required"))
+	}
+
 	dexReq := &api.ListRefreshReq{
 		UserId: req.Msg.UserId,
 	}
@@ -196,6 +240,10 @@ func (s *DexServer) ListRefresh(
 	if err != nil {
 		s.logger.Error("upstream dex ListRefresh request failed", slog.Any("error", err))
 		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	if dexRes == nil {
+		return nil, connect.NewError(connect.CodeInternal, errors.New("empty response from upstream dex"))
 	}
 
 	refreshTokens := make([]*dexv1.RefreshTokenRef, 0, len(dexRes.RefreshTokens))
@@ -228,6 +276,10 @@ func (s *DexServer) RevokeRefresh(
 ) (*connect.Response[dexv1.RevokeRefreshResponse], error) {
 	s.logger.Debug("Received RevokeRefresh request")
 
+	if req == nil || req.Msg == nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("request is required"))
+	}
+
 	dexReq := &api.RevokeRefreshReq{
 		UserId:   req.Msg.UserId,
 		ClientId: req.Msg.ClientId,
@@ -238,6 +290,10 @@ func (s *DexServer) RevokeRefresh(
 	if err != nil {
 		s.logger.Error("upstream dex RevokeRefresh request failed", slog.Any("error", err))
 		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	if dexRes == nil {
+		return nil, connect.NewError(connect.CodeInternal, errors.New("empty response from upstream dex"))
 	}
 
 	res := &dexv1.RevokeRefreshResponse{

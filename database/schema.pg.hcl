@@ -4913,7 +4913,6 @@ table "improvement_types" {
 function "get_parcel_tiles" {
   schema = schema.public
   lang   = "plpgsql"
-
   // Function Arguments
   arg "z" {
     type = integer
@@ -4926,15 +4925,12 @@ function "get_parcel_tiles" {
   arg "y" {
     type = integer
   }
-
   // Return Type
   return = bytea
-
   // Modifiers (Performance & Security)
   volatility = STABLE
   strict     = true
   parallel   = SAFE
-
   // The Execution Body
   as = <<-SQL
     DECLARE
@@ -4948,10 +4944,11 @@ function "get_parcel_tiles" {
       
       bounds := ST_TileEnvelope(z, x, y);
       
-      SELECT ST_AsMVT(tile, 'parcels', 4096, 'geom')
+      SELECT ST_AsMVT(tile, 'parcels', 4096, 'geom', 'parcel_id')
       INTO mvt
       FROM (
         SELECT 
+            p.parcel_id,
             p.public_id,
             -- Clip the geometry to the tile boundary for performance
             ST_AsMVTGeom(ST_Transform(pg.geom_web, 3857), bounds, 4096, 256, true) AS geom

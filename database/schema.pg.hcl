@@ -289,6 +289,14 @@ table "parcel_geometry" {
     on_delete = RESTRICT
   }
 
+  index "idx_parcel_geometry_parcel_id" {
+    columns = [ column.parcel_id ]
+  }
+
+  index "idx_parcel_geometry_feature_id" {
+    columns = [ column.parcel_id ]
+  }
+
   index "idx_geom_web_parcel_geometry" {
     type = GIST
 
@@ -472,16 +480,28 @@ table "parcel_attributes" {
     on_delete = RESTRICT
   }
 
+  index "idx_parcel_attributes_parcel_id" {
+    columns = [ column.parcel_id ]
+  }
+
   foreign_key "fk_address_id" {
     columns = [ column.address_id ]
     ref_columns = [ table.addresses.column.address_id ]
     on_delete = RESTRICT
   }
 
+  index "idx_parcel_attributes_address_id" {
+    columns = [ column.address_id ]
+  }
+
   foreign_key "fk_land_use_id" {
     columns = [ column.land_use_id ]
     ref_columns = [ table.land_uses.column.land_use_id ]
     on_delete = RESTRICT
+  }
+
+  index "idx_parcel_attributes_land_use_id" {
+    columns = [ column.land_use_id ]
   }
 
   exclude "no_overlapping_parcel_attributes" {
@@ -635,10 +655,18 @@ table "parcel_parties" {
     on_delete = RESTRICT
   }
 
+  index "idx_parcel_parties_parcel_id" {
+    columns = [ column.parcel_id ]
+  }
+
   foreign_key "fk_party_id" {
     columns = [ column.party_id ]
     ref_columns = [ table.parties.column.party_id ]
     on_delete = RESTRICT
+  }
+
+  index "idx_parcel_parties_party_id" {
+    columns = [ column.party_id ]
   }
 
   exclude "no_overlapping_parcel_parties" {
@@ -839,6 +867,10 @@ table "parcel_affordances" {
     columns = [column.public_id]
   }
 
+  index "idx_parcel_affordances_parcel_id" {
+    columns = [column.public_id]
+  }
+
   check "chk_require_origin" {
     expr = "zoning_id IS NOT NULL OR affordance_type_id != 1"
   }
@@ -1027,16 +1059,28 @@ table "parcel_neighborhood_definitions" {
     on_delete = RESTRICT
   }
 
+  index "idx_parcel_neighborhood_definitions_parcel_id" {
+    columns = [ column.parcel_id ]
+  }
+
   foreign_key "fk_neighborhood_id" {
     columns = [ column.neighborhood_id ]
     ref_columns = [ table.neighborhoods.column.neighborhood_id ]
     on_delete = RESTRICT
   }
 
+  index "idx_parcel_neighborhood_definitions_neighborhood_id" {
+    columns = [ column.neighborhood_id ]
+  }
+
   foreign_key "fk_neighborhood_definition_id" {
     columns = [ column.neighborhood_definition_id, column.is_legal ]
     ref_columns = [ table.neighborhood_definitions.column.neighborhood_definition_id, table.neighborhood_definitions.column.is_legal ]
     on_delete = RESTRICT
+  }
+
+  index "idx_parcel_neighborhood_definitions_definition_id" {
+    columns = [ column.neighborhood_definition_id ]
   }
 
   check "chk_legal_must_have_time" {
@@ -1332,6 +1376,10 @@ table "improvement_geometry" {
     on_delete = RESTRICT
   }
 
+  index "idx_improvement_geometry_improvement_id" {
+    columns = [ column.improvement_id ]
+  }
+
   index "idx_geom_web_improvement_geometry" {
     type = GIST
 
@@ -1517,10 +1565,18 @@ table "improvement_attributes" {
     on_delete = RESTRICT
   }
 
+  index "idx_improvement_attributes_improvement_id" {
+    columns = [ column.improvement_id ]
+  }
+
   foreign_key "fk_address_id" {
     columns = [ column.address_id ]
     ref_columns = [ table.addresses.column.address_id ]
     on_delete = RESTRICT
+  }
+
+  index "idx_improvement_attributes_address_id" {
+    columns = [ column.address_id ]
   }
 
   foreign_key "fk_improvement_type_id" {
@@ -1529,10 +1585,18 @@ table "improvement_attributes" {
     on_delete = RESTRICT
   }
 
+  index "idx_improvement_attributes_improvement_type_id" {
+    columns = [ column.improvement_type_id ]
+  }
+
   foreign_key "fk_improvement_condition_id" {
     columns = [ column.improvement_condition_id ]
     ref_columns = [ table.improvement_conditions.column.improvement_condition_id ]
     on_delete = RESTRICT
+  }
+
+  index "idx_improvement_attributes_improvement_condition_id" {
+    columns = [ column.improvement_condition_id ]
   }
 
   exclude "no_overlapping_improvement_attributes" {
@@ -1706,10 +1770,18 @@ table "improvement_parties" {
     on_delete = RESTRICT
   }
 
+  index "idx_improvement_parties_improvement_id" {
+    columns = [ column.improvement_id ]
+  }
+
   foreign_key "fk_party_id" {
     columns = [ column.party_id ]
     ref_columns = [ table.parties.column.party_id ]
     on_delete = RESTRICT
+  }
+
+  index "idx_improvement_parties_party_id" {
+    columns = [ column.party_id ]
   }
 
   exclude "no_overlapping_improvement_parties" {
@@ -2102,10 +2174,18 @@ table "parcel_improvements" {
     on_delete = RESTRICT
   }
 
+  index "idx_parcel_improvements_parcel_id" {
+    columns = [ column.parcel_id ]
+  }
+
   foreign_key "fk_improvement_id" {
     columns = [ column.improvement_id ]
     ref_columns = [ table.improvements.column.improvement_id ]
     on_delete = RESTRICT
+  }
+
+  index "idx_parcel_improvements_improvement_id" {
+    columns = [ column.improvement_id ]
   }
 
   exclude "no_overlapping_parcel_improvements" {
@@ -2386,6 +2466,10 @@ table "zoning_attributes" {
     columns = [ column.zoning_id ]
     ref_columns = [ table.zoning.column.zoning_id ]
     on_delete = RESTRICT
+  }
+
+  index "idx_zoning_attributes_zoning_id" {
+    columns = [ column.zoning_id ]
   }
 
   exclude "no_overlapping_zoning_attributes" {
@@ -2669,10 +2753,18 @@ table "party_attributes" {
     on_delete = RESTRICT
   }
 
+  index "idx_party_attributes_party_id" {
+    columns = [ column.party_id ]
+  }
+
   foreign_key "fk_address_id" {
     columns = [ column.address_id ]
     ref_columns = [ table.addresses.column.address_id ]
     on_delete = RESTRICT
+  }
+
+  index "idx_party_attributes_address_id" {
+    columns = [ column.address_id ]
   }
 
   exclude "no_overlapping_party_attributes" {
@@ -2965,6 +3057,10 @@ table "address_attributes" {
     columns = [ column.address_id ]
     ref_columns = [ table.addresses.column.address_id ]
     on_delete = RESTRICT
+  }
+
+  index "idx_address_attributes_address_id" {
+    columns = [ column.address_id ]
   }
 
   foreign_key "fk_country_id" {
@@ -3302,16 +3398,28 @@ table "real_property_transfer_party_parcels" {
     on_delete = RESTRICT
   }
 
+  index "idx_rpt_party_parcels_parcel_id" {
+    columns = [ column.parcel_id ]
+  }
+
   foreign_key "fk_real_property_transfer_id" {
     columns = [ column.real_property_transfer_id ]
     ref_columns = [ table.real_property_transfers.column.real_property_transfer_id ]
     on_delete = RESTRICT
   }
 
+  index "idx_rpt_party_parcels_rpt_id" {
+    columns = [ column.real_property_transfer_id ]
+  }
+
   foreign_key "fk_party_id" {
     columns = [ column.party_id ]
     ref_columns = [ table.parties.column.party_id ]
     on_delete = RESTRICT
+  }
+
+  index "idx_rpt_party_parcels_party_id" {
+    columns = [ column.party_id ]
   }
 
   check "valid_share_transfer" {
@@ -3458,16 +3566,28 @@ table "real_property_transfer_party_improvements" {
     on_delete = RESTRICT
   }
 
+  index "idx_rpt_party_improvements_hist_improvement_id" {
+    columns = [ column.improvement_id ]
+  }
+
   foreign_key "fk_real_property_transfer_id" {
     columns = [ column.real_property_transfer_id ]
     ref_columns = [ table.real_property_transfers.column.real_property_transfer_id ]
     on_delete = RESTRICT
   }
 
+  index "idx_rpt_party_improvements_hist_rpt_id" {
+    columns = [ column.real_property_transfer_id ]
+  }
+
   foreign_key "fk_party_id" {
     columns = [ column.party_id ]
     ref_columns = [ table.parties.column.party_id ]
     on_delete = RESTRICT
+  }
+
+  index "idx_rpt_party_improvements_hist_party_id" {
+    columns = [ column.party_id ]
   }
 
   check "valid_share_transfer" {
@@ -4090,10 +4210,18 @@ table "parcel_valuations" {
     on_delete = RESTRICT
   }
 
+  index "idx_parcel_valuations_parcel_id" {
+    columns = [ column.parcel_id ]
+  }
+
   foreign_key "fk_valuation_id" {
     columns = [ column.valuation_id ]
     ref_columns = [ table.valuations.column.valuation_id ]
     on_delete = RESTRICT
+  }
+
+  index "idx_parcel_valuations_valuation_id" {
+    columns = [ column.valuation_id ]
   }
 
   index "idx_parcel_valuations_parcel_id_valuation_id" {
@@ -4241,10 +4369,18 @@ table "improvement_valuations" {
     on_delete = RESTRICT
   }
 
+  index "idx_improvement_valuations_improvement_id" {
+    columns = [ column.improvement_id ]
+  }
+
   foreign_key "fk_valuation_id" {
     columns = [ column.valuation_id ]
     ref_columns = [ table.valuations.column.valuation_id ]
     on_delete = RESTRICT
+  }
+
+  index "idx_improvement_valuations_valuation_id" {
+    columns = [ column.valuation_id ]
   }
 
   index "idx_improvement_valuations_improvement_id_valuation_id" {

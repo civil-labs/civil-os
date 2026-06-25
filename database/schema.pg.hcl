@@ -9,17 +9,18 @@ extension "postgis" {
   schema = schema.public
 
   version = "3.5.6"
-
-  // Specifying the schema here doesn't work for some reason. Need to revisit this at some point
-  // It defaults to 3.5.2
 }
 
 extension "btree_gist" {
   schema = schema.public
+
+  version = "1.7"
 }
 
 extension "pgcrypto" {
   schema = schema.public
+
+  version = "1.3"
 }
 
 ##############################

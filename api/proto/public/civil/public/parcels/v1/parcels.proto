@@ -39,30 +39,23 @@ option (gnostic.openapi.v3.document) = {
 
 service ParcelsService {
   // Retrieves all of a specified parcel's attributes as an object.
-  rpc GetParcelsById(GetParcelsByIdRequest) returns (GetParcelsByIdResponse) {
-    // Give connect the option to use GET requests, but don't advertise it in the Swagger
-    option idempotency_level = NO_SIDE_EFFECTS;
-  }
+  rpc GetParcelsById(GetParcelsByIdRequest) returns (GetParcelsByIdResponse) {}
 
   rpc UpdateParcel(UpdateParcelRequest) returns (UpdateParcelResponse) {}
 
   // Retrieves a set of summary statistics about the specified numerical attribute for a specified list of parcels. Optionally returns the values as well
-  rpc GetNumericalParcelAttributeStatsById(GetNumericalParcelAttributeStatsByIdRequest) returns (GetNumericalParcelAttributeStatsByIdResponse) {
-    option idempotency_level = NO_SIDE_EFFECTS;
-  }
+  rpc GetNumericalParcelAttributeStatsById(GetNumericalParcelAttributeStatsByIdRequest) returns (GetNumericalParcelAttributeStatsByIdResponse) {}
 
   // Retrieves a set of summary statistics about the specified categorical attribute for a specified list of parcels. Optionally returns the values as well
-  rpc GetCategoricalParcelAttributeStatsById(GetCategoricalParcelAttributeStatsByIdRequest) returns (GetCategoricalParcelAttributeStatsByIdResponse) {
-    option idempotency_level = NO_SIDE_EFFECTS;
-  }
+  rpc GetCategoricalParcelAttributeStatsById(GetCategoricalParcelAttributeStatsByIdRequest) returns (GetCategoricalParcelAttributeStatsByIdResponse) {}
 
-  rpc GetEquityComparables(GetEquityComparablesRequest) returns (GetEquityComparablesResponse) {
-    option idempotency_level = NO_SIDE_EFFECTS;
-  }
+  rpc GetEquityComparables(GetEquityComparablesRequest) returns (GetEquityComparablesResponse) {}
 
-  rpc GetSalesComparables(GetSalesComparablesRequest) returns (GetSalesComparablesResponse) {
-    option idempotency_level = NO_SIDE_EFFECTS;
-  }
+  rpc GetSalesComparables(GetSalesComparablesRequest) returns (GetSalesComparablesResponse) {}
+
+  rpc GetParcelByFeatureId(GetParcelByFeatureIdRequest) returns (GetParcelByFeatureIdResponse) {}
+
+  rpc GetParcelIdsByFeatureId(GetParcelIdsByFeatureIdRequest) returns (GetParcelIdsByFeatureIdResponse) {}
 }
 
 message ParcelAffordances {
@@ -695,10 +688,10 @@ message GetParcelByFeatureIdResponse {
   Parcel parcel = 1;
 }
 
-message GetParcelIdByFeatureIdRequest {
+message GetParcelIdsByFeatureIdRequest {
   repeated int64 feature_id = 1;
 }
 
-message GetParcelIdByFeatureIdResponse {
+message GetParcelIdsByFeatureIdResponse {
   map<int64, string> parcel_ids = 1;
 }

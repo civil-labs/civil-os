@@ -4974,11 +4974,11 @@ function "get_parcel_tiles" {
       
       bounds := ST_TileEnvelope(z, x, y);
       
-      SELECT ST_AsMVT(tile, 'parcels', 4096, 'geom', 'parcel_id')
+      SELECT ST_AsMVT(tile, 'parcels', 4096, 'geom', 'feature_id')
       INTO mvt
       FROM (
         SELECT 
-            p.public_id,
+            p.feature_id,
             -- Clip the geometry to the tile boundary for performance
             ST_AsMVTGeom(ST_Transform(pg.geom_web, 3857), bounds, 4096, 256, true) AS geom
         FROM 

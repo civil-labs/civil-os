@@ -51,6 +51,7 @@ func (s *ParcelServer) GetParcelsById(
 
 		publicParcels[id] = &publicparcelsv1.Parcel{
 			ParcelId:            meshParcel.ParcelId,
+			FeatureId:           meshParcel.FeatureId,
 			FormattedAddress:    meshParcel.FormattedAddress,
 			AddressId:           meshParcel.AddressId,
 			PrimaryOwnerName:    meshParcel.PrimaryOwnerName,
@@ -279,4 +280,78 @@ func mapSaleComparableParcels(meshParcels map[string]*meshparcelsv1.SaleComparab
 		}
 	}
 	return publicParcels
+}
+
+func (s *ParcelServer) GetParcelByFeatureId(
+	ctx context.Context,
+	req *connect.Request[publicparcelsv1.GetParcelByFeatureIdRequest],
+) (*connect.Response[publicparcelsv1.GetParcelByFeatureIdResponse], error) {
+
+	s.logger.Debug("received GetParcelByFeatureId request")
+
+	meshReq := connect.NewRequest(&meshparcelsv1.GetParcelByFeatureIdRequest{
+		FeatureId:                req.Msg.FeatureId,
+		ValuationId:              req.Msg.ValuationId,
+		NeighborhoodDefinitionId: req.Msg.NeighborhoodDefinitionId,
+	})
+
+	meshRes, err := s.dbReaderClient.GetParcelByFeatureId(ctx, meshReq)
+	if err != nil {
+		s.logger.Error("upstream GetParcelByFeatureId request failed", slog.Any("error", err))
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	if meshRes.Msg.Parcel == nil {
+		return connect.NewResponse(&publicparcelsv1.GetParcelByFeatureIdResponse{}), nil
+	}
+
+	meshParcel := meshRes.Msg.Parcel
+
+	publicParcel := &publicparcelsv1.SimpleParcel{
+		ParcelId:            meshParcel.ParcelId,
+		FeatureId:           meshParcel.FeatureId,
+		FormattedAddress:    meshParcel.FormattedAddress,
+		AddressId:           meshParcel.AddressId,
+		PrimaryOwnerName:    meshParcel.PrimaryOwnerName,
+		PrimaryOwnerAddress: meshParcel.PrimaryOwnerAddress,
+		PartyIds:            meshParcel.PartyIds,
+		LandUseId:           meshParcel.LandUseId,
+		NeighborhoodId:      meshParcel.NeighborhoodId,
+		LandAreaSqFt:        meshParcel.LandAreaSqFt,
+		FrontageFt:          meshParcel.FrontageFt,
+		DepthFt:             meshParcel.DepthFt,
+		ZoningIds:           meshParcel.ZoningIds,
+		MarketLandValue:     meshParcel.MarketLandValue,
+		AssessedLandValue:   meshParcel.AssessedLandValue,
+		Properties:          meshParcel.Properties,
+	}
+
+	publicRes := &publicparcelsv1.GetParcelByFeatureIdResponse{
+		Parcel: publicParcel,
+	}
+	return connect.NewResponse(publicRes), nil
+}
+
+func (s *ParcelServer) GetParcelIdsByFeatureId(
+	ctx context.Context,
+	req *connect.Request[publicparcelsv1.GetParcelIdsByFeatureIdRequest],
+) (*connect.Response[publicparcelsv1.GetParcelIdsByFeatureIdResponse], error) {
+
+	s.logger.Debug("received GetParcelIdsByFeatureId request")
+
+	meshReq := connect.NewRequest(&meshparcelsv1.GetParcelIdsByFeatureIdRequest{
+		FeatureId: req.Msg.FeatureId,
+	})
+
+	meshRes, err := s.dbReaderClient.GetParcelIdsByFeatureId(ctx, meshReq)
+	if err != nil {
+		s.logger.Error("upstream GetParcelIdsByFeatureId request failed", slog.Any("error", err))
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	publicRes := &publicparcelsv1.GetParcelIdsByFeatureIdResponse{
+		ParcelIds: meshRes.Msg.ParcelIds,
+	}
+
+	return connect.NewResponse(publicRes), nil
 }

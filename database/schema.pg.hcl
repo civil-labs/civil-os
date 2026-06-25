@@ -18,6 +18,10 @@ extension "btree_gist" {
   schema = schema.public
 }
 
+extension "pgcrypto" {
+  schema = schema.public
+}
+
 ##############################
 ### System Settings
 ##############################

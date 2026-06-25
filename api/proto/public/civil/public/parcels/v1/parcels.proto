@@ -194,12 +194,14 @@ message Parcel {
     }
   ];
 
-  optional string formatted_address = 2 [(buf.validate.field).string = {
+  int64 feature_id = 2;
+
+  optional string formatted_address = 3 [(buf.validate.field).string = {
     min_len: 0
     max_len: 256
   }];
 
-  optional string address_id = 3 [
+  optional string address_id = 4 [
     (buf.validate.field).string.uuid = true,
 
     // Gnostic annotation for example
@@ -209,17 +211,17 @@ message Parcel {
     }
   ];
 
-  optional string primary_owner_name = 4 [(buf.validate.field).string = {
+  optional string primary_owner_name = 5 [(buf.validate.field).string = {
     min_len: 0
     max_len: 128
   }];
 
-  optional string primary_owner_address = 5 [(buf.validate.field).string = {
+  optional string primary_owner_address = 6 [(buf.validate.field).string = {
     min_len: 0
     max_len: 256
   }];
 
-  repeated string party_ids = 6 [
+  repeated string party_ids = 7 [
     (buf.validate.field).repeated = {
       // Communicate all will be unique
       unique: true
@@ -240,7 +242,7 @@ message Parcel {
     }
   ];
 
-  optional string land_use_id = 7 [
+  optional string land_use_id = 8 [
     (buf.validate.field).string.uuid = true,
 
     // Gnostic annotation for example
@@ -250,7 +252,7 @@ message Parcel {
     }
   ];
 
-  optional string neighborhood_id = 8 [
+  optional string neighborhood_id = 9 [
     (buf.validate.field).string.uuid = true,
 
     // Gnostic annotation for example
@@ -260,13 +262,13 @@ message Parcel {
     }
   ];
 
-  optional double land_area_sq_ft = 9 [(buf.validate.field).double = {gte: 0.0}];
+  optional double land_area_sq_ft = 10 [(buf.validate.field).double = {gte: 0.0}];
 
-  optional double frontage_ft = 10 [(buf.validate.field).double = {gte: 0.0}];
+  optional double frontage_ft = 11 [(buf.validate.field).double = {gte: 0.0}];
 
-  optional double depth_ft = 11 [(buf.validate.field).double = {gte: 0.0}];
+  optional double depth_ft = 12 [(buf.validate.field).double = {gte: 0.0}];
 
-  repeated string zoning_ids = 12 [
+  repeated string zoning_ids = 13 [
     (buf.validate.field).repeated = {
       // Communicate all will be unique
       unique: true
@@ -285,7 +287,7 @@ message Parcel {
     }
   ];
 
-  optional string market_land_value = 13 [
+  optional string market_land_value = 14 [
     (buf.validate.field).string = {
       // Strictly caps digits to 15 before the decimal, and up to 4 after. Matches the source DB column, which is numeric(19,4)
       pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"
@@ -293,7 +295,7 @@ message Parcel {
     (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for this parcel"}
   ];
 
-  optional string assessed_land_value = 14 [
+  optional string assessed_land_value = 15 [
     (buf.validate.field).string = {
       // Strictly caps digits to 15 before the decimal, and up to 4 after. Matches the source DB column, which is numeric(19,4)
       pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"
@@ -301,11 +303,11 @@ message Parcel {
     (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for this parcel"}
   ];
 
-  ParcelAffordances affordances = 15;
+  ParcelAffordances affordances = 16;
 
-  ParcelImprovementsSummary improvement_summary = 16;
+  ParcelImprovementsSummary improvement_summary = 17;
 
-  optional string properties = 17 [(buf.validate.field).string = {
+  optional string properties = 18 [(buf.validate.field).string = {
     max_bytes: 5120 // 5 KB limit (5 * 1024 bytes)
   }];
 }
@@ -663,4 +665,40 @@ message GetSalesComparablesRequest {
 
 message GetSalesComparablesResponse {
   map<string, SaleComparableParcel> parcels = 1;
+}
+
+message GetParcelByFeatureIdRequest {
+  int64 feature_id = 1;
+
+  optional string valuation_id = 2 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier of a valuation."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+
+  optional string neighborhood_definition_id = 3 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier of a neighborhood definition."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+}
+
+message GetParcelByFeatureIdResponse {
+  Parcel parcel = 1;
+}
+
+message GetParcelIdByFeatureIdRequest {
+  repeated int64 feature_id = 1;
+}
+
+message GetParcelIdByFeatureIdResponse {
+  map<int64, string> parcel_ids = 1;
 }

@@ -236,6 +236,13 @@ table "parcel_geometry" {
     null = false
   }
 
+  column "feature_id" {
+    type = bigint
+    null = false
+
+    default = sql("generate_secure_mvt_id()")
+  }
+
   column "geom_web" {
     type = sql("geometry(MultiPolygon, 4326)")
     null = false
@@ -296,6 +303,18 @@ table "parcel_geometry" {
       op = "&&"
     }
   }
+
+  exclude "no_overlapping_feature_id" {
+    type = GIST
+    on {
+      column = column.feature_id
+      op = "="
+    }
+    on {
+      column = column.legal_valid_range
+      op = "&&"
+    }
+  }
 }
 
 table "parcel_geometry_history" {
@@ -318,6 +337,13 @@ table "parcel_geometry_history" {
   column "parcel_id" {
     type = bigint
     null = false
+  }
+
+  column "feature_id" {
+    type = bigint
+    null = false
+
+    default = sql("generate_secure_mvt_id()")
   }
 
   column "geom_web" {
@@ -359,6 +385,10 @@ table "parcel_geometry_history" {
   }
 
   index "idx_parcel_geometry_history_parcel_id" {
+    columns = [column.parcel_id]
+  }
+
+  index "idx_parcel_geometry_history_feature_id" {
     columns = [column.parcel_id]
   }
 }
@@ -4948,7 +4978,6 @@ function "get_parcel_tiles" {
       INTO mvt
       FROM (
         SELECT 
-            p.parcel_id,
             p.public_id,
             -- Clip the geometry to the tile boundary for performance
             ST_AsMVTGeom(ST_Transform(pg.geom_web, 3857), bounds, 4096, 256, true) AS geom
@@ -4963,6 +4992,34 @@ function "get_parcel_tiles" {
             ST_Intersects(pg.geom_web, ST_Transform(bounds, 4326))
     ) AS tile;
       RETURN mvt;
+    END;
+  SQL
+}
+
+function "generate_secure_mvt_id" {
+  schema = schema.public
+  lang   = "plpgsql"
+
+  return = bigint
+
+  // Modifiers (Performance & Security)
+  volatility = VOLATILE
+  parallel   = SAFE
+
+  as   = <<-SQL
+    DECLARE
+        b bytea := gen_random_bytes(7);
+        res bigint := 0;
+    BEGIN
+        res := (get_byte(b, 0)::bigint << 48) |
+               (get_byte(b, 1)::bigint << 40) |
+               (get_byte(b, 2)::bigint << 32) |
+               (get_byte(b, 3)::bigint << 24) |
+               (get_byte(b, 4)::bigint << 16) |
+               (get_byte(b, 5)::bigint << 8) |
+               (get_byte(b, 6)::bigint);
+               
+        RETURN GREATEST(1, res & 9007199254740991);
     END;
   SQL
 }
@@ -5811,6 +5868,7 @@ function "record_parcel_geometry_history" {
           INSERT INTO parcel_geometry_history (
             parcel_geometry_id,
             parcel_id,
+            feature_id,
             geom_web,
             geom_legal,
             local_srid,
@@ -5820,6 +5878,7 @@ function "record_parcel_geometry_history" {
           ) VALUES (
             OLD.parcel_geometry_id,
             OLD.parcel_id,
+            OLD.feature_id,
             OLD.geom_web,
             OLD.geom_legal,
             OLD.local_srid,

@@ -5119,17 +5119,16 @@ function "get_parcel_tiles" {
       INTO mvt
       FROM (
         SELECT 
-            p.feature_id,
+            pg.feature_id,
             -- Clip the geometry to the tile boundary for performance
             ST_AsMVTGeom(ST_Transform(pg.geom_web, 3857), bounds, 4096, 256, true) AS geom
         FROM 
             public.parcels p
-        LEFT JOIN 
-            public.parcel_attributes pa ON p.parcel_id = pa.parcel_id
         JOIN
             public.parcel_geometry pg ON p.parcel_id = pg.parcel_id
         WHERE 
             p.is_voided = false AND
+            pg.legal_valid_range @> NOW() AND
             ST_Intersects(pg.geom_web, ST_Transform(bounds, 4326))
     ) AS tile;
       RETURN mvt;

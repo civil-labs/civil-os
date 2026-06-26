@@ -3566,7 +3566,7 @@ table "real_property_transfer_party_improvements" {
     on_delete = RESTRICT
   }
 
-  index "idx_rpt_party_improvements_hist_improvement_id" {
+  index "idx_rpt_party_improvements_improvement_id" {
     columns = [ column.improvement_id ]
   }
 
@@ -3586,7 +3586,7 @@ table "real_property_transfer_party_improvements" {
     on_delete = RESTRICT
   }
 
-  index "idx_rpt_party_improvements_hist_party_id" {
+  index "idx_rpt_party_improvements_party_id" {
     columns = [ column.party_id ]
   }
 

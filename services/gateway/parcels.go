@@ -340,7 +340,7 @@ func (s *ParcelServer) GetParcelIdsByFeatureId(
 	s.logger.Debug("received GetParcelIdsByFeatureId request")
 
 	meshReq := connect.NewRequest(&meshparcelsv1.GetParcelIdsByFeatureIdRequest{
-		FeatureId: req.Msg.FeatureId,
+		FeatureIds: req.Msg.FeatureIds,
 	})
 
 	meshRes, err := s.dbReaderClient.GetParcelIdsByFeatureId(ctx, meshReq)

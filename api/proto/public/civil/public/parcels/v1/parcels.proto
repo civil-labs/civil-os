@@ -814,7 +814,7 @@ message GetParcelByFeatureIdResponse {
 }
 
 message GetParcelIdsByFeatureIdRequest {
-  repeated int64 feature_id = 1;
+  repeated int64 feature_ids = 1;
 }
 
 message GetParcelIdsByFeatureIdResponse {

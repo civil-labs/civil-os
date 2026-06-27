@@ -169,18 +169,20 @@ message ComparableAttribute {
 
 message EquityComparableParcel {
   string parcel_id = 1;
-  string address_id = 2;
-  string formatted_address = 3;
-  repeated ComparableAttribute attributes = 4;
+  int64 feature_id = 2;
+  string address_id = 3;
+  string formatted_address = 4;
+  repeated ComparableAttribute attributes = 5;
 }
 
 message SaleComparableParcel {
   string parcel_id = 1;
-  string address_id = 2;
-  string formatted_address = 3;
-  google.protobuf.Timestamp sale_time = 4;
-  string sale_price = 5;
-  repeated ComparableAttribute attributes = 6;
+  int64 feature_id = 2;
+  string address_id = 3;
+  string formatted_address = 4;
+  google.protobuf.Timestamp sale_time = 5;
+  string sale_price = 6;
+  repeated ComparableAttribute attributes = 7;
 }
 
 message GetEquityComparablesRequest {

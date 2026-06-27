@@ -253,6 +253,7 @@ func mapEquityComparableParcels(meshParcels map[string]*meshparcelsv1.EquityComp
 		}
 		publicParcels[id] = &publicparcelsv1.EquityComparableParcel{
 			ParcelId:         mp.ParcelId,
+			FeatureId:        mp.FeatureId,
 			AddressId:        mp.AddressId,
 			FormattedAddress: mp.FormattedAddress,
 			Attributes:       mapComparableAttributes(mp.Attributes),
@@ -272,6 +273,7 @@ func mapSaleComparableParcels(meshParcels map[string]*meshparcelsv1.SaleComparab
 		}
 		publicParcels[id] = &publicparcelsv1.SaleComparableParcel{
 			ParcelId:         mp.ParcelId,
+			FeatureId:        mp.FeatureId,
 			AddressId:        mp.AddressId,
 			FormattedAddress: mp.FormattedAddress,
 			SaleTime:         mp.SaleTime,

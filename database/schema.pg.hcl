@@ -5115,11 +5115,9 @@ function "get_parcel_tiles" {
       
       bounds := ST_TileEnvelope(z, x, y);
       
-      SELECT ST_AsMVT(tile, 'parcels', 4096, 'geom', 'feature_id')
-      INTO mvt
-      FROM (
+      WITH tile AS (
         SELECT 
-            pg.feature_id,
+            pg.feature_id AS id,
             -- Clip the geometry to the tile boundary for performance
             ST_AsMVTGeom(ST_Transform(pg.geom_web, 3857), bounds, 4096, 256, true) AS geom
         FROM 
@@ -5130,7 +5128,10 @@ function "get_parcel_tiles" {
             p.is_voided = false AND
             pg.legal_valid_range @> NOW() AND
             ST_Intersects(pg.geom_web, ST_Transform(bounds, 4326))
-    ) AS tile;
+      )
+      SELECT ST_AsMVT(tile, 'parcels', 4096, 'geom', 'id')
+      INTO mvt
+      FROM tile;
       RETURN mvt;
     END;
   SQL

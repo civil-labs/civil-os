@@ -357,3 +357,28 @@ func (s *ParcelServer) GetParcelIdsByFeatureId(
 
 	return connect.NewResponse(publicRes), nil
 }
+
+func (s *ParcelServer) GetEstimatedParcelsExtentWGS84(
+	ctx context.Context,
+	req *connect.Request[publicparcelsv1.GetEstimatedParcelsExtentWGS84Request],
+) (*connect.Response[publicparcelsv1.GetEstimatedParcelsExtentWGS84Response], error) {
+
+	s.logger.Debug("received GetEstimatedParcelsExtentWGS84 request")
+
+	meshReq := connect.NewRequest(&meshparcelsv1.GetEstimatedParcelsExtentWGS84Request{})
+
+	meshRes, err := s.dbReaderClient.GetEstimatedParcelsExtentWGS84(ctx, meshReq)
+	if err != nil {
+		s.logger.Error("upstream GetEstimatedParcelsExtentWGS84 request failed", slog.Any("error", err))
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	publicRes := &publicparcelsv1.GetEstimatedParcelsExtentWGS84Response{
+		MinX: meshRes.Msg.MinX,
+		MinY: meshRes.Msg.MinY,
+		MaxX: meshRes.Msg.MaxX,
+		MaxY: meshRes.Msg.MaxY,
+	}
+
+	return connect.NewResponse(publicRes), nil
+}

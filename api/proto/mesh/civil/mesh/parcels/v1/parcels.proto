@@ -25,7 +25,7 @@ service ParcelsService {
 
   rpc GetParcelIdsByFeatureId(GetParcelIdsByFeatureIdRequest) returns (GetParcelIdsByFeatureIdResponse) {}
 
-  rpc GetEstimatedParcelsExtentInWGS84(GetEstimatedParcelsExtentInWGS84Request) returns (GetEstimatedParcelsExtentInWGS84Response) {}
+  rpc GetEstimatedParcelsExtentWGS84(GetEstimatedParcelsExtentWGS84Request) returns (GetEstimatedParcelsExtentWGS84Response) {}
 }
 
 message ParcelAffordances {
@@ -247,9 +247,9 @@ message GetParcelIdsByFeatureIdResponse {
   map<int64, string> parcel_ids = 1;
 }
 
-message GetEstimatedParcelsExtentInWGS84Request {}
+message GetEstimatedParcelsExtentWGS84Request {}
 
-message GetEstimatedParcelsExtentInWGS84Response {
+message GetEstimatedParcelsExtentWGS84Response {
   double min_x = 1;
   double min_y = 2;
   double max_x = 3;

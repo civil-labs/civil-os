@@ -2205,7 +2205,7 @@ table "parcel_improvements" {
       column = column.legal_valid_range
       op     = "&&"
     }
-    where = "is_primary = true"
+    where = "(is_primary = true)"
   }
 
   exclude "no_overlapping_improvements" {

@@ -5194,6 +5194,10 @@ function "get_primary_improvements" {
     type = sql("bigint[]")
   }
 
+  arg "target_time" {
+    type = timestamptz
+  }
+
   return = sql("TABLE(parcel_id bigint, improvement_id bigint)")
 
   volatility = STABLE
@@ -5220,10 +5224,10 @@ function "get_primary_improvements" {
           public.parcel_improvements pi
         LEFT JOIN 
           public.improvement_attributes ia ON pi.improvement_id = ia.improvement_id 
-          AND ia.legal_valid_range @> NOW()
+          AND ia.legal_valid_range @> target_time
         WHERE 
           pi.parcel_id = ANY(parcel_ids)
-          AND pi.legal_valid_range @> NOW()
+          AND pi.legal_valid_range @> target_time
       ) AS sub
       WHERE 
         sub.rn = 1;

@@ -11,7 +11,7 @@ import "google/type/interval.proto";
 option (gnostic.openapi.v3.document) = {
   info: {
     title: "Civil API"
-    version: "0.0.3"
+    version: "0.0.0"
     description: "Public API description for the Civil platform. Auth token can be retrieved by prefixing \"auth-\" to the beginning of your jurisdiction's endpoint."
   }
 
@@ -118,18 +118,27 @@ message ParcelImprovementsSummary {
     }
   ];
 
+  string primary_improvement_id = 2 [
+    (buf.validate.field).string.uuid = true,
+
+    (gnostic.openapi.v3.property) = {
+      description: "The ID of the primary improvement on this parcel"
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+
   // Physically impossible to be negative
-  double total_area_sq_ft = 2 [(buf.validate.field).double = {gte: 0.0}];
+  double total_area_sq_ft = 3 [(buf.validate.field).double = {gte: 0.0}];
 
-  int32 total_bathrooms = 3 [(buf.validate.field).int32 = {gte: 0}];
+  int32 total_bathrooms = 4 [(buf.validate.field).int32 = {gte: 0}];
 
-  int32 total_bedrooms = 4 [(buf.validate.field).int32 = {gte: 0}];
+  int32 total_bedrooms = 5 [(buf.validate.field).int32 = {gte: 0}];
 
-  int32 total_units = 5 [(buf.validate.field).int32 = {gte: 0}];
+  int32 total_units = 6 [(buf.validate.field).int32 = {gte: 0}];
 
-  optional int32 primary_year_built = 6 [(buf.validate.field).int32 = {}];
+  optional int32 primary_year_built = 7 [(buf.validate.field).int32 = {}];
 
-  optional string primary_condition_id = 7 [
+  optional string primary_condition_id = 8 [
     (buf.validate.field).string.uuid = true,
 
     (gnostic.openapi.v3.property) = {
@@ -138,7 +147,7 @@ message ParcelImprovementsSummary {
     }
   ];
 
-  optional string total_market_improvement_value = 8 [
+  optional string total_market_improvement_value = 9 [
     (buf.validate.field).string = {
       // Strictly caps digits to 15 before the decimal, and up to 4 after. Matches the source DB column, which is numeric(19,4)
       pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"
@@ -146,7 +155,7 @@ message ParcelImprovementsSummary {
     (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for improvements attached to this parcel"}
   ];
 
-  optional string total_assessed_improvement_value = 9 [
+  optional string total_assessed_improvement_value = 10 [
     (buf.validate.field).string = {
       // Strictly caps digits to 15 before the decimal, and up to 4 after. Matches the source DB column, which is numeric(19,4)
       pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"

@@ -21,7 +21,7 @@ service ParcelsService {
 
   rpc GetSalesComparables(GetSalesComparablesRequest) returns (GetSalesComparablesResponse) {}
 
-  rpc GetParcelByFeatureId(GetParcelByFeatureIdRequest) returns (GetParcelByFeatureIdResponse) {}
+  rpc GetParcelsByFeatureId(GetParcelsByFeatureIdRequest) returns (GetParcelsByFeatureIdResponse) {}
 
   rpc GetParcelIdsByFeatureId(GetParcelIdsByFeatureIdRequest) returns (GetParcelIdsByFeatureIdResponse) {}
 
@@ -40,22 +40,24 @@ message ParcelAffordances {
 message ParcelImprovementsSummary {
   repeated string improvement_ids = 1;
 
+  string primary_improvement_id = 2;
+
   // Physically impossible to be negative
-  double total_area_sq_ft = 2;
+  double total_area_sq_ft = 3;
 
-  int32 total_bathrooms = 3;
+  int32 total_bathrooms = 4;
 
-  int32 total_bedrooms = 4;
+  int32 total_bedrooms = 5;
 
-  int32 total_units = 5;
+  int32 total_units = 6;
 
-  optional int32 primary_year_built = 6;
+  optional int32 primary_year_built = 7;
 
-  optional string primary_condition_id = 7;
+  optional string primary_condition_id = 8;
 
-  optional string total_market_improvement_value = 8;
+  optional string total_market_improvement_value = 9;
 
-  optional string total_assessed_improvement_value = 9;
+  optional string total_assessed_improvement_value = 10;
 }
 
 message ParcelDetails {
@@ -100,12 +102,8 @@ message ParcelWithImprovementSummary {
 message GetParcelsWithImprovementSummaryByParcelIdRequest {
   repeated string parcel_ids = 1;
 
-  // The historical or future effective date the user wants to view.
-  // If omitted, defaults to the current time.
   optional google.protobuf.Timestamp legal_as_of = 2;
 
-  // The time to reset the database state to
-  // If omitted, defaults to the current time.
   optional google.protobuf.Timestamp system_as_of = 3;
 
   optional string valuation_id = 4;
@@ -115,6 +113,22 @@ message GetParcelsWithImprovementSummaryByParcelIdRequest {
 
 message GetParcelsWithImprovementSummaryByParcelIdResponse {
   // A map of parcel records, keyed by their public ID.
+  map<string, ParcelWithImprovementSummary> parcels = 1;
+}
+
+message GetParcelsByFeatureIdRequest {
+  repeated int64 feature_ids = 1;
+
+  optional google.protobuf.Timestamp legal_as_of = 2;
+
+  optional google.protobuf.Timestamp system_as_of = 3;
+
+  optional string valuation_id = 4;
+
+  optional string neighborhood_definition_id = 5;
+}
+
+message GetParcelsByFeatureIdResponse {
   map<string, ParcelWithImprovementSummary> parcels = 1;
 }
 
@@ -258,18 +272,6 @@ message SimpleParcel {
   optional string market_land_value = 14;
   optional string assessed_land_value = 15;
   optional string properties = 18;
-}
-
-message GetParcelByFeatureIdRequest {
-  int64 feature_id = 1;
-
-  optional string valuation_id = 2;
-
-  optional string neighborhood_definition_id = 3;
-}
-
-message GetParcelByFeatureIdResponse {
-  SimpleParcel parcel = 1;
 }
 
 message GetParcelIdsByFeatureIdRequest {

@@ -2148,6 +2148,13 @@ table "parcel_improvements" {
     null = false
   }
 
+  column "is_primary" {
+    type = boolean
+    null = false
+    
+    default = false
+  }
+
   column "legal_valid_range" {
     type = tstzrange
     null = false
@@ -2188,12 +2195,21 @@ table "parcel_improvements" {
     columns = [ column.improvement_id ]
   }
 
-  exclude "no_overlapping_parcel_improvements" {
+  exclude "no_overlapping_primary_improvements" {
     type = GIST
     on {
       column = column.parcel_id
       op = "="
     }
+    on {
+      column = column.legal_valid_range
+      op = "&&"
+    }
+    where = "is_primary = true"
+  }
+
+  exclude "no_overlapping_improvements" {
+    type = GIST
     on {
       column = column.improvement_id
       op = "="
@@ -2229,6 +2245,11 @@ table "parcel_improvements_history" {
 
   column "improvement_id" {
     type = bigint
+    null = false
+  }
+
+  column "is_primary" {
+    type = boolean
     null = false
   }
 
@@ -6555,6 +6576,7 @@ function "record_parcel_improvements_history" {
             parcel_improvement_id,
             parcel_id,
             improvement_id,
+            is_primary,
             legal_valid_range,
             system_valid_range,
             trace_id
@@ -6562,6 +6584,7 @@ function "record_parcel_improvements_history" {
             OLD.parcel_improvement_id,
             OLD.parcel_id,
             OLD.improvement_id,
+            OLD.is_primary,
             OLD.legal_valid_range,
             tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
             OLD.trace_id

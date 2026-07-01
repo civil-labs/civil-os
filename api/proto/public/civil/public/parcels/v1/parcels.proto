@@ -34,14 +34,16 @@ option (gnostic.openapi.v3.document) = {
 
   servers: [
     {url: "https://leepa.civillabs.app"},
-    {url: "https://louisville.civillabs.app"}]
+    {url: "https://louisville.civillabs.app"}
+  ]
 };
 
 service ParcelsService {
-  // Retrieves all of a specified parcel's attributes as an object.
+  // Retrieval
+
   rpc GetParcelsWithImprovementSummaryByParcelId(GetParcelsWithImprovementSummaryByParcelIdRequest) returns (GetParcelsWithImprovementSummaryByParcelIdResponse) {}
 
-  rpc UpdateParcel(UpdateParcelRequest) returns (UpdateParcelResponse) {}
+  rpc GetParcelsWithImprovementSummaryByFeatureId(GetParcelsWithImprovementSummaryByFeatureIdRequest) returns (GetParcelsWithImprovementSummaryByFeatureIdResponse) {}
 
   // Retrieves a set of summary statistics about the specified numerical attribute for a specified list of parcels. Optionally returns the values as well
   rpc GetNumericalParcelAttributeStatsById(GetNumericalParcelAttributeStatsByIdRequest) returns (GetNumericalParcelAttributeStatsByIdResponse) {}
@@ -53,11 +55,13 @@ service ParcelsService {
 
   rpc GetSalesComparables(GetSalesComparablesRequest) returns (GetSalesComparablesResponse) {}
 
-  rpc GetParcelsWithImprovementSummaryByFeatureId(GetParcelsWithImprovementSummaryByFeatureIdRequest) returns (GetParcelsWithImprovementSummaryByFeatureIdResponse) {}
-
   rpc GetParcelIdsByFeatureId(GetParcelIdsByFeatureIdRequest) returns (GetParcelIdsByFeatureIdResponse) {}
 
   rpc GetEstimatedParcelsExtentWGS84(GetEstimatedParcelsExtentWGS84Request) returns (GetEstimatedParcelsExtentWGS84Response) {}
+
+  // Mutation
+
+  rpc UpdateParcel(UpdateParcelRequest) returns (UpdateParcelResponse) {}
 }
 
 message ParcelAffordances {
@@ -71,9 +75,7 @@ message ParcelAffordances {
       max_items: 50
 
       // Communicate all are UUIDs
-      items: {
-        string: {uuid: true}
-      }
+      items: {string: {uuid: true}}
     },
     // Gnostic annotation updated to reflect an array format for the example
     (gnostic.openapi.v3.property) = {
@@ -107,9 +109,7 @@ message ParcelImprovementsSummary {
       max_items: 50
 
       // Communicate all are UUIDs
-      items: {
-        string: {uuid: true}
-      }
+      items: {string: {uuid: true}}
     },
     // Gnostic annotation updated to reflect an array format for the example
     (gnostic.openapi.v3.property) = {
@@ -212,9 +212,7 @@ message ParcelDetails {
       max_items: 10
 
       // Communicate all are UUIDs
-      items: {
-        string: {uuid: true}
-      }
+      items: {string: {uuid: true}}
     },
     // Gnostic annotation updated to reflect an array format for the example
     (gnostic.openapi.v3.property) = {
@@ -257,9 +255,7 @@ message ParcelDetails {
       max_items: 50
 
       // Communicate all are UUIDs
-      items: {
-        string: {uuid: true}
-      }
+      items: {string: {uuid: true}}
     },
     // Gnostic annotation updated to reflect an array format for the example
     (gnostic.openapi.v3.property) = {
@@ -304,9 +300,7 @@ message GetParcelsWithImprovementSummaryByParcelIdRequest {
       max_items: 100
 
       // Apply the uuid rule to the items in the array
-      items: {
-        string: {uuid: true}
-      }
+      items: {string: {uuid: true}}
     },
     (gnostic.openapi.v3.property) = {
       description: "A list of unique identifiers for the parcels."
@@ -454,9 +448,7 @@ message GetNumericalParcelAttributeStatsByIdRequest {
       max_items: 1000
 
       // Apply the uuid rule to the items in the array
-      items: {
-        string: {uuid: true}
-      }
+      items: {string: {uuid: true}}
     },
     (gnostic.openapi.v3.property) = {
       description: "A list of unique identifiers for the parcels."
@@ -533,9 +525,7 @@ message GetCategoricalParcelAttributeStatsByIdRequest {
       max_items: 1000
 
       // Apply the uuid rule to the items in the array
-      items: {
-        string: {uuid: true}
-      }
+      items: {string: {uuid: true}}
     },
     (gnostic.openapi.v3.property) = {
       description: "A list of unique identifiers for the parcels."

@@ -9,6 +9,8 @@ service ParcelsService {
   // Retrieves the value for a specified attribute for a given parcel
   rpc GetParcelsWithImprovementSummaryByParcelId(GetParcelsWithImprovementSummaryByParcelIdRequest) returns (GetParcelsWithImprovementSummaryByParcelIdResponse) {}
 
+  rpc GetParcelsWithImprovementSummaryByFeatureId(GetParcelsWithImprovementSummaryByFeatureIdRequest) returns (GetParcelsWithImprovementSummaryByFeatureIdResponse) {}
+
   rpc UpdateParcel(UpdateParcelRequest) returns (UpdateParcelResponse) {}
 
   // Retrieves a set of summary statistics about the specified numerical attribute for a specified list of parcels. Optionally returns the values as well
@@ -20,8 +22,6 @@ service ParcelsService {
   rpc GetEquityComparables(GetEquityComparablesRequest) returns (GetEquityComparablesResponse) {}
 
   rpc GetSalesComparables(GetSalesComparablesRequest) returns (GetSalesComparablesResponse) {}
-
-  rpc GetParcelsByFeatureId(GetParcelsByFeatureIdRequest) returns (GetParcelsByFeatureIdResponse) {}
 
   rpc GetParcelIdsByFeatureId(GetParcelIdsByFeatureIdRequest) returns (GetParcelIdsByFeatureIdResponse) {}
 
@@ -114,7 +114,7 @@ message GetParcelsWithImprovementSummaryByParcelIdResponse {
   map<string, ParcelWithImprovementSummary> parcels = 1;
 }
 
-message GetParcelsByFeatureIdRequest {
+message GetParcelsWithImprovementSummaryByFeatureIdRequest {
   repeated int64 feature_ids = 1;
 
   optional google.protobuf.Timestamp legal_as_of = 2;
@@ -124,7 +124,7 @@ message GetParcelsByFeatureIdRequest {
   optional string neighborhood_definition_id = 4;
 }
 
-message GetParcelsByFeatureIdResponse {
+message GetParcelsWithImprovementSummaryByFeatureIdResponse {
   map<string, ParcelWithImprovementSummary> parcels = 1;
 }
 

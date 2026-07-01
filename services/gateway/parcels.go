@@ -17,85 +17,30 @@ type ParcelServer struct {
 	logger         *slog.Logger
 }
 
-func (s *ParcelServer) GetParcelsById(
+func (s *ParcelServer) GetParcelsWithImprovementSummaryByParcelId(
 	ctx context.Context,
-	req *connect.Request[publicparcelsv1.GetParcelsByIdRequest],
-) (*connect.Response[publicparcelsv1.GetParcelsByIdResponse], error) {
+	req *connect.Request[publicparcelsv1.GetParcelsWithImprovementSummaryByParcelIdRequest],
+) (*connect.Response[publicparcelsv1.GetParcelsWithImprovementSummaryByParcelIdResponse], error) {
 
-	s.logger.Debug("received GetParcelsById request")
+	s.logger.Debug("received GetParcelsWithImprovementSummaryByParcelId request")
 
-	meshReq := connect.NewRequest(&meshparcelsv1.GetParcelsByIdRequest{
+	meshReq := connect.NewRequest(&meshparcelsv1.GetParcelsWithImprovementSummaryByParcelIdRequest{
 		ParcelIds:                req.Msg.ParcelIds,
-		LegalAsOf:                req.Msg.LegalAsOf,
-		SystemAsOf:               req.Msg.SystemAsOf,
-		NeighborhoodDefinitionId: req.Msg.NeighborhoodDefinitionId,
+		LegalAsOf:                req.Msg.GetLegalAsOf(),
 		ValuationId:              req.Msg.ValuationId,
+		NeighborhoodDefinitionId: req.Msg.NeighborhoodDefinitionId,
 	})
 
-	meshRes, err := s.dbReaderClient.GetParcelsById(ctx, meshReq)
+	meshRes, err := s.dbReaderClient.GetParcelsWithImprovementSummaryByParcelId(ctx, meshReq)
 	if err != nil {
-		// ConnectRPC automatically handles wrapping standard gRPC error codes
-		// You might want to log the internal error here, but return a sanitized error to the public client
-		s.logger.Error("upstream GetParcelsById request failed", slog.Any("error", err))
+		s.logger.Error("upstream GetParcelsWithImprovementSummaryByParcelId request failed", slog.Any("error", err))
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	// Initialize a new map for the public response, sized to match the incoming data
-	publicParcels := make(map[string]*publicparcelsv1.Parcel, len(meshRes.Msg.Parcels))
-
-	// Iterate and manually map the fields
-	for id, meshParcel := range meshRes.Msg.Parcels {
-		if meshParcel == nil {
-			continue // Always good practice to guard against nil pointers in protobuf maps
-		}
-
-		publicParcels[id] = &publicparcelsv1.Parcel{
-			ParcelId:            meshParcel.ParcelId,
-			FeatureId:           meshParcel.FeatureId,
-			FormattedAddress:    meshParcel.FormattedAddress,
-			AddressId:           meshParcel.AddressId,
-			PrimaryOwnerName:    meshParcel.PrimaryOwnerName,
-			PrimaryOwnerAddress: meshParcel.PrimaryOwnerAddress,
-			PartyIds:            meshParcel.PartyIds,
-			LandUseId:           meshParcel.LandUseId,
-			NeighborhoodId:      meshParcel.NeighborhoodId,
-			LandAreaSqFt:        meshParcel.LandAreaSqFt,
-			FrontageFt:          meshParcel.FrontageFt,
-			DepthFt:             meshParcel.DepthFt,
-			ZoningIds:           meshParcel.ZoningIds,
-			MarketLandValue:     meshParcel.MarketLandValue,
-			AssessedLandValue:   meshParcel.AssessedLandValue,
-
-			Affordances: &publicparcelsv1.ParcelAffordances{
-				AffordanceIds:           meshParcel.Affordances.AffordanceIds,
-				MaxFar:                  meshParcel.Affordances.MaxFar,
-				MinLotSizeSqFt:          meshParcel.Affordances.MinLotSizeSqFt,
-				MaxHeightFt:             meshParcel.Affordances.MaxHeightFt,
-				MaxDwellingUnitsPerAcre: meshParcel.Affordances.MaxDwellingUnitsPerAcre,
-				MaxLotCoveragePct:       meshParcel.Affordances.MaxLotCoveragePct,
-			},
-
-			ImprovementSummary: &publicparcelsv1.ParcelImprovementsSummary{
-				ImprovementIds:           meshParcel.ImprovementSummary.ImprovementIds,
-				TotalAreaSqFt:            meshParcel.ImprovementSummary.TotalAreaSqFt,
-				TotalBathrooms:           meshParcel.ImprovementSummary.TotalBathrooms,
-				TotalBedrooms:            meshParcel.ImprovementSummary.TotalBedrooms,
-				TotalUnits:               meshParcel.ImprovementSummary.TotalUnits,
-				OldestYearBuilt:          meshParcel.ImprovementSummary.OldestYearBuilt,
-				NewestYearBuilt:          meshParcel.ImprovementSummary.NewestYearBuilt,
-				WorstConditionId:         meshParcel.ImprovementSummary.WorstConditionId,
-				BestConditionId:          meshParcel.ImprovementSummary.BestConditionId,
-				MarketImprovementValue:   meshParcel.ImprovementSummary.MarketImprovementValue,
-				AssessedImprovementValue: meshParcel.ImprovementSummary.AssessedImprovementValue,
-			},
-
-			Properties: meshParcel.Properties,
-		}
+	publicRes := &publicparcelsv1.GetParcelsWithImprovementSummaryByParcelIdResponse{
+		Parcels: mapParcelWithImprovementSummary(meshRes.Msg.Parcels),
 	}
 
-	publicRes := &publicparcelsv1.GetParcelsByIdResponse{
-		Parcels: publicParcels,
-	}
 	return connect.NewResponse(publicRes), nil
 }
 
@@ -284,53 +229,30 @@ func mapSaleComparableParcels(meshParcels map[string]*meshparcelsv1.SaleComparab
 	return publicParcels
 }
 
-func (s *ParcelServer) GetParcelByFeatureId(
+func (s *ParcelServer) GetParcelsWithImprovementSummaryByFeatureId(
 	ctx context.Context,
-	req *connect.Request[publicparcelsv1.GetParcelByFeatureIdRequest],
-) (*connect.Response[publicparcelsv1.GetParcelByFeatureIdResponse], error) {
+	req *connect.Request[publicparcelsv1.GetParcelsWithImprovementSummaryByFeatureIdRequest],
+) (*connect.Response[publicparcelsv1.GetParcelsWithImprovementSummaryByFeatureIdResponse], error) {
 
-	s.logger.Debug("received GetParcelByFeatureId request")
+	s.logger.Debug("received GetParcelsWithImprovementSummaryByFeatureId request")
 
-	meshReq := connect.NewRequest(&meshparcelsv1.GetParcelByFeatureIdRequest{
-		FeatureId:                req.Msg.FeatureId,
+	meshReq := connect.NewRequest(&meshparcelsv1.GetParcelsWithImprovementSummaryByFeatureIdRequest{
+		FeatureIds:               req.Msg.FeatureIds,
+		LegalAsOf:                req.Msg.GetLegalAsOf(),
 		ValuationId:              req.Msg.ValuationId,
 		NeighborhoodDefinitionId: req.Msg.NeighborhoodDefinitionId,
 	})
 
-	meshRes, err := s.dbReaderClient.GetParcelByFeatureId(ctx, meshReq)
+	meshRes, err := s.dbReaderClient.GetParcelsWithImprovementSummaryByFeatureId(ctx, meshReq)
 	if err != nil {
-		s.logger.Error("upstream GetParcelByFeatureId request failed", slog.Any("error", err))
+		s.logger.Error("upstream GetParcelsWithImprovementSummaryByFeatureId request failed", slog.Any("error", err))
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	if meshRes.Msg.Parcel == nil {
-		return connect.NewResponse(&publicparcelsv1.GetParcelByFeatureIdResponse{}), nil
+	publicRes := &publicparcelsv1.GetParcelsWithImprovementSummaryByFeatureIdResponse{
+		Parcels: mapParcelWithImprovementSummary(meshRes.Msg.Parcels),
 	}
 
-	meshParcel := meshRes.Msg.Parcel
-
-	publicParcel := &publicparcelsv1.SimpleParcel{
-		ParcelId:            meshParcel.ParcelId,
-		FeatureId:           meshParcel.FeatureId,
-		FormattedAddress:    meshParcel.FormattedAddress,
-		AddressId:           meshParcel.AddressId,
-		PrimaryOwnerName:    meshParcel.PrimaryOwnerName,
-		PrimaryOwnerAddress: meshParcel.PrimaryOwnerAddress,
-		PartyIds:            meshParcel.PartyIds,
-		LandUseId:           meshParcel.LandUseId,
-		NeighborhoodId:      meshParcel.NeighborhoodId,
-		LandAreaSqFt:        meshParcel.LandAreaSqFt,
-		FrontageFt:          meshParcel.FrontageFt,
-		DepthFt:             meshParcel.DepthFt,
-		ZoningIds:           meshParcel.ZoningIds,
-		MarketLandValue:     meshParcel.MarketLandValue,
-		AssessedLandValue:   meshParcel.AssessedLandValue,
-		Properties:          meshParcel.Properties,
-	}
-
-	publicRes := &publicparcelsv1.GetParcelByFeatureIdResponse{
-		Parcel: publicParcel,
-	}
 	return connect.NewResponse(publicRes), nil
 }
 
@@ -381,4 +303,62 @@ func (s *ParcelServer) GetEstimatedParcelsExtentWGS84(
 	}
 
 	return connect.NewResponse(publicRes), nil
+}
+
+func mapParcelWithImprovementSummary(meshParcels map[string]*meshparcelsv1.ParcelWithImprovementSummary) map[string]*publicparcelsv1.ParcelWithImprovementSummary {
+	if meshParcels == nil {
+		return nil
+	}
+	publicParcels := make(map[string]*publicparcelsv1.ParcelWithImprovementSummary, len(meshParcels))
+	for id, mp := range meshParcels {
+		if mp == nil {
+			continue
+		}
+
+		var publicDetails *publicparcelsv1.ParcelDetails
+		if mp.ParcelDetails != nil {
+			md := mp.ParcelDetails
+			publicDetails = &publicparcelsv1.ParcelDetails{
+				ParcelId:            md.ParcelId,
+				FeatureId:           md.FeatureId,
+				FormattedAddress:    md.FormattedAddress,
+				AddressId:           md.AddressId,
+				PrimaryOwnerName:    md.PrimaryOwnerName,
+				PrimaryOwnerAddress: md.PrimaryOwnerAddress,
+				PartyIds:            md.PartyIds,
+				LandUseId:           md.LandUseId,
+				NeighborhoodId:      md.NeighborhoodId,
+				LandAreaSqFt:        md.LandAreaSqFt,
+				FrontageFt:          md.FrontageFt,
+				DepthFt:             md.DepthFt,
+				ZoningIds:           md.ZoningIds,
+				MarketLandValue:     md.MarketLandValue,
+				AssessedLandValue:   md.AssessedLandValue,
+				Properties:          md.Properties,
+			}
+		}
+
+		var publicSummary *publicparcelsv1.ParcelImprovementsSummary
+		if mp.ImprovementSummary != nil {
+			ms := mp.ImprovementSummary
+			publicSummary = &publicparcelsv1.ParcelImprovementsSummary{
+				ImprovementIds:                ms.ImprovementIds,
+				PrimaryImprovementId:           ms.PrimaryImprovementId,
+				TotalAreaSqFt:                  ms.TotalAreaSqFt,
+				TotalBathrooms:                 ms.TotalBathrooms,
+				TotalBedrooms:                  ms.TotalBedrooms,
+				TotalUnits:                     ms.TotalUnits,
+				PrimaryYearBuilt:               ms.PrimaryYearBuilt,
+				PrimaryConditionId:             ms.PrimaryConditionId,
+				TotalMarketImprovementValue:   ms.TotalMarketImprovementValue,
+				TotalAssessedImprovementValue: ms.TotalAssessedImprovementValue,
+			}
+		}
+
+		publicParcels[id] = &publicparcelsv1.ParcelWithImprovementSummary{
+			ParcelDetails:      publicDetails,
+			ImprovementSummary: publicSummary,
+		}
+	}
+	return publicParcels
 }

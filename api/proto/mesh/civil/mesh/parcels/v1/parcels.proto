@@ -104,11 +104,9 @@ message GetParcelsWithImprovementSummaryByParcelIdRequest {
 
   optional google.protobuf.Timestamp legal_as_of = 2;
 
-  optional google.protobuf.Timestamp system_as_of = 3;
+  optional string valuation_id = 3;
 
-  optional string valuation_id = 4;
-
-  optional string neighborhood_definition_id = 5;
+  optional string neighborhood_definition_id = 4;
 }
 
 message GetParcelsWithImprovementSummaryByParcelIdResponse {
@@ -121,11 +119,9 @@ message GetParcelsByFeatureIdRequest {
 
   optional google.protobuf.Timestamp legal_as_of = 2;
 
-  optional google.protobuf.Timestamp system_as_of = 3;
+  optional string valuation_id = 3;
 
-  optional string valuation_id = 4;
-
-  optional string neighborhood_definition_id = 5;
+  optional string neighborhood_definition_id = 4;
 }
 
 message GetParcelsByFeatureIdResponse {

@@ -322,16 +322,7 @@ message GetParcelsWithImprovementSummaryByParcelIdRequest {
     (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcel data for. Defaults to now. If a parcel does not have data for that time, no data for that parcel is returned."}
   ];
 
-  optional google.protobuf.Timestamp system_as_of = 3 [
-    (buf.validate.field).timestamp = {
-      // From the Unix Epoch till now
-      gt: {seconds: -1}
-      lt_now: true
-    },
-    (gnostic.openapi.v3.property) = {description: "A previous timestamp, which the query will use to determine the previous state of the database. Defaults to now. If a parcel does not have data for that time, no data for that parcel is returned."}
-  ];
-
-  optional string valuation_id = 4 [
+  optional string valuation_id = 3 [
     (buf.validate.field).string.uuid = true,
 
     // Gnostic annotation for example
@@ -341,7 +332,7 @@ message GetParcelsWithImprovementSummaryByParcelIdRequest {
     }
   ];
 
-  optional string neighborhood_definition_id = 5 [
+  optional string neighborhood_definition_id = 4 [
     (buf.validate.field).string.uuid = true,
 
     // Gnostic annotation for example
@@ -367,16 +358,7 @@ message GetParcelsWithImprovementSummaryByFeatureIdRequest {
     (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcel data for. Defaults to now. If a parcel does not have data for that time, no data for that parcel is returned."}
   ];
 
-  optional google.protobuf.Timestamp system_as_of = 3 [
-    (buf.validate.field).timestamp = {
-      // From the Unix Epoch till now
-      gt: {seconds: -1}
-      lt_now: true
-    },
-    (gnostic.openapi.v3.property) = {description: "A previous timestamp, which the query will use to retrieve a previous state of the database. Defaults to now. If a parcel does not have data for that time, no data for that parcel is returned."}
-  ];
-
-  optional string valuation_id = 4 [
+  optional string valuation_id = 3 [
     (buf.validate.field).string.uuid = true,
 
     // Gnostic annotation for example
@@ -386,7 +368,7 @@ message GetParcelsWithImprovementSummaryByFeatureIdRequest {
     }
   ];
 
-  optional string neighborhood_definition_id = 5 [
+  optional string neighborhood_definition_id = 4 [
     (buf.validate.field).string.uuid = true,
 
     // Gnostic annotation for example

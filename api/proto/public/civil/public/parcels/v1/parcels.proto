@@ -39,7 +39,7 @@ option (gnostic.openapi.v3.document) = {
 
 service ParcelsService {
   // Retrieves all of a specified parcel's attributes as an object.
-  rpc GetParcelsById(GetParcelsByIdRequest) returns (GetParcelsByIdResponse) {}
+  rpc GetParcelsWithImprovementSummaryByParcelId(GetParcelsWithImprovementSummaryByParcelIdRequest) returns (GetParcelsWithImprovementSummaryByParcelIdResponse) {}
 
   rpc UpdateParcel(UpdateParcelRequest) returns (UpdateParcelResponse) {}
 
@@ -53,7 +53,7 @@ service ParcelsService {
 
   rpc GetSalesComparables(GetSalesComparablesRequest) returns (GetSalesComparablesResponse) {}
 
-  rpc GetParcelByFeatureId(GetParcelByFeatureIdRequest) returns (GetParcelByFeatureIdResponse) {}
+  rpc GetParcelsWithImprovementSummaryByFeatureId(GetParcelsWithImprovementSummaryByFeatureIdRequest) returns (GetParcelsWithImprovementSummaryByFeatureIdResponse) {}
 
   rpc GetParcelIdsByFeatureId(GetParcelIdsByFeatureIdRequest) returns (GetParcelIdsByFeatureIdResponse) {}
 
@@ -127,41 +127,18 @@ message ParcelImprovementsSummary {
 
   int32 total_units = 5 [(buf.validate.field).int32 = {gte: 0}];
 
-  // Bounded to realistic historical/future parameters
-  optional int32 oldest_year_built = 6 [(buf.validate.field).int32 = {}];
+  optional int32 primary_year_built = 6 [(buf.validate.field).int32 = {}];
 
-  optional int32 newest_year_built = 7 [(buf.validate.field).int32 = {}];
-
-  optional string weighted_average_depreciation_modifier = 8 [
-    (buf.validate.field).string = {
-      // Matches 0, 0.0000 -> 0.9999, 1, and 1.0000
-      pattern: "^(0(\\.[0-9]{1,4})?|1(\\.0{1,4})?)$"
-    },
-    (gnostic.openapi.v3.property) = {description: "The average of the depreciation modifiers of the conditions of every improvement on this parcel, as weighted by their floor areas"}
-  ];
-
-  // Worst and best based on the conditions' depreciation factors
-  optional string worst_condition_id = 9 [
+  optional string primary_condition_id = 7 [
     (buf.validate.field).string.uuid = true,
 
-    // Gnostic annotation for example
     (gnostic.openapi.v3.property) = {
-      description: "The worst condition of an improvement on this parcel, as sorted by their depreciation modifiers."
+      description: "The ID of the condition of the primary improvement on this parcel"
       example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
     }
   ];
 
-  optional string best_condition_id = 10 [
-    (buf.validate.field).string.uuid = true,
-
-    // Gnostic annotation for example
-    (gnostic.openapi.v3.property) = {
-      description: "The best condition of an improvement on this parcel, as sorted by their depreciation modifiers."
-      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
-    }
-  ];
-
-  optional string market_improvement_value = 11 [
+  optional string total_market_improvement_value = 8 [
     (buf.validate.field).string = {
       // Strictly caps digits to 15 before the decimal, and up to 4 after. Matches the source DB column, which is numeric(19,4)
       pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"
@@ -169,7 +146,7 @@ message ParcelImprovementsSummary {
     (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for improvements attached to this parcel"}
   ];
 
-  optional string assessed_improvement_value = 12 [
+  optional string total_assessed_improvement_value = 9 [
     (buf.validate.field).string = {
       // Strictly caps digits to 15 before the decimal, and up to 4 after. Matches the source DB column, which is numeric(19,4)
       pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"
@@ -178,7 +155,7 @@ message ParcelImprovementsSummary {
   ];
 }
 
-message Parcel {
+message ParcelDetails {
   string parcel_id = 1 [
     (buf.validate.field).string.uuid = true,
 
@@ -189,7 +166,7 @@ message Parcel {
     }
   ];
 
-  int64 feature_id = 2;
+  optional int64 feature_id = 2;
 
   optional string formatted_address = 3 [(buf.validate.field).string = {
     min_len: 0
@@ -298,16 +275,17 @@ message Parcel {
     (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for this parcel"}
   ];
 
-  ParcelAffordances affordances = 16;
-
-  ParcelImprovementsSummary improvement_summary = 17;
-
-  optional string properties = 18 [(buf.validate.field).string = {
+  optional string properties = 16 [(buf.validate.field).string = {
     max_bytes: 5120 // 5 KB limit (5 * 1024 bytes)
   }];
 }
 
-message GetParcelsByIdRequest {
+message ParcelWithImprovementSummary {
+  ParcelDetails parcel_details = 1;
+  ParcelImprovementsSummary improvement_summary = 2;
+}
+
+message GetParcelsWithImprovementSummaryByParcelIdRequest {
   repeated string parcel_ids = 1 [
     (buf.validate.field).repeated = {
       // Enforce uniqueness at the API edge
@@ -327,25 +305,21 @@ message GetParcelsByIdRequest {
     }
   ];
 
-  // The historical or future effective date the user wants to view.
-  // If omitted, defaults to the current time.
   optional google.protobuf.Timestamp legal_as_of = 2 [
     (buf.validate.field).timestamp = {
       // Bounded to prevent integer overflow or absurd historical queries
       gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
     },
-    (gnostic.openapi.v3.property) = {description: "The real-world date to evaluate the parcel against. Defaults to now."}
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcel data for. Defaults to now. If a parcel does not have data for that time, no data for that parcel is returned."}
   ];
 
-  // The time to reset the database state to
-  // If omitted, defaults to the current time.
   optional google.protobuf.Timestamp system_as_of = 3 [
     (buf.validate.field).timestamp = {
       // From the Unix Epoch till now
       gt: {seconds: -1}
       lt_now: true
     },
-    (gnostic.openapi.v3.property) = {description: "The transaction time to evaluate the database state against. Defaults to now."}
+    (gnostic.openapi.v3.property) = {description: "A previous timestamp, which the query will use to determine the previous state of the database. Defaults to now. If a parcel does not have data for that time, no data for that parcel is returned."}
   ];
 
   optional string valuation_id = 4 [
@@ -369,9 +343,53 @@ message GetParcelsByIdRequest {
   ];
 }
 
-message GetParcelsByIdResponse {
-  // A map of parcel records, keyed by their public ID.
-  map<string, Parcel> parcels = 1 [(gnostic.openapi.v3.property) = {description: "A dictionary of parcels, keyed by their unique parcel_id."}];
+message GetParcelsWithImprovementSummaryByParcelIdResponse {
+  map<string, ParcelWithImprovementSummary> parcels = 1 [(gnostic.openapi.v3.property) = {description: "A dictionary of parcels, keyed by their UUID parcel ID."}];
+}
+
+message GetParcelsWithImprovementSummaryByFeatureIdRequest {
+  repeated int64 feature_ids = 1;
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcel data for. Defaults to now. If a parcel does not have data for that time, no data for that parcel is returned."}
+  ];
+
+  optional google.protobuf.Timestamp system_as_of = 3 [
+    (buf.validate.field).timestamp = {
+      // From the Unix Epoch till now
+      gt: {seconds: -1}
+      lt_now: true
+    },
+    (gnostic.openapi.v3.property) = {description: "A previous timestamp, which the query will use to retrieve a previous state of the database. Defaults to now. If a parcel does not have data for that time, no data for that parcel is returned."}
+  ];
+
+  optional string valuation_id = 4 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier of a valuation."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+
+  optional string neighborhood_definition_id = 5 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier of a neighborhood definition."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+}
+
+message GetParcelsWithImprovementSummaryByFeatureIdResponse {
+  map<string, ParcelWithImprovementSummary> parcels = 1 [(gnostic.openapi.v3.property) = {description: "A dictionary of parcels, keyed by their integer feature ID."}];
 }
 
 message UpdateParcelRequest {
@@ -662,159 +680,6 @@ message GetSalesComparablesRequest {
 
 message GetSalesComparablesResponse {
   map<string, SaleComparableParcel> parcels = 1;
-}
-
-message SimpleParcel {
-  string parcel_id = 1 [
-    (buf.validate.field).string.uuid = true,
-
-    // Gnostic annotation for example
-    (gnostic.openapi.v3.property) = {
-      description: "The unique identifier for the parcel."
-      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
-    }
-  ];
-
-  int64 feature_id = 2;
-
-  optional string formatted_address = 3 [(buf.validate.field).string = {
-    min_len: 0
-    max_len: 256
-  }];
-
-  optional string address_id = 4 [
-    (buf.validate.field).string.uuid = true,
-
-    // Gnostic annotation for example
-    (gnostic.openapi.v3.property) = {
-      description: "The unique identifier for the parcel's address."
-      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
-    }
-  ];
-
-  optional string primary_owner_name = 5 [(buf.validate.field).string = {
-    min_len: 0
-    max_len: 128
-  }];
-
-  optional string primary_owner_address = 6 [(buf.validate.field).string = {
-    min_len: 0
-    max_len: 256
-  }];
-
-  repeated string party_ids = 7 [
-    (buf.validate.field).repeated = {
-      // Communicate all will be unique
-      unique: true
-
-      // A single parcel will rarely have more than a
-      // handful of owners
-      max_items: 10
-
-      // Communicate all are UUIDs
-      items: {
-        string: {uuid: true}
-      }
-    },
-    // Gnostic annotation updated to reflect an array format for the example
-    (gnostic.openapi.v3.property) = {
-      description: "A list of unique identifiers for the parties that own this parcel."
-      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
-    }
-  ];
-
-  optional string land_use_id = 8 [
-    (buf.validate.field).string.uuid = true,
-
-    // Gnostic annotation for example
-    (gnostic.openapi.v3.property) = {
-      description: "The unique identifier for the parcel's land use."
-      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
-    }
-  ];
-
-  optional string neighborhood_id = 9 [
-    (buf.validate.field).string.uuid = true,
-
-    // Gnostic annotation for example
-    (gnostic.openapi.v3.property) = {
-      description: "The unique identifier for the parcel's neighborhood. Will only populate if a neighborhood definition ID is provided, and the parcel has a neighborhood for that definition."
-      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
-    }
-  ];
-
-  optional double land_area_sq_ft = 10 [(buf.validate.field).double = {gte: 0.0}];
-
-  optional double frontage_ft = 11 [(buf.validate.field).double = {gte: 0.0}];
-
-  optional double depth_ft = 12 [(buf.validate.field).double = {gte: 0.0}];
-
-  repeated string zoning_ids = 13 [
-    (buf.validate.field).repeated = {
-      // Communicate all will be unique
-      unique: true
-
-      max_items: 50
-
-      // Communicate all are UUIDs
-      items: {
-        string: {uuid: true}
-      }
-    },
-    // Gnostic annotation updated to reflect an array format for the example
-    (gnostic.openapi.v3.property) = {
-      description: "A list of unique identifiers for the zoning overlays on the parcel."
-      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
-    }
-  ];
-
-  optional string market_land_value = 14 [
-    (buf.validate.field).string = {
-      // Strictly caps digits to 15 before the decimal, and up to 4 after. Matches the source DB column, which is numeric(19,4)
-      pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"
-    },
-    (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for this parcel"}
-  ];
-
-  optional string assessed_land_value = 15 [
-    (buf.validate.field).string = {
-      // Strictly caps digits to 15 before the decimal, and up to 4 after. Matches the source DB column, which is numeric(19,4)
-      pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"
-    },
-    (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for this parcel"}
-  ];
-
-  optional string properties = 17 [(buf.validate.field).string = {
-    max_bytes: 5120 // 5 KB limit (5 * 1024 bytes)
-  }];
-}
-
-message GetParcelByFeatureIdRequest {
-  int64 feature_id = 1;
-
-  optional string valuation_id = 2 [
-    (buf.validate.field).string.uuid = true,
-
-    // Gnostic annotation for example
-    (gnostic.openapi.v3.property) = {
-      description: "The unique identifier of a valuation."
-      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
-    }
-  ];
-
-  optional string neighborhood_definition_id = 3 [
-    (buf.validate.field).string.uuid = true,
-
-    // Gnostic annotation for example
-    (gnostic.openapi.v3.property) = {
-      description: "The unique identifier of a neighborhood definition."
-      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
-    }
-  ];
-}
-
-message GetParcelByFeatureIdResponse {
-  SimpleParcel parcel = 1;
 }
 
 message GetParcelIdsByFeatureIdRequest {

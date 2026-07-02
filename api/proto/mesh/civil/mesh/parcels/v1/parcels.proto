@@ -53,11 +53,13 @@ message ParcelImprovementsSummary {
 
   optional int32 primary_year_built = 7;
 
-  optional string primary_condition_id = 8;
+  optional int32 primary_effective_year_built = 8;
 
-  optional string total_market_improvement_value = 9;
+  optional string primary_condition_id = 9;
 
-  optional string total_assessed_improvement_value = 10;
+  optional string total_market_improvement_value = 10;
+
+  optional string total_assessed_improvement_value = 11;
 }
 
 message ParcelDetails {

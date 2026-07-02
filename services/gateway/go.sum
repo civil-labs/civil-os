@@ -100,6 +100,8 @@ github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UF
 github.com/cespare/xxhash/v2 v2.3.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/civil-labs/civil-api-go v0.0.0-20260702133909-db70b61b3199 h1:abHjuPl9D9y+TNb1AR55V6YhT7BBVSz95YsgJ+zY1J4=
 github.com/civil-labs/civil-api-go v0.0.0-20260702133909-db70b61b3199/go.mod h1:6rNa9Fgk6fNFI7xFuf09C0jKHWzYw8J7xGXKYNICQQs=
+github.com/civil-labs/civil-api-go v0.0.0-20260702152446-280ddf686204 h1:rQKjKt3k7jBFVRhdFUeWIkX62sxO3mP9Zr9d3kAEa8w=
+github.com/civil-labs/civil-api-go v0.0.0-20260702152446-280ddf686204/go.mod h1:6rNa9Fgk6fNFI7xFuf09C0jKHWzYw8J7xGXKYNICQQs=
 github.com/cncf/xds/go v0.0.0-20260202195803-dba9d589def2 h1:aBangftG7EVZoUb69Os8IaYg++6uMOdKK83QtkkvJik=
 github.com/cncf/xds/go v0.0.0-20260202195803-dba9d589def2/go.mod h1:qwXFYgsP6T7XnJtbKlf1HP8AjxZZyzxMmc+Lq5GjlU4=
 github.com/coreos/go-oidc/v3 v3.17.0 h1:hWBGaQfbi0iVviX4ibC7bk8OKT5qNr4klBaCHVNvehc=

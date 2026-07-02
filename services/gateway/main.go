@@ -18,7 +18,9 @@ import (
 	"github.com/civil-labs/civil-api-go/civil/public/improvements/v1/improvementsv1connect"
 	"github.com/civil-labs/civil-api-go/civil/public/instance/v1/instancev1connect"
 	"github.com/civil-labs/civil-api-go/civil/public/landuses/v1/landusesv1connect"
+	publicneighborhoodsv1connect "github.com/civil-labs/civil-api-go/civil/public/neighborhoods/v1/neighborhoodsv1connect"
 	"github.com/civil-labs/civil-api-go/civil/public/parcels/v1/parcelsv1connect"
+	publicvaluationsv1connect "github.com/civil-labs/civil-api-go/civil/public/valuations/v1/valuationsv1connect"
 	"github.com/civil-labs/civil-api-go/civil/public/zoning/v1/zoningv1connect"
 	"github.com/dexidp/dex/api/v2"
 	"google.golang.org/grpc"
@@ -26,7 +28,9 @@ import (
 
 	meshimprovementsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/improvements/v1/improvementsv1connect"
 	meshlandusesv1connect "github.com/civil-labs/civil-api-go/civil/mesh/landuses/v1/landusesv1connect"
+	meshneighborhoodsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/neighborhoods/v1/neighborhoodsv1connect"
 	meshparcelsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/parcels/v1/parcelsv1connect"
+	meshvaluationsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/valuations/v1/valuationsv1connect"
 	meshzoningv1connect "github.com/civil-labs/civil-api-go/civil/mesh/zoning/v1/zoningv1connect"
 
 	"connectrpc.com/connect"
@@ -132,6 +136,16 @@ func main() {
 		dbReaderAddress,
 	)
 
+	meshValuationsClient := meshvaluationsv1connect.NewValuationServiceClient(
+		http.DefaultClient,
+		dbReaderAddress,
+	)
+
+	meshNeighborhoodsClient := meshneighborhoodsv1connect.NewNeighborhoodServiceClient(
+		http.DefaultClient,
+		dbReaderAddress,
+	)
+
 	mux := http.NewServeMux()
 
 	parcelsServer := &ParcelServer{
@@ -193,6 +207,30 @@ func main() {
 	)
 
 	mux.Handle(zoningPath, CORSMiddleware(auth(zoningHandler), logger))
+
+	valuationsServer := &ValuationServer{
+		dbReaderClient: meshValuationsClient,
+		logger:         logger,
+	}
+
+	valuationsPath, valuationsHandler := publicvaluationsv1connect.NewValuationServiceHandler(
+		valuationsServer,
+		connect.WithInterceptors(validate.NewInterceptor()),
+	)
+
+	mux.Handle(valuationsPath, CORSMiddleware(auth(valuationsHandler), logger))
+
+	neighborhoodsServer := &NeighborhoodServer{
+		dbReaderClient: meshNeighborhoodsClient,
+		logger:         logger,
+	}
+
+	neighborhoodsPath, neighborhoodsHandler := publicneighborhoodsv1connect.NewNeighborhoodServiceHandler(
+		neighborhoodsServer,
+		connect.WithInterceptors(validate.NewInterceptor()),
+	)
+
+	mux.Handle(neighborhoodsPath, CORSMiddleware(auth(neighborhoodsHandler), logger))
 
 	// Create gRPC connection to Dex if an address is provided
 	if config.DexGrpcAddress != "" {

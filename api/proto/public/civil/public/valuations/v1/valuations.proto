@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package civil.public.valuations.v1;
+
+import "buf/validate/validate.proto";
+import "gnostic/openapi/v3/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+service ValuationService {
+  rpc GetValuations(GetValuationsRequest) returns (GetValuationsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message Valuation {
+  string id = 1 [
+    (buf.validate.field).string.uuid = true,
+
+    // Gnostic annotation for example
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier for the valuation."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+
+  google.protobuf.Timestamp valuation_timestamp = 2;
+}
+
+message GetValuationsRequest {}
+
+message GetValuationsResponse {
+  map<string, Valuation> valuations = 1;
+}

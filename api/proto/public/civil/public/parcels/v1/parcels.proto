@@ -34,8 +34,7 @@ option (gnostic.openapi.v3.document) = {
 
   servers: [
     {url: "https://leepa.civillabs.app"},
-    {url: "https://louisville.civillabs.app"}
-  ]
+    {url: "https://louisville.civillabs.app"}]
 };
 
 service ParcelsService {
@@ -75,7 +74,9 @@ message ParcelAffordances {
       max_items: 50
 
       // Communicate all are UUIDs
-      items: {string: {uuid: true}}
+      items: {
+        string: {uuid: true}
+      }
     },
     // Gnostic annotation updated to reflect an array format for the example
     (gnostic.openapi.v3.property) = {
@@ -109,7 +110,9 @@ message ParcelImprovementsSummary {
       max_items: 50
 
       // Communicate all are UUIDs
-      items: {string: {uuid: true}}
+      items: {
+        string: {uuid: true}
+      }
     },
     // Gnostic annotation updated to reflect an array format for the example
     (gnostic.openapi.v3.property) = {
@@ -212,7 +215,9 @@ message ParcelDetails {
       max_items: 10
 
       // Communicate all are UUIDs
-      items: {string: {uuid: true}}
+      items: {
+        string: {uuid: true}
+      }
     },
     // Gnostic annotation updated to reflect an array format for the example
     (gnostic.openapi.v3.property) = {
@@ -255,7 +260,9 @@ message ParcelDetails {
       max_items: 50
 
       // Communicate all are UUIDs
-      items: {string: {uuid: true}}
+      items: {
+        string: {uuid: true}
+      }
     },
     // Gnostic annotation updated to reflect an array format for the example
     (gnostic.openapi.v3.property) = {
@@ -300,7 +307,9 @@ message GetParcelsWithImprovementSummaryByParcelIdRequest {
       max_items: 100
 
       // Apply the uuid rule to the items in the array
-      items: {string: {uuid: true}}
+      items: {
+        string: {uuid: true}
+      }
     },
     (gnostic.openapi.v3.property) = {
       description: "A list of unique identifiers for the parcels."
@@ -448,7 +457,9 @@ message GetNumericalParcelAttributeStatsByIdRequest {
       max_items: 1000
 
       // Apply the uuid rule to the items in the array
-      items: {string: {uuid: true}}
+      items: {
+        string: {uuid: true}
+      }
     },
     (gnostic.openapi.v3.property) = {
       description: "A list of unique identifiers for the parcels."
@@ -525,7 +536,9 @@ message GetCategoricalParcelAttributeStatsByIdRequest {
       max_items: 1000
 
       // Apply the uuid rule to the items in the array
-      items: {string: {uuid: true}}
+      items: {
+        string: {uuid: true}
+      }
     },
     (gnostic.openapi.v3.property) = {
       description: "A list of unique identifiers for the parcels."
@@ -622,6 +635,7 @@ message SaleComparableParcel {
   google.protobuf.Timestamp sale_time = 5;
   string sale_price = 6;
   repeated ComparableAttribute attributes = 7;
+  google.protobuf.Timestamp attribute_time = 8;
 }
 
 message GetEquityComparablesRequest {
@@ -657,6 +671,8 @@ message GetSalesComparablesRequest {
     // Ensures the start is strictly before the end, assuming both are provided
     expression: "!has(this.start_time) || !has(this.end_time) || this.start_time < this.end_time"
   }];
+
+  optional bool return_only_frozen_sales = 5 [(gnostic.openapi.v3.property) = {description: "Boolean value that dictates whether to only return sales comps in which the parcel has frozen characteristics stored for the sale date. Defaults to false."}];
 }
 
 message GetSalesComparablesResponse {

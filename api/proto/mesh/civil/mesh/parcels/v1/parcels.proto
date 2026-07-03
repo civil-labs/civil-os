@@ -452,105 +452,105 @@ message GetPrimaryImprovementTypeIdByParcelIdResponse {
 
 // Feature IDs
 message GetLandAreaSqftByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1;
 }
 
 message GetLandAreaSqftByFeatureIdResponse {
-  map<string, double> values = 1;
+  map<int64, double> values = 1;
 }
 
 message GetFrontageFtByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1;
 }
 
 message GetFrontageFtByFeatureIdResponse {
-  map<string, double> values = 1;
+  map<int64, double> values = 1;
 }
 
 message GetDepthFtByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1;
 }
 
 message GetDepthFtByFeatureIdResponse {
-  map<string, double> values = 1;
+  map<int64, double> values = 1;
 }
 
 message GetLandUseIdSqftByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1;
 }
 
 message GetLandUseIdSqftByFeatureIdResponse {
-  map<string, string> values = 1;
+  map<int64, string> values = 1;
 }
 
 message GetZoningIdByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1;
 }
 
 message GetZoningIdByFeatureIdResponse {
-  map<string, string> values = 1;
+  map<int64, string> values = 1;
 }
 
 message GetImprovementAreaSqftByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1;
 }
 
 message GetImprovementAreaSqftByFeatureIdResponse {
-  map<string, double> values = 1;
+  map<int64, double> values = 1;
 }
 
 message GetBedroomsByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1;
 }
 
 message GetBedroomsByFeatureIdResponse {
-  map<string, int32> values = 1;
+  map<int64, int32> values = 1;
 }
 
 message GetBathroomsByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1;
 }
 
 message GetBathroomsByFeatureIdResponse {
-  map<string, int32> values = 1;
+  map<int64, int32> values = 1;
 }
 
 message GetUnitsByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1;
 }
 
 message GetUnitsByFeatureIdResponse {
-  map<string, int32> values = 1;
+  map<int64, int32> values = 1;
 }
 
 message GetPrimaryImprovementYearBuiltByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1;
 }
 
 message GetPrimaryImprovementYearBuiltByFeatureIdResponse {
-  map<string, int32> values = 1;
+  map<int64, int32> values = 1;
 }
 
 message GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1;
 }
 
 message GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse {
-  map<string, int32> values = 1;
+  map<int64, int32> values = 1;
 }
 
 message GetPrimaryImprovementConditionIdByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1;
 }
 
 message GetPrimaryImprovementConditionIdByFeatureIdResponse {
-  map<string, string> values = 1;
+  map<int64, string> values = 1;
 }
 
 message GetPrimaryImprovementTypeIdByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1;
 }
 
 message GetPrimaryImprovementTypeIdByFeatureIdResponse {
-  map<string, string> values = 1;
+  map<int64, string> values = 1;
 }

@@ -754,15 +754,49 @@ message GetEstimatedParcelsExtentWGS84Response {
 
 // Parcel IDs
 message GetLandAreaSqftByParcelIdRequest {
-  repeated string parcel_ids = 1;
+  repeated string parcel_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+
+      // Apply the uuid rule to the items in the array
+      items: {
+        string: {uuid: true}
+      }
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of UUID identifiers for parcels."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
+    }
+  ];
 }
 
 message GetLandAreaSqftByParcelIdResponse {
-  map<string, double> values = 1;
+  map<string, double> values = 1 [(gnostic.openapi.v3.property) = {description: "Map of values, keyed by the UUID parcel_id"}];
 }
 
 message GetFrontageFtByParcelIdRequest {
-  repeated string parcel_ids = 1;
+  repeated string parcel_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+
+      // Apply the uuid rule to the items in the array
+      items: {
+        string: {uuid: true}
+      }
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of UUID identifiers for parcels."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
+    }
+  ];
 }
 
 message GetFrontageFtByParcelIdResponse {
@@ -770,7 +804,24 @@ message GetFrontageFtByParcelIdResponse {
 }
 
 message GetDepthFtByParcelIdRequest {
-  repeated string parcel_ids = 1;
+  repeated string parcel_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+
+      // Apply the uuid rule to the items in the array
+      items: {
+        string: {uuid: true}
+      }
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of UUID identifiers for parcels."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
+    }
+  ];
 }
 
 message GetDepthFtByParcelIdResponse {
@@ -778,7 +829,24 @@ message GetDepthFtByParcelIdResponse {
 }
 
 message GetLandUseIdSqftByParcelIdRequest {
-  repeated string parcel_ids = 1;
+  repeated string parcel_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+
+      // Apply the uuid rule to the items in the array
+      items: {
+        string: {uuid: true}
+      }
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of UUID identifiers for parcels."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
+    }
+  ];
 }
 
 message GetLandUseIdSqftByParcelIdResponse {
@@ -786,7 +854,24 @@ message GetLandUseIdSqftByParcelIdResponse {
 }
 
 message GetZoningIdByParcelIdRequest {
-  repeated string parcel_ids = 1;
+  repeated string parcel_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+
+      // Apply the uuid rule to the items in the array
+      items: {
+        string: {uuid: true}
+      }
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of UUID identifiers for parcels."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
+    }
+  ];
 }
 
 message GetZoningIdByParcelIdResponse {
@@ -794,7 +879,24 @@ message GetZoningIdByParcelIdResponse {
 }
 
 message GetImprovementAreaSqftByParcelIdRequest {
-  repeated string parcel_ids = 1;
+  repeated string parcel_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+
+      // Apply the uuid rule to the items in the array
+      items: {
+        string: {uuid: true}
+      }
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of UUID identifiers for parcels."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
+    }
+  ];
 }
 
 message GetImprovementAreaSqftByParcelIdResponse {
@@ -802,7 +904,24 @@ message GetImprovementAreaSqftByParcelIdResponse {
 }
 
 message GetBedroomsByParcelIdRequest {
-  repeated string parcel_ids = 1;
+  repeated string parcel_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+
+      // Apply the uuid rule to the items in the array
+      items: {
+        string: {uuid: true}
+      }
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of UUID identifiers for parcels."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
+    }
+  ];
 }
 
 message GetBedroomsByParcelIdResponse {
@@ -810,7 +929,24 @@ message GetBedroomsByParcelIdResponse {
 }
 
 message GetBathroomsByParcelIdRequest {
-  repeated string parcel_ids = 1;
+  repeated string parcel_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+
+      // Apply the uuid rule to the items in the array
+      items: {
+        string: {uuid: true}
+      }
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of UUID identifiers for parcels."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
+    }
+  ];
 }
 
 message GetBathroomsByParcelIdResponse {
@@ -818,7 +954,24 @@ message GetBathroomsByParcelIdResponse {
 }
 
 message GetUnitsByParcelIdRequest {
-  repeated string parcel_ids = 1;
+  repeated string parcel_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+
+      // Apply the uuid rule to the items in the array
+      items: {
+        string: {uuid: true}
+      }
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of UUID identifiers for parcels."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
+    }
+  ];
 }
 
 message GetUnitsByParcelIdResponse {
@@ -826,7 +979,24 @@ message GetUnitsByParcelIdResponse {
 }
 
 message GetPrimaryImprovementYearBuiltByParcelIdRequest {
-  repeated string parcel_ids = 1;
+  repeated string parcel_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+
+      // Apply the uuid rule to the items in the array
+      items: {
+        string: {uuid: true}
+      }
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of UUID identifiers for parcels."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
+    }
+  ];
 }
 
 message GetPrimaryImprovementYearBuiltByParcelIdResponse {
@@ -834,7 +1004,24 @@ message GetPrimaryImprovementYearBuiltByParcelIdResponse {
 }
 
 message GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest {
-  repeated string parcel_ids = 1;
+  repeated string parcel_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+
+      // Apply the uuid rule to the items in the array
+      items: {
+        string: {uuid: true}
+      }
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of UUID identifiers for parcels."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
+    }
+  ];
 }
 
 message GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse {
@@ -842,7 +1029,24 @@ message GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse {
 }
 
 message GetPrimaryImprovementConditionIdByParcelIdRequest {
-  repeated string parcel_ids = 1;
+  repeated string parcel_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+
+      // Apply the uuid rule to the items in the array
+      items: {
+        string: {uuid: true}
+      }
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of UUID identifiers for parcels."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
+    }
+  ];
 }
 
 message GetPrimaryImprovementConditionIdByParcelIdResponse {
@@ -850,7 +1054,24 @@ message GetPrimaryImprovementConditionIdByParcelIdResponse {
 }
 
 message GetPrimaryImprovementTypeIdByParcelIdRequest {
-  repeated string parcel_ids = 1;
+  repeated string parcel_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+
+      // Apply the uuid rule to the items in the array
+      items: {
+        string: {uuid: true}
+      }
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of UUID identifiers for parcels."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
+    }
+  ];
 }
 
 message GetPrimaryImprovementTypeIdByParcelIdResponse {
@@ -859,105 +1080,261 @@ message GetPrimaryImprovementTypeIdByParcelIdResponse {
 
 // Feature IDs
 message GetLandAreaSqftByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of 53-bit integer IDs for parcel geometry."
+      example: {yaml: "['7382152353198509', '2261752343789113']"}
+    }
+  ];
 }
 
 message GetLandAreaSqftByFeatureIdResponse {
-  map<string, double> values = 1;
+  map<int64, double> values = 1;
 }
 
 message GetFrontageFtByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of 53-bit integer IDs for parcel geometry."
+      example: {yaml: "['7382152353198509', '2261752343789113']"}
+    }
+  ];
 }
 
 message GetFrontageFtByFeatureIdResponse {
-  map<string, double> values = 1;
+  map<int64, double> values = 1;
 }
 
 message GetDepthFtByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of 53-bit integer IDs for parcel geometry."
+      example: {yaml: "['7382152353198509', '2261752343789113']"}
+    }
+  ];
 }
 
 message GetDepthFtByFeatureIdResponse {
-  map<string, double> values = 1;
+  map<int64, double> values = 1;
 }
 
 message GetLandUseIdSqftByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of 53-bit integer IDs for parcel geometry."
+      example: {yaml: "['7382152353198509', '2261752343789113']"}
+    }
+  ];
 }
 
 message GetLandUseIdSqftByFeatureIdResponse {
-  map<string, string> values = 1;
+  map<int64, string> values = 1;
 }
 
 message GetZoningIdByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of 53-bit integer IDs for parcel geometry."
+      example: {yaml: "['7382152353198509', '2261752343789113']"}
+    }
+  ];
 }
 
 message GetZoningIdByFeatureIdResponse {
-  map<string, string> values = 1;
+  map<int64, string> values = 1;
 }
 
 message GetImprovementAreaSqftByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of 53-bit integer IDs for parcel geometry."
+      example: {yaml: "['7382152353198509', '2261752343789113']"}
+    }
+  ];
 }
 
 message GetImprovementAreaSqftByFeatureIdResponse {
-  map<string, double> values = 1;
+  map<int64, double> values = 1;
 }
 
 message GetBedroomsByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of 53-bit integer IDs for parcel geometry."
+      example: {yaml: "['7382152353198509', '2261752343789113']"}
+    }
+  ];
 }
 
 message GetBedroomsByFeatureIdResponse {
-  map<string, int32> values = 1;
+  map<int64, int32> values = 1;
 }
 
 message GetBathroomsByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of 53-bit integer IDs for parcel geometry."
+      example: {yaml: "['7382152353198509', '2261752343789113']"}
+    }
+  ];
 }
 
 message GetBathroomsByFeatureIdResponse {
-  map<string, int32> values = 1;
+  map<int64, int32> values = 1;
 }
 
 message GetUnitsByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of 53-bit integer IDs for parcel geometry."
+      example: {yaml: "['7382152353198509', '2261752343789113']"}
+    }
+  ];
 }
 
 message GetUnitsByFeatureIdResponse {
-  map<string, int32> values = 1;
+  map<int64, int32> values = 1;
 }
 
 message GetPrimaryImprovementYearBuiltByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of 53-bit integer IDs for parcel geometry."
+      example: {yaml: "['7382152353198509', '2261752343789113']"}
+    }
+  ];
 }
 
 message GetPrimaryImprovementYearBuiltByFeatureIdResponse {
-  map<string, int32> values = 1;
+  map<int64, int32> values = 1;
 }
 
 message GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of 53-bit integer IDs for parcel geometry."
+      example: {yaml: "['7382152353198509', '2261752343789113']"}
+    }
+  ];
 }
 
 message GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse {
-  map<string, int32> values = 1;
+  map<int64, int32> values = 1;
 }
 
 message GetPrimaryImprovementConditionIdByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of 53-bit integer IDs for parcel geometry."
+      example: {yaml: "['7382152353198509', '2261752343789113']"}
+    }
+  ];
 }
 
 message GetPrimaryImprovementConditionIdByFeatureIdResponse {
-  map<string, string> values = 1;
+  map<int64, string> values = 1;
 }
 
 message GetPrimaryImprovementTypeIdByFeatureIdRequest {
-  repeated string feature_ids = 1;
+  repeated int64 feature_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 1000
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of 53-bit integer IDs for parcel geometry."
+      example: {yaml: "['7382152353198509', '2261752343789113']"}
+    }
+  ];
 }
 
 message GetPrimaryImprovementTypeIdByFeatureIdResponse {
-  map<string, string> values = 1;
+  map<int64, string> values = 1;
 }

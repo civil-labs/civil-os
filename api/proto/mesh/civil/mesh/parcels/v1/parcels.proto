@@ -348,6 +348,7 @@ message GetEstimatedParcelsExtentWGS84Response {
 // Parcel IDs
 message GetLandAreaSqftByParcelIdRequest {
   repeated string parcel_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetLandAreaSqftByParcelIdResponse {
@@ -356,6 +357,7 @@ message GetLandAreaSqftByParcelIdResponse {
 
 message GetFrontageFtByParcelIdRequest {
   repeated string parcel_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetFrontageFtByParcelIdResponse {
@@ -364,6 +366,7 @@ message GetFrontageFtByParcelIdResponse {
 
 message GetDepthFtByParcelIdRequest {
   repeated string parcel_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetDepthFtByParcelIdResponse {
@@ -372,6 +375,7 @@ message GetDepthFtByParcelIdResponse {
 
 message GetLandUseIdSqftByParcelIdRequest {
   repeated string parcel_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetLandUseIdSqftByParcelIdResponse {
@@ -380,6 +384,7 @@ message GetLandUseIdSqftByParcelIdResponse {
 
 message GetZoningIdByParcelIdRequest {
   repeated string parcel_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetZoningIdByParcelIdResponse {
@@ -388,6 +393,7 @@ message GetZoningIdByParcelIdResponse {
 
 message GetImprovementAreaSqftByParcelIdRequest {
   repeated string parcel_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetImprovementAreaSqftByParcelIdResponse {
@@ -396,6 +402,7 @@ message GetImprovementAreaSqftByParcelIdResponse {
 
 message GetBedroomsByParcelIdRequest {
   repeated string parcel_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetBedroomsByParcelIdResponse {
@@ -404,6 +411,7 @@ message GetBedroomsByParcelIdResponse {
 
 message GetBathroomsByParcelIdRequest {
   repeated string parcel_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetBathroomsByParcelIdResponse {
@@ -412,6 +420,7 @@ message GetBathroomsByParcelIdResponse {
 
 message GetUnitsByParcelIdRequest {
   repeated string parcel_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetUnitsByParcelIdResponse {
@@ -420,6 +429,7 @@ message GetUnitsByParcelIdResponse {
 
 message GetPrimaryImprovementYearBuiltByParcelIdRequest {
   repeated string parcel_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetPrimaryImprovementYearBuiltByParcelIdResponse {
@@ -428,6 +438,7 @@ message GetPrimaryImprovementYearBuiltByParcelIdResponse {
 
 message GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest {
   repeated string parcel_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse {
@@ -436,6 +447,7 @@ message GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse {
 
 message GetPrimaryImprovementConditionIdByParcelIdRequest {
   repeated string parcel_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetPrimaryImprovementConditionIdByParcelIdResponse {
@@ -444,6 +456,7 @@ message GetPrimaryImprovementConditionIdByParcelIdResponse {
 
 message GetPrimaryImprovementTypeIdByParcelIdRequest {
   repeated string parcel_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetPrimaryImprovementTypeIdByParcelIdResponse {
@@ -453,6 +466,7 @@ message GetPrimaryImprovementTypeIdByParcelIdResponse {
 // Feature IDs
 message GetLandAreaSqftByFeatureIdRequest {
   repeated int64 feature_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetLandAreaSqftByFeatureIdResponse {
@@ -461,6 +475,7 @@ message GetLandAreaSqftByFeatureIdResponse {
 
 message GetFrontageFtByFeatureIdRequest {
   repeated int64 feature_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetFrontageFtByFeatureIdResponse {
@@ -469,6 +484,7 @@ message GetFrontageFtByFeatureIdResponse {
 
 message GetDepthFtByFeatureIdRequest {
   repeated int64 feature_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetDepthFtByFeatureIdResponse {
@@ -477,6 +493,7 @@ message GetDepthFtByFeatureIdResponse {
 
 message GetLandUseIdSqftByFeatureIdRequest {
   repeated int64 feature_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetLandUseIdSqftByFeatureIdResponse {
@@ -485,6 +502,7 @@ message GetLandUseIdSqftByFeatureIdResponse {
 
 message GetZoningIdByFeatureIdRequest {
   repeated int64 feature_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetZoningIdByFeatureIdResponse {
@@ -493,6 +511,7 @@ message GetZoningIdByFeatureIdResponse {
 
 message GetImprovementAreaSqftByFeatureIdRequest {
   repeated int64 feature_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetImprovementAreaSqftByFeatureIdResponse {
@@ -501,6 +520,7 @@ message GetImprovementAreaSqftByFeatureIdResponse {
 
 message GetBedroomsByFeatureIdRequest {
   repeated int64 feature_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetBedroomsByFeatureIdResponse {
@@ -509,6 +529,7 @@ message GetBedroomsByFeatureIdResponse {
 
 message GetBathroomsByFeatureIdRequest {
   repeated int64 feature_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetBathroomsByFeatureIdResponse {
@@ -517,6 +538,7 @@ message GetBathroomsByFeatureIdResponse {
 
 message GetUnitsByFeatureIdRequest {
   repeated int64 feature_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetUnitsByFeatureIdResponse {
@@ -525,6 +547,7 @@ message GetUnitsByFeatureIdResponse {
 
 message GetPrimaryImprovementYearBuiltByFeatureIdRequest {
   repeated int64 feature_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetPrimaryImprovementYearBuiltByFeatureIdResponse {
@@ -533,6 +556,7 @@ message GetPrimaryImprovementYearBuiltByFeatureIdResponse {
 
 message GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest {
   repeated int64 feature_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse {
@@ -541,6 +565,7 @@ message GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse {
 
 message GetPrimaryImprovementConditionIdByFeatureIdRequest {
   repeated int64 feature_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetPrimaryImprovementConditionIdByFeatureIdResponse {
@@ -549,6 +574,7 @@ message GetPrimaryImprovementConditionIdByFeatureIdResponse {
 
 message GetPrimaryImprovementTypeIdByFeatureIdRequest {
   repeated int64 feature_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
 message GetPrimaryImprovementTypeIdByFeatureIdResponse {

@@ -772,6 +772,14 @@ message GetLandAreaSqftByParcelIdRequest {
       example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
     }
   ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
+  ];
 }
 
 message GetLandAreaSqftByParcelIdResponse {
@@ -796,6 +804,14 @@ message GetFrontageFtByParcelIdRequest {
       description: "A list of UUID identifiers for parcels."
       example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
     }
+  ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
   ];
 }
 
@@ -822,6 +838,14 @@ message GetDepthFtByParcelIdRequest {
       example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
     }
   ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
+  ];
 }
 
 message GetDepthFtByParcelIdResponse {
@@ -846,6 +870,14 @@ message GetLandUseIdSqftByParcelIdRequest {
       description: "A list of UUID identifiers for parcels."
       example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
     }
+  ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
   ];
 }
 
@@ -872,6 +904,14 @@ message GetZoningIdByParcelIdRequest {
       example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
     }
   ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
+  ];
 }
 
 message GetZoningIdByParcelIdResponse {
@@ -896,6 +936,14 @@ message GetImprovementAreaSqftByParcelIdRequest {
       description: "A list of UUID identifiers for parcels."
       example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
     }
+  ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
   ];
 }
 
@@ -922,6 +970,14 @@ message GetBedroomsByParcelIdRequest {
       example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
     }
   ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
+  ];
 }
 
 message GetBedroomsByParcelIdResponse {
@@ -946,6 +1002,14 @@ message GetBathroomsByParcelIdRequest {
       description: "A list of UUID identifiers for parcels."
       example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
     }
+  ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
   ];
 }
 
@@ -972,6 +1036,14 @@ message GetUnitsByParcelIdRequest {
       example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
     }
   ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
+  ];
 }
 
 message GetUnitsByParcelIdResponse {
@@ -996,6 +1068,14 @@ message GetPrimaryImprovementYearBuiltByParcelIdRequest {
       description: "A list of UUID identifiers for parcels."
       example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
     }
+  ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
   ];
 }
 
@@ -1022,6 +1102,14 @@ message GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest {
       example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
     }
   ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
+  ];
 }
 
 message GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse {
@@ -1046,6 +1134,14 @@ message GetPrimaryImprovementConditionIdByParcelIdRequest {
       description: "A list of UUID identifiers for parcels."
       example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
     }
+  ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
   ];
 }
 
@@ -1072,6 +1168,14 @@ message GetPrimaryImprovementTypeIdByParcelIdRequest {
       example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
     }
   ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
+  ];
 }
 
 message GetPrimaryImprovementTypeIdByParcelIdResponse {
@@ -1093,6 +1197,14 @@ message GetLandAreaSqftByFeatureIdRequest {
       example: {yaml: "['7382152353198509', '2261752343789113']"}
     }
   ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
+  ];
 }
 
 message GetLandAreaSqftByFeatureIdResponse {
@@ -1112,6 +1224,14 @@ message GetFrontageFtByFeatureIdRequest {
       description: "A list of 53-bit integer IDs for parcel geometry."
       example: {yaml: "['7382152353198509', '2261752343789113']"}
     }
+  ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
   ];
 }
 
@@ -1133,6 +1253,14 @@ message GetDepthFtByFeatureIdRequest {
       example: {yaml: "['7382152353198509', '2261752343789113']"}
     }
   ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
+  ];
 }
 
 message GetDepthFtByFeatureIdResponse {
@@ -1152,6 +1280,14 @@ message GetLandUseIdSqftByFeatureIdRequest {
       description: "A list of 53-bit integer IDs for parcel geometry."
       example: {yaml: "['7382152353198509', '2261752343789113']"}
     }
+  ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
   ];
 }
 
@@ -1173,6 +1309,14 @@ message GetZoningIdByFeatureIdRequest {
       example: {yaml: "['7382152353198509', '2261752343789113']"}
     }
   ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
+  ];
 }
 
 message GetZoningIdByFeatureIdResponse {
@@ -1192,6 +1336,14 @@ message GetImprovementAreaSqftByFeatureIdRequest {
       description: "A list of 53-bit integer IDs for parcel geometry."
       example: {yaml: "['7382152353198509', '2261752343789113']"}
     }
+  ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
   ];
 }
 
@@ -1213,6 +1365,14 @@ message GetBedroomsByFeatureIdRequest {
       example: {yaml: "['7382152353198509', '2261752343789113']"}
     }
   ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
+  ];
 }
 
 message GetBedroomsByFeatureIdResponse {
@@ -1232,6 +1392,14 @@ message GetBathroomsByFeatureIdRequest {
       description: "A list of 53-bit integer IDs for parcel geometry."
       example: {yaml: "['7382152353198509', '2261752343789113']"}
     }
+  ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
   ];
 }
 
@@ -1253,6 +1421,14 @@ message GetUnitsByFeatureIdRequest {
       example: {yaml: "['7382152353198509', '2261752343789113']"}
     }
   ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
+  ];
 }
 
 message GetUnitsByFeatureIdResponse {
@@ -1272,6 +1448,14 @@ message GetPrimaryImprovementYearBuiltByFeatureIdRequest {
       description: "A list of 53-bit integer IDs for parcel geometry."
       example: {yaml: "['7382152353198509', '2261752343789113']"}
     }
+  ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
   ];
 }
 
@@ -1293,6 +1477,14 @@ message GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest {
       example: {yaml: "['7382152353198509', '2261752343789113']"}
     }
   ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
+  ];
 }
 
 message GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse {
@@ -1313,6 +1505,14 @@ message GetPrimaryImprovementConditionIdByFeatureIdRequest {
       example: {yaml: "['7382152353198509', '2261752343789113']"}
     }
   ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
+  ];
 }
 
 message GetPrimaryImprovementConditionIdByFeatureIdResponse {
@@ -1332,6 +1532,14 @@ message GetPrimaryImprovementTypeIdByFeatureIdRequest {
       description: "A list of 53-bit integer IDs for parcel geometry."
       example: {yaml: "['7382152353198509', '2261752343789113']"}
     }
+  ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to retrieve the parcels' values for this attribute for. Defaults to now. If a parcel does not have a value for that attribute at that time, no data for that parcel is returned."}
   ];
 }
 

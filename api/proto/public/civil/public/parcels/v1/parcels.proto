@@ -58,6 +58,58 @@ service ParcelsService {
 
   rpc GetEstimatedParcelsExtentWGS84(GetEstimatedParcelsExtentWGS84Request) returns (GetEstimatedParcelsExtentWGS84Response) {}
 
+  rpc GetLandAreaSqftByParcelId(GetLandAreaSqftByParcelIdRequest) returns (GetLandAreaSqftByParcelIdResponse) {}
+
+  rpc GetFrontageFtByParcelId(GetFrontageFtByParcelIdRequest) returns (GetFrontageFtByParcelIdResponse) {}
+
+  rpc GetDepthFtByParcelId(GetDepthFtByParcelIdRequest) returns (GetDepthFtByParcelIdResponse) {}
+
+  rpc GetLandUseIdSqftByParcelId(GetLandUseIdSqftByParcelIdRequest) returns (GetLandUseIdSqftByParcelIdResponse) {}
+
+  rpc GetZoningIdByParcelId(GetZoningIdByParcelIdRequest) returns (GetZoningIdByParcelIdResponse) {}
+
+  rpc GetImprovementAreaSqftByParcelId(GetImprovementAreaSqftByParcelIdRequest) returns (GetImprovementAreaSqftByParcelIdResponse) {}
+
+  rpc GetBedroomsByParcelId(GetBedroomsByParcelIdRequest) returns (GetBedroomsByParcelIdResponse) {}
+
+  rpc GetBathroomsByParcelId(GetBathroomsByParcelIdRequest) returns (GetBathroomsByParcelIdResponse) {}
+
+  rpc GetUnitsByParcelId(GetUnitsByParcelIdRequest) returns (GetUnitsByParcelIdResponse) {}
+
+  rpc GetPrimaryImprovementYearBuiltByParcelId(GetPrimaryImprovementYearBuiltByParcelIdRequest) returns (GetPrimaryImprovementYearBuiltByParcelIdResponse) {}
+
+  rpc GetPrimaryImprovementEffectiveYearBuiltByParcelId(GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest) returns (GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse) {}
+
+  rpc GetPrimaryImprovementConditionIdByParcelId(GetPrimaryImprovementConditionIdByParcelIdRequest) returns (GetPrimaryImprovementConditionIdByParcelIdResponse) {}
+
+  rpc GetPrimaryImprovementTypeIdByParcelId(GetPrimaryImprovementTypeIdByParcelIdRequest) returns (GetPrimaryImprovementTypeIdByParcelIdResponse) {}
+
+  rpc GetLandAreaSqftByFeatureId(GetLandAreaSqftByFeatureIdRequest) returns (GetLandAreaSqftByFeatureIdResponse) {}
+
+  rpc GetFrontageFtByFeatureId(GetFrontageFtByFeatureIdRequest) returns (GetFrontageFtByFeatureIdResponse) {}
+
+  rpc GetDepthFtByFeatureId(GetDepthFtByFeatureIdRequest) returns (GetDepthFtByFeatureIdResponse) {}
+
+  rpc GetLandUseIdSqftByFeatureId(GetLandUseIdSqftByFeatureIdRequest) returns (GetLandUseIdSqftByFeatureIdResponse) {}
+
+  rpc GetZoningIdByFeatureId(GetZoningIdByFeatureIdRequest) returns (GetZoningIdByFeatureIdResponse) {}
+
+  rpc GetImprovementAreaSqftByFeatureId(GetImprovementAreaSqftByFeatureIdRequest) returns (GetImprovementAreaSqftByFeatureIdResponse) {}
+
+  rpc GetBedroomsByFeatureId(GetBedroomsByFeatureIdRequest) returns (GetBedroomsByFeatureIdResponse) {}
+
+  rpc GetBathroomsByFeatureId(GetBathroomsByFeatureIdRequest) returns (GetBathroomsByFeatureIdResponse) {}
+
+  rpc GetUnitsByFeatureId(GetUnitsByFeatureIdRequest) returns (GetUnitsByFeatureIdResponse) {}
+
+  rpc GetPrimaryImprovementYearBuiltByFeatureId(GetPrimaryImprovementYearBuiltByFeatureIdRequest) returns (GetPrimaryImprovementYearBuiltByFeatureIdResponse) {}
+
+  rpc GetPrimaryImprovementEffectiveYearBuiltByFeatureId(GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest) returns (GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse) {}
+
+  rpc GetPrimaryImprovementConditionIdByFeatureId(GetPrimaryImprovementConditionIdByFeatureIdRequest) returns (GetPrimaryImprovementConditionIdByFeatureIdResponse) {}
+
+  rpc GetPrimaryImprovementTypeIdByFeatureId(GetPrimaryImprovementTypeIdByFeatureIdRequest) returns (GetPrimaryImprovementTypeIdByFeatureIdResponse) {}
+
   // Mutation
 
   rpc UpdateParcel(UpdateParcelRequest) returns (UpdateParcelResponse) {}
@@ -440,13 +492,13 @@ enum ParcelAttribute {
   PARCEL_ATTRIBUTE_LAND_USE_ID = 4;
   PARCEL_ATTRIBUTE_ZONING_ID = 5;
   PARCEL_ATTRIBUTE_IMPROVEMENT_AREA_SQ_FT = 6;
-  PARCEL_ATTRIBUTE_IMPROVEMENT_YEAR_BUILT = 7;
-  PARCEL_ATTRIBUTE_IMPROVEMENT_EFFECTIVE_YEAR_BUILT = 8;
-  PARCEL_ATTRIBUTE_BEDROOMS = 9;
-  PARCEL_ATTRIBUTE_BATHROOMS = 10;
-  PARCEL_ATTRIBUTE_UNITS = 11;
-  PARCEL_ATTRIBUTE_CONDITION_ID = 12;
-  PARCEL_ATTRIBUTE_IMPROVEMENT_TYPE_ID = 13;
+  PARCEL_ATTRIBUTE_BEDROOMS = 7;
+  PARCEL_ATTRIBUTE_BATHROOMS = 8;
+  PARCEL_ATTRIBUTE_UNITS = 9;
+  PARCEL_ATTRIBUTE_PRIMARY_IMPROVEMENT_YEAR_BUILT = 10;
+  PARCEL_ATTRIBUTE_PRIMARY_IMPROVEMENT_EFFECTIVE_YEAR_BUILT = 11;
+  PARCEL_ATTRIBUTE_PRIMARY_IMPROVEMENT_CONDITION_ID = 12;
+  PARCEL_ATTRIBUTE_PRIMARY_IMPROVEMENT_TYPE_ID = 13;
 }
 
 message GetNumericalParcelAttributeStatsByIdRequest {
@@ -696,4 +748,216 @@ message GetEstimatedParcelsExtentWGS84Response {
   double min_y = 2 [(gnostic.openapi.v3.property) = {description: "Minimum Latitude / South"}];
   double max_x = 3 [(gnostic.openapi.v3.property) = {description: "Maximum Longitude / East"}];
   double max_y = 4 [(gnostic.openapi.v3.property) = {description: "Maximum Latitude / North"}];
+}
+
+// Get single attribute APIs
+
+// Parcel IDs
+message GetLandAreaSqftByParcelIdRequest {
+  repeated string parcel_ids = 1;
+}
+
+message GetLandAreaSqftByParcelIdResponse {
+  map<string, double> values = 1;
+}
+
+message GetFrontageFtByParcelIdRequest {
+  repeated string parcel_ids = 1;
+}
+
+message GetFrontageFtByParcelIdResponse {
+  map<string, double> values = 1;
+}
+
+message GetDepthFtByParcelIdRequest {
+  repeated string parcel_ids = 1;
+}
+
+message GetDepthFtByParcelIdResponse {
+  map<string, double> values = 1;
+}
+
+message GetLandUseIdSqftByParcelIdRequest {
+  repeated string parcel_ids = 1;
+}
+
+message GetLandUseIdSqftByParcelIdResponse {
+  map<string, string> values = 1;
+}
+
+message GetZoningIdByParcelIdRequest {
+  repeated string parcel_ids = 1;
+}
+
+message GetZoningIdByParcelIdResponse {
+  map<string, string> values = 1;
+}
+
+message GetImprovementAreaSqftByParcelIdRequest {
+  repeated string parcel_ids = 1;
+}
+
+message GetImprovementAreaSqftByParcelIdResponse {
+  map<string, double> values = 1;
+}
+
+message GetBedroomsByParcelIdRequest {
+  repeated string parcel_ids = 1;
+}
+
+message GetBedroomsByParcelIdResponse {
+  map<string, int32> values = 1;
+}
+
+message GetBathroomsByParcelIdRequest {
+  repeated string parcel_ids = 1;
+}
+
+message GetBathroomsByParcelIdResponse {
+  map<string, int32> values = 1;
+}
+
+message GetUnitsByParcelIdRequest {
+  repeated string parcel_ids = 1;
+}
+
+message GetUnitsByParcelIdResponse {
+  map<string, int32> values = 1;
+}
+
+message GetPrimaryImprovementYearBuiltByParcelIdRequest {
+  repeated string parcel_ids = 1;
+}
+
+message GetPrimaryImprovementYearBuiltByParcelIdResponse {
+  map<string, int32> values = 1;
+}
+
+message GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest {
+  repeated string parcel_ids = 1;
+}
+
+message GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse {
+  map<string, int32> values = 1;
+}
+
+message GetPrimaryImprovementConditionIdByParcelIdRequest {
+  repeated string parcel_ids = 1;
+}
+
+message GetPrimaryImprovementConditionIdByParcelIdResponse {
+  map<string, string> values = 1;
+}
+
+message GetPrimaryImprovementTypeIdByParcelIdRequest {
+  repeated string parcel_ids = 1;
+}
+
+message GetPrimaryImprovementTypeIdByParcelIdResponse {
+  map<string, string> values = 1;
+}
+
+// Feature IDs
+message GetLandAreaSqftByFeatureIdRequest {
+  repeated string feature_ids = 1;
+}
+
+message GetLandAreaSqftByFeatureIdResponse {
+  map<string, double> values = 1;
+}
+
+message GetFrontageFtByFeatureIdRequest {
+  repeated string feature_ids = 1;
+}
+
+message GetFrontageFtByFeatureIdResponse {
+  map<string, double> values = 1;
+}
+
+message GetDepthFtByFeatureIdRequest {
+  repeated string feature_ids = 1;
+}
+
+message GetDepthFtByFeatureIdResponse {
+  map<string, double> values = 1;
+}
+
+message GetLandUseIdSqftByFeatureIdRequest {
+  repeated string feature_ids = 1;
+}
+
+message GetLandUseIdSqftByFeatureIdResponse {
+  map<string, string> values = 1;
+}
+
+message GetZoningIdByFeatureIdRequest {
+  repeated string feature_ids = 1;
+}
+
+message GetZoningIdByFeatureIdResponse {
+  map<string, string> values = 1;
+}
+
+message GetImprovementAreaSqftByFeatureIdRequest {
+  repeated string feature_ids = 1;
+}
+
+message GetImprovementAreaSqftByFeatureIdResponse {
+  map<string, double> values = 1;
+}
+
+message GetBedroomsByFeatureIdRequest {
+  repeated string feature_ids = 1;
+}
+
+message GetBedroomsByFeatureIdResponse {
+  map<string, int32> values = 1;
+}
+
+message GetBathroomsByFeatureIdRequest {
+  repeated string feature_ids = 1;
+}
+
+message GetBathroomsByFeatureIdResponse {
+  map<string, int32> values = 1;
+}
+
+message GetUnitsByFeatureIdRequest {
+  repeated string feature_ids = 1;
+}
+
+message GetUnitsByFeatureIdResponse {
+  map<string, int32> values = 1;
+}
+
+message GetPrimaryImprovementYearBuiltByFeatureIdRequest {
+  repeated string feature_ids = 1;
+}
+
+message GetPrimaryImprovementYearBuiltByFeatureIdResponse {
+  map<string, int32> values = 1;
+}
+
+message GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest {
+  repeated string feature_ids = 1;
+}
+
+message GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse {
+  map<string, int32> values = 1;
+}
+
+message GetPrimaryImprovementConditionIdByFeatureIdRequest {
+  repeated string feature_ids = 1;
+}
+
+message GetPrimaryImprovementConditionIdByFeatureIdResponse {
+  map<string, string> values = 1;
+}
+
+message GetPrimaryImprovementTypeIdByFeatureIdRequest {
+  repeated string feature_ids = 1;
+}
+
+message GetPrimaryImprovementTypeIdByFeatureIdResponse {
+  map<string, string> values = 1;
 }

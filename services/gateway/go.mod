@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.41.9
 	github.com/aws/aws-sdk-go-v2/config v1.32.20
 	github.com/aws/aws-sdk-go-v2/service/servicediscovery v1.39.22
-	github.com/civil-labs/civil-api-go v0.0.0-20260702152446-280ddf686204
+	github.com/civil-labs/civil-api-go v0.0.0-20260703155337-913ad971a110
 	github.com/coreos/go-oidc/v3 v3.17.0
 	github.com/dexidp/dex/api/v2 v2.4.0
 	gocloud.dev v0.46.0
@@ -100,4 +100,3 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20260610212136-7ab31c22f7ad // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260610212136-7ab31c22f7ad // indirect
 )
-

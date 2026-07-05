@@ -363,3 +363,263 @@ func mapParcelWithImprovementSummary(meshParcels map[string]*meshparcelsv1.Parce
 	}
 	return publicParcels
 }
+
+func (s *ParcelServer) GetLandAreaSqftByParcelId(ctx context.Context, req *connect.Request[publicparcelsv1.GetLandAreaSqftByParcelIdRequest]) (*connect.Response[publicparcelsv1.GetLandAreaSqftByParcelIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetLandAreaSqftByParcelIdRequest{
+		ParcelIds: req.Msg.ParcelIds,
+		LegalAsOf: req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetLandAreaSqftByParcelId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetLandAreaSqftByParcelIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetFrontageFtByParcelId(ctx context.Context, req *connect.Request[publicparcelsv1.GetFrontageFtByParcelIdRequest]) (*connect.Response[publicparcelsv1.GetFrontageFtByParcelIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetFrontageFtByParcelIdRequest{
+		ParcelIds: req.Msg.ParcelIds,
+		LegalAsOf: req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetFrontageFtByParcelId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetFrontageFtByParcelIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetDepthFtByParcelId(ctx context.Context, req *connect.Request[publicparcelsv1.GetDepthFtByParcelIdRequest]) (*connect.Response[publicparcelsv1.GetDepthFtByParcelIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetDepthFtByParcelIdRequest{
+		ParcelIds: req.Msg.ParcelIds,
+		LegalAsOf: req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetDepthFtByParcelId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetDepthFtByParcelIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetLandUseIdSqftByParcelId(ctx context.Context, req *connect.Request[publicparcelsv1.GetLandUseIdSqftByParcelIdRequest]) (*connect.Response[publicparcelsv1.GetLandUseIdSqftByParcelIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetLandUseIdSqftByParcelIdRequest{
+		ParcelIds: req.Msg.ParcelIds,
+		LegalAsOf: req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetLandUseIdSqftByParcelId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetLandUseIdSqftByParcelIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetZoningIdByParcelId(ctx context.Context, req *connect.Request[publicparcelsv1.GetZoningIdByParcelIdRequest]) (*connect.Response[publicparcelsv1.GetZoningIdByParcelIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetZoningIdByParcelIdRequest{
+		ParcelIds: req.Msg.ParcelIds,
+		LegalAsOf: req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetZoningIdByParcelId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetZoningIdByParcelIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetImprovementAreaSqftByParcelId(ctx context.Context, req *connect.Request[publicparcelsv1.GetImprovementAreaSqftByParcelIdRequest]) (*connect.Response[publicparcelsv1.GetImprovementAreaSqftByParcelIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetImprovementAreaSqftByParcelIdRequest{
+		ParcelIds: req.Msg.ParcelIds,
+		LegalAsOf: req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetImprovementAreaSqftByParcelId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetImprovementAreaSqftByParcelIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetBedroomsByParcelId(ctx context.Context, req *connect.Request[publicparcelsv1.GetBedroomsByParcelIdRequest]) (*connect.Response[publicparcelsv1.GetBedroomsByParcelIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetBedroomsByParcelIdRequest{
+		ParcelIds: req.Msg.ParcelIds,
+		LegalAsOf: req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetBedroomsByParcelId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetBedroomsByParcelIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetBathroomsByParcelId(ctx context.Context, req *connect.Request[publicparcelsv1.GetBathroomsByParcelIdRequest]) (*connect.Response[publicparcelsv1.GetBathroomsByParcelIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetBathroomsByParcelIdRequest{
+		ParcelIds: req.Msg.ParcelIds,
+		LegalAsOf: req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetBathroomsByParcelId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetBathroomsByParcelIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetUnitsByParcelId(ctx context.Context, req *connect.Request[publicparcelsv1.GetUnitsByParcelIdRequest]) (*connect.Response[publicparcelsv1.GetUnitsByParcelIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetUnitsByParcelIdRequest{
+		ParcelIds: req.Msg.ParcelIds,
+		LegalAsOf: req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetUnitsByParcelId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetUnitsByParcelIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetPrimaryImprovementYearBuiltByParcelId(ctx context.Context, req *connect.Request[publicparcelsv1.GetPrimaryImprovementYearBuiltByParcelIdRequest]) (*connect.Response[publicparcelsv1.GetPrimaryImprovementYearBuiltByParcelIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetPrimaryImprovementYearBuiltByParcelIdRequest{
+		ParcelIds: req.Msg.ParcelIds,
+		LegalAsOf: req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetPrimaryImprovementYearBuiltByParcelId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetPrimaryImprovementYearBuiltByParcelIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetPrimaryImprovementEffectiveYearBuiltByParcelId(ctx context.Context, req *connect.Request[publicparcelsv1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest]) (*connect.Response[publicparcelsv1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest{
+		ParcelIds: req.Msg.ParcelIds,
+		LegalAsOf: req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetPrimaryImprovementEffectiveYearBuiltByParcelId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetPrimaryImprovementConditionIdByParcelId(ctx context.Context, req *connect.Request[publicparcelsv1.GetPrimaryImprovementConditionIdByParcelIdRequest]) (*connect.Response[publicparcelsv1.GetPrimaryImprovementConditionIdByParcelIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetPrimaryImprovementConditionIdByParcelIdRequest{
+		ParcelIds: req.Msg.ParcelIds,
+		LegalAsOf: req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetPrimaryImprovementConditionIdByParcelId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetPrimaryImprovementConditionIdByParcelIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetPrimaryImprovementTypeIdByParcelId(ctx context.Context, req *connect.Request[publicparcelsv1.GetPrimaryImprovementTypeIdByParcelIdRequest]) (*connect.Response[publicparcelsv1.GetPrimaryImprovementTypeIdByParcelIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetPrimaryImprovementTypeIdByParcelIdRequest{
+		ParcelIds: req.Msg.ParcelIds,
+		LegalAsOf: req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetPrimaryImprovementTypeIdByParcelId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetPrimaryImprovementTypeIdByParcelIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetLandAreaSqftByFeatureId(ctx context.Context, req *connect.Request[publicparcelsv1.GetLandAreaSqftByFeatureIdRequest]) (*connect.Response[publicparcelsv1.GetLandAreaSqftByFeatureIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetLandAreaSqftByFeatureIdRequest{
+		FeatureIds: req.Msg.FeatureIds,
+		LegalAsOf:  req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetLandAreaSqftByFeatureId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetLandAreaSqftByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetFrontageFtByFeatureId(ctx context.Context, req *connect.Request[publicparcelsv1.GetFrontageFtByFeatureIdRequest]) (*connect.Response[publicparcelsv1.GetFrontageFtByFeatureIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetFrontageFtByFeatureIdRequest{
+		FeatureIds: req.Msg.FeatureIds,
+		LegalAsOf:  req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetFrontageFtByFeatureId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetFrontageFtByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetDepthFtByFeatureId(ctx context.Context, req *connect.Request[publicparcelsv1.GetDepthFtByFeatureIdRequest]) (*connect.Response[publicparcelsv1.GetDepthFtByFeatureIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetDepthFtByFeatureIdRequest{
+		FeatureIds: req.Msg.FeatureIds,
+		LegalAsOf:  req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetDepthFtByFeatureId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetDepthFtByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetLandUseIdSqftByFeatureId(ctx context.Context, req *connect.Request[publicparcelsv1.GetLandUseIdSqftByFeatureIdRequest]) (*connect.Response[publicparcelsv1.GetLandUseIdSqftByFeatureIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetLandUseIdSqftByFeatureIdRequest{
+		FeatureIds: req.Msg.FeatureIds,
+		LegalAsOf:  req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetLandUseIdSqftByFeatureId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetLandUseIdSqftByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetZoningIdByFeatureId(ctx context.Context, req *connect.Request[publicparcelsv1.GetZoningIdByFeatureIdRequest]) (*connect.Response[publicparcelsv1.GetZoningIdByFeatureIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetZoningIdByFeatureIdRequest{
+		FeatureIds: req.Msg.FeatureIds,
+		LegalAsOf:  req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetZoningIdByFeatureId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetZoningIdByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetImprovementAreaSqftByFeatureId(ctx context.Context, req *connect.Request[publicparcelsv1.GetImprovementAreaSqftByFeatureIdRequest]) (*connect.Response[publicparcelsv1.GetImprovementAreaSqftByFeatureIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetImprovementAreaSqftByFeatureIdRequest{
+		FeatureIds: req.Msg.FeatureIds,
+		LegalAsOf:  req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetImprovementAreaSqftByFeatureId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetImprovementAreaSqftByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetBedroomsByFeatureId(ctx context.Context, req *connect.Request[publicparcelsv1.GetBedroomsByFeatureIdRequest]) (*connect.Response[publicparcelsv1.GetBedroomsByFeatureIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetBedroomsByFeatureIdRequest{
+		FeatureIds: req.Msg.FeatureIds,
+		LegalAsOf:  req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetBedroomsByFeatureId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetBedroomsByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetBathroomsByFeatureId(ctx context.Context, req *connect.Request[publicparcelsv1.GetBathroomsByFeatureIdRequest]) (*connect.Response[publicparcelsv1.GetBathroomsByFeatureIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetBathroomsByFeatureIdRequest{
+		FeatureIds: req.Msg.FeatureIds,
+		LegalAsOf:  req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetBathroomsByFeatureId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetBathroomsByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetUnitsByFeatureId(ctx context.Context, req *connect.Request[publicparcelsv1.GetUnitsByFeatureIdRequest]) (*connect.Response[publicparcelsv1.GetUnitsByFeatureIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetUnitsByFeatureIdRequest{
+		FeatureIds: req.Msg.FeatureIds,
+		LegalAsOf:  req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetUnitsByFeatureId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetUnitsByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetPrimaryImprovementYearBuiltByFeatureId(ctx context.Context, req *connect.Request[publicparcelsv1.GetPrimaryImprovementYearBuiltByFeatureIdRequest]) (*connect.Response[publicparcelsv1.GetPrimaryImprovementYearBuiltByFeatureIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetPrimaryImprovementYearBuiltByFeatureIdRequest{
+		FeatureIds: req.Msg.FeatureIds,
+		LegalAsOf:  req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetPrimaryImprovementYearBuiltByFeatureId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetPrimaryImprovementYearBuiltByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetPrimaryImprovementEffectiveYearBuiltByFeatureId(ctx context.Context, req *connect.Request[publicparcelsv1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest]) (*connect.Response[publicparcelsv1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest{
+		FeatureIds: req.Msg.FeatureIds,
+		LegalAsOf:  req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetPrimaryImprovementEffectiveYearBuiltByFeatureId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetPrimaryImprovementConditionIdByFeatureId(ctx context.Context, req *connect.Request[publicparcelsv1.GetPrimaryImprovementConditionIdByFeatureIdRequest]) (*connect.Response[publicparcelsv1.GetPrimaryImprovementConditionIdByFeatureIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetPrimaryImprovementConditionIdByFeatureIdRequest{
+		FeatureIds: req.Msg.FeatureIds,
+		LegalAsOf:  req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetPrimaryImprovementConditionIdByFeatureId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetPrimaryImprovementConditionIdByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
+}
+
+func (s *ParcelServer) GetPrimaryImprovementTypeIdByFeatureId(ctx context.Context, req *connect.Request[publicparcelsv1.GetPrimaryImprovementTypeIdByFeatureIdRequest]) (*connect.Response[publicparcelsv1.GetPrimaryImprovementTypeIdByFeatureIdResponse], error) {
+	meshReq := connect.NewRequest(&meshparcelsv1.GetPrimaryImprovementTypeIdByFeatureIdRequest{
+		FeatureIds: req.Msg.FeatureIds,
+		LegalAsOf:  req.Msg.LegalAsOf,
+	})
+	meshRes, err := s.dbReaderClient.GetPrimaryImprovementTypeIdByFeatureId(ctx, meshReq)
+	if err != nil { return nil, err }
+	return connect.NewResponse(&publicparcelsv1.GetPrimaryImprovementTypeIdByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
+}

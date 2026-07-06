@@ -284,6 +284,7 @@ message SaleComparableParcel {
   google.protobuf.Timestamp sale_time = 5;
   string sale_price = 6;
   repeated ComparableAttribute attributes = 7;
+  google.protobuf.Timestamp attribute_time = 8;
 }
 
 message GetEquityComparablesRequest {
@@ -301,6 +302,7 @@ message GetSalesComparablesRequest {
   repeated ComparableCriteria criteria = 2;
   repeated string selected_parcel_ids = 3;
   google.type.Interval time_range = 4;
+  optional bool return_only_frozen_sales = 5;
 }
 
 message GetSalesComparablesResponse {

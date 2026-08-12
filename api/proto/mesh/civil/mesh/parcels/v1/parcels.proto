@@ -31,7 +31,7 @@ service ParcelsService {
 
   rpc GetDepthFtByParcelId(GetDepthFtByParcelIdRequest) returns (GetDepthFtByParcelIdResponse) {}
 
-  rpc GetLandUseIdSqftByParcelId(GetLandUseIdSqftByParcelIdRequest) returns (GetLandUseIdSqftByParcelIdResponse) {}
+  rpc GetLandUseIdByParcelId(GetLandUseIdByParcelIdRequest) returns (GetLandUseIdByParcelIdResponse) {}
 
   rpc GetZoningIdByParcelId(GetZoningIdByParcelIdRequest) returns (GetZoningIdByParcelIdResponse) {}
 
@@ -57,7 +57,7 @@ service ParcelsService {
 
   rpc GetDepthFtByFeatureId(GetDepthFtByFeatureIdRequest) returns (GetDepthFtByFeatureIdResponse) {}
 
-  rpc GetLandUseIdSqftByFeatureId(GetLandUseIdSqftByFeatureIdRequest) returns (GetLandUseIdSqftByFeatureIdResponse) {}
+  rpc GetLandUseIdByFeatureId(GetLandUseIdByFeatureIdRequest) returns (GetLandUseIdByFeatureIdResponse) {}
 
   rpc GetZoningIdByFeatureId(GetZoningIdByFeatureIdRequest) returns (GetZoningIdByFeatureIdResponse) {}
 
@@ -373,12 +373,12 @@ message GetDepthFtByParcelIdResponse {
   map<string, double> values = 1;
 }
 
-message GetLandUseIdSqftByParcelIdRequest {
+message GetLandUseIdByParcelIdRequest {
   repeated string parcel_ids = 1;
   optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
-message GetLandUseIdSqftByParcelIdResponse {
+message GetLandUseIdByParcelIdResponse {
   map<string, string> values = 1;
 }
 
@@ -491,12 +491,12 @@ message GetDepthFtByFeatureIdResponse {
   map<int64, double> values = 1;
 }
 
-message GetLandUseIdSqftByFeatureIdRequest {
+message GetLandUseIdByFeatureIdRequest {
   repeated int64 feature_ids = 1;
   optional google.protobuf.Timestamp legal_as_of = 2;
 }
 
-message GetLandUseIdSqftByFeatureIdResponse {
+message GetLandUseIdByFeatureIdResponse {
   map<int64, string> values = 1;
 }
 

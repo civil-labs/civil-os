@@ -441,16 +441,16 @@ func (s *ParcelServer) GetDepthFtByParcelId(ctx context.Context, req *connect.Re
 	return connect.NewResponse(&publicparcelsv1.GetDepthFtByParcelIdResponse{Values: meshRes.Msg.Values}), nil
 }
 
-func (s *ParcelServer) GetLandUseIdSqftByParcelId(ctx context.Context, req *connect.Request[publicparcelsv1.GetLandUseIdSqftByParcelIdRequest]) (*connect.Response[publicparcelsv1.GetLandUseIdSqftByParcelIdResponse], error) {
-	sample := s.logParcelIds("GetLandUseIdSqftByParcelId", req.Msg.ParcelIds)
-	meshReq := connect.NewRequest(&meshparcelsv1.GetLandUseIdSqftByParcelIdRequest{
+func (s *ParcelServer) GetLandUseIdByParcelId(ctx context.Context, req *connect.Request[publicparcelsv1.GetLandUseIdByParcelIdRequest]) (*connect.Response[publicparcelsv1.GetLandUseIdByParcelIdResponse], error) {
+	sample := s.logParcelIds("GetLandUseIdByParcelId", req.Msg.ParcelIds)
+	meshReq := connect.NewRequest(&meshparcelsv1.GetLandUseIdByParcelIdRequest{
 		ParcelIds: req.Msg.ParcelIds,
 		LegalAsOf: req.Msg.LegalAsOf,
 	})
-	meshRes, err := s.dbReaderClient.GetLandUseIdSqftByParcelId(ctx, meshReq)
+	meshRes, err := s.dbReaderClient.GetLandUseIdByParcelId(ctx, meshReq)
 	if err != nil { return nil, err }
-	logReturnedValues(s.logger, "GetLandUseIdSqftByParcelId", sample, meshRes.Msg.Values)
-	return connect.NewResponse(&publicparcelsv1.GetLandUseIdSqftByParcelIdResponse{Values: meshRes.Msg.Values}), nil
+	logReturnedValues(s.logger, "GetLandUseIdByParcelId", sample, meshRes.Msg.Values)
+	return connect.NewResponse(&publicparcelsv1.GetLandUseIdByParcelIdResponse{Values: meshRes.Msg.Values}), nil
 }
 
 func (s *ParcelServer) GetZoningIdByParcelId(ctx context.Context, req *connect.Request[publicparcelsv1.GetZoningIdByParcelIdRequest]) (*connect.Response[publicparcelsv1.GetZoningIdByParcelIdResponse], error) {
@@ -597,16 +597,16 @@ func (s *ParcelServer) GetDepthFtByFeatureId(ctx context.Context, req *connect.R
 	return connect.NewResponse(&publicparcelsv1.GetDepthFtByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
 }
 
-func (s *ParcelServer) GetLandUseIdSqftByFeatureId(ctx context.Context, req *connect.Request[publicparcelsv1.GetLandUseIdSqftByFeatureIdRequest]) (*connect.Response[publicparcelsv1.GetLandUseIdSqftByFeatureIdResponse], error) {
-	sample := s.logFeatureIds("GetLandUseIdSqftByFeatureId", req.Msg.FeatureIds)
-	meshReq := connect.NewRequest(&meshparcelsv1.GetLandUseIdSqftByFeatureIdRequest{
+func (s *ParcelServer) GetLandUseIdByFeatureId(ctx context.Context, req *connect.Request[publicparcelsv1.GetLandUseIdByFeatureIdRequest]) (*connect.Response[publicparcelsv1.GetLandUseIdByFeatureIdResponse], error) {
+	sample := s.logFeatureIds("GetLandUseIdByFeatureId", req.Msg.FeatureIds)
+	meshReq := connect.NewRequest(&meshparcelsv1.GetLandUseIdByFeatureIdRequest{
 		FeatureIds: req.Msg.FeatureIds,
 		LegalAsOf:  req.Msg.LegalAsOf,
 	})
-	meshRes, err := s.dbReaderClient.GetLandUseIdSqftByFeatureId(ctx, meshReq)
+	meshRes, err := s.dbReaderClient.GetLandUseIdByFeatureId(ctx, meshReq)
 	if err != nil { return nil, err }
-	logReturnedValues(s.logger, "GetLandUseIdSqftByFeatureId", sample, meshRes.Msg.Values)
-	return connect.NewResponse(&publicparcelsv1.GetLandUseIdSqftByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
+	logReturnedValues(s.logger, "GetLandUseIdByFeatureId", sample, meshRes.Msg.Values)
+	return connect.NewResponse(&publicparcelsv1.GetLandUseIdByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
 }
 
 func (s *ParcelServer) GetZoningIdByFeatureId(ctx context.Context, req *connect.Request[publicparcelsv1.GetZoningIdByFeatureIdRequest]) (*connect.Response[publicparcelsv1.GetZoningIdByFeatureIdResponse], error) {

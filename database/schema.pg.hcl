@@ -1610,7 +1610,7 @@ table "improvement_attributes" {
     on_delete   = RESTRICT
   }
 
-  index "idx_improvement_attributes_improvement_quality_id" {
+  index "idx_improvement_attributes_improvement_condition_id" {
     columns = [column.improvement_condition_id]
   }
 

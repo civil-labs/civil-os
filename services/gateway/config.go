@@ -30,6 +30,7 @@ func LoadConfig(logger *slog.Logger) (*Config, error) {
 		"CIVIL_TILE_SERVER_HOST",
 		"CIVIL_ALLOWED_CLIENT_IDS",
 		"CIVIL_DB_READER_HOST",
+		"CIVIL_DEX_GRPC_ADDRESS",
 		"CIVIL_INSTANCE_METADATA_URL",
 	}
 

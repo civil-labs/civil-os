@@ -55,7 +55,7 @@ func LoadConfig(logger *slog.Logger) (*Config, error) {
 		IDPHost:             os.Getenv("CIVIL_IDP_HOST"),
 		TileServerHost:      os.Getenv("CIVIL_TILE_SERVER_HOST"),
 		DBReaderHost:        os.Getenv("CIVIL_DB_READER_HOST"),
-		DexGrpcAddress:      os.Getenv("CIVIL_DEX_GRPC_ADDRESS"),
+		DexGrpcAddress:      os.Getenv("CIVIL_DEX_GRPC_ADDRESS"), // Not required, and will only be used if not empty
 		AllowedClientsIds:   getAllowedClientIdsEnv(),
 		InstanceMetadataUrl: os.Getenv("CIVIL_INSTANCE_METADATA_URL"),
 	}, nil

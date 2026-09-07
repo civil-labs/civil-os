@@ -1,5 +1,5 @@
 # Use the official Martin image
-FROM ghcr.io/maplibre/martin:1.3.0
+FROM ghcr.io/maplibre/martin:1.15.0
 
 # Copy the local config file into the container
 # We put it in /etc/martin/ to follow standard linux conventions

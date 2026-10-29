@@ -2,23 +2,31 @@
 ### Extensions
 ##############################
 schema "public" {
-  comment = "standard public schema"
+  comment = "default postgres schema (locked down)"
+}
+
+schema "core" {
+  comment = "schema for relational data and audit"
+}
+
+schema "extensions" {
+  comment = "schema for isolated extensions"
 }
 
 extension "postgis" {
-  schema = schema.public
+  schema = schema.extensions
 
   version = "3.5.6"
 }
 
 extension "btree_gist" {
-  schema = schema.public
+  schema = schema.core
 
   version = "1.7"
 }
 
 extension "pgcrypto" {
-  schema = schema.public
+  schema = schema.core
 
   version = "1.3"
 }
@@ -27,7 +35,7 @@ extension "pgcrypto" {
 ### System Settings
 ##############################
 table "system_settings" {
-  schema = schema.public
+  schema = schema.core
 
   column "system_setting_id" {
     type    = int
@@ -62,7 +70,7 @@ table "system_settings" {
 }
 
 table "system_settings_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "system_setting_history_id" {
     type = bigint
@@ -104,7 +112,7 @@ table "system_settings_history" {
 
 // Domain Anchor
 table "parcels" {
-  schema = schema.public
+  schema = schema.core
 
   column "parcel_id" {
     type = bigint
@@ -168,7 +176,7 @@ table "parcels" {
 }
 
 table "parcels_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "parcel_history_id" {
     type = bigint
@@ -225,7 +233,7 @@ table "parcels_history" {
 
 // Geometry
 table "parcel_geometry" {
-  schema = schema.public
+  schema = schema.core
 
   column "parcel_geometry_id" {
     type = bigint
@@ -331,7 +339,7 @@ table "parcel_geometry" {
 }
 
 table "parcel_geometry_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "parcel_geometry_history_id" {
     type = bigint
@@ -408,7 +416,7 @@ table "parcel_geometry_history" {
 
 // Attributes
 table "parcel_attributes" {
-  schema = schema.public
+  schema = schema.core
 
   column "parcel_attribute_id" {
     type = bigint
@@ -522,7 +530,7 @@ table "parcel_attributes" {
 }
 
 table "parcel_attributes_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "parcel_attribute_history_id" {
     type = bigint
@@ -603,7 +611,7 @@ table "parcel_attributes_history" {
 
 // Parties
 table "parcel_parties" {
-  schema = schema.public
+  schema = schema.core
 
   column "parcel_party_id" {
     type = bigint
@@ -691,7 +699,7 @@ table "parcel_parties" {
 }
 
 table "parcel_parties_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "parcel_party_history_id" {
     type = bigint
@@ -756,7 +764,7 @@ table "parcel_parties_history" {
 
 // Affordances
 table "parcel_affordances" {
-  schema = schema.public
+  schema = schema.core
 
   column "parcel_affordance_id" {
     type = bigint
@@ -902,7 +910,7 @@ table "parcel_affordances" {
 }
 
 table "parcel_affordances_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "parcel_affordance_history_id" {
     type = bigint
@@ -1002,7 +1010,7 @@ table "parcel_affordances_history" {
 }
 
 table "parcel_neighborhood_definitions" {
-  schema = schema.public
+  schema = schema.core
 
   column "parcel_neighborhood_definition_id" {
     type = bigint
@@ -1115,7 +1123,7 @@ table "parcel_neighborhood_definitions" {
 }
 
 table "parcel_neighborhood_definitions_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "parcel_neighborhood_definition_history_id" {
     type = bigint
@@ -1193,7 +1201,7 @@ table "parcel_neighborhood_definitions_history" {
 
 // Domain Anchor
 table "improvements" {
-  schema = schema.public
+  schema = schema.core
 
   column "improvement_id" {
     type = bigint
@@ -1257,7 +1265,7 @@ table "improvements" {
 }
 
 table "improvements_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "improvement_history_id" {
     type = bigint
@@ -1314,7 +1322,7 @@ table "improvements_history" {
 
 // Geometry
 table "improvement_geometry" {
-  schema = schema.public
+  schema = schema.core
 
   column "improvement_geometry_id" {
     type = bigint
@@ -1402,7 +1410,7 @@ table "improvement_geometry" {
 }
 
 table "improvement_geometry_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "improvement_geometry_history_id" {
     type = bigint
@@ -1473,7 +1481,7 @@ table "improvement_geometry_history" {
 
 // Attributes
 table "improvement_attributes" {
-  schema = schema.public
+  schema = schema.core
 
   column "improvement_attribute_id" {
     type = bigint
@@ -1642,7 +1650,7 @@ table "improvement_attributes" {
 }
 
 table "improvement_attributes_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "improvement_attribute_history_id" {
     type = bigint
@@ -1753,7 +1761,7 @@ table "improvement_attributes_history" {
 
 // Parties
 table "improvement_parties" {
-  schema = schema.public
+  schema = schema.core
 
   column "improvement_party_id" {
     type = bigint
@@ -1841,7 +1849,7 @@ table "improvement_parties" {
 }
 
 table "improvement_parties_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "improvement_party_history_id" {
     type = bigint
@@ -1910,7 +1918,7 @@ table "improvement_parties_history" {
 
 // Domain Anchor
 table "improvement_conditions" {
-  schema = schema.public
+  schema = schema.core
 
   column "improvement_condition_id" {
     type = bigint
@@ -1974,7 +1982,7 @@ table "improvement_conditions" {
 }
 
 table "improvement_conditions_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "improvement_condition_history_id" {
     type = bigint
@@ -2031,7 +2039,7 @@ table "improvement_conditions_history" {
 
 // Attributes
 table "improvement_condition_attributes" {
-  schema = schema.public
+  schema = schema.core
 
   column "improvement_condition_attribute_id" {
     type = bigint
@@ -2097,7 +2105,7 @@ table "improvement_condition_attributes" {
 }
 
 table "improvement_condition_attributes_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "improvement_condition_attribute_history_id" {
     type = bigint
@@ -2163,7 +2171,7 @@ table "improvement_condition_attributes_history" {
 
 // Domain Anchor
 table "improvement_qualities" {
-  schema = schema.public
+  schema = schema.core
 
   column "improvement_quality_id" {
     type = bigint
@@ -2227,7 +2235,7 @@ table "improvement_qualities" {
 }
 
 table "improvement_qualities_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "improvement_quality_history_id" {
     type = bigint
@@ -2283,7 +2291,7 @@ table "improvement_qualities_history" {
 
 // Attributes
 table "improvement_quality_attributes" {
-  schema = schema.public
+  schema = schema.core
 
   column "improvement_quality_attribute_id" {
     type = bigint
@@ -2349,7 +2357,7 @@ table "improvement_quality_attributes" {
 }
 
 table "improvement_quality_attributes_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "improvement_quality_attribute_history_id" {
     type = bigint
@@ -2414,7 +2422,7 @@ table "improvement_quality_attributes_history" {
 ##############################
 
 table "parcel_improvements" {
-  schema = schema.public
+  schema = schema.core
 
   column "parcel_improvement_id" {
     type = bigint
@@ -2509,7 +2517,7 @@ table "parcel_improvements" {
 }
 
 table "parcel_improvements_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "parcel_improvement_history_id" {
     type = bigint
@@ -2578,7 +2586,7 @@ table "parcel_improvements_history" {
 
 // Domain Anchor
 table "zoning" {
-  schema = schema.public
+  schema = schema.core
 
   column "zoning_id" {
     type = bigint
@@ -2642,7 +2650,7 @@ table "zoning" {
 }
 
 table "zoning_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "zoning_history_id" {
     type = bigint
@@ -2699,7 +2707,7 @@ table "zoning_history" {
 
 // Attributes
 table "zoning_attributes" {
-  schema = schema.public
+  schema = schema.core
 
   column "zoning_attribute_id" {
     type = bigint
@@ -2798,7 +2806,7 @@ table "zoning_attributes" {
 }
 
 table "zoning_attributes_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "zoning_attribute_history_id" {
     type = bigint
@@ -2888,7 +2896,7 @@ table "zoning_attributes_history" {
 
 // Domain Anchor
 table "parties" {
-  schema = schema.public
+  schema = schema.core
 
   column "party_id" {
     type = bigint
@@ -2952,7 +2960,7 @@ table "parties" {
 }
 
 table "parties_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "party_history_id" {
     type = bigint
@@ -3009,7 +3017,7 @@ table "parties_history" {
 
 // Attributes
 table "party_attributes" {
-  schema = schema.public
+  schema = schema.core
 
   column "party_attribute_id" {
     type = bigint
@@ -3089,7 +3097,7 @@ table "party_attributes" {
 }
 
 table "party_attributes_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "party_attribute_history_id" {
     type = bigint
@@ -3154,7 +3162,7 @@ table "party_attributes_history" {
 
 // Domain Anchor
 table "addresses" {
-  schema = schema.public
+  schema = schema.core
 
   column "address_id" {
     type = bigint
@@ -3218,7 +3226,7 @@ table "addresses" {
 }
 
 table "addresses_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "address_history_id" {
     type = bigint
@@ -3275,7 +3283,7 @@ table "addresses_history" {
 
 // Attributes
 table "address_attributes" {
-  schema = schema.public
+  schema = schema.core
 
   column "address_attribute_id" {
     type = bigint
@@ -3397,7 +3405,7 @@ table "address_attributes" {
 }
 
 table "address_attributes_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "address_attribute_history_id" {
     type = bigint
@@ -3502,7 +3510,7 @@ table "address_attributes_history" {
 
 # Real Property Transfers
 table "real_property_transfers" {
-  schema = schema.public
+  schema = schema.core
 
   column "real_property_transfer_id" {
     type = bigint
@@ -3576,7 +3584,7 @@ table "real_property_transfers" {
 }
 
 table "real_property_transfers_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "real_property_transfer_history_id" {
     type = bigint
@@ -3648,7 +3656,7 @@ table "real_property_transfers_history" {
 
 # Linking Tables
 table "real_property_transfer_party_parcels" {
-  schema = schema.public
+  schema = schema.core
 
   column "real_property_transfer_party_parcel_id" {
     type = bigint
@@ -3744,7 +3752,7 @@ table "real_property_transfer_party_parcels" {
 }
 
 table "real_property_transfer_party_parcels_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "real_property_transfer_party_parcel_history_id" {
     type = bigint
@@ -3817,7 +3825,7 @@ table "real_property_transfer_party_parcels_history" {
 }
 
 table "real_property_transfer_party_improvements" {
-  schema = schema.public
+  schema = schema.core
 
   column "real_property_transfer_party_improvement_id" {
     type = bigint
@@ -3912,7 +3920,7 @@ table "real_property_transfer_party_improvements" {
 }
 
 table "real_property_transfer_party_improvements_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "real_property_transfer_party_improvement_history_id" {
     type = bigint
@@ -3985,7 +3993,7 @@ table "real_property_transfer_party_improvements_history" {
 }
 
 table "real_property_transfer_code_assignments" {
-  schema = schema.public
+  schema = schema.core
 
   column "real_property_transfer_code_assignment_id" {
     type = bigint
@@ -4040,7 +4048,7 @@ table "real_property_transfer_code_assignments" {
 }
 
 table "real_property_transfer_code_assignments_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "real_property_transfer_code_assignment_history_id" {
     type = bigint
@@ -4095,7 +4103,7 @@ table "real_property_transfer_code_assignments_history" {
 
 # Codes/Code Types
 table "real_property_transfer_codes" {
-  schema = schema.public
+  schema = schema.core
 
   column "real_property_transfer_code_id" {
     type = bigint
@@ -4170,7 +4178,7 @@ table "real_property_transfer_codes" {
 }
 
 table "real_property_transfer_codes_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "real_property_transfer_code_history_id" {
     type = bigint
@@ -4231,7 +4239,7 @@ table "real_property_transfer_codes_history" {
 }
 
 table "real_property_transfer_code_types" {
-  schema = schema.public
+  schema = schema.core
 
   column "real_property_transfer_code_type_id" {
     type = bigint
@@ -4295,7 +4303,7 @@ table "real_property_transfer_code_types" {
 }
 
 table "real_property_transfer_code_types_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "real_property_transfer_code_type_history_id" {
     type = bigint
@@ -4355,7 +4363,7 @@ table "real_property_transfer_code_types_history" {
 ##############################
 
 table "valuations" {
-  schema = schema.public
+  schema = schema.core
 
   column "valuation_id" {
     type = bigint
@@ -4410,7 +4418,7 @@ table "valuations" {
 }
 
 table "valuations_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "valuation_history_id" {
     type = bigint
@@ -4461,7 +4469,7 @@ table "valuations_history" {
 }
 
 table "parcel_valuations" {
-  schema = schema.public
+  schema = schema.core
 
   column "parcel_valuation_id" {
     type = bigint
@@ -4551,7 +4559,7 @@ table "parcel_valuations" {
 }
 
 table "parcel_valuations_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "parcel_valuation_history_id" {
     type = bigint
@@ -4620,7 +4628,7 @@ table "parcel_valuations_history" {
 }
 
 table "improvement_valuations" {
-  schema = schema.public
+  schema = schema.core
 
   column "improvement_valuation_id" {
     type = bigint
@@ -4710,7 +4718,7 @@ table "improvement_valuations" {
 }
 
 table "improvement_valuations_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "improvement_valuation_history_id" {
     type = bigint
@@ -4783,7 +4791,7 @@ table "improvement_valuations_history" {
 ##############################
 
 table "neighborhood_definitions" {
-  schema = schema.public
+  schema = schema.core
 
   column "neighborhood_definition_id" {
     type = bigint
@@ -4854,7 +4862,7 @@ table "neighborhood_definitions" {
 }
 
 table "neighborhood_definitions_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "neighborhood_definition_history_id" {
     type = bigint
@@ -4910,7 +4918,7 @@ table "neighborhood_definitions_history" {
 }
 
 table "neighborhoods" {
-  schema = schema.public
+  schema = schema.core
 
   column "neighborhood_id" {
     type = bigint
@@ -4969,7 +4977,7 @@ table "neighborhoods" {
 }
 
 table "neighborhoods_history" {
-  schema = schema.public
+  schema = schema.core
 
   column "neighborhood_history_id" {
     type = bigint
@@ -5024,7 +5032,7 @@ table "neighborhoods_history" {
 ##############################
 
 table "affordance_types" {
-  schema = schema.public
+  schema = schema.core
 
   column "affordance_type_id" {
     type = bigint
@@ -5068,7 +5076,7 @@ table "affordance_types" {
 }
 
 table "countries" {
-  schema = schema.public
+  schema = schema.core
 
   column "country_id" {
     type = bigint
@@ -5118,7 +5126,7 @@ table "countries" {
 }
 
 table "administrative_areas" {
-  schema = schema.public
+  schema = schema.core
 
   column "administrative_area_id" {
     type = bigint
@@ -5168,7 +5176,7 @@ table "administrative_areas" {
 }
 
 table "land_uses" {
-  schema = schema.public
+  schema = schema.core
 
   column "land_use_id" {
     type = bigint
@@ -5248,7 +5256,7 @@ table "land_uses" {
 }
 
 table "land_use_types" {
-  schema = schema.public
+  schema = schema.core
 
   column "land_use_type_id" {
     type = bigint
@@ -5317,7 +5325,7 @@ table "land_use_types" {
 }
 
 table "improvement_types" {
-  schema = schema.public
+  schema = schema.core
 
   column "improvement_type_id" {
     type = bigint
@@ -5390,7 +5398,7 @@ table "improvement_types" {
 ##############################
 
 function "get_parcel_tiles" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   // Function Arguments
   arg "z" {
@@ -5446,7 +5454,7 @@ function "get_parcel_tiles" {
 }
 
 function "generate_secure_mvt_id" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
 
   return = bigint
@@ -5474,7 +5482,7 @@ function "generate_secure_mvt_id" {
 }
 
 function "get_primary_improvements" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
 
   arg "parcel_ids" {
@@ -6317,7 +6325,7 @@ trigger "history_immutable" {
 ### History Functions
 ##############################
 function "record_system_settings_history" {
-  schema   = schema.public
+  schema   = schema.core
   lang     = "plpgsql"
   return   = trigger
   security = DEFINER
@@ -6355,7 +6363,7 @@ function "record_system_settings_history" {
 }
 
 function "record_parcels_history" {
-  schema   = schema.public
+  schema   = schema.core
   lang     = "plpgsql"
   return   = trigger
   security = DEFINER
@@ -6399,7 +6407,7 @@ function "record_parcels_history" {
 }
 
 function "record_parcel_geometry_history" {
-  schema   = schema.public
+  schema   = schema.core
   lang     = "plpgsql"
   return   = trigger
   security = DEFINER
@@ -6447,7 +6455,7 @@ function "record_parcel_geometry_history" {
 }
 
 function "record_parcel_attributes_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -6500,7 +6508,7 @@ function "record_parcel_attributes_history" {
 }
 
 function "record_parcel_parties_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -6545,7 +6553,7 @@ function "record_parcel_parties_history" {
 }
 
 function "record_parcel_affordances_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -6606,7 +6614,7 @@ function "record_parcel_affordances_history" {
 }
 
 function "record_parcel_neighborhood_definitions_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -6653,7 +6661,7 @@ function "record_parcel_neighborhood_definitions_history" {
 }
 
 function "record_improvements_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -6698,7 +6706,7 @@ function "record_improvements_history" {
 }
 
 function "record_improvement_geometry_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -6747,7 +6755,7 @@ function "record_improvement_geometry_history" {
 }
 
 function "record_improvement_attributes_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -6814,7 +6822,7 @@ function "record_improvement_attributes_history" {
 }
 
 function "record_improvement_parties_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -6859,7 +6867,7 @@ function "record_improvement_parties_history" {
 }
 
 function "record_improvement_conditions_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -6904,7 +6912,7 @@ function "record_improvement_conditions_history" {
 }
 
 function "record_improvement_condition_attributes_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -6949,7 +6957,7 @@ function "record_improvement_condition_attributes_history" {
 }
 
 function "record_improvement_qualities_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -6994,7 +7002,7 @@ function "record_improvement_qualities_history" {
 }
 
 function "record_improvement_quality_attributes_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -7039,7 +7047,7 @@ function "record_improvement_quality_attributes_history" {
 }
 
 function "record_parcel_improvements_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -7084,7 +7092,7 @@ function "record_parcel_improvements_history" {
 }
 
 function "record_zoning_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -7129,7 +7137,7 @@ function "record_zoning_history" {
 }
 
 function "record_zoning_attributes_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -7184,7 +7192,7 @@ function "record_zoning_attributes_history" {
 }
 
 function "record_parties_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -7229,7 +7237,7 @@ function "record_parties_history" {
 }
 
 function "record_party_attributes_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -7274,7 +7282,7 @@ function "record_party_attributes_history" {
 }
 
 function "record_addresses_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -7319,7 +7327,7 @@ function "record_addresses_history" {
 }
 
 function "record_address_attributes_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -7380,7 +7388,7 @@ function "record_address_attributes_history" {
 }
 
 function "record_real_property_transfers_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -7431,7 +7439,7 @@ function "record_real_property_transfers_history" {
 }
 
 function "record_real_property_transfer_party_parcels_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -7478,7 +7486,7 @@ function "record_real_property_transfer_party_parcels_history" {
 }
 
 function "record_real_property_transfer_party_improvements_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -7525,7 +7533,7 @@ function "record_real_property_transfer_party_improvements_history" {
 }
 
 function "record_real_property_transfer_code_assignments_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -7566,7 +7574,7 @@ function "record_real_property_transfer_code_assignments_history" {
 }
 
 function "record_real_property_transfer_codes_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -7613,7 +7621,7 @@ function "record_real_property_transfer_codes_history" {
 }
 
 function "record_real_property_transfer_code_types_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -7658,7 +7666,7 @@ function "record_real_property_transfer_code_types_history" {
 }
 
 function "record_valuations_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -7701,7 +7709,7 @@ function "record_valuations_history" {
 }
 
 function "record_parcel_valuations_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -7748,7 +7756,7 @@ function "record_parcel_valuations_history" {
 }
 
 function "record_improvement_valuations_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -7795,7 +7803,7 @@ function "record_improvement_valuations_history" {
 }
 
 function "record_neighborhood_definitions_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -7840,7 +7848,7 @@ function "record_neighborhood_definitions_history" {
 }
 
 function "record_neighborhoods_history" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
   # Use the creator's role, as the caller shouldn't have insert privileges
@@ -7883,7 +7891,7 @@ function "record_neighborhoods_history" {
 }
 
 function "prevent_history_tampering" {
-  schema = schema.public
+  schema = schema.core
   lang   = "plpgsql"
   return = trigger
 

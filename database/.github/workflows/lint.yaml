@@ -1,0 +1,22 @@
+name: Schema PR Lint
+on:
+  pull_request:
+    paths:
+      - 'migrations/**'
+      - 'schema/**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arigaio/setup-atlas@v0
+        with:
+          cloud-token: ${{ secrets.ATLAS_PRO_TOKEN }}
+      - name: Validate Integrity & Lint
+        run: |
+          atlas migrate validate --dir "file://migrations"
+          atlas migrate lint \
+            --dir "file://migrations" \
+            --dev-url "docker://postgis/postgis:16-3.4/dev?search_path=core,geo,extensions,public" \
+            --latest 1

@@ -9,6 +9,10 @@ schema "core" {
   comment = "schema for relational data and audit"
 }
 
+schema "geo" {
+  comment = "schema for heavy spatial data"
+}
+
 schema "extensions" {
   comment = "schema for isolated extensions"
 }
@@ -20,13 +24,13 @@ extension "postgis" {
 }
 
 extension "btree_gist" {
-  schema = schema.core
+  schema = schema.extensions
 
   version = "1.7"
 }
 
 extension "pgcrypto" {
-  schema = schema.core
+  schema = schema.extensions
 
   version = "1.3"
 }
@@ -233,7 +237,7 @@ table "parcels_history" {
 
 // Geometry
 table "parcel_geometry" {
-  schema = schema.core
+  schema = schema.geo
 
   column "parcel_geometry_id" {
     type = bigint
@@ -253,16 +257,16 @@ table "parcel_geometry" {
     type = bigint
     null = false
 
-    default = sql("generate_secure_mvt_id()")
+    default = sql("geo.generate_secure_mvt_id()")
   }
 
   column "geom_web" {
-    type = sql("geometry(MultiPolygon, 4326)")
+    type = sql("extensions.geometry(MultiPolygon, 4326)")
     null = false
   }
 
   column "geom_legal" {
-    type = sql("geometry(MultiPolygon)")
+    type = sql("extensions.geometry(MultiPolygon)")
     null = true
   }
 
@@ -302,7 +306,7 @@ table "parcel_geometry" {
   }
 
   index "idx_parcel_geometry_feature_id" {
-    columns = [column.parcel_id]
+    columns = [column.feature_id]
   }
 
   index "idx_geom_web_parcel_geometry" {
@@ -339,7 +343,7 @@ table "parcel_geometry" {
 }
 
 table "parcel_geometry_history" {
-  schema = schema.core
+  schema = schema.geo
 
   column "parcel_geometry_history_id" {
     type = bigint
@@ -364,16 +368,16 @@ table "parcel_geometry_history" {
     type = bigint
     null = false
 
-    default = sql("generate_secure_mvt_id()")
+    default = sql("geo.generate_secure_mvt_id()")
   }
 
   column "geom_web" {
-    type = sql("geometry(MultiPolygon, 4326)")
+    type = sql("extensions.geometry(MultiPolygon, 4326)")
     null = false
   }
 
   column "geom_legal" {
-    type = sql("geometry(MultiPolygon)")
+    type = sql("extensions.geometry(MultiPolygon)")
     null = true
   }
 
@@ -876,7 +880,7 @@ table "parcel_affordances" {
   }
 
   index "idx_parcel_affordances_parcel_id" {
-    columns = [column.public_id]
+    columns = [column.parcel_id]
   }
 
   check "chk_require_origin" {
@@ -1322,7 +1326,7 @@ table "improvements_history" {
 
 // Geometry
 table "improvement_geometry" {
-  schema = schema.core
+  schema = schema.geo
 
   column "improvement_geometry_id" {
     type = bigint
@@ -1339,12 +1343,12 @@ table "improvement_geometry" {
   }
 
   column "geom_web" {
-    type = sql("geometry(MultiPolygonZ, 4326)")
+    type = sql("extensions.geometry(MultiPolygonZ, 4326)")
     null = false
   }
 
   column "geom_legal" {
-    type = sql("geometry(MultiPolygonZ)")
+    type = sql("extensions.geometry(MultiPolygonZ)")
     null = true
   }
 
@@ -1410,7 +1414,7 @@ table "improvement_geometry" {
 }
 
 table "improvement_geometry_history" {
-  schema = schema.core
+  schema = schema.geo
 
   column "improvement_geometry_history_id" {
     type = bigint
@@ -1432,12 +1436,12 @@ table "improvement_geometry_history" {
   }
 
   column "geom_web" {
-    type = sql("geometry(MultiPolygonZ, 4326)")
+    type = sql("extensions.geometry(MultiPolygonZ, 4326)")
     null = false
   }
 
   column "geom_legal" {
-    type = sql("geometry(MultiPolygonZ)")
+    type = sql("extensions.geometry(MultiPolygonZ)")
     null = true
   }
 
@@ -3345,7 +3349,7 @@ table "address_attributes" {
   }
 
   column "coordinates" {
-    type = sql("geometry(Point, 4326)")
+    type = sql("extensions.geometry(Point, 4326)")
     null = true
   }
 
@@ -3472,7 +3476,7 @@ table "address_attributes_history" {
   }
 
   column "coordinates" {
-    type = sql("geometry(Point, 4326)")
+    type = sql("extensions.geometry(Point, 4326)")
     null = true
   }
 
@@ -3892,7 +3896,7 @@ table "real_property_transfer_party_improvements" {
     on_delete   = RESTRICT
   }
 
-  index "idx_rpt_party_improvements_hist_rpt_id" {
+  index "idx_rpt_party_improvements_rpt_id" {
     columns = [column.real_property_transfer_id]
   }
 
@@ -3912,7 +3916,7 @@ table "real_property_transfer_party_improvements" {
 
   # Without is_grantor being included in the column, a party can only be a grantor or grantee
   # in a transfer, not both. That should cover almost every case, and if cases pop up where
-  # that must be broken its time to start looking at a more robut solution for municipal clerks' offices
+  # that must be broken its time to start looking at a more robust solution for clerks' offices
   index "idx_rpt_party_improvements_unique_party" {
     unique  = true
     columns = [column.improvement_id, column.real_property_transfer_id, column.party_id]
@@ -5422,7 +5426,7 @@ function "get_parcel_tiles" {
   as = <<-SQL
     DECLARE
       mvt bytea;
-      bounds geometry;
+      bounds extensions.geometry;
     BEGIN
        -- Guard against invalid zoom levels causing ST_TileEnvelope to overflow
       IF z < 0 OR z > 24 THEN
@@ -5437,9 +5441,9 @@ function "get_parcel_tiles" {
             -- Clip the geometry to the tile boundary for performance
             ST_AsMVTGeom(ST_Transform(pg.geom_web, 3857), bounds, 4096, 256, true) AS geom
         FROM 
-            public.parcels p
+            core.parcels p
         JOIN
-            public.parcel_geometry pg ON p.parcel_id = pg.parcel_id
+            geo.parcel_geometry pg ON p.parcel_id = pg.parcel_id
         WHERE 
             p.is_voided = false AND
             pg.legal_valid_range @> NOW() AND
@@ -5454,7 +5458,7 @@ function "get_parcel_tiles" {
 }
 
 function "generate_secure_mvt_id" {
-  schema = schema.core
+  schema = schema.geo
   lang   = "plpgsql"
 
   return = bigint
@@ -5516,9 +5520,9 @@ function "get_primary_improvements" {
               pi.improvement_id ASC
           ) as rn
         FROM 
-          public.parcel_improvements pi
+          core.parcel_improvements pi
         LEFT JOIN 
-          public.improvement_attributes ia ON pi.improvement_id = ia.improvement_id 
+          geo.improvement_attributes ia ON pi.improvement_id = ia.improvement_id 
           AND ia.legal_valid_range @> target_time
         WHERE 
           pi.parcel_id = ANY(parcel_ids)
@@ -7898,6 +7902,7 @@ function "prevent_history_tampering" {
   as = <<-SQL
     BEGIN
       RAISE EXCEPTION 'TAMPER ALERT: History tables are immutable, append-only ledgers. UPDATE, DELETE, and TRUNCATE operations are strictly forbidden.';
+      RETURN NULL;
     END;
   SQL
 }

@@ -35,41 +35,60 @@ jobs:
       - name: Determine Image Tag
         id: tagger
         run: |
+          git fetch --tags --force
+
+          # Shorten the commit SHA
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+
+          # Handle manual push of a git tag (e.g., git push origin v1.0.0)
           if [ "${{ github.event_name }}" = "push" ]; then
-            TAG="${GITHUB_REF_NAME}"
-          elif [ "${{ inputs.bump }}" = "manual" ]; then
-            TAG="${{ inputs.custom_tag }}"
-          else
-            # Calculate next semver tag from git history or commit sha
-            PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-            TAG="${PREV_TAG}-${{ inputs.bump }}.${{ github.sha }}"
+            echo "tag=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+            exit 0
           fi
-          echo "tag=${TAG}" >> $GITHUB_OUTPUT
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+          # Handle manual text input override
+          if [ "${{ inputs.bump }}" = "manual" ]; then
+            echo "tag=${{ inputs.custom_tag }}" >> $GITHUB_OUTPUT
+            exit 0
+          fi
 
-      - name: Login to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          # Resolve the latest semver tag, stripping non-semver suffixes
+          RAW_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          CLEAN_TAG=$(echo "${RAW_TAG}" | sed -E 's/^v//; s/-.*$//')
 
-      - name: Build and Push Migration Image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository }}/migrations:${{ steps.tagger.outputs.tag }}
-            ghcr.io/${{ github.repository }}/migrations:latest
+          IFS='.' read -r MAJOR MINOR PATCH <<< "${CLEAN_TAG}"
+          MAJOR=${MAJOR:-0}
+          MINOR=${MINOR:-0}
+          PATCH=${PATCH:-0}
 
-      # Optional: Output Kustomize/ConfigMap manifests to a GitOps release branch
-      - name: Generate ConfigMap Manifest Artifact
+          case "${{ inputs.bump }}" in
+            major)
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+              ;;
+            minor)
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              ;;
+            patch)
+              PATCH=$((PATCH + 1))
+              ;;
+          esac
+
+          # Choose format: Pure SemVer (v0.1.0) or SemVer with commit metadata (v0.1.0-d64e891)
+          SEMVER="v${MAJOR}.${MINOR}.${PATCH}"
+          FULL_TAG="${SEMVER}-${SHORT_SHA}"
+
+          echo "tag=${FULL_TAG}" >> $GITHUB_OUTPUT
+          echo "semver=${SEMVER}" >> $GITHUB_OUTPUT
+          echo "Calculated tag: ${FULL_TAG} (Base semver: ${SEMVER})"
+
+      # Automatically tag the commit so the next build increments from this version
+      - name: Create and Push Git Tag
+        if: github.event_name == 'workflow_dispatch' && inputs.bump != 'manual'
         run: |
-          mkdir -p dist
-          kubectl create configmap civil-db-migrations-${{ steps.tagger.outputs.tag }} \
-            --from-file=migrations/ \
-            --dry-run=client -o yaml > dist/migration-configmap.yaml
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ steps.tagger.outputs.semver }}" -m "Release ${{ steps.tagger.outputs.tag }}"
+          git push origin "${{ steps.tagger.outputs.semver }}"

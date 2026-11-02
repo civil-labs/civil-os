@@ -1,0 +1,6 @@
+[tools]
+atlas = "1.3.0"
+
+[tasks.build-migration]
+description = "Builds versioned migration"
+run = "atlas migrate diff --env local"

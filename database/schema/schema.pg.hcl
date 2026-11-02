@@ -20,7 +20,7 @@ schema "extensions" {
 extension "postgis" {
   schema = schema.extensions
 
-  version = "3.5.6"
+  version = "3.6.4"
 }
 
 extension "btree_gist" {
@@ -32,7 +32,7 @@ extension "btree_gist" {
 extension "pgcrypto" {
   schema = schema.extensions
 
-  version = "1.3"
+  version = "1.4"
 }
 
 ##############################

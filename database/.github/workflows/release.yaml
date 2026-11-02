@@ -121,8 +121,8 @@ jobs:
           push: true
           # ghcr.io repository paths must always be lowercased
           tags: |
-            ghcr.io/${{ github.repository_owner }}/civil-db-migrations:${{ steps.tagger.outputs.tag }}
-            ghcr.io/${{ github.repository_owner }}/civil-db-migrations:latest
+            ghcr.io/${{ github.repository_owner }}/civil-os-db-migrations:${{ steps.tagger.outputs.tag }}
+            ghcr.io/${{ github.repository_owner }}/civil-os-db-migrations:latest
 
       # Output Kustomize/ConfigMap manifests
       - name: Generate ConfigMap Manifest Artifact

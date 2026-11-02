@@ -3,87 +3,17 @@ CREATE SCHEMA "extensions";
 -- Set comment to schema: "extensions"
 COMMENT ON SCHEMA "extensions" IS 'schema for isolated extensions';
 -- Create extension "postgis"
-CREATE EXTENSION "postgis" WITH SCHEMA "extensions" VERSION "3.5.6";
+CREATE EXTENSION "postgis" WITH SCHEMA "extensions" VERSION "3.6.4";
 -- Create extension "pgcrypto"
-CREATE EXTENSION "pgcrypto" WITH SCHEMA "extensions" VERSION "1.3";
+CREATE EXTENSION "pgcrypto" WITH SCHEMA "extensions" VERSION "1.4";
 -- Create extension "btree_gist"
 CREATE EXTENSION "btree_gist" WITH SCHEMA "extensions" VERSION "1.7";
+-- Set comment to schema: "public"
+COMMENT ON SCHEMA "public" IS 'default postgres schema (locked down)';
 -- Add new schema named "core"
 CREATE SCHEMA "core";
 -- Set comment to schema: "core"
 COMMENT ON SCHEMA "core" IS 'schema for relational data and audit';
--- Create "neighborhood_definitions_history" table
-CREATE TABLE "core"."neighborhood_definitions_history" (
-  "neighborhood_definition_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
-  "neighborhood_definition_id" bigint NOT NULL,
-  "public_id" uuid NOT NULL,
-  "legacy_id" text NULL,
-  "name" text NOT NULL,
-  "is_legal" boolean NOT NULL,
-  "system_valid_range" tstzrange NOT NULL,
-  "trace_id" character varying(32) NOT NULL,
-  PRIMARY KEY ("neighborhood_definition_history_id")
-);
--- Create index "idx_neighborhood_definitions_history_neighborhood_definition_id" to table: "neighborhood_definitions_history"
-CREATE INDEX "idx_neighborhood_definitions_history_neighborhood_definition_id" ON "core"."neighborhood_definitions_history" ("neighborhood_definition_id");
--- Create "record_real_property_transfer_code_types_history" function
-CREATE FUNCTION "core"."record_real_property_transfer_code_types_history" () RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER AS $$
-DECLARE
-  current_transaction_time timestamptz := now();
-BEGIN
-  IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-    INSERT INTO real_property_transfer_code_types_history (
-      real_property_transfer_code_type_id,
-      public_id,
-      legacy_id,
-      name,
-      description,
-      system_valid_range,
-      trace_id
-    ) VALUES (
-      OLD.real_property_transfer_code_type_id,
-      OLD.public_id,
-      OLD.legacy_id,
-      OLD.name,
-      OLD.description,
-      tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
-      OLD.trace_id
-    );
-  END IF;
-          
-  -- Safely route the return pointer
-  IF (TG_OP = 'UPDATE') THEN
-      -- Ensures the record's system log is updated for the proper time
-      NEW.system_updated_at = current_transaction_time;
-      RETURN NEW;
-  ELSIF (TG_OP = 'DELETE') THEN
-      RETURN OLD;
-  END IF;
-        
-  RETURN NULL;
-END;
-$$;
--- Create "real_property_transfer_code_types" table
-CREATE TABLE "core"."real_property_transfer_code_types" (
-  "real_property_transfer_code_type_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
-  "public_id" uuid NOT NULL DEFAULT gen_random_uuid(),
-  "legacy_id" text NULL,
-  "name" text NOT NULL,
-  "description" text NULL,
-  "system_updated_at" timestamptz NOT NULL DEFAULT now(),
-  "trace_id" character varying(32) NOT NULL,
-  PRIMARY KEY ("real_property_transfer_code_type_id")
-);
--- Create index "idx_rpt_code_types_legacy_id" to table: "real_property_transfer_code_types"
-CREATE UNIQUE INDEX "idx_rpt_code_types_legacy_id" ON "core"."real_property_transfer_code_types" ("legacy_id");
--- Create index "idx_rpt_code_types_name" to table: "real_property_transfer_code_types"
-CREATE UNIQUE INDEX "idx_rpt_code_types_name" ON "core"."real_property_transfer_code_types" ("name");
--- Create index "idx_rpt_code_types_public_id" to table: "real_property_transfer_code_types"
-CREATE UNIQUE INDEX "idx_rpt_code_types_public_id" ON "core"."real_property_transfer_code_types" ("public_id");
--- Create trigger "record_real_property_transfer_code_types_history"
-CREATE TRIGGER "record_real_property_transfer_code_types_history" BEFORE DELETE OR UPDATE ON "core"."real_property_transfer_code_types" FOR EACH ROW EXECUTE FUNCTION "core"."record_real_property_transfer_code_types_history"();
--- Set comment to schema: "public"
-COMMENT ON SCHEMA "public" IS 'default postgres schema (locked down)';
 -- Add new schema named "geo"
 CREATE SCHEMA "geo";
 -- Set comment to schema: "geo"
@@ -1207,6 +1137,43 @@ BEGIN
   RETURN NULL;
 END;
 $$;
+-- Create "record_real_property_transfer_code_types_history" function
+CREATE FUNCTION "core"."record_real_property_transfer_code_types_history" () RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER AS $$
+DECLARE
+  current_transaction_time timestamptz := now();
+BEGIN
+  IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
+    INSERT INTO real_property_transfer_code_types_history (
+      real_property_transfer_code_type_id,
+      public_id,
+      legacy_id,
+      name,
+      description,
+      system_valid_range,
+      trace_id
+    ) VALUES (
+      OLD.real_property_transfer_code_type_id,
+      OLD.public_id,
+      OLD.legacy_id,
+      OLD.name,
+      OLD.description,
+      tstzrange(OLD.system_updated_at, current_transaction_time, '[)'),
+      OLD.trace_id
+    );
+  END IF;
+          
+  -- Safely route the return pointer
+  IF (TG_OP = 'UPDATE') THEN
+      -- Ensures the record's system log is updated for the proper time
+      NEW.system_updated_at = current_transaction_time;
+      RETURN NEW;
+  ELSIF (TG_OP = 'DELETE') THEN
+      RETURN OLD;
+  END IF;
+        
+  RETURN NULL;
+END;
+$$;
 -- Create "record_real_property_transfer_codes_history" function
 CREATE FUNCTION "core"."record_real_property_transfer_codes_history" () RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER AS $$
 DECLARE
@@ -1517,28 +1484,6 @@ BEGIN
   RETURN NULL;
 END;
 $$;
--- Create "parcel_geometry_history" table
-CREATE TABLE "geo"."parcel_geometry_history" (
-  "parcel_geometry_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
-  "parcel_geometry_id" bigint NOT NULL,
-  "parcel_id" bigint NOT NULL,
-  "feature_id" bigint NOT NULL DEFAULT geo.generate_secure_mvt_id(),
-  "geom_web" extensions.geometry(MultiPolygon,4326) NOT NULL,
-  "geom_legal" extensions.geometry(MultiPolygon) NULL,
-  "local_srid" integer NULL,
-  "legal_valid_range" tstzrange NOT NULL,
-  "system_valid_range" tstzrange NOT NULL,
-  "trace_id" character varying(32) NOT NULL,
-  PRIMARY KEY ("parcel_geometry_history_id")
-);
--- Create index "idx_parcel_geometry_history_feature_id" to table: "parcel_geometry_history"
-CREATE INDEX "idx_parcel_geometry_history_feature_id" ON "geo"."parcel_geometry_history" ("parcel_id");
--- Create index "idx_parcel_geometry_history_parcel_geometry_id" to table: "parcel_geometry_history"
-CREATE INDEX "idx_parcel_geometry_history_parcel_geometry_id" ON "geo"."parcel_geometry_history" ("parcel_geometry_id");
--- Create index "idx_parcel_geometry_history_parcel_id" to table: "parcel_geometry_history"
-CREATE INDEX "idx_parcel_geometry_history_parcel_id" ON "geo"."parcel_geometry_history" ("parcel_id");
--- Create trigger "history_immutable"
-CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "geo"."parcel_geometry_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
 -- Create "addresses" table
 CREATE TABLE "core"."addresses" (
   "address_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
@@ -1650,28 +1595,6 @@ CREATE TABLE "core"."addresses_history" (
 CREATE INDEX "idx_addresses_history_address_id" ON "core"."addresses_history" ("address_id");
 -- Create trigger "history_immutable"
 CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."addresses_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
--- Create trigger "record_parcel_geometry_history"
-CREATE TRIGGER "record_parcel_geometry_history" BEFORE DELETE OR UPDATE ON "geo"."parcel_geometry" FOR EACH ROW EXECUTE FUNCTION "core"."record_parcel_geometry_history"();
--- Create "improvement_geometry_history" table
-CREATE TABLE "geo"."improvement_geometry_history" (
-  "improvement_geometry_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
-  "improvement_geometry_id" bigint NOT NULL,
-  "improvement_id" bigint NOT NULL,
-  "geom_web" extensions.geometry(MultiPolygonZ,4326) NOT NULL,
-  "geom_legal" extensions.geometry(MultiPolygonZ) NULL,
-  "local_horizontal_srid" integer NULL,
-  "local_vertical_datum" text NULL,
-  "legal_valid_range" tstzrange NOT NULL,
-  "system_valid_range" tstzrange NOT NULL,
-  "trace_id" character varying(32) NOT NULL,
-  PRIMARY KEY ("improvement_geometry_history_id")
-);
--- Create index "idx_improvement_geometry_history_improvement_geometry_id" to table: "improvement_geometry_history"
-CREATE INDEX "idx_improvement_geometry_history_improvement_geometry_id" ON "geo"."improvement_geometry_history" ("improvement_geometry_id");
--- Create index "idx_improvement_geometry_history_improvement_id" to table: "improvement_geometry_history"
-CREATE INDEX "idx_improvement_geometry_history_improvement_id" ON "geo"."improvement_geometry_history" ("improvement_id");
--- Create trigger "history_immutable"
-CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "geo"."improvement_geometry_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
 -- Create "improvement_conditions" table
 CREATE TABLE "core"."improvement_conditions" (
   "improvement_condition_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
@@ -1791,27 +1714,6 @@ CREATE INDEX "idx_improvement_attributes_history_improvement_attribute_id" ON "c
 CREATE INDEX "idx_improvement_attributes_history_improvement_id" ON "core"."improvement_attributes_history" ("improvement_id");
 -- Create trigger "history_immutable"
 CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."improvement_attributes_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
--- Create "improvement_geometry" table
-CREATE TABLE "geo"."improvement_geometry" (
-  "improvement_geometry_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
-  "improvement_id" bigint NOT NULL,
-  "geom_web" extensions.geometry(MultiPolygonZ,4326) NOT NULL,
-  "geom_legal" extensions.geometry(MultiPolygonZ) NULL,
-  "local_horizontal_srid" integer NULL,
-  "local_vertical_datum" text NULL,
-  "legal_valid_range" tstzrange NOT NULL,
-  "system_updated_at" timestamptz NOT NULL DEFAULT now(),
-  "trace_id" character varying(32) NOT NULL,
-  PRIMARY KEY ("improvement_geometry_id"),
-  CONSTRAINT "no_overlapping_improvement_geometry" EXCLUDE USING GIST ("improvement_id" WITH =, "legal_valid_range" WITH &&),
-  CONSTRAINT "fk_improvement_id" FOREIGN KEY ("improvement_id") REFERENCES "core"."improvements" ("improvement_id") ON UPDATE NO ACTION ON DELETE RESTRICT
-);
--- Create index "idx_geom_web_improvement_geometry" to table: "improvement_geometry"
-CREATE INDEX "idx_geom_web_improvement_geometry" ON "geo"."improvement_geometry" USING GIST ("geom_web");
--- Create index "idx_improvement_geometry_improvement_id" to table: "improvement_geometry"
-CREATE INDEX "idx_improvement_geometry_improvement_id" ON "geo"."improvement_geometry" ("improvement_id");
--- Create trigger "record_improvement_geometry_history"
-CREATE TRIGGER "record_improvement_geometry_history" BEFORE DELETE OR UPDATE ON "geo"."improvement_geometry" FOR EACH ROW EXECUTE FUNCTION "core"."record_improvement_geometry_history"();
 -- Create "improvement_condition_attributes" table
 CREATE TABLE "core"."improvement_condition_attributes" (
   "improvement_condition_attribute_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
@@ -1845,8 +1747,6 @@ CREATE INDEX "idx_impr_cond_attr_history_impr_cond_attr_id" ON "core"."improveme
 CREATE INDEX "idx_impr_cond_attr_history_impr_cond_id" ON "core"."improvement_condition_attributes_history" ("improvement_condition_id");
 -- Create trigger "history_immutable"
 CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."improvement_condition_attributes_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
--- Create trigger "history_immutable"
-CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."neighborhood_definitions_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
 -- Create trigger "record_improvement_conditions_history"
 CREATE TRIGGER "record_improvement_conditions_history" BEFORE DELETE OR UPDATE ON "core"."improvement_conditions" FOR EACH ROW EXECUTE FUNCTION "core"."record_improvement_conditions_history"();
 -- Create "improvement_conditions_history" table
@@ -1920,22 +1820,6 @@ CREATE INDEX "idx_improvement_parties_history_improvement_id" ON "core"."improve
 CREATE INDEX "idx_improvement_parties_history_improvement_party_id" ON "core"."improvement_parties_history" ("improvement_party_id");
 -- Create index "idx_improvement_parties_history_party_id" to table: "improvement_parties_history"
 CREATE INDEX "idx_improvement_parties_history_party_id" ON "core"."improvement_parties_history" ("party_id");
--- Create "zoning_history" table
-CREATE TABLE "core"."zoning_history" (
-  "zoning_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
-  "zoning_id" bigint NOT NULL,
-  "public_id" uuid NOT NULL,
-  "legacy_id" text NULL,
-  "is_voided" boolean NOT NULL,
-  "voided_at" timestamptz NULL,
-  "system_valid_range" tstzrange NOT NULL,
-  "trace_id" character varying(32) NOT NULL,
-  PRIMARY KEY ("zoning_history_id")
-);
--- Create index "idx_zoning_history_zoning_id" to table: "zoning_history"
-CREATE INDEX "idx_zoning_history_zoning_id" ON "core"."zoning_history" ("zoning_id");
--- Create trigger "history_immutable"
-CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."zoning_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
 -- Create trigger "record_improvement_qualities_history"
 CREATE TRIGGER "record_improvement_qualities_history" BEFORE DELETE OR UPDATE ON "core"."improvement_qualities" FOR EACH ROW EXECUTE FUNCTION "core"."record_improvement_qualities_history"();
 -- Create "improvement_qualities_history" table
@@ -1983,29 +1867,6 @@ CREATE TABLE "core"."improvement_quality_attributes_history" (
 CREATE INDEX "idx_impr_qual_attr_history_impr_qual_attr_id" ON "core"."improvement_quality_attributes_history" ("improvement_quality_attribute_id");
 -- Create index "idx_impr_qual_attr_history_impr_qual_id" to table: "improvement_quality_attributes_history"
 CREATE INDEX "idx_impr_qual_attr_history_impr_qual_id" ON "core"."improvement_quality_attributes_history" ("improvement_quality_id");
--- Create "zoning_attributes_history" table
-CREATE TABLE "core"."zoning_attributes_history" (
-  "zoning_attribute_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
-  "zoning_attribute_id" bigint NOT NULL,
-  "zoning_id" bigint NOT NULL,
-  "name" text NOT NULL,
-  "code" text NOT NULL,
-  "max_far" numeric(6,2) NULL,
-  "min_lot_size_sq_m" numeric(6,2) NULL,
-  "max_height_m" numeric(6,2) NULL,
-  "max_dwelling_units_per_hectare" numeric(6,2) NULL,
-  "max_lot_coverage_pct" numeric(5,4) NULL,
-  "legal_valid_range" tstzrange NOT NULL,
-  "system_valid_range" tstzrange NOT NULL,
-  "trace_id" character varying(32) NOT NULL,
-  PRIMARY KEY ("zoning_attribute_history_id")
-);
--- Create index "idx_zoning_attributes_history_zoning_attribute_id" to table: "zoning_attributes_history"
-CREATE INDEX "idx_zoning_attributes_history_zoning_attribute_id" ON "core"."zoning_attributes_history" ("zoning_attribute_id");
--- Create index "idx_zoning_attributes_history_zoning_id" to table: "zoning_attributes_history"
-CREATE INDEX "idx_zoning_attributes_history_zoning_id" ON "core"."zoning_attributes_history" ("zoning_id");
--- Create trigger "history_immutable"
-CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."zoning_attributes_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
 -- Create "valuations" table
 CREATE TABLE "core"."valuations" (
   "valuation_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
@@ -2064,45 +1925,6 @@ CREATE INDEX "idx_improvement_valuations_history_improvement_valuation_id" ON "c
 CREATE INDEX "idx_improvement_valuations_history_valuation_id" ON "core"."improvement_valuations_history" ("valuation_id");
 -- Create trigger "history_immutable"
 CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."improvement_valuations_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
--- Create "zoning" table
-CREATE TABLE "core"."zoning" (
-  "zoning_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
-  "public_id" uuid NOT NULL DEFAULT gen_random_uuid(),
-  "legacy_id" text NULL,
-  "is_voided" boolean NOT NULL DEFAULT false,
-  "voided_at" timestamptz NULL,
-  "system_updated_at" timestamptz NOT NULL DEFAULT now(),
-  "trace_id" character varying(32) NOT NULL,
-  PRIMARY KEY ("zoning_id"),
-  CONSTRAINT "chk_voided_logic" CHECK (((is_voided = false) AND (voided_at IS NULL)) OR ((is_voided = true) AND (voided_at IS NOT NULL)))
-);
--- Create index "idx_zoning_legacy_id" to table: "zoning"
-CREATE UNIQUE INDEX "idx_zoning_legacy_id" ON "core"."zoning" ("legacy_id");
--- Create index "idx_zoning_public_id" to table: "zoning"
-CREATE UNIQUE INDEX "idx_zoning_public_id" ON "core"."zoning" ("public_id");
--- Create "zoning_attributes" table
-CREATE TABLE "core"."zoning_attributes" (
-  "zoning_attribute_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
-  "zoning_id" bigint NOT NULL,
-  "name" text NOT NULL,
-  "code" text NOT NULL,
-  "max_far" numeric(6,2) NULL,
-  "min_lot_size_sq_m" numeric(6,2) NULL,
-  "max_height_m" numeric(6,2) NULL,
-  "max_dwelling_units_per_hectare" numeric(6,2) NULL,
-  "max_lot_coverage_pct" numeric(5,4) NULL,
-  "legal_valid_range" tstzrange NOT NULL,
-  "system_updated_at" timestamptz NOT NULL DEFAULT now(),
-  "trace_id" character varying(32) NOT NULL,
-  PRIMARY KEY ("zoning_attribute_id"),
-  CONSTRAINT "no_overlapping_zoning_attributes" EXCLUDE USING GIST ("zoning_id" WITH =, "legal_valid_range" WITH &&),
-  CONSTRAINT "fk_zoning_id" FOREIGN KEY ("zoning_id") REFERENCES "core"."zoning" ("zoning_id") ON UPDATE NO ACTION ON DELETE RESTRICT,
-  CONSTRAINT "valid_max_lot_coverage" CHECK ((max_lot_coverage_pct > (0)::numeric) AND (max_lot_coverage_pct <= 1.0000))
-);
--- Create index "idx_zoning_attributes_zoning_id" to table: "zoning_attributes"
-CREATE INDEX "idx_zoning_attributes_zoning_id" ON "core"."zoning_attributes" ("zoning_id");
--- Create trigger "record_zoning_attributes_history"
-CREATE TRIGGER "record_zoning_attributes_history" BEFORE DELETE OR UPDATE ON "core"."zoning_attributes" FOR EACH ROW EXECUTE FUNCTION "core"."record_zoning_attributes_history"();
 -- Create trigger "record_improvements_history"
 CREATE TRIGGER "record_improvements_history" BEFORE DELETE OR UPDATE ON "core"."improvements" FOR EACH ROW EXECUTE FUNCTION "core"."record_improvements_history"();
 -- Create "improvements_history" table
@@ -2121,23 +1943,6 @@ CREATE TABLE "core"."improvements_history" (
 CREATE INDEX "idx_improvements_history_improvement_id" ON "core"."improvements_history" ("improvement_id");
 -- Create trigger "history_immutable"
 CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."improvements_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
--- Create trigger "record_zoning_history"
-CREATE TRIGGER "record_zoning_history" BEFORE DELETE OR UPDATE ON "core"."zoning" FOR EACH ROW EXECUTE FUNCTION "core"."record_zoning_history"();
--- Create "valuations_history" table
-CREATE TABLE "core"."valuations_history" (
-  "valuation_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
-  "valuation_id" bigint NOT NULL,
-  "public_id" uuid NOT NULL,
-  "legacy_id" text NULL,
-  "valuation_date" timestamptz NOT NULL,
-  "system_valid_range" tstzrange NOT NULL,
-  "trace_id" character varying(32) NOT NULL,
-  PRIMARY KEY ("valuation_history_id")
-);
--- Create index "idx_valuations_history_valuation_id" to table: "valuations_history"
-CREATE INDEX "idx_valuations_history_valuation_id" ON "core"."valuations_history" ("valuation_id");
--- Create trigger "history_immutable"
-CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."valuations_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
 -- Create "neighborhood_definitions" table
 CREATE TABLE "core"."neighborhood_definitions" (
   "neighborhood_definition_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
@@ -2159,17 +1964,22 @@ CREATE UNIQUE INDEX "idx_neighborhood_definitions_name" ON "core"."neighborhood_
 CREATE UNIQUE INDEX "idx_neighborhood_definitions_public_id" ON "core"."neighborhood_definitions" ("public_id");
 -- Create trigger "record_neighborhood_definitions_history"
 CREATE TRIGGER "record_neighborhood_definitions_history" BEFORE DELETE OR UPDATE ON "core"."neighborhood_definitions" FOR EACH ROW EXECUTE FUNCTION "core"."record_neighborhood_definitions_history"();
--- Create trigger "record_valuations_history"
-CREATE TRIGGER "record_valuations_history" BEFORE DELETE OR UPDATE ON "core"."valuations" FOR EACH ROW EXECUTE FUNCTION "core"."record_valuations_history"();
--- Create "system_settings_history" table
-CREATE TABLE "core"."system_settings_history" (
-  "system_setting_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
-  "system_setting_id" integer NOT NULL,
-  "base_currency" character(3) NOT NULL,
+-- Create "neighborhood_definitions_history" table
+CREATE TABLE "core"."neighborhood_definitions_history" (
+  "neighborhood_definition_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+  "neighborhood_definition_id" bigint NOT NULL,
+  "public_id" uuid NOT NULL,
+  "legacy_id" text NULL,
+  "name" text NOT NULL,
+  "is_legal" boolean NOT NULL,
   "system_valid_range" tstzrange NOT NULL,
   "trace_id" character varying(32) NOT NULL,
-  PRIMARY KEY ("system_setting_history_id")
+  PRIMARY KEY ("neighborhood_definition_history_id")
 );
+-- Create index "idx_neighborhood_definitions_history_neighborhood_definition_id" to table: "neighborhood_definitions_history"
+CREATE INDEX "idx_neighborhood_definitions_history_neighborhood_definition_id" ON "core"."neighborhood_definitions_history" ("neighborhood_definition_id");
+-- Create trigger "history_immutable"
+CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."neighborhood_definitions_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
 -- Create "neighborhoods" table
 CREATE TABLE "core"."neighborhoods" (
   "neighborhood_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
@@ -2203,17 +2013,6 @@ CREATE TABLE "core"."neighborhoods_history" (
 CREATE INDEX "idx_neighborhoods_history_neighborhood_id" ON "core"."neighborhoods_history" ("neighborhood_id");
 -- Create trigger "history_immutable"
 CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."neighborhoods_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
--- Create "system_settings" table
-CREATE TABLE "core"."system_settings" (
-  "system_setting_id" integer NOT NULL DEFAULT 1,
-  "base_currency" character(3) NOT NULL DEFAULT 'USD',
-  "system_updated_at" timestamptz NOT NULL DEFAULT now(),
-  "trace_id" character varying(32) NOT NULL,
-  PRIMARY KEY ("system_setting_id"),
-  CONSTRAINT "enforce_single_row" CHECK (system_setting_id = 1)
-);
--- Create trigger "record_system_settings_history"
-CREATE TRIGGER "record_system_settings_history" BEFORE DELETE OR UPDATE ON "core"."system_settings" FOR EACH ROW EXECUTE FUNCTION "core"."record_system_settings_history"();
 -- Create "affordance_types" table
 CREATE TABLE "core"."affordance_types" (
   "affordance_type_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
@@ -2225,6 +2024,22 @@ CREATE TABLE "core"."affordance_types" (
 );
 -- Create index "idx_affordance_types_public_id" to table: "affordance_types"
 CREATE UNIQUE INDEX "idx_affordance_types_public_id" ON "core"."affordance_types" ("public_id");
+-- Create "zoning" table
+CREATE TABLE "core"."zoning" (
+  "zoning_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+  "public_id" uuid NOT NULL DEFAULT gen_random_uuid(),
+  "legacy_id" text NULL,
+  "is_voided" boolean NOT NULL DEFAULT false,
+  "voided_at" timestamptz NULL,
+  "system_updated_at" timestamptz NOT NULL DEFAULT now(),
+  "trace_id" character varying(32) NOT NULL,
+  PRIMARY KEY ("zoning_id"),
+  CONSTRAINT "chk_voided_logic" CHECK (((is_voided = false) AND (voided_at IS NULL)) OR ((is_voided = true) AND (voided_at IS NOT NULL)))
+);
+-- Create index "idx_zoning_legacy_id" to table: "zoning"
+CREATE UNIQUE INDEX "idx_zoning_legacy_id" ON "core"."zoning" ("legacy_id");
+-- Create index "idx_zoning_public_id" to table: "zoning"
+CREATE UNIQUE INDEX "idx_zoning_public_id" ON "core"."zoning" ("public_id");
 -- Create "parcel_affordances" table
 CREATE TABLE "core"."parcel_affordances" (
   "parcel_affordance_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
@@ -2370,25 +2185,6 @@ CREATE INDEX "idx_parcel_attributes_history_parcel_attribute_id" ON "core"."parc
 CREATE INDEX "idx_parcel_attributes_history_parcel_id" ON "core"."parcel_attributes_history" ("parcel_id");
 -- Create trigger "history_immutable"
 CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."parcel_attributes_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
--- Create "real_property_transfers_history" table
-CREATE TABLE "core"."real_property_transfers_history" (
-  "real_property_transfer_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
-  "real_property_transfer_id" bigint NOT NULL,
-  "public_id" uuid NOT NULL,
-  "legacy_id" text NULL,
-  "transfer_timestamp" timestamptz NOT NULL,
-  "transfer_amount" numeric(19,4) NULL,
-  "deed_book" text NULL,
-  "deed_page" text NULL,
-  "deed_uri" text NULL,
-  "system_valid_range" tstzrange NOT NULL,
-  "trace_id" character varying(32) NOT NULL,
-  PRIMARY KEY ("real_property_transfer_history_id")
-);
--- Create index "idx_real_property_transfers_history_real_property_transfer_id" to table: "real_property_transfers_history"
-CREATE INDEX "idx_real_property_transfers_history_real_property_transfer_id" ON "core"."real_property_transfers_history" ("real_property_transfer_id");
--- Create trigger "history_immutable"
-CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."real_property_transfers_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
 -- Create trigger "record_parcel_improvements_history"
 CREATE TRIGGER "record_parcel_improvements_history" BEFORE DELETE OR UPDATE ON "core"."parcel_improvements" FOR EACH ROW EXECUTE FUNCTION "core"."record_parcel_improvements_history"();
 -- Create "parcel_improvements_history" table
@@ -2461,26 +2257,6 @@ CREATE INDEX "idx_parcel_neighborhood_definitions_history_parcel_id" ON "core"."
 CREATE INDEX "idx_parcel_neighborhood_definitions_history_parcel_neighborhood" ON "core"."parcel_neighborhood_definitions_history" ("parcel_neighborhood_definition_id");
 -- Create trigger "history_immutable"
 CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."parcel_neighborhood_definitions_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
--- Create "real_property_transfers" table
-CREATE TABLE "core"."real_property_transfers" (
-  "real_property_transfer_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
-  "public_id" uuid NOT NULL DEFAULT gen_random_uuid(),
-  "legacy_id" text NULL,
-  "transfer_timestamp" timestamptz NOT NULL,
-  "transfer_amount" numeric(19,4) NULL,
-  "deed_book" text NULL,
-  "deed_page" text NULL,
-  "deed_uri" text NULL,
-  "system_updated_at" timestamptz NOT NULL DEFAULT now(),
-  "trace_id" character varying(32) NOT NULL,
-  PRIMARY KEY ("real_property_transfer_id")
-);
--- Create index "idx_real_property_transfers_legacy_id" to table: "real_property_transfers"
-CREATE UNIQUE INDEX "idx_real_property_transfers_legacy_id" ON "core"."real_property_transfers" ("legacy_id");
--- Create index "idx_real_property_transfers_public_id" to table: "real_property_transfers"
-CREATE UNIQUE INDEX "idx_real_property_transfers_public_id" ON "core"."real_property_transfers" ("public_id");
--- Create trigger "record_real_property_transfers_history"
-CREATE TRIGGER "record_real_property_transfers_history" BEFORE DELETE OR UPDATE ON "core"."real_property_transfers" FOR EACH ROW EXECUTE FUNCTION "core"."record_real_property_transfers_history"();
 -- Create "parcel_parties" table
 CREATE TABLE "core"."parcel_parties" (
   "parcel_party_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
@@ -2520,29 +2296,6 @@ CREATE INDEX "idx_parcel_parties_history_parcel_id" ON "core"."parcel_parties_hi
 CREATE INDEX "idx_parcel_parties_history_parcel_party_id" ON "core"."parcel_parties_history" ("parcel_party_id");
 -- Create index "idx_parcel_parties_history_party_id" to table: "parcel_parties_history"
 CREATE INDEX "idx_parcel_parties_history_party_id" ON "core"."parcel_parties_history" ("party_id");
--- Create "real_property_transfer_party_parcels_history" table
-CREATE TABLE "core"."real_property_transfer_party_parcels_history" (
-  "real_property_transfer_party_parcel_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
-  "real_property_transfer_party_parcel_id" bigint NOT NULL,
-  "parcel_id" bigint NOT NULL,
-  "real_property_transfer_id" bigint NOT NULL,
-  "party_id" bigint NOT NULL,
-  "is_grantor" boolean NOT NULL,
-  "transferred_share" numeric(5,4) NOT NULL,
-  "system_valid_range" tstzrange NOT NULL,
-  "trace_id" character varying(32) NOT NULL,
-  PRIMARY KEY ("real_property_transfer_party_parcel_history_id")
-);
--- Create index "idx_rpt_party_parcels_hist_id" to table: "real_property_transfer_party_parcels_history"
-CREATE INDEX "idx_rpt_party_parcels_hist_id" ON "core"."real_property_transfer_party_parcels_history" ("real_property_transfer_party_parcel_id");
--- Create index "idx_rpt_party_parcels_hist_parcel_id" to table: "real_property_transfer_party_parcels_history"
-CREATE INDEX "idx_rpt_party_parcels_hist_parcel_id" ON "core"."real_property_transfer_party_parcels_history" ("parcel_id");
--- Create index "idx_rpt_party_parcels_hist_party_id" to table: "real_property_transfer_party_parcels_history"
-CREATE INDEX "idx_rpt_party_parcels_hist_party_id" ON "core"."real_property_transfer_party_parcels_history" ("party_id");
--- Create index "idx_rpt_party_parcels_hist_transfer_id" to table: "real_property_transfer_party_parcels_history"
-CREATE INDEX "idx_rpt_party_parcels_hist_transfer_id" ON "core"."real_property_transfer_party_parcels_history" ("real_property_transfer_id");
--- Create trigger "history_immutable"
-CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."real_property_transfer_party_parcels_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
 -- Create "parcel_valuations" table
 CREATE TABLE "core"."parcel_valuations" (
   "parcel_valuation_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
@@ -2605,32 +2358,6 @@ CREATE TABLE "core"."parcels_history" (
 CREATE INDEX "idx_parcels_history_parcel_id" ON "core"."parcels_history" ("parcel_id");
 -- Create trigger "history_immutable"
 CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."parcels_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
--- Create "real_property_transfer_party_parcels" table
-CREATE TABLE "core"."real_property_transfer_party_parcels" (
-  "real_property_transfer_party_parcel_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
-  "parcel_id" bigint NOT NULL,
-  "real_property_transfer_id" bigint NOT NULL,
-  "party_id" bigint NOT NULL,
-  "is_grantor" boolean NOT NULL,
-  "transferred_share" numeric(5,4) NOT NULL,
-  "system_updated_at" timestamptz NOT NULL DEFAULT now(),
-  "trace_id" character varying(32) NOT NULL,
-  PRIMARY KEY ("real_property_transfer_party_parcel_id"),
-  CONSTRAINT "fk_parcel_id" FOREIGN KEY ("parcel_id") REFERENCES "core"."parcels" ("parcel_id") ON UPDATE NO ACTION ON DELETE RESTRICT,
-  CONSTRAINT "fk_party_id" FOREIGN KEY ("party_id") REFERENCES "core"."parties" ("party_id") ON UPDATE NO ACTION ON DELETE RESTRICT,
-  CONSTRAINT "fk_real_property_transfer_id" FOREIGN KEY ("real_property_transfer_id") REFERENCES "core"."real_property_transfers" ("real_property_transfer_id") ON UPDATE NO ACTION ON DELETE RESTRICT,
-  CONSTRAINT "valid_share_transfer" CHECK ((transferred_share > (0)::numeric) AND (transferred_share <= 1.0000))
-);
--- Create index "idx_rpt_party_parcels_parcel_id" to table: "real_property_transfer_party_parcels"
-CREATE INDEX "idx_rpt_party_parcels_parcel_id" ON "core"."real_property_transfer_party_parcels" ("parcel_id");
--- Create index "idx_rpt_party_parcels_party_id" to table: "real_property_transfer_party_parcels"
-CREATE INDEX "idx_rpt_party_parcels_party_id" ON "core"."real_property_transfer_party_parcels" ("party_id");
--- Create index "idx_rpt_party_parcels_rpt_id" to table: "real_property_transfer_party_parcels"
-CREATE INDEX "idx_rpt_party_parcels_rpt_id" ON "core"."real_property_transfer_party_parcels" ("real_property_transfer_id");
--- Create index "idx_rpt_party_parcels_unique_party" to table: "real_property_transfer_party_parcels"
-CREATE UNIQUE INDEX "idx_rpt_party_parcels_unique_party" ON "core"."real_property_transfer_party_parcels" ("parcel_id", "real_property_transfer_id", "party_id");
--- Create trigger "record_real_property_transfer_party_parcels_history"
-CREATE TRIGGER "record_real_property_transfer_party_parcels_history" BEFORE DELETE OR UPDATE ON "core"."real_property_transfer_party_parcels" FOR EACH ROW EXECUTE FUNCTION "core"."record_real_property_transfer_party_parcels_history"();
 -- Create trigger "record_parties_history"
 CREATE TRIGGER "record_parties_history" BEFORE DELETE OR UPDATE ON "core"."parties" FOR EACH ROW EXECUTE FUNCTION "core"."record_parties_history"();
 -- Create "parties_history" table
@@ -2649,29 +2376,6 @@ CREATE TABLE "core"."parties_history" (
 CREATE INDEX "idx_parties_history_party_id" ON "core"."parties_history" ("party_id");
 -- Create trigger "history_immutable"
 CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."parties_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
--- Create "real_property_transfer_party_improvements_history" table
-CREATE TABLE "core"."real_property_transfer_party_improvements_history" (
-  "real_property_transfer_party_improvement_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
-  "real_property_transfer_party_improvement_id" bigint NOT NULL,
-  "improvement_id" bigint NOT NULL,
-  "real_property_transfer_id" bigint NOT NULL,
-  "party_id" bigint NOT NULL,
-  "is_grantor" boolean NOT NULL,
-  "transferred_share" numeric(5,4) NOT NULL,
-  "system_valid_range" tstzrange NOT NULL,
-  "trace_id" character varying(32) NOT NULL,
-  PRIMARY KEY ("real_property_transfer_party_improvement_history_id")
-);
--- Create index "idx_rpt_party_improvements_hist_id" to table: "real_property_transfer_party_improvements_history"
-CREATE INDEX "idx_rpt_party_improvements_hist_id" ON "core"."real_property_transfer_party_improvements_history" ("real_property_transfer_party_improvement_id");
--- Create index "idx_rpt_party_improvements_hist_improvement_id" to table: "real_property_transfer_party_improvements_history"
-CREATE INDEX "idx_rpt_party_improvements_hist_improvement_id" ON "core"."real_property_transfer_party_improvements_history" ("improvement_id");
--- Create index "idx_rpt_party_improvements_hist_party_id" to table: "real_property_transfer_party_improvements_history"
-CREATE INDEX "idx_rpt_party_improvements_hist_party_id" ON "core"."real_property_transfer_party_improvements_history" ("party_id");
--- Create index "idx_rpt_party_improvements_hist_transfer_id" to table: "real_property_transfer_party_improvements_history"
-CREATE INDEX "idx_rpt_party_improvements_hist_transfer_id" ON "core"."real_property_transfer_party_improvements_history" ("real_property_transfer_id");
--- Create trigger "history_immutable"
-CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."real_property_transfer_party_improvements_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
 -- Create "party_attributes" table
 CREATE TABLE "core"."party_attributes" (
   "party_attribute_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
@@ -2710,6 +2414,23 @@ CREATE INDEX "idx_party_attributes_history_party_attribute_id" ON "core"."party_
 CREATE INDEX "idx_party_attributes_history_party_id" ON "core"."party_attributes_history" ("party_id");
 -- Create trigger "history_immutable"
 CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."party_attributes_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
+-- Create "real_property_transfer_code_types" table
+CREATE TABLE "core"."real_property_transfer_code_types" (
+  "real_property_transfer_code_type_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+  "public_id" uuid NOT NULL DEFAULT gen_random_uuid(),
+  "legacy_id" text NULL,
+  "name" text NOT NULL,
+  "description" text NULL,
+  "system_updated_at" timestamptz NOT NULL DEFAULT now(),
+  "trace_id" character varying(32) NOT NULL,
+  PRIMARY KEY ("real_property_transfer_code_type_id")
+);
+-- Create index "idx_rpt_code_types_legacy_id" to table: "real_property_transfer_code_types"
+CREATE UNIQUE INDEX "idx_rpt_code_types_legacy_id" ON "core"."real_property_transfer_code_types" ("legacy_id");
+-- Create index "idx_rpt_code_types_name" to table: "real_property_transfer_code_types"
+CREATE UNIQUE INDEX "idx_rpt_code_types_name" ON "core"."real_property_transfer_code_types" ("name");
+-- Create index "idx_rpt_code_types_public_id" to table: "real_property_transfer_code_types"
+CREATE UNIQUE INDEX "idx_rpt_code_types_public_id" ON "core"."real_property_transfer_code_types" ("public_id");
 -- Create "real_property_transfer_codes" table
 CREATE TABLE "core"."real_property_transfer_codes" (
   "real_property_transfer_code_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
@@ -2729,6 +2450,24 @@ CREATE UNIQUE INDEX "idx_rpt_codes_legacy_id" ON "core"."real_property_transfer_
 CREATE UNIQUE INDEX "idx_rpt_codes_public_id" ON "core"."real_property_transfer_codes" ("public_id");
 -- Create index "idx_rpt_codes_unique_name" to table: "real_property_transfer_codes"
 CREATE UNIQUE INDEX "idx_rpt_codes_unique_name" ON "core"."real_property_transfer_codes" ("real_property_transfer_code_type_id", "name");
+-- Create "real_property_transfers" table
+CREATE TABLE "core"."real_property_transfers" (
+  "real_property_transfer_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+  "public_id" uuid NOT NULL DEFAULT gen_random_uuid(),
+  "legacy_id" text NULL,
+  "transfer_timestamp" timestamptz NOT NULL,
+  "transfer_amount" numeric(19,4) NULL,
+  "deed_book" text NULL,
+  "deed_page" text NULL,
+  "deed_uri" text NULL,
+  "system_updated_at" timestamptz NOT NULL DEFAULT now(),
+  "trace_id" character varying(32) NOT NULL,
+  PRIMARY KEY ("real_property_transfer_id")
+);
+-- Create index "idx_real_property_transfers_legacy_id" to table: "real_property_transfers"
+CREATE UNIQUE INDEX "idx_real_property_transfers_legacy_id" ON "core"."real_property_transfers" ("legacy_id");
+-- Create index "idx_real_property_transfers_public_id" to table: "real_property_transfers"
+CREATE UNIQUE INDEX "idx_real_property_transfers_public_id" ON "core"."real_property_transfers" ("public_id");
 -- Create "real_property_transfer_code_assignments" table
 CREATE TABLE "core"."real_property_transfer_code_assignments" (
   "real_property_transfer_code_assignment_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
@@ -2762,6 +2501,43 @@ CREATE INDEX "idx_rpt_code_assignments_hist_rpt_code_id" ON "core"."real_propert
 CREATE INDEX "idx_rpt_code_assignments_hist_rpt_id" ON "core"."real_property_transfer_code_assignments_history" ("real_property_transfer_id");
 -- Create trigger "history_immutable"
 CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."real_property_transfer_code_assignments_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
+-- Create trigger "record_real_property_transfer_code_types_history"
+CREATE TRIGGER "record_real_property_transfer_code_types_history" BEFORE DELETE OR UPDATE ON "core"."real_property_transfer_code_types" FOR EACH ROW EXECUTE FUNCTION "core"."record_real_property_transfer_code_types_history"();
+-- Create "real_property_transfer_code_types_history" table
+CREATE TABLE "core"."real_property_transfer_code_types_history" (
+  "real_property_transfer_code_type_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+  "real_property_transfer_code_type_id" bigint NOT NULL,
+  "public_id" uuid NOT NULL,
+  "legacy_id" text NULL,
+  "name" text NOT NULL,
+  "description" text NULL,
+  "system_valid_range" tstzrange NOT NULL,
+  "trace_id" character varying(32) NOT NULL,
+  PRIMARY KEY ("real_property_transfer_code_type_history_id")
+);
+-- Create index "idx_rpt_code_types_history_id" to table: "real_property_transfer_code_types_history"
+CREATE INDEX "idx_rpt_code_types_history_id" ON "core"."real_property_transfer_code_types_history" ("real_property_transfer_code_type_id");
+-- Create trigger "history_immutable"
+CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."real_property_transfer_code_types_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
+-- Create trigger "record_real_property_transfer_codes_history"
+CREATE TRIGGER "record_real_property_transfer_codes_history" BEFORE DELETE OR UPDATE ON "core"."real_property_transfer_codes" FOR EACH ROW EXECUTE FUNCTION "core"."record_real_property_transfer_codes_history"();
+-- Create "real_property_transfer_codes_history" table
+CREATE TABLE "core"."real_property_transfer_codes_history" (
+  "real_property_transfer_code_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+  "real_property_transfer_code_id" bigint NOT NULL,
+  "public_id" uuid NOT NULL,
+  "legacy_id" text NULL,
+  "real_property_transfer_code_type_id" bigint NULL,
+  "name" text NOT NULL,
+  "description" text NULL,
+  "system_valid_range" tstzrange NOT NULL,
+  "trace_id" character varying(32) NOT NULL,
+  PRIMARY KEY ("real_property_transfer_code_history_id")
+);
+-- Create index "idx_rpt_transfer_codes_history_id" to table: "real_property_transfer_codes_history"
+CREATE INDEX "idx_rpt_transfer_codes_history_id" ON "core"."real_property_transfer_codes_history" ("real_property_transfer_code_id");
+-- Create trigger "history_immutable"
+CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."real_property_transfer_codes_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
 -- Create "real_property_transfer_party_improvements" table
 CREATE TABLE "core"."real_property_transfer_party_improvements" (
   "real_property_transfer_party_improvement_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
@@ -2788,38 +2564,262 @@ CREATE INDEX "idx_rpt_party_improvements_rpt_id" ON "core"."real_property_transf
 CREATE UNIQUE INDEX "idx_rpt_party_improvements_unique_party" ON "core"."real_property_transfer_party_improvements" ("improvement_id", "real_property_transfer_id", "party_id");
 -- Create trigger "record_real_property_transfer_party_improvements_history"
 CREATE TRIGGER "record_real_property_transfer_party_improvements_history" BEFORE DELETE OR UPDATE ON "core"."real_property_transfer_party_improvements" FOR EACH ROW EXECUTE FUNCTION "core"."record_real_property_transfer_party_improvements_history"();
--- Create "real_property_transfer_code_types_history" table
-CREATE TABLE "core"."real_property_transfer_code_types_history" (
-  "real_property_transfer_code_type_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
-  "real_property_transfer_code_type_id" bigint NOT NULL,
-  "public_id" uuid NOT NULL,
-  "legacy_id" text NULL,
-  "name" text NOT NULL,
-  "description" text NULL,
+-- Create "real_property_transfer_party_improvements_history" table
+CREATE TABLE "core"."real_property_transfer_party_improvements_history" (
+  "real_property_transfer_party_improvement_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+  "real_property_transfer_party_improvement_id" bigint NOT NULL,
+  "improvement_id" bigint NOT NULL,
+  "real_property_transfer_id" bigint NOT NULL,
+  "party_id" bigint NOT NULL,
+  "is_grantor" boolean NOT NULL,
+  "transferred_share" numeric(5,4) NOT NULL,
   "system_valid_range" tstzrange NOT NULL,
   "trace_id" character varying(32) NOT NULL,
-  PRIMARY KEY ("real_property_transfer_code_type_history_id")
+  PRIMARY KEY ("real_property_transfer_party_improvement_history_id")
 );
--- Create index "idx_rpt_code_types_history_id" to table: "real_property_transfer_code_types_history"
-CREATE INDEX "idx_rpt_code_types_history_id" ON "core"."real_property_transfer_code_types_history" ("real_property_transfer_code_type_id");
+-- Create index "idx_rpt_party_improvements_hist_id" to table: "real_property_transfer_party_improvements_history"
+CREATE INDEX "idx_rpt_party_improvements_hist_id" ON "core"."real_property_transfer_party_improvements_history" ("real_property_transfer_party_improvement_id");
+-- Create index "idx_rpt_party_improvements_hist_improvement_id" to table: "real_property_transfer_party_improvements_history"
+CREATE INDEX "idx_rpt_party_improvements_hist_improvement_id" ON "core"."real_property_transfer_party_improvements_history" ("improvement_id");
+-- Create index "idx_rpt_party_improvements_hist_party_id" to table: "real_property_transfer_party_improvements_history"
+CREATE INDEX "idx_rpt_party_improvements_hist_party_id" ON "core"."real_property_transfer_party_improvements_history" ("party_id");
+-- Create index "idx_rpt_party_improvements_hist_transfer_id" to table: "real_property_transfer_party_improvements_history"
+CREATE INDEX "idx_rpt_party_improvements_hist_transfer_id" ON "core"."real_property_transfer_party_improvements_history" ("real_property_transfer_id");
 -- Create trigger "history_immutable"
-CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."real_property_transfer_code_types_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
--- Create "real_property_transfer_codes_history" table
-CREATE TABLE "core"."real_property_transfer_codes_history" (
-  "real_property_transfer_code_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
-  "real_property_transfer_code_id" bigint NOT NULL,
-  "public_id" uuid NOT NULL,
-  "legacy_id" text NULL,
-  "real_property_transfer_code_type_id" bigint NULL,
-  "name" text NOT NULL,
-  "description" text NULL,
+CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."real_property_transfer_party_improvements_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
+-- Create "real_property_transfer_party_parcels" table
+CREATE TABLE "core"."real_property_transfer_party_parcels" (
+  "real_property_transfer_party_parcel_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+  "parcel_id" bigint NOT NULL,
+  "real_property_transfer_id" bigint NOT NULL,
+  "party_id" bigint NOT NULL,
+  "is_grantor" boolean NOT NULL,
+  "transferred_share" numeric(5,4) NOT NULL,
+  "system_updated_at" timestamptz NOT NULL DEFAULT now(),
+  "trace_id" character varying(32) NOT NULL,
+  PRIMARY KEY ("real_property_transfer_party_parcel_id"),
+  CONSTRAINT "fk_parcel_id" FOREIGN KEY ("parcel_id") REFERENCES "core"."parcels" ("parcel_id") ON UPDATE NO ACTION ON DELETE RESTRICT,
+  CONSTRAINT "fk_party_id" FOREIGN KEY ("party_id") REFERENCES "core"."parties" ("party_id") ON UPDATE NO ACTION ON DELETE RESTRICT,
+  CONSTRAINT "fk_real_property_transfer_id" FOREIGN KEY ("real_property_transfer_id") REFERENCES "core"."real_property_transfers" ("real_property_transfer_id") ON UPDATE NO ACTION ON DELETE RESTRICT,
+  CONSTRAINT "valid_share_transfer" CHECK ((transferred_share > (0)::numeric) AND (transferred_share <= 1.0000))
+);
+-- Create index "idx_rpt_party_parcels_parcel_id" to table: "real_property_transfer_party_parcels"
+CREATE INDEX "idx_rpt_party_parcels_parcel_id" ON "core"."real_property_transfer_party_parcels" ("parcel_id");
+-- Create index "idx_rpt_party_parcels_party_id" to table: "real_property_transfer_party_parcels"
+CREATE INDEX "idx_rpt_party_parcels_party_id" ON "core"."real_property_transfer_party_parcels" ("party_id");
+-- Create index "idx_rpt_party_parcels_rpt_id" to table: "real_property_transfer_party_parcels"
+CREATE INDEX "idx_rpt_party_parcels_rpt_id" ON "core"."real_property_transfer_party_parcels" ("real_property_transfer_id");
+-- Create index "idx_rpt_party_parcels_unique_party" to table: "real_property_transfer_party_parcels"
+CREATE UNIQUE INDEX "idx_rpt_party_parcels_unique_party" ON "core"."real_property_transfer_party_parcels" ("parcel_id", "real_property_transfer_id", "party_id");
+-- Create trigger "record_real_property_transfer_party_parcels_history"
+CREATE TRIGGER "record_real_property_transfer_party_parcels_history" BEFORE DELETE OR UPDATE ON "core"."real_property_transfer_party_parcels" FOR EACH ROW EXECUTE FUNCTION "core"."record_real_property_transfer_party_parcels_history"();
+-- Create "real_property_transfer_party_parcels_history" table
+CREATE TABLE "core"."real_property_transfer_party_parcels_history" (
+  "real_property_transfer_party_parcel_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+  "real_property_transfer_party_parcel_id" bigint NOT NULL,
+  "parcel_id" bigint NOT NULL,
+  "real_property_transfer_id" bigint NOT NULL,
+  "party_id" bigint NOT NULL,
+  "is_grantor" boolean NOT NULL,
+  "transferred_share" numeric(5,4) NOT NULL,
   "system_valid_range" tstzrange NOT NULL,
   "trace_id" character varying(32) NOT NULL,
-  PRIMARY KEY ("real_property_transfer_code_history_id")
+  PRIMARY KEY ("real_property_transfer_party_parcel_history_id")
 );
--- Create index "idx_rpt_transfer_codes_history_id" to table: "real_property_transfer_codes_history"
-CREATE INDEX "idx_rpt_transfer_codes_history_id" ON "core"."real_property_transfer_codes_history" ("real_property_transfer_code_id");
+-- Create index "idx_rpt_party_parcels_hist_id" to table: "real_property_transfer_party_parcels_history"
+CREATE INDEX "idx_rpt_party_parcels_hist_id" ON "core"."real_property_transfer_party_parcels_history" ("real_property_transfer_party_parcel_id");
+-- Create index "idx_rpt_party_parcels_hist_parcel_id" to table: "real_property_transfer_party_parcels_history"
+CREATE INDEX "idx_rpt_party_parcels_hist_parcel_id" ON "core"."real_property_transfer_party_parcels_history" ("parcel_id");
+-- Create index "idx_rpt_party_parcels_hist_party_id" to table: "real_property_transfer_party_parcels_history"
+CREATE INDEX "idx_rpt_party_parcels_hist_party_id" ON "core"."real_property_transfer_party_parcels_history" ("party_id");
+-- Create index "idx_rpt_party_parcels_hist_transfer_id" to table: "real_property_transfer_party_parcels_history"
+CREATE INDEX "idx_rpt_party_parcels_hist_transfer_id" ON "core"."real_property_transfer_party_parcels_history" ("real_property_transfer_id");
 -- Create trigger "history_immutable"
-CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."real_property_transfer_codes_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
--- Create trigger "record_real_property_transfer_codes_history"
-CREATE TRIGGER "record_real_property_transfer_codes_history" BEFORE DELETE OR UPDATE ON "core"."real_property_transfer_codes" FOR EACH ROW EXECUTE FUNCTION "core"."record_real_property_transfer_codes_history"();
+CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."real_property_transfer_party_parcels_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
+-- Create trigger "record_real_property_transfers_history"
+CREATE TRIGGER "record_real_property_transfers_history" BEFORE DELETE OR UPDATE ON "core"."real_property_transfers" FOR EACH ROW EXECUTE FUNCTION "core"."record_real_property_transfers_history"();
+-- Create "real_property_transfers_history" table
+CREATE TABLE "core"."real_property_transfers_history" (
+  "real_property_transfer_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+  "real_property_transfer_id" bigint NOT NULL,
+  "public_id" uuid NOT NULL,
+  "legacy_id" text NULL,
+  "transfer_timestamp" timestamptz NOT NULL,
+  "transfer_amount" numeric(19,4) NULL,
+  "deed_book" text NULL,
+  "deed_page" text NULL,
+  "deed_uri" text NULL,
+  "system_valid_range" tstzrange NOT NULL,
+  "trace_id" character varying(32) NOT NULL,
+  PRIMARY KEY ("real_property_transfer_history_id")
+);
+-- Create index "idx_real_property_transfers_history_real_property_transfer_id" to table: "real_property_transfers_history"
+CREATE INDEX "idx_real_property_transfers_history_real_property_transfer_id" ON "core"."real_property_transfers_history" ("real_property_transfer_id");
+-- Create trigger "history_immutable"
+CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."real_property_transfers_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
+-- Create "system_settings" table
+CREATE TABLE "core"."system_settings" (
+  "system_setting_id" integer NOT NULL DEFAULT 1,
+  "base_currency" character(3) NOT NULL DEFAULT 'USD',
+  "system_updated_at" timestamptz NOT NULL DEFAULT now(),
+  "trace_id" character varying(32) NOT NULL,
+  PRIMARY KEY ("system_setting_id"),
+  CONSTRAINT "enforce_single_row" CHECK (system_setting_id = 1)
+);
+-- Create trigger "record_system_settings_history"
+CREATE TRIGGER "record_system_settings_history" BEFORE DELETE OR UPDATE ON "core"."system_settings" FOR EACH ROW EXECUTE FUNCTION "core"."record_system_settings_history"();
+-- Create "system_settings_history" table
+CREATE TABLE "core"."system_settings_history" (
+  "system_setting_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+  "system_setting_id" integer NOT NULL,
+  "base_currency" character(3) NOT NULL,
+  "system_valid_range" tstzrange NOT NULL,
+  "trace_id" character varying(32) NOT NULL,
+  PRIMARY KEY ("system_setting_history_id")
+);
+-- Create trigger "record_valuations_history"
+CREATE TRIGGER "record_valuations_history" BEFORE DELETE OR UPDATE ON "core"."valuations" FOR EACH ROW EXECUTE FUNCTION "core"."record_valuations_history"();
+-- Create "valuations_history" table
+CREATE TABLE "core"."valuations_history" (
+  "valuation_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+  "valuation_id" bigint NOT NULL,
+  "public_id" uuid NOT NULL,
+  "legacy_id" text NULL,
+  "valuation_date" timestamptz NOT NULL,
+  "system_valid_range" tstzrange NOT NULL,
+  "trace_id" character varying(32) NOT NULL,
+  PRIMARY KEY ("valuation_history_id")
+);
+-- Create index "idx_valuations_history_valuation_id" to table: "valuations_history"
+CREATE INDEX "idx_valuations_history_valuation_id" ON "core"."valuations_history" ("valuation_id");
+-- Create trigger "history_immutable"
+CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."valuations_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
+-- Create trigger "record_zoning_history"
+CREATE TRIGGER "record_zoning_history" BEFORE DELETE OR UPDATE ON "core"."zoning" FOR EACH ROW EXECUTE FUNCTION "core"."record_zoning_history"();
+-- Create "zoning_attributes" table
+CREATE TABLE "core"."zoning_attributes" (
+  "zoning_attribute_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+  "zoning_id" bigint NOT NULL,
+  "name" text NOT NULL,
+  "code" text NOT NULL,
+  "max_far" numeric(6,2) NULL,
+  "min_lot_size_sq_m" numeric(6,2) NULL,
+  "max_height_m" numeric(6,2) NULL,
+  "max_dwelling_units_per_hectare" numeric(6,2) NULL,
+  "max_lot_coverage_pct" numeric(5,4) NULL,
+  "legal_valid_range" tstzrange NOT NULL,
+  "system_updated_at" timestamptz NOT NULL DEFAULT now(),
+  "trace_id" character varying(32) NOT NULL,
+  PRIMARY KEY ("zoning_attribute_id"),
+  CONSTRAINT "no_overlapping_zoning_attributes" EXCLUDE USING GIST ("zoning_id" WITH =, "legal_valid_range" WITH &&),
+  CONSTRAINT "fk_zoning_id" FOREIGN KEY ("zoning_id") REFERENCES "core"."zoning" ("zoning_id") ON UPDATE NO ACTION ON DELETE RESTRICT,
+  CONSTRAINT "valid_max_lot_coverage" CHECK ((max_lot_coverage_pct > (0)::numeric) AND (max_lot_coverage_pct <= 1.0000))
+);
+-- Create index "idx_zoning_attributes_zoning_id" to table: "zoning_attributes"
+CREATE INDEX "idx_zoning_attributes_zoning_id" ON "core"."zoning_attributes" ("zoning_id");
+-- Create trigger "record_zoning_attributes_history"
+CREATE TRIGGER "record_zoning_attributes_history" BEFORE DELETE OR UPDATE ON "core"."zoning_attributes" FOR EACH ROW EXECUTE FUNCTION "core"."record_zoning_attributes_history"();
+-- Create "zoning_attributes_history" table
+CREATE TABLE "core"."zoning_attributes_history" (
+  "zoning_attribute_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+  "zoning_attribute_id" bigint NOT NULL,
+  "zoning_id" bigint NOT NULL,
+  "name" text NOT NULL,
+  "code" text NOT NULL,
+  "max_far" numeric(6,2) NULL,
+  "min_lot_size_sq_m" numeric(6,2) NULL,
+  "max_height_m" numeric(6,2) NULL,
+  "max_dwelling_units_per_hectare" numeric(6,2) NULL,
+  "max_lot_coverage_pct" numeric(5,4) NULL,
+  "legal_valid_range" tstzrange NOT NULL,
+  "system_valid_range" tstzrange NOT NULL,
+  "trace_id" character varying(32) NOT NULL,
+  PRIMARY KEY ("zoning_attribute_history_id")
+);
+-- Create index "idx_zoning_attributes_history_zoning_attribute_id" to table: "zoning_attributes_history"
+CREATE INDEX "idx_zoning_attributes_history_zoning_attribute_id" ON "core"."zoning_attributes_history" ("zoning_attribute_id");
+-- Create index "idx_zoning_attributes_history_zoning_id" to table: "zoning_attributes_history"
+CREATE INDEX "idx_zoning_attributes_history_zoning_id" ON "core"."zoning_attributes_history" ("zoning_id");
+-- Create trigger "history_immutable"
+CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."zoning_attributes_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
+-- Create "zoning_history" table
+CREATE TABLE "core"."zoning_history" (
+  "zoning_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+  "zoning_id" bigint NOT NULL,
+  "public_id" uuid NOT NULL,
+  "legacy_id" text NULL,
+  "is_voided" boolean NOT NULL,
+  "voided_at" timestamptz NULL,
+  "system_valid_range" tstzrange NOT NULL,
+  "trace_id" character varying(32) NOT NULL,
+  PRIMARY KEY ("zoning_history_id")
+);
+-- Create index "idx_zoning_history_zoning_id" to table: "zoning_history"
+CREATE INDEX "idx_zoning_history_zoning_id" ON "core"."zoning_history" ("zoning_id");
+-- Create trigger "history_immutable"
+CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "core"."zoning_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
+-- Create "improvement_geometry" table
+CREATE TABLE "geo"."improvement_geometry" (
+  "improvement_geometry_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+  "improvement_id" bigint NOT NULL,
+  "geom_web" extensions.geometry(MultiPolygonZ,4326) NOT NULL,
+  "geom_legal" extensions.geometry(MultiPolygonZ) NULL,
+  "local_horizontal_srid" integer NULL,
+  "local_vertical_datum" text NULL,
+  "legal_valid_range" tstzrange NOT NULL,
+  "system_updated_at" timestamptz NOT NULL DEFAULT now(),
+  "trace_id" character varying(32) NOT NULL,
+  PRIMARY KEY ("improvement_geometry_id"),
+  CONSTRAINT "no_overlapping_improvement_geometry" EXCLUDE USING GIST ("improvement_id" WITH =, "legal_valid_range" WITH &&),
+  CONSTRAINT "fk_improvement_id" FOREIGN KEY ("improvement_id") REFERENCES "core"."improvements" ("improvement_id") ON UPDATE NO ACTION ON DELETE RESTRICT
+);
+-- Create index "idx_geom_web_improvement_geometry" to table: "improvement_geometry"
+CREATE INDEX "idx_geom_web_improvement_geometry" ON "geo"."improvement_geometry" USING GIST ("geom_web");
+-- Create index "idx_improvement_geometry_improvement_id" to table: "improvement_geometry"
+CREATE INDEX "idx_improvement_geometry_improvement_id" ON "geo"."improvement_geometry" ("improvement_id");
+-- Create trigger "record_improvement_geometry_history"
+CREATE TRIGGER "record_improvement_geometry_history" BEFORE DELETE OR UPDATE ON "geo"."improvement_geometry" FOR EACH ROW EXECUTE FUNCTION "core"."record_improvement_geometry_history"();
+-- Create "improvement_geometry_history" table
+CREATE TABLE "geo"."improvement_geometry_history" (
+  "improvement_geometry_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+  "improvement_geometry_id" bigint NOT NULL,
+  "improvement_id" bigint NOT NULL,
+  "geom_web" extensions.geometry(MultiPolygonZ,4326) NOT NULL,
+  "geom_legal" extensions.geometry(MultiPolygonZ) NULL,
+  "local_horizontal_srid" integer NULL,
+  "local_vertical_datum" text NULL,
+  "legal_valid_range" tstzrange NOT NULL,
+  "system_valid_range" tstzrange NOT NULL,
+  "trace_id" character varying(32) NOT NULL,
+  PRIMARY KEY ("improvement_geometry_history_id")
+);
+-- Create index "idx_improvement_geometry_history_improvement_geometry_id" to table: "improvement_geometry_history"
+CREATE INDEX "idx_improvement_geometry_history_improvement_geometry_id" ON "geo"."improvement_geometry_history" ("improvement_geometry_id");
+-- Create index "idx_improvement_geometry_history_improvement_id" to table: "improvement_geometry_history"
+CREATE INDEX "idx_improvement_geometry_history_improvement_id" ON "geo"."improvement_geometry_history" ("improvement_id");
+-- Create trigger "history_immutable"
+CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "geo"."improvement_geometry_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();
+-- Create trigger "record_parcel_geometry_history"
+CREATE TRIGGER "record_parcel_geometry_history" BEFORE DELETE OR UPDATE ON "geo"."parcel_geometry" FOR EACH ROW EXECUTE FUNCTION "core"."record_parcel_geometry_history"();
+-- Create "parcel_geometry_history" table
+CREATE TABLE "geo"."parcel_geometry_history" (
+  "parcel_geometry_history_id" bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+  "parcel_geometry_id" bigint NOT NULL,
+  "parcel_id" bigint NOT NULL,
+  "feature_id" bigint NOT NULL DEFAULT geo.generate_secure_mvt_id(),
+  "geom_web" extensions.geometry(MultiPolygon,4326) NOT NULL,
+  "geom_legal" extensions.geometry(MultiPolygon) NULL,
+  "local_srid" integer NULL,
+  "legal_valid_range" tstzrange NOT NULL,
+  "system_valid_range" tstzrange NOT NULL,
+  "trace_id" character varying(32) NOT NULL,
+  PRIMARY KEY ("parcel_geometry_history_id")
+);
+-- Create index "idx_parcel_geometry_history_feature_id" to table: "parcel_geometry_history"
+CREATE INDEX "idx_parcel_geometry_history_feature_id" ON "geo"."parcel_geometry_history" ("parcel_id");
+-- Create index "idx_parcel_geometry_history_parcel_geometry_id" to table: "parcel_geometry_history"
+CREATE INDEX "idx_parcel_geometry_history_parcel_geometry_id" ON "geo"."parcel_geometry_history" ("parcel_geometry_id");
+-- Create index "idx_parcel_geometry_history_parcel_id" to table: "parcel_geometry_history"
+CREATE INDEX "idx_parcel_geometry_history_parcel_id" ON "geo"."parcel_geometry_history" ("parcel_id");
+-- Create trigger "history_immutable"
+CREATE TRIGGER "history_immutable" BEFORE DELETE OR TRUNCATE OR UPDATE ON "geo"."parcel_geometry_history" FOR EACH STATEMENT EXECUTE FUNCTION "core"."prevent_history_tampering"();

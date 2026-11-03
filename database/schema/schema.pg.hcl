@@ -414,7 +414,7 @@ table "parcel_geometry_history" {
   }
 
   index "idx_parcel_geometry_history_feature_id" {
-    columns = [column.parcel_id]
+    columns = [column.feature_id]
   }
 }
 

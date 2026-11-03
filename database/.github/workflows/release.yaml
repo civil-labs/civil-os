@@ -1,4 +1,4 @@
-name: Build Migration Artifact
+name: Build and Commit Migration ConfigMap
 on:
   workflow_dispatch:
     inputs:
@@ -22,17 +22,18 @@ on:
 
 permissions:
   contents: write
-  packages: write
 
 jobs:
-  build-and-publish:
+  generate-and-commit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # Ensure checkout checks out the branch directly when triggered via workflow_dispatch
+          ref: ${{ github.ref }}
 
-      - name: Determine Image Tag
+      - name: Determine Release Tag
         id: tagger
         run: |
           git fetch --tags --force 2>/dev/null || true
@@ -44,7 +45,7 @@ jobs:
             CLEAN_PUSH_TAG="${GITHUB_REF_NAME#v}"
             echo "tag=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
             echo "semver=v${CLEAN_PUSH_TAG}" >> $GITHUB_OUTPUT
-            echo "cm_tag=$(echo "${GITHUB_REF_NAME}" | tr '[:upper:]' '[:lower:]' | tr '_' '-')" >> $GITHUB_OUTPUT
+            echo "cm_tag=$(echo "${GITHUB_REF_NAME}" | tr '[:upper:]' '[:lower:]' | tr '_' '-' | tr '.' '-')" >> $GITHUB_OUTPUT
             exit 0
           fi
 
@@ -53,7 +54,7 @@ jobs:
             CUSTOM="${{ inputs.custom_tag }}"
             echo "tag=${CUSTOM}" >> $GITHUB_OUTPUT
             echo "semver=${CUSTOM}" >> $GITHUB_OUTPUT
-            echo "cm_tag=$(echo "${CUSTOM}" | tr '[:upper:]' '[:lower:]' | tr '_' '-')" >> $GITHUB_OUTPUT
+            echo "cm_tag=$(echo "${CUSTOM}" | tr '[:upper:]' '[:lower:]' | tr '_' '-' | tr '.' '-')" >> $GITHUB_OUTPUT
             exit 0
           fi
 
@@ -89,45 +90,45 @@ jobs:
           SEMVER="v${MAJOR}.${MINOR}.${PATCH}"
           FULL_TAG="${SEMVER}-${SHORT_SHA}"
 
+          # DNS-1123 compliant label for Kubernetes ConfigMap names
+          CM_TAG=$(echo "${FULL_TAG}" | tr '[:upper:]' '[:lower:]' | tr '_' '-' | tr '.' '-')
+
           echo "tag=${FULL_TAG}" >> $GITHUB_OUTPUT
           echo "semver=${SEMVER}" >> $GITHUB_OUTPUT
-          echo "cm_tag=$(echo "${FULL_TAG}" | tr '[:upper:]' '[:lower:]' | tr '_' '-')" >> $GITHUB_OUTPUT
-          echo "Calculated tag: ${FULL_TAG} (Base semver: ${SEMVER})"
+          echo "cm_tag=${CM_TAG}" >> $GITHUB_OUTPUT
+          echo "Calculated tag: ${FULL_TAG} (Base semver: ${SEMVER}, ConfigMap tag: ${CM_TAG})"
 
-      # Automatically tag the commit so subsequent runs increment from this version
-      - name: Create and Push Git Tag
-        if: github.event_name == 'workflow_dispatch' && inputs.bump != 'manual'
+      - name: Generate Versioned ConfigMap
+        run: |
+          TARGET_DIR="manifests/migrations/${{ steps.tagger.outputs.tag }}"
+          mkdir -p "${TARGET_DIR}"
+
+          # Generate versioned ConfigMap manifest
+          kubectl create configmap "civil-os-db-migrations-${{ steps.tagger.outputs.cm_tag }}" \
+            --from-file=migrations/ \
+            --dry-run=client -o yaml > "${TARGET_DIR}/configmap.yaml"
+
+          # Maintain a rolling latest copy for convenience
+          mkdir -p manifests/migrations
+          cp "${TARGET_DIR}/configmap.yaml" manifests/migrations/latest.yaml
+
+      - name: Commit and Push Versioned Manifests
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add manifests/migrations/
+          
+          # Only commit if changes exist
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore(migrations): release configmap ${{ steps.tagger.outputs.tag }} [skip ci]"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
+
+      - name: Create and Push Git Release Tag
+        if: github.event_name == 'workflow_dispatch' && inputs.bump != 'manual'
+        run: |
           git tag -a "${{ steps.tagger.outputs.semver }}" -m "Release ${{ steps.tagger.outputs.tag }}"
           git push origin "${{ steps.tagger.outputs.semver }}"
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and Push Migration Image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          # ghcr.io repository paths must always be lowercased
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/civil-os-db-migrations:${{ steps.tagger.outputs.tag }}
-            ghcr.io/${{ github.repository_owner }}/civil-os-db-migrations:latest
-
-      # Output Kustomize/ConfigMap manifests
-      - name: Generate ConfigMap Manifest Artifact
-        run: |
-          mkdir -p dist
-          kubectl create configmap civil-db-migrations-${{ steps.tagger.outputs.cm_tag }} \
-            --from-file=migrations/ \
-            --dry-run=client -o yaml > dist/migration-configmap.yaml

@@ -98,6 +98,14 @@ jobs:
           echo "cm_tag=${CM_TAG}" >> $GITHUB_OUTPUT
           echo "Calculated tag: ${FULL_TAG} (Base semver: ${SEMVER}, ConfigMap tag: ${CM_TAG})"
 
+      - name: Validate Migration Integrity
+        run: |
+          # Ensure LF line endings on all migration files
+          find migrations/ -type f -exec sed -i -e 's/\r$//' {} +
+
+          # Verify migration files match atlas.sum before packaging
+          atlas migrate validate --dir "file://migrations"
+
       - name: Generate Versioned ConfigMap
         run: |
           TARGET_DIR="manifests/migrations/${{ steps.tagger.outputs.tag }}"

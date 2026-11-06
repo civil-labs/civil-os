@@ -1,0 +1,2 @@
+migrations/*.sql text eol=lf
+migrations/atlas.sum text eol=lf

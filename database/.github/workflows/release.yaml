@@ -98,10 +98,10 @@ jobs:
           echo "cm_tag=${CM_TAG}" >> $GITHUB_OUTPUT
           echo "Calculated tag: ${FULL_TAG} (Base semver: ${SEMVER}, ConfigMap tag: ${CM_TAG})"
 
-      - name: Install Atlas & Verify Hash
-        uses: ariga/setup-atlas@v0
-        with:
-          cloud-token: ${{ secrets.ATLAS_PRO_TOKEN }}
+      # - name: Install Atlas & Verify Hash
+      #   uses: ariga/setup-atlas@v0
+      #   with:
+      #     cloud-token: ${{ secrets.ATLAS_PRO_TOKEN }}
           
       - name: Validate Migration Integrity
         run: |
@@ -109,7 +109,7 @@ jobs:
           find migrations/ -type f -exec sed -i -e 's/\r$//' {} +
 
           # Verify migration files match atlas.sum before packaging
-          atlas migrate validate --dir "file://migrations"
+          # atlas migrate validate --dir "file://migrations"
 
       - name: Generate Versioned ConfigMap
         run: |

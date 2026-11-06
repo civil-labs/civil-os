@@ -2816,7 +2816,7 @@ CREATE TABLE "geo"."parcel_geometry_history" (
   PRIMARY KEY ("parcel_geometry_history_id")
 );
 -- Create index "idx_parcel_geometry_history_feature_id" to table: "parcel_geometry_history"
-CREATE INDEX "idx_parcel_geometry_history_feature_id" ON "geo"."parcel_geometry_history" ("parcel_id");
+CREATE INDEX "idx_parcel_geometry_history_feature_id" ON "geo"."parcel_geometry_history" ("feature_id");
 -- Create index "idx_parcel_geometry_history_parcel_geometry_id" to table: "parcel_geometry_history"
 CREATE INDEX "idx_parcel_geometry_history_parcel_geometry_id" ON "geo"."parcel_geometry_history" ("parcel_geometry_id");
 -- Create index "idx_parcel_geometry_history_parcel_id" to table: "parcel_geometry_history"

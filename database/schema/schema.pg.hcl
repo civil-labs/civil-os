@@ -5469,7 +5469,7 @@ function "generate_secure_mvt_id" {
 
   as = <<-SQL
     DECLARE
-        b bytea := gen_random_bytes(7);
+        b bytea := extensions.gen_random_bytes(7);
         res bigint := 0;
     BEGIN
         res := (get_byte(b, 0)::bigint << 48) |

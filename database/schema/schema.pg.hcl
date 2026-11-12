@@ -5522,7 +5522,7 @@ function "get_primary_improvements" {
         FROM 
           core.parcel_improvements pi
         LEFT JOIN 
-          geo.improvement_attributes ia ON pi.improvement_id = ia.improvement_id 
+          core.improvement_attributes ia ON pi.improvement_id = ia.improvement_id 
           AND ia.legal_valid_range @> target_time
         WHERE 
           pi.parcel_id = ANY(parcel_ids)
@@ -6339,7 +6339,7 @@ function "record_system_settings_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO system_settings_history (
+          INSERT INTO core.system_settings_history (
             system_setting_id,
             base_currency,
             system_valid_range,
@@ -6377,7 +6377,7 @@ function "record_parcels_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO parcels_history (
+          INSERT INTO core.parcels_history (
             parcel_id,
             public_id,
             legacy_id,
@@ -6421,7 +6421,7 @@ function "record_parcel_geometry_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO parcel_geometry_history (
+          INSERT INTO geo.parcel_geometry_history (
             parcel_geometry_id,
             parcel_id,
             feature_id,
@@ -6470,7 +6470,7 @@ function "record_parcel_attributes_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO parcel_attributes_history (
+          INSERT INTO core.parcel_attributes_history (
             parcel_attribute_id,
             parcel_id,
             address_id,
@@ -6523,7 +6523,7 @@ function "record_parcel_parties_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO parcel_parties_history (
+          INSERT INTO core.parcel_parties_history (
             parcel_party_id,
             parcel_id,
             party_id,
@@ -6568,7 +6568,7 @@ function "record_parcel_affordances_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO parcel_affordances_history (
+          INSERT INTO core.parcel_affordances_history (
             parcel_affordance_id,
             public_id,
             parcel_id,
@@ -6629,7 +6629,7 @@ function "record_parcel_neighborhood_definitions_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO parcel_neighborhood_definitions_history (
+          INSERT INTO core.parcel_neighborhood_definitions_history (
             parcel_neighborhood_definition_id,
             parcel_id,
             neighborhood_id,
@@ -6676,7 +6676,7 @@ function "record_improvements_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO improvements_history (
+          INSERT INTO core.improvements_history (
             improvement_id,
             public_id,
             legacy_id,
@@ -6721,7 +6721,7 @@ function "record_improvement_geometry_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO improvement_geometry_history (
+          INSERT INTO geo.improvement_geometry_history (
             improvement_geometry_id,
             improvement_id,
             geom_web,
@@ -6770,7 +6770,7 @@ function "record_improvement_attributes_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO improvement_attributes_history (
+          INSERT INTO core.improvement_attributes_history (
             improvement_attribute_id,
             improvement_id,
             address_id,
@@ -6837,7 +6837,7 @@ function "record_improvement_parties_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO improvement_parties_history (
+          INSERT INTO core.improvement_parties_history (
             improvement_party_id,
             improvement_id,
             party_id,
@@ -6882,7 +6882,7 @@ function "record_improvement_conditions_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO improvement_conditions_history (
+          INSERT INTO core.improvement_conditions_history (
             improvement_condition_id,
             public_id,
             legacy_id,
@@ -6927,7 +6927,7 @@ function "record_improvement_condition_attributes_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO improvement_condition_attributes_history (
+          INSERT INTO core.improvement_condition_attributes_history (
             improvement_condition_attribute_id,
             improvement_condition_id,
             name,
@@ -6972,7 +6972,7 @@ function "record_improvement_qualities_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO improvement_qualities_history (
+          INSERT INTO core.improvement_qualities_history (
             improvement_quality_id,
             public_id,
             legacy_id,
@@ -7017,7 +7017,7 @@ function "record_improvement_quality_attributes_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO improvement_quality_attributes_history (
+          INSERT INTO core.improvement_quality_attributes_history (
             improvement_quality_attribute_id,
             improvement_quality_id,
             name,
@@ -7062,7 +7062,7 @@ function "record_parcel_improvements_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO parcel_improvements_history (
+          INSERT INTO core.parcel_improvements_history (
             parcel_improvement_id,
             parcel_id,
             improvement_id,
@@ -7107,7 +7107,7 @@ function "record_zoning_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO zoning_history (
+          INSERT INTO core.zoning_history (
             zoning_id,
             public_id,
             legacy_id,
@@ -7152,7 +7152,7 @@ function "record_zoning_attributes_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO zoning_attributes_history (
+          INSERT INTO core.zoning_attributes_history (
             zoning_attribute_id,
             zoning_id,
             name,
@@ -7207,7 +7207,7 @@ function "record_parties_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO parties_history (
+          INSERT INTO core.parties_history (
             party_id,
             public_id,
             legacy_id,
@@ -7252,7 +7252,7 @@ function "record_party_attributes_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO party_attributes_history (
+          INSERT INTO core.party_attributes_history (
             party_attribute_id,
             party_id,
             name,
@@ -7297,7 +7297,7 @@ function "record_addresses_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO addresses_history (
+          INSERT INTO core.addresses_history (
             address_id,
             public_id,
             legacy_id,
@@ -7342,7 +7342,7 @@ function "record_address_attributes_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO address_attributes_history (
+          INSERT INTO core.address_attributes_history (
             address_attribute_id,
             address_id,
             country_id,
@@ -7403,7 +7403,7 @@ function "record_real_property_transfers_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO real_property_transfers_history (
+          INSERT INTO core.real_property_transfers_history (
             real_property_transfer_id,
             public_id,
             legacy_id,
@@ -7454,7 +7454,7 @@ function "record_real_property_transfer_party_parcels_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO real_property_transfer_party_parcels_history (
+          INSERT INTO core.real_property_transfer_party_parcels_history (
             real_property_transfer_party_parcel_id,
             parcel_id,
             real_property_transfer_id,
@@ -7501,7 +7501,7 @@ function "record_real_property_transfer_party_improvements_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO real_property_transfer_party_improvements_history (
+          INSERT INTO core.real_property_transfer_party_improvements_history (
             real_property_transfer_party_improvement_id,
             improvement_id,
             real_property_transfer_id,
@@ -7548,7 +7548,7 @@ function "record_real_property_transfer_code_assignments_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO real_property_transfer_code_assignments_history (
+          INSERT INTO core.real_property_transfer_code_assignments_history (
             real_property_transfer_code_assignment_id,
             real_property_transfer_id,
             real_property_transfer_code_id,
@@ -7589,7 +7589,7 @@ function "record_real_property_transfer_codes_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO real_property_transfer_codes_history (
+          INSERT INTO core.real_property_transfer_codes_history (
             real_property_transfer_code_id,
             public_id,
             legacy_id,
@@ -7636,7 +7636,7 @@ function "record_real_property_transfer_code_types_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO real_property_transfer_code_types_history (
+          INSERT INTO core.real_property_transfer_code_types_history (
             real_property_transfer_code_type_id,
             public_id,
             legacy_id,
@@ -7681,7 +7681,7 @@ function "record_valuations_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO valuations_history (
+          INSERT INTO core.valuations_history (
             valuation_id,
             public_id,
             legacy_id,
@@ -7724,7 +7724,7 @@ function "record_parcel_valuations_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO parcel_valuations_history (
+          INSERT INTO core.parcel_valuations_history (
             parcel_valuation_id,
             parcel_id,
             valuation_id,
@@ -7771,7 +7771,7 @@ function "record_improvement_valuations_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO improvement_valuations_history (
+          INSERT INTO core.improvement_valuations_history (
             improvement_valuation_id,
             improvement_id,
             valuation_id,
@@ -7818,7 +7818,7 @@ function "record_neighborhood_definitions_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO neighborhood_definitions_history (
+          INSERT INTO core.neighborhood_definitions_history (
             neighborhood_definition_id,
             public_id,
             legacy_id,
@@ -7863,7 +7863,7 @@ function "record_neighborhoods_history" {
         current_transaction_time timestamptz := now();
       BEGIN
         IF (TG_OP = 'UPDATE' OR TG_OP = 'DELETE') THEN
-          INSERT INTO neighborhoods_history (
+          INSERT INTO core.neighborhoods_history (
             neighborhood_id,
             public_id,
             legacy_id,

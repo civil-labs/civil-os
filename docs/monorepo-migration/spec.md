@@ -18,7 +18,7 @@
 | F3 | The mesh `ParcelsService` is split into `ParcelReadService` (reader) and `ParcelWriteService` (writer). All other mesh services are renamed to the `<Entity>ReadService` pattern. The public API keeps its current service names, including a single `ParcelsService`. | Outcome 4, Decisions |
 | F4 | database-editor is renamed to database-writer in every path, module, binary, image, env var, log string and doc. | Outcome 4 |
 | F5 | The writer implements `ParcelWriteService.UpdateParcel` against the database. The gateway's public `UpdateParcel` validates the request, forwards it to the writer and returns the writer's result or error. | Outcome 4 |
-| F6 | The gateway has no AWS SDK dependency and reaches backends through configured host names (Kubernetes Service DNS in-cluster). | Outcome 7 |
+| F6 | The gateway has no AWS coupling: it reaches backends through configured host names (Kubernetes Service DNS in-cluster) and calls no cloud discovery API. Optional S3 support for instance metadata (gocloud.dev `s3blob`) stays, alongside GCS, Azure and file, so the AWS SDK remains an indirect dependency. *(Amended 2026-11-14, owner decision.)* | Outcome 7 |
 | F7 | An app release `vX.Y.Z` publishes `ghcr.io/civil-labs/civil-os/{gateway,database-reader,database-writer,tile-server}:vX.Y.Z` and a migration ConfigMap artifact at the same version. The tag is the Go module version. | Outcome 2 |
 | F8 | A Public API release `public-api-vX.Y.Z` publishes `@civil-labs/civil-os-api@X.Y.Z` to npm and attaches the public OpenAPI spec. Its structure accepts further language SDKs without renaming. | Outcome 3 |
 | F9 | Each merge to `main` publishes `:sha-<short>` images for all four services. No `latest` tag is ever published. | Decisions |
@@ -142,7 +142,7 @@ This resolves intent open question Q2.
 
 ### 5.1 Gateway
 
-- **AWS removal.** Delete `backend.go`. `BackendManager` is never called today, because the gateway already dials the reader's configured host. Drop the `aws-sdk-go-v2` modules.
+- **AWS removal.** Delete `backend.go`. `BackendManager` is never called today, because the gateway already dials the reader's configured host. Drop the Cloud Map (`servicediscovery`) module. `aws-sdk-go-v2` itself stays, as a dependency of the optional `s3blob` driver (F6).
 - **New env var `CIVIL_OS_GATEWAY_WRITER_HOST`, optional.**
   - When set, the gateway creates a `ParcelWriteService` client and routes public `UpdateParcel` to it.
   - When unset, public `UpdateParcel` returns `Unavailable` ("writes are not enabled on this instance"). Existing deployments without a writer keep starting unchanged.
@@ -348,4 +348,4 @@ Each criterion maps to the intent's success criterion with the same number.
 6. `release-please --dry-run` (or the first release PR) proposes both an app release and a `public-api` release.
 7. `grep -ri editor` finds no service reference (excluding docs history). An e2e update persists and reads back through the gateway.
 8. README, `docs/architecture.md`, `CLAUDE.md` and `docs/github-setup.md` exist, and every command in them works as written.
-9. `go list -m all | grep aws-sdk` returns nothing.
+9. No gateway code calls AWS directly: `git grep aws-sdk-go-v2 -- services` returns nothing, and `go mod why -m github.com/aws/aws-sdk-go-v2/service/servicediscovery` reports the module is not needed. *(Amended 2026-11-14, owner decision.)*

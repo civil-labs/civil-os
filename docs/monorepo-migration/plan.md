@@ -135,7 +135,7 @@ The imported `.github/`, `mise.toml`, `go.mod` and `.gitignore` files stay as-is
 
 **Checks**
 - `go build ./... && go vet ./...` passes.
-- `go list -m all | grep -c aws-sdk` prints `0`.
+- `git grep aws-sdk-go-v2 -- services` finds nothing, and `servicediscovery` is gone from `go.mod`. The AWS SDK remains only through gocloud `s3blob` (spec F6, amended 2026-11-14).
 - `buf lint` passes.
 
 ## PR 4: env var contract and log level (`feat!: CIVIL_OS_ env var contract`)

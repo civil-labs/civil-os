@@ -1,4 +1,4 @@
-module github.com/civil-labs/civil-gateway
+module github.com/civil-labs/civil-os
 
 go 1.26.1
 
@@ -12,6 +12,7 @@ require (
 	github.com/civil-labs/civil-api-go v0.0.0-20260812161835-dd57510ff842
 	github.com/coreos/go-oidc/v3 v3.17.0
 	github.com/dexidp/dex/api/v2 v2.4.0
+	github.com/jackc/pgx/v5 v5.9.1
 	gocloud.dev v0.46.0
 	google.golang.org/grpc v1.81.1
 	google.golang.org/protobuf v1.36.11
@@ -71,6 +72,9 @@ require (
 	github.com/google/wire v0.7.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.14 // indirect
 	github.com/googleapis/gax-go/v2 v2.21.0 // indirect
+	github.com/jackc/pgpassfile v1.0.0 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
+	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect

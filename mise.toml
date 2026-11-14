@@ -1,0 +1,36 @@
+[tools]
+go = "1.26.1"
+buf = "1.66.1"
+node = "22"
+# Local migration authoring only. Never installed or run in CI (spec §6.4).
+atlas = "1.3.0"
+
+[tasks.build]
+description = "Build every Go package"
+run = "go build ./..."
+
+[tasks.test]
+description = "Run unit and handler tests"
+run = "go test ./..."
+
+[tasks.lint]
+description = "Vet Go code and lint protos"
+run = ["go vet ./...", "buf lint api"]
+
+[tasks.check]
+description = "Everything CI runs that needs no Docker"
+depends = ["build", "lint", "test"]
+
+[tasks."db:diff"]
+description = "Generate a new versioned migration from database/schema (needs local Atlas Pro login)"
+dir = "database"
+run = '''
+git add --renormalize .
+git ls-files -z | xargs -0 sed -i 's/\r$//'
+atlas migrate diff --env local
+'''
+
+[tasks."db:validate"]
+description = "Verify database/migrations/atlas.sum (local only; CI has no Atlas license)"
+dir = "database"
+run = "atlas migrate validate --env local"

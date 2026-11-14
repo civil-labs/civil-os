@@ -31,3 +31,15 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# civil-os build outputs
+/services/gateway/gateway
+/services/database-reader/reader
+/services/database-writer/writer
+
+# Generated at build/publish time, never committed
+/api/gen/openapi/
+/sdk/js/gen/
+/sdk/js/index.js
+/sdk/js/index.d.ts
+node_modules/

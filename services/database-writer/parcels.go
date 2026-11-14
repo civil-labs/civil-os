@@ -13,7 +13,7 @@ import (
 // It is replaced by the ParcelWriteService implementation in PR 3 of
 // docs/monorepo-migration/plan.md.
 type ParcelServer struct {
-	parcelsv1connect.UnimplementedParcelsServiceHandler
+	parcelsv1connect.UnimplementedParcelWriteServiceHandler
 
 	db     *pgxpool.Pool
 	logger *slog.Logger

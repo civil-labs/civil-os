@@ -438,40 +438,6 @@ func (s *APIServer) getParcelsWithImprovementSummary(
 	return parcels, nil
 }
 
-func (s *APIServer) UpdateParcel(
-	ctx context.Context,
-	req *connect.Request[parcelsv1.UpdateParcelRequest],
-) (*connect.Response[parcelsv1.UpdateParcelResponse], error) {
-
-	// if req.Msg.ParcelId == "" {
-	// 	return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("parcel ID is required"))
-	// }
-	// if req.Msg.PropertyName == "" {
-	// 	return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("property name is required"))
-	// }
-
-	// query := `SELECT properties ->> $2 FROM parcels WHERE id = $1`
-
-	// // Execute Query
-	// var value *string // Use a pointer to handle nulls if the key doesn't exist in the JSON
-	// err := s.db.QueryRow(ctx, query, req.Msg.ParcelId, req.Msg.PropertyName).Scan(&value)
-
-	// if err != nil {
-	// 	if errors.Is(err, pgx.ErrNoRows) {
-	// 		return nil, connect.NewError(connect.CodeNotFound, errors.New("parcel not found"))
-	// 	}
-	// 	return nil, connect.NewError(connect.CodeInternal, errors.New("database error"))
-	// }
-
-	// if value == nil {
-	// 	msg := fmt.Sprintf("property %s not found for parcel %s", req.Msg.PropertyName, req.Msg.ParcelId)
-	// 	return nil, connect.NewError(connect.CodeNotFound, errors.New(msg))
-	// }
-
-	res := &parcelsv1.UpdateParcelResponse{}
-	return connect.NewResponse(res), nil
-}
-
 func (s *APIServer) GetCategoricalParcelStatsById(
 	ctx context.Context,
 	req *connect.Request[parcelsv1.GetCategoricalParcelStatsByIdRequest],

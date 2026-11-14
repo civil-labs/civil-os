@@ -11,7 +11,7 @@ import (
 )
 
 type ImprovementServer struct {
-	dbReaderClient meshimprovementsv1connect.ImprovementsServiceClient
+	dbReaderClient meshimprovementsv1connect.ImprovementReadServiceClient
 	logger         *slog.Logger
 }
 

@@ -11,7 +11,7 @@ import (
 )
 
 type NeighborhoodServer struct {
-	dbReaderClient meshneighborhoodsv1connect.NeighborhoodServiceClient
+	dbReaderClient meshneighborhoodsv1connect.NeighborhoodReadServiceClient
 	logger         *slog.Logger
 }
 

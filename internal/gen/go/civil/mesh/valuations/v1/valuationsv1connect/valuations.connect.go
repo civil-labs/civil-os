@@ -21,8 +21,8 @@ import (
 const _ = connect.IsAtLeastVersion1_13_0
 
 const (
-	// ValuationServiceName is the fully-qualified name of the ValuationService service.
-	ValuationServiceName = "civil.mesh.valuations.v1.ValuationService"
+	// ValuationReadServiceName is the fully-qualified name of the ValuationReadService service.
+	ValuationReadServiceName = "civil.mesh.valuations.v1.ValuationReadService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -33,78 +33,80 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// ValuationServiceGetValuationsProcedure is the fully-qualified name of the ValuationService's
-	// GetValuations RPC.
-	ValuationServiceGetValuationsProcedure = "/civil.mesh.valuations.v1.ValuationService/GetValuations"
+	// ValuationReadServiceGetValuationsProcedure is the fully-qualified name of the
+	// ValuationReadService's GetValuations RPC.
+	ValuationReadServiceGetValuationsProcedure = "/civil.mesh.valuations.v1.ValuationReadService/GetValuations"
 )
 
-// ValuationServiceClient is a client for the civil.mesh.valuations.v1.ValuationService service.
-type ValuationServiceClient interface {
+// ValuationReadServiceClient is a client for the civil.mesh.valuations.v1.ValuationReadService
+// service.
+type ValuationReadServiceClient interface {
 	GetValuations(context.Context, *connect.Request[v1.GetValuationsRequest]) (*connect.Response[v1.GetValuationsResponse], error)
 }
 
-// NewValuationServiceClient constructs a client for the civil.mesh.valuations.v1.ValuationService
-// service. By default, it uses the Connect protocol with the binary Protobuf Codec, asks for
-// gzipped responses, and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply
-// the connect.WithGRPC() or connect.WithGRPCWeb() options.
+// NewValuationReadServiceClient constructs a client for the
+// civil.mesh.valuations.v1.ValuationReadService service. By default, it uses the Connect protocol
+// with the binary Protobuf Codec, asks for gzipped responses, and sends uncompressed requests. To
+// use the gRPC or gRPC-Web protocols, supply the connect.WithGRPC() or connect.WithGRPCWeb()
+// options.
 //
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
 // http://api.acme.com or https://acme.com/grpc).
-func NewValuationServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ValuationServiceClient {
+func NewValuationReadServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ValuationReadServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
-	valuationServiceMethods := v1.File_civil_mesh_valuations_v1_valuations_proto.Services().ByName("ValuationService").Methods()
-	return &valuationServiceClient{
+	valuationReadServiceMethods := v1.File_civil_mesh_valuations_v1_valuations_proto.Services().ByName("ValuationReadService").Methods()
+	return &valuationReadServiceClient{
 		getValuations: connect.NewClient[v1.GetValuationsRequest, v1.GetValuationsResponse](
 			httpClient,
-			baseURL+ValuationServiceGetValuationsProcedure,
-			connect.WithSchema(valuationServiceMethods.ByName("GetValuations")),
+			baseURL+ValuationReadServiceGetValuationsProcedure,
+			connect.WithSchema(valuationReadServiceMethods.ByName("GetValuations")),
 			connect.WithClientOptions(opts...),
 		),
 	}
 }
 
-// valuationServiceClient implements ValuationServiceClient.
-type valuationServiceClient struct {
+// valuationReadServiceClient implements ValuationReadServiceClient.
+type valuationReadServiceClient struct {
 	getValuations *connect.Client[v1.GetValuationsRequest, v1.GetValuationsResponse]
 }
 
-// GetValuations calls civil.mesh.valuations.v1.ValuationService.GetValuations.
-func (c *valuationServiceClient) GetValuations(ctx context.Context, req *connect.Request[v1.GetValuationsRequest]) (*connect.Response[v1.GetValuationsResponse], error) {
+// GetValuations calls civil.mesh.valuations.v1.ValuationReadService.GetValuations.
+func (c *valuationReadServiceClient) GetValuations(ctx context.Context, req *connect.Request[v1.GetValuationsRequest]) (*connect.Response[v1.GetValuationsResponse], error) {
 	return c.getValuations.CallUnary(ctx, req)
 }
 
-// ValuationServiceHandler is an implementation of the civil.mesh.valuations.v1.ValuationService
-// service.
-type ValuationServiceHandler interface {
+// ValuationReadServiceHandler is an implementation of the
+// civil.mesh.valuations.v1.ValuationReadService service.
+type ValuationReadServiceHandler interface {
 	GetValuations(context.Context, *connect.Request[v1.GetValuationsRequest]) (*connect.Response[v1.GetValuationsResponse], error)
 }
 
-// NewValuationServiceHandler builds an HTTP handler from the service implementation. It returns the
-// path on which to mount the handler and the handler itself.
+// NewValuationReadServiceHandler builds an HTTP handler from the service implementation. It returns
+// the path on which to mount the handler and the handler itself.
 //
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
-func NewValuationServiceHandler(svc ValuationServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	valuationServiceMethods := v1.File_civil_mesh_valuations_v1_valuations_proto.Services().ByName("ValuationService").Methods()
-	valuationServiceGetValuationsHandler := connect.NewUnaryHandler(
-		ValuationServiceGetValuationsProcedure,
+func NewValuationReadServiceHandler(svc ValuationReadServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	valuationReadServiceMethods := v1.File_civil_mesh_valuations_v1_valuations_proto.Services().ByName("ValuationReadService").Methods()
+	valuationReadServiceGetValuationsHandler := connect.NewUnaryHandler(
+		ValuationReadServiceGetValuationsProcedure,
 		svc.GetValuations,
-		connect.WithSchema(valuationServiceMethods.ByName("GetValuations")),
+		connect.WithSchema(valuationReadServiceMethods.ByName("GetValuations")),
 		connect.WithHandlerOptions(opts...),
 	)
-	return "/civil.mesh.valuations.v1.ValuationService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/civil.mesh.valuations.v1.ValuationReadService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case ValuationServiceGetValuationsProcedure:
-			valuationServiceGetValuationsHandler.ServeHTTP(w, r)
+		case ValuationReadServiceGetValuationsProcedure:
+			valuationReadServiceGetValuationsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
 	})
 }
 
-// UnimplementedValuationServiceHandler returns CodeUnimplemented from all methods.
-type UnimplementedValuationServiceHandler struct{}
+// UnimplementedValuationReadServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedValuationReadServiceHandler struct{}
 
-func (UnimplementedValuationServiceHandler) GetValuations(context.Context, *connect.Request[v1.GetValuationsRequest]) (*connect.Response[v1.GetValuationsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.valuations.v1.ValuationService.GetValuations is not implemented"))
+func (UnimplementedValuationReadServiceHandler) GetValuations(context.Context, *connect.Request[v1.GetValuationsRequest]) (*connect.Response[v1.GetValuationsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.valuations.v1.ValuationReadService.GetValuations is not implemented"))
 }

@@ -5,7 +5,7 @@ package civil.mesh.sales.v1;
 import "google/protobuf/timestamp.proto";
 import "google/type/interval.proto";
 
-service SalesService {
+service SaleReadService {
   // Retrieves all of a specified parcel's attributes as an object.
   rpc GetSalesByParcelId(GetSalesByParcelIdRequest) returns (GetSalesByParcelIdResponse) {
     // Give connect the option to use GET requests, but don't advertise it in the Swagger

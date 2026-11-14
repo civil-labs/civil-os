@@ -13,7 +13,7 @@ import (
 )
 
 type ParcelServer struct {
-	dbReaderClient meshparcelsv1connect.ParcelsServiceClient
+	dbReaderClient meshparcelsv1connect.ParcelReadServiceClient
 	logger         *slog.Logger
 }
 

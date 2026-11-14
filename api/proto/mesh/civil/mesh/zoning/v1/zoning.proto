@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package civil.mesh.zoning.v1;
 
-service ZoningService {
+service ZoningReadService {
   rpc GetZoning(GetZoningRequest) returns (GetZoningResponse) {}
 }
 

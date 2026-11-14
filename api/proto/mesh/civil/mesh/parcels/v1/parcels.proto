@@ -5,7 +5,7 @@ package civil.mesh.parcels.v1;
 import "google/protobuf/timestamp.proto";
 import "google/type/interval.proto";
 
-service ParcelsService {
+service ParcelReadService {
   // Retrieves the value for a specified attribute for a given parcel
   rpc GetParcelsWithImprovementSummaryByParcelId(GetParcelsWithImprovementSummaryByParcelIdRequest) returns (GetParcelsWithImprovementSummaryByParcelIdResponse) {}
 
@@ -76,9 +76,14 @@ service ParcelsService {
   rpc GetPrimaryImprovementConditionIdByFeatureId(GetPrimaryImprovementConditionIdByFeatureIdRequest) returns (GetPrimaryImprovementConditionIdByFeatureIdResponse) {}
 
   rpc GetPrimaryImprovementTypeIdByFeatureId(GetPrimaryImprovementTypeIdByFeatureIdRequest) returns (GetPrimaryImprovementTypeIdByFeatureIdResponse) {}
+}
 
-  // Mutation
-
+// Parcel mutations. Served by the database-writer, which connects with a
+// write-capable database role; reads stay on ParcelReadService.
+service ParcelWriteService {
+  // Corrects the current legal record of a parcel's attributes in place.
+  // Only fields present in the request change; properties replaces the
+  // stored JSON object.
   rpc UpdateParcel(UpdateParcelRequest) returns (UpdateParcelResponse) {}
 }
 

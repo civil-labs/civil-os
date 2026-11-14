@@ -11,7 +11,7 @@ import (
 )
 
 type ZoningServer struct {
-	dbReaderClient meshzoningv1connect.ZoningServiceClient
+	dbReaderClient meshzoningv1connect.ZoningReadServiceClient
 	logger         *slog.Logger
 }
 

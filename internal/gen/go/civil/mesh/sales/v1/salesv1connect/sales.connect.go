@@ -21,8 +21,8 @@ import (
 const _ = connect.IsAtLeastVersion1_13_0
 
 const (
-	// SalesServiceName is the fully-qualified name of the SalesService service.
-	SalesServiceName = "civil.mesh.sales.v1.SalesService"
+	// SaleReadServiceName is the fully-qualified name of the SaleReadService service.
+	SaleReadServiceName = "civil.mesh.sales.v1.SaleReadService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -33,114 +33,114 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// SalesServiceGetSalesByParcelIdProcedure is the fully-qualified name of the SalesService's
+	// SaleReadServiceGetSalesByParcelIdProcedure is the fully-qualified name of the SaleReadService's
 	// GetSalesByParcelId RPC.
-	SalesServiceGetSalesByParcelIdProcedure = "/civil.mesh.sales.v1.SalesService/GetSalesByParcelId"
-	// SalesServiceGetSalesByPolygonProcedure is the fully-qualified name of the SalesService's
+	SaleReadServiceGetSalesByParcelIdProcedure = "/civil.mesh.sales.v1.SaleReadService/GetSalesByParcelId"
+	// SaleReadServiceGetSalesByPolygonProcedure is the fully-qualified name of the SaleReadService's
 	// GetSalesByPolygon RPC.
-	SalesServiceGetSalesByPolygonProcedure = "/civil.mesh.sales.v1.SalesService/GetSalesByPolygon"
+	SaleReadServiceGetSalesByPolygonProcedure = "/civil.mesh.sales.v1.SaleReadService/GetSalesByPolygon"
 )
 
-// SalesServiceClient is a client for the civil.mesh.sales.v1.SalesService service.
-type SalesServiceClient interface {
+// SaleReadServiceClient is a client for the civil.mesh.sales.v1.SaleReadService service.
+type SaleReadServiceClient interface {
 	// Retrieves all of a specified parcel's attributes as an object.
 	GetSalesByParcelId(context.Context, *connect.Request[v1.GetSalesByParcelIdRequest]) (*connect.Response[v1.GetSalesByParcelIdResponse], error)
 	// Retrieves a set of summary statistics about the specified numerical attribute for a specified list of parcels. Optionally returns the values as well
 	GetSalesByPolygon(context.Context, *connect.Request[v1.GetSalesByPolygonRequest]) (*connect.Response[v1.GetSalesByPolygonResponse], error)
 }
 
-// NewSalesServiceClient constructs a client for the civil.mesh.sales.v1.SalesService service. By
-// default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
-// and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
+// NewSaleReadServiceClient constructs a client for the civil.mesh.sales.v1.SaleReadService service.
+// By default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped
+// responses, and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
 // connect.WithGRPC() or connect.WithGRPCWeb() options.
 //
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
 // http://api.acme.com or https://acme.com/grpc).
-func NewSalesServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) SalesServiceClient {
+func NewSaleReadServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) SaleReadServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
-	salesServiceMethods := v1.File_civil_mesh_sales_v1_sales_proto.Services().ByName("SalesService").Methods()
-	return &salesServiceClient{
+	saleReadServiceMethods := v1.File_civil_mesh_sales_v1_sales_proto.Services().ByName("SaleReadService").Methods()
+	return &saleReadServiceClient{
 		getSalesByParcelId: connect.NewClient[v1.GetSalesByParcelIdRequest, v1.GetSalesByParcelIdResponse](
 			httpClient,
-			baseURL+SalesServiceGetSalesByParcelIdProcedure,
-			connect.WithSchema(salesServiceMethods.ByName("GetSalesByParcelId")),
+			baseURL+SaleReadServiceGetSalesByParcelIdProcedure,
+			connect.WithSchema(saleReadServiceMethods.ByName("GetSalesByParcelId")),
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		getSalesByPolygon: connect.NewClient[v1.GetSalesByPolygonRequest, v1.GetSalesByPolygonResponse](
 			httpClient,
-			baseURL+SalesServiceGetSalesByPolygonProcedure,
-			connect.WithSchema(salesServiceMethods.ByName("GetSalesByPolygon")),
+			baseURL+SaleReadServiceGetSalesByPolygonProcedure,
+			connect.WithSchema(saleReadServiceMethods.ByName("GetSalesByPolygon")),
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 	}
 }
 
-// salesServiceClient implements SalesServiceClient.
-type salesServiceClient struct {
+// saleReadServiceClient implements SaleReadServiceClient.
+type saleReadServiceClient struct {
 	getSalesByParcelId *connect.Client[v1.GetSalesByParcelIdRequest, v1.GetSalesByParcelIdResponse]
 	getSalesByPolygon  *connect.Client[v1.GetSalesByPolygonRequest, v1.GetSalesByPolygonResponse]
 }
 
-// GetSalesByParcelId calls civil.mesh.sales.v1.SalesService.GetSalesByParcelId.
-func (c *salesServiceClient) GetSalesByParcelId(ctx context.Context, req *connect.Request[v1.GetSalesByParcelIdRequest]) (*connect.Response[v1.GetSalesByParcelIdResponse], error) {
+// GetSalesByParcelId calls civil.mesh.sales.v1.SaleReadService.GetSalesByParcelId.
+func (c *saleReadServiceClient) GetSalesByParcelId(ctx context.Context, req *connect.Request[v1.GetSalesByParcelIdRequest]) (*connect.Response[v1.GetSalesByParcelIdResponse], error) {
 	return c.getSalesByParcelId.CallUnary(ctx, req)
 }
 
-// GetSalesByPolygon calls civil.mesh.sales.v1.SalesService.GetSalesByPolygon.
-func (c *salesServiceClient) GetSalesByPolygon(ctx context.Context, req *connect.Request[v1.GetSalesByPolygonRequest]) (*connect.Response[v1.GetSalesByPolygonResponse], error) {
+// GetSalesByPolygon calls civil.mesh.sales.v1.SaleReadService.GetSalesByPolygon.
+func (c *saleReadServiceClient) GetSalesByPolygon(ctx context.Context, req *connect.Request[v1.GetSalesByPolygonRequest]) (*connect.Response[v1.GetSalesByPolygonResponse], error) {
 	return c.getSalesByPolygon.CallUnary(ctx, req)
 }
 
-// SalesServiceHandler is an implementation of the civil.mesh.sales.v1.SalesService service.
-type SalesServiceHandler interface {
+// SaleReadServiceHandler is an implementation of the civil.mesh.sales.v1.SaleReadService service.
+type SaleReadServiceHandler interface {
 	// Retrieves all of a specified parcel's attributes as an object.
 	GetSalesByParcelId(context.Context, *connect.Request[v1.GetSalesByParcelIdRequest]) (*connect.Response[v1.GetSalesByParcelIdResponse], error)
 	// Retrieves a set of summary statistics about the specified numerical attribute for a specified list of parcels. Optionally returns the values as well
 	GetSalesByPolygon(context.Context, *connect.Request[v1.GetSalesByPolygonRequest]) (*connect.Response[v1.GetSalesByPolygonResponse], error)
 }
 
-// NewSalesServiceHandler builds an HTTP handler from the service implementation. It returns the
+// NewSaleReadServiceHandler builds an HTTP handler from the service implementation. It returns the
 // path on which to mount the handler and the handler itself.
 //
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
-func NewSalesServiceHandler(svc SalesServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	salesServiceMethods := v1.File_civil_mesh_sales_v1_sales_proto.Services().ByName("SalesService").Methods()
-	salesServiceGetSalesByParcelIdHandler := connect.NewUnaryHandler(
-		SalesServiceGetSalesByParcelIdProcedure,
+func NewSaleReadServiceHandler(svc SaleReadServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	saleReadServiceMethods := v1.File_civil_mesh_sales_v1_sales_proto.Services().ByName("SaleReadService").Methods()
+	saleReadServiceGetSalesByParcelIdHandler := connect.NewUnaryHandler(
+		SaleReadServiceGetSalesByParcelIdProcedure,
 		svc.GetSalesByParcelId,
-		connect.WithSchema(salesServiceMethods.ByName("GetSalesByParcelId")),
+		connect.WithSchema(saleReadServiceMethods.ByName("GetSalesByParcelId")),
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
-	salesServiceGetSalesByPolygonHandler := connect.NewUnaryHandler(
-		SalesServiceGetSalesByPolygonProcedure,
+	saleReadServiceGetSalesByPolygonHandler := connect.NewUnaryHandler(
+		SaleReadServiceGetSalesByPolygonProcedure,
 		svc.GetSalesByPolygon,
-		connect.WithSchema(salesServiceMethods.ByName("GetSalesByPolygon")),
+		connect.WithSchema(saleReadServiceMethods.ByName("GetSalesByPolygon")),
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
-	return "/civil.mesh.sales.v1.SalesService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/civil.mesh.sales.v1.SaleReadService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case SalesServiceGetSalesByParcelIdProcedure:
-			salesServiceGetSalesByParcelIdHandler.ServeHTTP(w, r)
-		case SalesServiceGetSalesByPolygonProcedure:
-			salesServiceGetSalesByPolygonHandler.ServeHTTP(w, r)
+		case SaleReadServiceGetSalesByParcelIdProcedure:
+			saleReadServiceGetSalesByParcelIdHandler.ServeHTTP(w, r)
+		case SaleReadServiceGetSalesByPolygonProcedure:
+			saleReadServiceGetSalesByPolygonHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
 	})
 }
 
-// UnimplementedSalesServiceHandler returns CodeUnimplemented from all methods.
-type UnimplementedSalesServiceHandler struct{}
+// UnimplementedSaleReadServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedSaleReadServiceHandler struct{}
 
-func (UnimplementedSalesServiceHandler) GetSalesByParcelId(context.Context, *connect.Request[v1.GetSalesByParcelIdRequest]) (*connect.Response[v1.GetSalesByParcelIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.sales.v1.SalesService.GetSalesByParcelId is not implemented"))
+func (UnimplementedSaleReadServiceHandler) GetSalesByParcelId(context.Context, *connect.Request[v1.GetSalesByParcelIdRequest]) (*connect.Response[v1.GetSalesByParcelIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.sales.v1.SaleReadService.GetSalesByParcelId is not implemented"))
 }
 
-func (UnimplementedSalesServiceHandler) GetSalesByPolygon(context.Context, *connect.Request[v1.GetSalesByPolygonRequest]) (*connect.Response[v1.GetSalesByPolygonResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.sales.v1.SalesService.GetSalesByPolygon is not implemented"))
+func (UnimplementedSaleReadServiceHandler) GetSalesByPolygon(context.Context, *connect.Request[v1.GetSalesByPolygonRequest]) (*connect.Response[v1.GetSalesByPolygonResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.sales.v1.SaleReadService.GetSalesByPolygon is not implemented"))
 }

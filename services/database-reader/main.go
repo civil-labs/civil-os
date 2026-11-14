@@ -75,28 +75,33 @@ func main() {
 	}
 	mux := http.NewServeMux()
 
-	path, handler := parcelsv1connect.NewParcelsServiceHandler(srv)
+	path, handler := parcelsv1connect.NewParcelReadServiceHandler(srv)
 	mux.Handle(path, handler)
 
-	path2, handler2 := improvementsv1connect.NewImprovementsServiceHandler(srv)
+	path2, handler2 := improvementsv1connect.NewImprovementReadServiceHandler(srv)
 	mux.Handle(path2, handler2)
 
-	path3, handler3 := landusesv1connect.NewLandUsesServiceHandler(srv)
+	path3, handler3 := landusesv1connect.NewLandUseReadServiceHandler(srv)
 	mux.Handle(path3, handler3)
 
-	path4, handler4 := zoningv1connect.NewZoningServiceHandler(srv)
+	path4, handler4 := zoningv1connect.NewZoningReadServiceHandler(srv)
 	mux.Handle(path4, handler4)
 
-	path5, handler5 := meshvaluationsv1connect.NewValuationServiceHandler(srv)
+	path5, handler5 := meshvaluationsv1connect.NewValuationReadServiceHandler(srv)
 	mux.Handle(path5, handler5)
 
-	path6, handler6 := meshneighborhoodsv1connect.NewNeighborhoodServiceHandler(srv)
+	path6, handler6 := meshneighborhoodsv1connect.NewNeighborhoodReadServiceHandler(srv)
 	mux.Handle(path6, handler6)
 
 	// Pass the fully qualified name of the service so the health check
 	// can report on this specific service, as well as the global server status.
 	checker := grpchealth.NewStaticChecker(
-		parcelsv1connect.ParcelsServiceName,
+		parcelsv1connect.ParcelReadServiceName,
+		improvementsv1connect.ImprovementReadServiceName,
+		landusesv1connect.LandUseReadServiceName,
+		zoningv1connect.ZoningReadServiceName,
+		meshvaluationsv1connect.ValuationReadServiceName,
+		meshneighborhoodsv1connect.NeighborhoodReadServiceName,
 	)
 
 	healthPath, healthHandler := grpchealth.NewHandler(checker)

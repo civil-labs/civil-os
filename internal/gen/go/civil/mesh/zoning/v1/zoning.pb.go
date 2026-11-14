@@ -220,8 +220,8 @@ const file_civil_mesh_zoning_v1_zoning_proto_rawDesc = "" +
 	"\x06zoning\x18\x01 \x03(\v23.civil.mesh.zoning.v1.GetZoningResponse.ZoningEntryR\x06zoning\x1aW\n" +
 	"\vZoningEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x122\n" +
-	"\x05value\x18\x02 \x01(\v2\x1c.civil.mesh.zoning.v1.ZoningR\x05value:\x028\x012o\n" +
-	"\rZoningService\x12^\n" +
+	"\x05value\x18\x02 \x01(\v2\x1c.civil.mesh.zoning.v1.ZoningR\x05value:\x028\x012s\n" +
+	"\x11ZoningReadService\x12^\n" +
 	"\tGetZoning\x12&.civil.mesh.zoning.v1.GetZoningRequest\x1a'.civil.mesh.zoning.v1.GetZoningResponse\"\x00B\xe8\x01\n" +
 	"\x18com.civil.mesh.zoning.v1B\vZoningProtoP\x01ZLgithub.com/civil-labs/civil-os/internal/gen/go/civil/mesh/zoning/v1;zoningv1\xa2\x02\x03CMZ\xaa\x02\x14Civil.Mesh.Zoning.V1\xca\x02\x14Civil\\Mesh\\Zoning\\V1\xe2\x02 Civil\\Mesh\\Zoning\\V1\\GPBMetadata\xea\x02\x17Civil::Mesh::Zoning::V1b\x06proto3"
 
@@ -247,8 +247,8 @@ var file_civil_mesh_zoning_v1_zoning_proto_goTypes = []any{
 var file_civil_mesh_zoning_v1_zoning_proto_depIdxs = []int32{
 	3, // 0: civil.mesh.zoning.v1.GetZoningResponse.zoning:type_name -> civil.mesh.zoning.v1.GetZoningResponse.ZoningEntry
 	0, // 1: civil.mesh.zoning.v1.GetZoningResponse.ZoningEntry.value:type_name -> civil.mesh.zoning.v1.Zoning
-	1, // 2: civil.mesh.zoning.v1.ZoningService.GetZoning:input_type -> civil.mesh.zoning.v1.GetZoningRequest
-	2, // 3: civil.mesh.zoning.v1.ZoningService.GetZoning:output_type -> civil.mesh.zoning.v1.GetZoningResponse
+	1, // 2: civil.mesh.zoning.v1.ZoningReadService.GetZoning:input_type -> civil.mesh.zoning.v1.GetZoningRequest
+	2, // 3: civil.mesh.zoning.v1.ZoningReadService.GetZoning:output_type -> civil.mesh.zoning.v1.GetZoningResponse
 	3, // [3:4] is the sub-list for method output_type
 	2, // [2:3] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name

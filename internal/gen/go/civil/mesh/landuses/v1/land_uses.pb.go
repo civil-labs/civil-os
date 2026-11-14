@@ -361,8 +361,8 @@ const file_civil_mesh_landuses_v1_land_uses_proto_rawDesc = "" +
 	"\x0eland_use_types\x18\x01 \x03(\v2A.civil.mesh.landuses.v1.GetLandUseTypesResponse.LandUseTypesEntryR\flandUseTypes\x1ad\n" +
 	"\x11LandUseTypesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x129\n" +
-	"\x05value\x18\x02 \x01(\v2#.civil.mesh.landuses.v1.LandUseTypeR\x05value:\x028\x012\xf1\x01\n" +
-	"\x0fLandUsesService\x12h\n" +
+	"\x05value\x18\x02 \x01(\v2#.civil.mesh.landuses.v1.LandUseTypeR\x05value:\x028\x012\xf4\x01\n" +
+	"\x12LandUseReadService\x12h\n" +
 	"\vGetLandUses\x12*.civil.mesh.landuses.v1.GetLandUsesRequest\x1a+.civil.mesh.landuses.v1.GetLandUsesResponse\"\x00\x12t\n" +
 	"\x0fGetLandUseTypes\x12..civil.mesh.landuses.v1.GetLandUseTypesRequest\x1a/.civil.mesh.landuses.v1.GetLandUseTypesResponse\"\x00B\xf8\x01\n" +
 	"\x1acom.civil.mesh.landuses.v1B\rLandUsesProtoP\x01ZPgithub.com/civil-labs/civil-os/internal/gen/go/civil/mesh/landuses/v1;landusesv1\xa2\x02\x03CML\xaa\x02\x16Civil.Mesh.Landuses.V1\xca\x02\x16Civil\\Mesh\\Landuses\\V1\xe2\x02\"Civil\\Mesh\\Landuses\\V1\\GPBMetadata\xea\x02\x19Civil::Mesh::Landuses::V1b\x06proto3"
@@ -395,10 +395,10 @@ var file_civil_mesh_landuses_v1_land_uses_proto_depIdxs = []int32{
 	7, // 1: civil.mesh.landuses.v1.GetLandUseTypesResponse.land_use_types:type_name -> civil.mesh.landuses.v1.GetLandUseTypesResponse.LandUseTypesEntry
 	0, // 2: civil.mesh.landuses.v1.GetLandUsesResponse.LandUsesEntry.value:type_name -> civil.mesh.landuses.v1.LandUse
 	3, // 3: civil.mesh.landuses.v1.GetLandUseTypesResponse.LandUseTypesEntry.value:type_name -> civil.mesh.landuses.v1.LandUseType
-	1, // 4: civil.mesh.landuses.v1.LandUsesService.GetLandUses:input_type -> civil.mesh.landuses.v1.GetLandUsesRequest
-	4, // 5: civil.mesh.landuses.v1.LandUsesService.GetLandUseTypes:input_type -> civil.mesh.landuses.v1.GetLandUseTypesRequest
-	2, // 6: civil.mesh.landuses.v1.LandUsesService.GetLandUses:output_type -> civil.mesh.landuses.v1.GetLandUsesResponse
-	5, // 7: civil.mesh.landuses.v1.LandUsesService.GetLandUseTypes:output_type -> civil.mesh.landuses.v1.GetLandUseTypesResponse
+	1, // 4: civil.mesh.landuses.v1.LandUseReadService.GetLandUses:input_type -> civil.mesh.landuses.v1.GetLandUsesRequest
+	4, // 5: civil.mesh.landuses.v1.LandUseReadService.GetLandUseTypes:input_type -> civil.mesh.landuses.v1.GetLandUseTypesRequest
+	2, // 6: civil.mesh.landuses.v1.LandUseReadService.GetLandUses:output_type -> civil.mesh.landuses.v1.GetLandUsesResponse
+	5, // 7: civil.mesh.landuses.v1.LandUseReadService.GetLandUseTypes:output_type -> civil.mesh.landuses.v1.GetLandUseTypesResponse
 	6, // [6:8] is the sub-list for method output_type
 	4, // [4:6] is the sub-list for method input_type
 	4, // [4:4] is the sub-list for extension type_name

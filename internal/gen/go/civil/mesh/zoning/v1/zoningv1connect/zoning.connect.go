@@ -21,8 +21,8 @@ import (
 const _ = connect.IsAtLeastVersion1_13_0
 
 const (
-	// ZoningServiceName is the fully-qualified name of the ZoningService service.
-	ZoningServiceName = "civil.mesh.zoning.v1.ZoningService"
+	// ZoningReadServiceName is the fully-qualified name of the ZoningReadService service.
+	ZoningReadServiceName = "civil.mesh.zoning.v1.ZoningReadService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -33,76 +33,78 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// ZoningServiceGetZoningProcedure is the fully-qualified name of the ZoningService's GetZoning RPC.
-	ZoningServiceGetZoningProcedure = "/civil.mesh.zoning.v1.ZoningService/GetZoning"
+	// ZoningReadServiceGetZoningProcedure is the fully-qualified name of the ZoningReadService's
+	// GetZoning RPC.
+	ZoningReadServiceGetZoningProcedure = "/civil.mesh.zoning.v1.ZoningReadService/GetZoning"
 )
 
-// ZoningServiceClient is a client for the civil.mesh.zoning.v1.ZoningService service.
-type ZoningServiceClient interface {
+// ZoningReadServiceClient is a client for the civil.mesh.zoning.v1.ZoningReadService service.
+type ZoningReadServiceClient interface {
 	GetZoning(context.Context, *connect.Request[v1.GetZoningRequest]) (*connect.Response[v1.GetZoningResponse], error)
 }
 
-// NewZoningServiceClient constructs a client for the civil.mesh.zoning.v1.ZoningService service. By
-// default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
-// and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
-// connect.WithGRPC() or connect.WithGRPCWeb() options.
+// NewZoningReadServiceClient constructs a client for the civil.mesh.zoning.v1.ZoningReadService
+// service. By default, it uses the Connect protocol with the binary Protobuf Codec, asks for
+// gzipped responses, and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply
+// the connect.WithGRPC() or connect.WithGRPCWeb() options.
 //
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
 // http://api.acme.com or https://acme.com/grpc).
-func NewZoningServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ZoningServiceClient {
+func NewZoningReadServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ZoningReadServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
-	zoningServiceMethods := v1.File_civil_mesh_zoning_v1_zoning_proto.Services().ByName("ZoningService").Methods()
-	return &zoningServiceClient{
+	zoningReadServiceMethods := v1.File_civil_mesh_zoning_v1_zoning_proto.Services().ByName("ZoningReadService").Methods()
+	return &zoningReadServiceClient{
 		getZoning: connect.NewClient[v1.GetZoningRequest, v1.GetZoningResponse](
 			httpClient,
-			baseURL+ZoningServiceGetZoningProcedure,
-			connect.WithSchema(zoningServiceMethods.ByName("GetZoning")),
+			baseURL+ZoningReadServiceGetZoningProcedure,
+			connect.WithSchema(zoningReadServiceMethods.ByName("GetZoning")),
 			connect.WithClientOptions(opts...),
 		),
 	}
 }
 
-// zoningServiceClient implements ZoningServiceClient.
-type zoningServiceClient struct {
+// zoningReadServiceClient implements ZoningReadServiceClient.
+type zoningReadServiceClient struct {
 	getZoning *connect.Client[v1.GetZoningRequest, v1.GetZoningResponse]
 }
 
-// GetZoning calls civil.mesh.zoning.v1.ZoningService.GetZoning.
-func (c *zoningServiceClient) GetZoning(ctx context.Context, req *connect.Request[v1.GetZoningRequest]) (*connect.Response[v1.GetZoningResponse], error) {
+// GetZoning calls civil.mesh.zoning.v1.ZoningReadService.GetZoning.
+func (c *zoningReadServiceClient) GetZoning(ctx context.Context, req *connect.Request[v1.GetZoningRequest]) (*connect.Response[v1.GetZoningResponse], error) {
 	return c.getZoning.CallUnary(ctx, req)
 }
 
-// ZoningServiceHandler is an implementation of the civil.mesh.zoning.v1.ZoningService service.
-type ZoningServiceHandler interface {
+// ZoningReadServiceHandler is an implementation of the civil.mesh.zoning.v1.ZoningReadService
+// service.
+type ZoningReadServiceHandler interface {
 	GetZoning(context.Context, *connect.Request[v1.GetZoningRequest]) (*connect.Response[v1.GetZoningResponse], error)
 }
 
-// NewZoningServiceHandler builds an HTTP handler from the service implementation. It returns the
-// path on which to mount the handler and the handler itself.
+// NewZoningReadServiceHandler builds an HTTP handler from the service implementation. It returns
+// the path on which to mount the handler and the handler itself.
 //
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
-func NewZoningServiceHandler(svc ZoningServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	zoningServiceMethods := v1.File_civil_mesh_zoning_v1_zoning_proto.Services().ByName("ZoningService").Methods()
-	zoningServiceGetZoningHandler := connect.NewUnaryHandler(
-		ZoningServiceGetZoningProcedure,
+func NewZoningReadServiceHandler(svc ZoningReadServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	zoningReadServiceMethods := v1.File_civil_mesh_zoning_v1_zoning_proto.Services().ByName("ZoningReadService").Methods()
+	zoningReadServiceGetZoningHandler := connect.NewUnaryHandler(
+		ZoningReadServiceGetZoningProcedure,
 		svc.GetZoning,
-		connect.WithSchema(zoningServiceMethods.ByName("GetZoning")),
+		connect.WithSchema(zoningReadServiceMethods.ByName("GetZoning")),
 		connect.WithHandlerOptions(opts...),
 	)
-	return "/civil.mesh.zoning.v1.ZoningService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/civil.mesh.zoning.v1.ZoningReadService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case ZoningServiceGetZoningProcedure:
-			zoningServiceGetZoningHandler.ServeHTTP(w, r)
+		case ZoningReadServiceGetZoningProcedure:
+			zoningReadServiceGetZoningHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
 	})
 }
 
-// UnimplementedZoningServiceHandler returns CodeUnimplemented from all methods.
-type UnimplementedZoningServiceHandler struct{}
+// UnimplementedZoningReadServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedZoningReadServiceHandler struct{}
 
-func (UnimplementedZoningServiceHandler) GetZoning(context.Context, *connect.Request[v1.GetZoningRequest]) (*connect.Response[v1.GetZoningResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.zoning.v1.ZoningService.GetZoning is not implemented"))
+func (UnimplementedZoningReadServiceHandler) GetZoning(context.Context, *connect.Request[v1.GetZoningRequest]) (*connect.Response[v1.GetZoningResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.zoning.v1.ZoningReadService.GetZoning is not implemented"))
 }

@@ -116,32 +116,32 @@ func main() {
 
 	dbReaderAddress := "http://" + config.DBReaderHost
 
-	meshClient := meshparcelsv1connect.NewParcelsServiceClient(
+	meshClient := meshparcelsv1connect.NewParcelReadServiceClient(
 		http.DefaultClient,
 		dbReaderAddress, // The Envoy-routable address for the db-reader service
 	)
 
-	meshImprovementsClient := meshimprovementsv1connect.NewImprovementsServiceClient(
+	meshImprovementsClient := meshimprovementsv1connect.NewImprovementReadServiceClient(
 		http.DefaultClient,
 		dbReaderAddress,
 	)
 
-	meshLandUsesClient := meshlandusesv1connect.NewLandUsesServiceClient(
+	meshLandUsesClient := meshlandusesv1connect.NewLandUseReadServiceClient(
 		http.DefaultClient,
 		dbReaderAddress,
 	)
 
-	meshZoningClient := meshzoningv1connect.NewZoningServiceClient(
+	meshZoningClient := meshzoningv1connect.NewZoningReadServiceClient(
 		http.DefaultClient,
 		dbReaderAddress,
 	)
 
-	meshValuationsClient := meshvaluationsv1connect.NewValuationServiceClient(
+	meshValuationsClient := meshvaluationsv1connect.NewValuationReadServiceClient(
 		http.DefaultClient,
 		dbReaderAddress,
 	)
 
-	meshNeighborhoodsClient := meshneighborhoodsv1connect.NewNeighborhoodServiceClient(
+	meshNeighborhoodsClient := meshneighborhoodsv1connect.NewNeighborhoodReadServiceClient(
 		http.DefaultClient,
 		dbReaderAddress,
 	)

@@ -10,7 +10,6 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.41.9
 	github.com/aws/aws-sdk-go-v2/config v1.32.20
 	github.com/aws/aws-sdk-go-v2/service/servicediscovery v1.39.22
-	github.com/civil-labs/civil-api-go v0.0.0-20260812161835-dd57510ff842
 	github.com/coreos/go-oidc/v3 v3.17.0
 	github.com/dexidp/dex/api/v2 v2.4.0
 	github.com/google/gnostic v0.7.1

@@ -15,7 +15,7 @@ import (
 
 	"connectrpc.com/grpchealth"
 
-	"github.com/civil-labs/civil-api-go/civil/mesh/parcels/v1/parcelsv1connect"
+	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1/parcelsv1connect"
 )
 
 func main() {

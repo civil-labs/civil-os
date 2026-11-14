@@ -5,9 +5,9 @@ import (
 	"log/slog"
 
 	"connectrpc.com/connect"
-	meshimprovementsv1 "github.com/civil-labs/civil-api-go/civil/mesh/improvements/v1"
-	meshimprovementsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/improvements/v1/improvementsv1connect"
-	publicimprovementsv1 "github.com/civil-labs/civil-api-go/civil/public/improvements/v1"
+	publicimprovementsv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/improvements/v1"
+	meshimprovementsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/improvements/v1"
+	meshimprovementsv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/improvements/v1/improvementsv1connect"
 )
 
 type ImprovementServer struct {

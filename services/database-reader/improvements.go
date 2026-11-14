@@ -6,7 +6,7 @@ import (
 	"log/slog"
 
 	"connectrpc.com/connect"
-	improvementsv1 "github.com/civil-labs/civil-api-go/civil/mesh/improvements/v1"
+	improvementsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/improvements/v1"
 )
 
 func (s *APIServer) GetImprovementTypes(

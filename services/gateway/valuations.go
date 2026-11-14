@@ -5,9 +5,9 @@ import (
 	"log/slog"
 
 	"connectrpc.com/connect"
-	meshvaluationsv1 "github.com/civil-labs/civil-api-go/civil/mesh/valuations/v1"
-	meshvaluationsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/valuations/v1/valuationsv1connect"
-	publicvaluationsv1 "github.com/civil-labs/civil-api-go/civil/public/valuations/v1"
+	publicvaluationsv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/valuations/v1"
+	meshvaluationsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/valuations/v1"
+	meshvaluationsv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/valuations/v1/valuationsv1connect"
 )
 
 type ValuationServer struct {

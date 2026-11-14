@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"connectrpc.com/connect"
-	instancev1 "github.com/civil-labs/civil-api-go/civil/public/instance/v1"
+	instancev1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/instance/v1"
 	"gocloud.dev/blob"
 	_ "gocloud.dev/blob/azureblob"
 	_ "gocloud.dev/blob/fileblob"

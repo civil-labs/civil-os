@@ -6,7 +6,7 @@ import (
 	"log/slog"
 
 	"connectrpc.com/connect"
-	landusesv1 "github.com/civil-labs/civil-api-go/civil/mesh/landuses/v1"
+	landusesv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/landuses/v1"
 )
 
 func (s *APIServer) GetLandUses(

@@ -4,10 +4,10 @@ import (
 	"context"
 	"log/slog"
 
-	publicparcelsv1 "github.com/civil-labs/civil-api-go/civil/public/parcels/v1"
+	publicparcelsv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/parcels/v1"
 
-	meshparcelsv1 "github.com/civil-labs/civil-api-go/civil/mesh/parcels/v1"
-	meshparcelsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/parcels/v1/parcelsv1connect"
+	meshparcelsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1"
+	meshparcelsv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1/parcelsv1connect"
 
 	"connectrpc.com/connect"
 )
@@ -343,14 +343,14 @@ func mapParcelWithImprovementSummary(meshParcels map[string]*meshparcelsv1.Parce
 			ms := mp.ImprovementSummary
 			publicSummary = &publicparcelsv1.ParcelImprovementsSummary{
 				ImprovementIds:                ms.ImprovementIds,
-				PrimaryImprovementId:           ms.PrimaryImprovementId,
-				TotalAreaSqFt:                  ms.TotalAreaSqFt,
-				TotalBathrooms:                 ms.TotalBathrooms,
-				TotalBedrooms:                  ms.TotalBedrooms,
-				TotalUnits:                     ms.TotalUnits,
-				PrimaryYearBuilt:               ms.PrimaryYearBuilt,
-				PrimaryEffectiveYearBuilt:      ms.PrimaryEffectiveYearBuilt,
-				PrimaryConditionId:             ms.PrimaryConditionId,
+				PrimaryImprovementId:          ms.PrimaryImprovementId,
+				TotalAreaSqFt:                 ms.TotalAreaSqFt,
+				TotalBathrooms:                ms.TotalBathrooms,
+				TotalBedrooms:                 ms.TotalBedrooms,
+				TotalUnits:                    ms.TotalUnits,
+				PrimaryYearBuilt:              ms.PrimaryYearBuilt,
+				PrimaryEffectiveYearBuilt:     ms.PrimaryEffectiveYearBuilt,
+				PrimaryConditionId:            ms.PrimaryConditionId,
 				TotalMarketImprovementValue:   ms.TotalMarketImprovementValue,
 				TotalAssessedImprovementValue: ms.TotalAssessedImprovementValue,
 			}
@@ -412,7 +412,9 @@ func (s *ParcelServer) GetLandAreaSqftByParcelId(ctx context.Context, req *conne
 		LegalAsOf: req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetLandAreaSqftByParcelId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetLandAreaSqftByParcelId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetLandAreaSqftByParcelIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -424,7 +426,9 @@ func (s *ParcelServer) GetFrontageFtByParcelId(ctx context.Context, req *connect
 		LegalAsOf: req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetFrontageFtByParcelId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetFrontageFtByParcelId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetFrontageFtByParcelIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -436,7 +440,9 @@ func (s *ParcelServer) GetDepthFtByParcelId(ctx context.Context, req *connect.Re
 		LegalAsOf: req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetDepthFtByParcelId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetDepthFtByParcelId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetDepthFtByParcelIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -448,7 +454,9 @@ func (s *ParcelServer) GetLandUseIdByParcelId(ctx context.Context, req *connect.
 		LegalAsOf: req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetLandUseIdByParcelId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetLandUseIdByParcelId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetLandUseIdByParcelIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -460,7 +468,9 @@ func (s *ParcelServer) GetZoningIdByParcelId(ctx context.Context, req *connect.R
 		LegalAsOf: req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetZoningIdByParcelId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetZoningIdByParcelId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetZoningIdByParcelIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -472,7 +482,9 @@ func (s *ParcelServer) GetImprovementAreaSqftByParcelId(ctx context.Context, req
 		LegalAsOf: req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetImprovementAreaSqftByParcelId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetImprovementAreaSqftByParcelId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetImprovementAreaSqftByParcelIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -484,7 +496,9 @@ func (s *ParcelServer) GetBedroomsByParcelId(ctx context.Context, req *connect.R
 		LegalAsOf: req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetBedroomsByParcelId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetBedroomsByParcelId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetBedroomsByParcelIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -496,7 +510,9 @@ func (s *ParcelServer) GetBathroomsByParcelId(ctx context.Context, req *connect.
 		LegalAsOf: req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetBathroomsByParcelId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetBathroomsByParcelId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetBathroomsByParcelIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -508,7 +524,9 @@ func (s *ParcelServer) GetUnitsByParcelId(ctx context.Context, req *connect.Requ
 		LegalAsOf: req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetUnitsByParcelId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetUnitsByParcelId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetUnitsByParcelIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -520,7 +538,9 @@ func (s *ParcelServer) GetPrimaryImprovementYearBuiltByParcelId(ctx context.Cont
 		LegalAsOf: req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetPrimaryImprovementYearBuiltByParcelId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetPrimaryImprovementYearBuiltByParcelId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetPrimaryImprovementYearBuiltByParcelIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -532,7 +552,9 @@ func (s *ParcelServer) GetPrimaryImprovementEffectiveYearBuiltByParcelId(ctx con
 		LegalAsOf: req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetPrimaryImprovementEffectiveYearBuiltByParcelId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetPrimaryImprovementEffectiveYearBuiltByParcelId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -544,7 +566,9 @@ func (s *ParcelServer) GetPrimaryImprovementConditionIdByParcelId(ctx context.Co
 		LegalAsOf: req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetPrimaryImprovementConditionIdByParcelId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetPrimaryImprovementConditionIdByParcelId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetPrimaryImprovementConditionIdByParcelIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -556,7 +580,9 @@ func (s *ParcelServer) GetPrimaryImprovementTypeIdByParcelId(ctx context.Context
 		LegalAsOf: req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetPrimaryImprovementTypeIdByParcelId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetPrimaryImprovementTypeIdByParcelId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetPrimaryImprovementTypeIdByParcelIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -568,7 +594,9 @@ func (s *ParcelServer) GetLandAreaSqftByFeatureId(ctx context.Context, req *conn
 		LegalAsOf:  req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetLandAreaSqftByFeatureId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetLandAreaSqftByFeatureId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetLandAreaSqftByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -580,7 +608,9 @@ func (s *ParcelServer) GetFrontageFtByFeatureId(ctx context.Context, req *connec
 		LegalAsOf:  req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetFrontageFtByFeatureId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetFrontageFtByFeatureId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetFrontageFtByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -592,7 +622,9 @@ func (s *ParcelServer) GetDepthFtByFeatureId(ctx context.Context, req *connect.R
 		LegalAsOf:  req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetDepthFtByFeatureId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetDepthFtByFeatureId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetDepthFtByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -604,7 +636,9 @@ func (s *ParcelServer) GetLandUseIdByFeatureId(ctx context.Context, req *connect
 		LegalAsOf:  req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetLandUseIdByFeatureId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetLandUseIdByFeatureId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetLandUseIdByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -616,7 +650,9 @@ func (s *ParcelServer) GetZoningIdByFeatureId(ctx context.Context, req *connect.
 		LegalAsOf:  req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetZoningIdByFeatureId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetZoningIdByFeatureId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetZoningIdByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -628,7 +664,9 @@ func (s *ParcelServer) GetImprovementAreaSqftByFeatureId(ctx context.Context, re
 		LegalAsOf:  req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetImprovementAreaSqftByFeatureId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetImprovementAreaSqftByFeatureId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetImprovementAreaSqftByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -640,7 +678,9 @@ func (s *ParcelServer) GetBedroomsByFeatureId(ctx context.Context, req *connect.
 		LegalAsOf:  req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetBedroomsByFeatureId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetBedroomsByFeatureId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetBedroomsByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -652,7 +692,9 @@ func (s *ParcelServer) GetBathroomsByFeatureId(ctx context.Context, req *connect
 		LegalAsOf:  req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetBathroomsByFeatureId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetBathroomsByFeatureId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetBathroomsByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -664,7 +706,9 @@ func (s *ParcelServer) GetUnitsByFeatureId(ctx context.Context, req *connect.Req
 		LegalAsOf:  req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetUnitsByFeatureId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetUnitsByFeatureId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetUnitsByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -676,7 +720,9 @@ func (s *ParcelServer) GetPrimaryImprovementYearBuiltByFeatureId(ctx context.Con
 		LegalAsOf:  req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetPrimaryImprovementYearBuiltByFeatureId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetPrimaryImprovementYearBuiltByFeatureId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetPrimaryImprovementYearBuiltByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -688,7 +734,9 @@ func (s *ParcelServer) GetPrimaryImprovementEffectiveYearBuiltByFeatureId(ctx co
 		LegalAsOf:  req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetPrimaryImprovementEffectiveYearBuiltByFeatureId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetPrimaryImprovementEffectiveYearBuiltByFeatureId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -700,7 +748,9 @@ func (s *ParcelServer) GetPrimaryImprovementConditionIdByFeatureId(ctx context.C
 		LegalAsOf:  req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetPrimaryImprovementConditionIdByFeatureId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetPrimaryImprovementConditionIdByFeatureId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetPrimaryImprovementConditionIdByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
 }
@@ -712,7 +762,9 @@ func (s *ParcelServer) GetPrimaryImprovementTypeIdByFeatureId(ctx context.Contex
 		LegalAsOf:  req.Msg.LegalAsOf,
 	})
 	meshRes, err := s.dbReaderClient.GetPrimaryImprovementTypeIdByFeatureId(ctx, meshReq)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	logReturnedValues(s.logger, "GetPrimaryImprovementTypeIdByFeatureId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetPrimaryImprovementTypeIdByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
 }

@@ -3,7 +3,7 @@ package main
 import (
 	"log/slog"
 
-	"github.com/civil-labs/civil-api-go/civil/mesh/parcels/v1/parcelsv1connect"
+	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1/parcelsv1connect"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

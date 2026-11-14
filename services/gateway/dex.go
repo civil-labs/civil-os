@@ -6,7 +6,7 @@ import (
 	"log/slog"
 
 	"connectrpc.com/connect"
-	dexv1 "github.com/civil-labs/civil-api-go/civil/public/dex/v1"
+	dexv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/dex/v1"
 
 	"github.com/dexidp/dex/api/v2"
 )

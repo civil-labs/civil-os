@@ -5,9 +5,9 @@ import (
 	"log/slog"
 
 	"connectrpc.com/connect"
-	meshneighborhoodsv1 "github.com/civil-labs/civil-api-go/civil/mesh/neighborhoods/v1"
-	meshneighborhoodsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/neighborhoods/v1/neighborhoodsv1connect"
-	publicneighborhoodsv1 "github.com/civil-labs/civil-api-go/civil/public/neighborhoods/v1"
+	publicneighborhoodsv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/neighborhoods/v1"
+	meshneighborhoodsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/neighborhoods/v1"
+	meshneighborhoodsv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/neighborhoods/v1/neighborhoodsv1connect"
 )
 
 type NeighborhoodServer struct {

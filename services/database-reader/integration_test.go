@@ -196,13 +196,13 @@ func (p parcel) impType() string {
 	return tu.FixtureID(tu.ImprovementTypePrefix, 2)
 }
 
-// queried are active parcels with and without improvements; an unknown ID
-// is asked for too and must not come back. Voided parcels are covered by
-// TestVoidedParcelVisibility.
+// queried are active parcels with and without improvements. The voided
+// parcel and an unknown ID are asked for too and must never come back:
+// voided parcels are hidden from every read.
 var queried = []parcel{{1}, {3}, {13}, {17}}
 
 func parcelIDs() []string {
-	out := []string{tu.MissingID}
+	out := []string{tu.ParcelID(tu.VoidedParcel), tu.MissingID}
 	for _, p := range queried {
 		out = append(out, p.id())
 	}
@@ -210,7 +210,7 @@ func parcelIDs() []string {
 }
 
 func featureIDs() []int64 {
-	out := []int64{999999}
+	out := []int64{tu.ParcelFeatureID(tu.VoidedParcel), 999999}
 	for _, p := range queried {
 		out = append(out, p.feature())
 	}
@@ -239,7 +239,7 @@ func checkValues[K comparable, V any](t *testing.T, name string, got map[K]V, ke
 	}
 	for k := range got {
 		if _, ok := expected[k]; !ok {
-			t.Errorf("%s: unexpected key %v (unknown or unimproved parcel)", name, k)
+			t.Errorf("%s: unexpected key %v (voided, unknown or unimproved parcel)", name, k)
 		}
 	}
 }
@@ -560,37 +560,43 @@ func TestEquityComparables(t *testing.T) {
 	}
 }
 
-// TestVoidedParcelVisibility pins how the reader treats a voided parcel
-// today: the attribute and summary RPCs still return it, while
-// GetParcelIdsByFeatureId (and the writer) treat it as gone. Whether reads
-// should hide voided parcels is an open owner decision; change this test
-// together with the reader if they should.
-func TestVoidedParcelVisibility(t *testing.T) {
-	r := startReader(t)
+// TestVoidedParcelHidden checks the voided parcel still has current rows
+// (so the other tests' absence checks prove the filter, not missing data) and
+// that the comparables RPCs drop it too.
+func TestVoidedParcelHidden(t *testing.T) {
+	pool := tu.FixtureDatabase(t).Pool(t)
 	ctx := context.Background()
-	id, fid := tu.ParcelID(tu.VoidedParcel), tu.ParcelFeatureID(tu.VoidedParcel)
-
-	la, err := r.parcels.GetLandAreaSqftByParcelId(ctx, connect.NewRequest(&parcelsv1.GetLandAreaSqftByParcelIdRequest{ParcelIds: []string{id}}))
+	var rows int
+	err := pool.QueryRow(ctx, `
+		SELECT count(*) FROM core.parcel_attributes pa JOIN core.parcels p USING (parcel_id)
+		WHERE p.public_id = $1 AND p.is_voided AND pa.legal_valid_range @> now()`, tu.ParcelID(tu.VoidedParcel)).Scan(&rows)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, ok := la.Msg.Values[id]; !ok {
-		t.Error("GetLandAreaSqftByParcelId no longer returns the voided parcel")
+	if rows != 1 {
+		t.Fatalf("fixture: voided parcel has %d current attribute rows, want 1", rows)
 	}
 
-	sum, err := r.parcels.GetParcelsWithImprovementSummaryByFeatureId(ctx, connect.NewRequest(&parcelsv1.GetParcelsWithImprovementSummaryByFeatureIdRequest{FeatureIds: []int64{fid}}))
+	r := startReader(t)
+	voided := tu.ParcelID(tu.VoidedParcel)
+	eq, err := r.parcels.GetEquityComparables(ctx, connect.NewRequest(&parcelsv1.GetEquityComparablesRequest{
+		SelectedParcelIds: []string{voided, tu.ParcelID(19)},
+	}))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, ok := sum.Msg.Parcels[id]; !ok {
-		t.Error("GetParcelsWithImprovementSummaryByFeatureId no longer returns the voided parcel")
+	if _, ok := eq.Msg.Parcels[voided]; ok || len(eq.Msg.Parcels) != 1 {
+		t.Errorf("equity comparables returned %v, want only parcel 19", sortedKeys(eq.Msg.Parcels))
 	}
 
-	pi, err := r.parcels.GetParcelIdsByFeatureId(ctx, connect.NewRequest(&parcelsv1.GetParcelIdsByFeatureIdRequest{FeatureIds: []int64{fid}}))
+	// The last grid row holds parcels 17-20; 20 is voided.
+	poly, err := r.parcels.GetEquityComparables(ctx, connect.NewRequest(&parcelsv1.GetEquityComparablesRequest{
+		WktPolygon: "POLYGON((-140.0001 -39.9983, -139.9983 -39.9983, -139.9983 -39.9981, -140.0001 -39.9981, -140.0001 -39.9983))",
+	}))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, ok := pi.Msg.ParcelIds[fid]; ok {
-		t.Error("GetParcelIdsByFeatureId now returns the voided parcel")
+	if _, ok := poly.Msg.Parcels[voided]; ok || len(poly.Msg.Parcels) != 3 {
+		t.Errorf("polygon comparables returned %v, want parcels 17-19", sortedKeys(poly.Msg.Parcels))
 	}
 }

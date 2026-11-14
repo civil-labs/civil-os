@@ -22,7 +22,8 @@
 --   * Parcel 1 also has a historical attributes row valid 2020-01-01..2024-01-01
 --     with land area 350 m2; its current row starts 2024-01-01.
 --   * Parcels 1-15 each have one primary improvement (improvement n); parcel 3
---     also has a secondary improvement (improvement 16).
+--     also has a secondary improvement (improvement 16). Voided parcel 20 has
+--     primary improvement 17, so improvement reads must hide it too.
 --   * Zoning: parcels 1-12 are R-1, 13-20 are C-1.
 --   * Neighborhoods (legal definition 1): parcels 1-10 North, 11-20 South.
 --   * Valuation 1 (2025 roll): parcel market value 100000 + 5000n, assessed 90%.
@@ -200,10 +201,11 @@ JOIN core.parcels p ON p.public_id = pg_temp.fid('a0000000', fx.n)
 CROSS JOIN core.valuations v;
 
 -- Improvements ----------------------------------------------------------------------
--- Improvement k (1..15) sits on parcel k; improvement 16 is a secondary building on parcel 3.
+-- Improvement k (1..15) sits on parcel k; improvement 16 is a secondary building on parcel 3;
+-- improvement 17 is the primary building on voided parcel 20.
 
 INSERT INTO core.improvements (public_id, legacy_id, trace_id)
-SELECT pg_temp.fid('53000000', k), 'FX-IMP-' || k, 'fixture' FROM generate_series(1, 16) k;
+SELECT pg_temp.fid('53000000', k), 'FX-IMP-' || k, 'fixture' FROM generate_series(1, 17) k;
 
 INSERT INTO core.improvement_attributes (improvement_id, address_id, improvement_type_id, improvement_condition_id, improvement_quality_id, area_sq_m, bathrooms, bedrooms, year_built, effective_year_built, units, legal_valid_range, trace_id)
 SELECT i.improvement_id, a.address_id, it.improvement_type_id, c.improvement_condition_id, q.improvement_quality_id,
@@ -212,7 +214,7 @@ SELECT i.improvement_id, a.address_id, it.improvement_type_id, c.improvement_con
        CASE WHEN v.k = 16 THEN 0 ELSE 3 END,
        1980 + v.k, 1990 + v.k, 1,
        tstzrange('2020-01-01 00:00:00+00', NULL), 'fixture'
-FROM (SELECT k, CASE WHEN k = 16 THEN 3 ELSE k END AS parcel_n FROM generate_series(1, 16) k) v
+FROM (SELECT k, CASE k WHEN 16 THEN 3 WHEN 17 THEN 20 ELSE k END AS parcel_n FROM generate_series(1, 17) k) v
 JOIN core.improvements i ON i.public_id = pg_temp.fid('53000000', v.k)
 JOIN core.addresses a ON a.public_id = pg_temp.fid('20000000', v.parcel_n)
 JOIN core.improvement_types it ON it.public_id = pg_temp.fid('50000000', CASE WHEN v.parcel_n <= 12 THEN 1 ELSE 2 END)
@@ -221,13 +223,13 @@ CROSS JOIN core.improvement_qualities q;
 
 INSERT INTO core.parcel_improvements (parcel_id, improvement_id, is_primary, legal_valid_range, trace_id)
 SELECT p.parcel_id, i.improvement_id, v.k <> 16, tstzrange('2020-01-01 00:00:00+00', NULL), 'fixture'
-FROM (SELECT k, CASE WHEN k = 16 THEN 3 ELSE k END AS parcel_n FROM generate_series(1, 16) k) v
+FROM (SELECT k, CASE k WHEN 16 THEN 3 WHEN 17 THEN 20 ELSE k END AS parcel_n FROM generate_series(1, 17) k) v
 JOIN core.parcels p ON p.public_id = pg_temp.fid('a0000000', v.parcel_n)
 JOIN core.improvements i ON i.public_id = pg_temp.fid('53000000', v.k);
 
 INSERT INTO core.improvement_valuations (improvement_id, valuation_id, market_value, assessed_value, legal_valid_range, trace_id)
 SELECT i.improvement_id, v.valuation_id, 80000 + 2000 * k, (80000 + 2000 * k) * 0.9, tstzrange('2020-01-01 00:00:00+00', NULL), 'fixture'
-FROM generate_series(1, 16) k
+FROM generate_series(1, 17) k
 JOIN core.improvements i ON i.public_id = pg_temp.fid('53000000', k)
 CROSS JOIN core.valuations v;
 

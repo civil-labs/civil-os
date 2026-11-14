@@ -51,7 +51,7 @@ func TestFixturesLoad(t *testing.T) {
 	err := pool.QueryRow(ctx, `SELECT
 		(SELECT count(*) FROM core.parcels),
 		(SELECT count(*) FROM core.parcels WHERE NOT is_voided),
-		(SELECT count(*) FROM core.parcel_improvements WHERE is_primary)`).Scan(&parcels, &active, &primary)
+		(SELECT count(*) FROM core.parcel_improvements pi JOIN core.parcels p USING (parcel_id) WHERE pi.is_primary AND NOT p.is_voided)`).Scan(&parcels, &active, &primary)
 	if err != nil {
 		t.Fatal(err)
 	}

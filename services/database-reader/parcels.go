@@ -121,7 +121,7 @@ func (s *APIServer) getParcelsWithImprovementSummary(
 			FROM core.parcels p
 			JOIN geo.parcel_geometry pg ON p.parcel_id = pg.parcel_id AND pg.legal_valid_range @> $1::timestamptz
 			JOIN core.parcel_attributes pa ON p.parcel_id = pa.parcel_id AND pa.legal_valid_range @> $1::timestamptz
-			WHERE %s
+			WHERE NOT p.is_voided AND %s
 		),
 		primary_imps AS (
 			SELECT * FROM core.get_primary_improvements(ARRAY(SELECT parcel_id FROM matched_parcels), $1::timestamptz)
@@ -1321,7 +1321,7 @@ func (s *APIServer) getLandAreaSqftByParcelId(ctx context.Context, parcelIds []s
 		SELECT p.public_id::text, pa.land_area_sq_m
 		FROM core.parcels p
 		JOIN core.parcel_attributes pa ON p.parcel_id = pa.parcel_id AND pa.legal_valid_range @> $1::timestamptz
-		WHERE p.public_id = ANY($2::uuid[])
+		WHERE p.public_id = ANY($2::uuid[]) AND NOT p.is_voided
 	`
 	rows, err := s.db.Query(ctx, query, targetTime, parcelIds)
 	if err != nil {
@@ -1361,7 +1361,7 @@ func (s *APIServer) getFrontageFtByParcelId(ctx context.Context, parcelIds []str
 		SELECT p.public_id::text, pa.frontage_m
 		FROM core.parcels p
 		JOIN core.parcel_attributes pa ON p.parcel_id = pa.parcel_id AND pa.legal_valid_range @> $1::timestamptz
-		WHERE p.public_id = ANY($2::uuid[])
+		WHERE p.public_id = ANY($2::uuid[]) AND NOT p.is_voided
 	`
 	rows, err := s.db.Query(ctx, query, targetTime, parcelIds)
 	if err != nil {
@@ -1401,7 +1401,7 @@ func (s *APIServer) getDepthFtByParcelId(ctx context.Context, parcelIds []string
 		SELECT p.public_id::text, pa.depth_m
 		FROM core.parcels p
 		JOIN core.parcel_attributes pa ON p.parcel_id = pa.parcel_id AND pa.legal_valid_range @> $1::timestamptz
-		WHERE p.public_id = ANY($2::uuid[])
+		WHERE p.public_id = ANY($2::uuid[]) AND NOT p.is_voided
 	`
 	rows, err := s.db.Query(ctx, query, targetTime, parcelIds)
 	if err != nil {
@@ -1442,7 +1442,7 @@ func (s *APIServer) getLandUseIdByParcelId(ctx context.Context, parcelIds []stri
 		FROM core.parcels p
 		JOIN core.parcel_attributes pa ON p.parcel_id = pa.parcel_id AND pa.legal_valid_range @> $1::timestamptz
 		JOIN core.land_uses lu ON pa.land_use_id = lu.land_use_id
-		WHERE p.public_id = ANY($2::uuid[])
+		WHERE p.public_id = ANY($2::uuid[]) AND NOT p.is_voided
 	`
 	rows, err := s.db.Query(ctx, query, targetTime, parcelIds)
 	if err != nil {
@@ -1483,7 +1483,7 @@ func (s *APIServer) getZoningIdByParcelId(ctx context.Context, parcelIds []strin
 		FROM core.parcels p
 		JOIN core.parcel_affordances pa ON p.parcel_id = pa.parcel_id AND pa.legal_valid_range @> $1::timestamptz
 		JOIN core.zoning z ON pa.zoning_id = z.zoning_id
-		WHERE p.public_id = ANY($2::uuid[])
+		WHERE p.public_id = ANY($2::uuid[]) AND NOT p.is_voided
 		GROUP BY p.public_id
 	`
 	rows, err := s.db.Query(ctx, query, targetTime, parcelIds)
@@ -1526,7 +1526,7 @@ func (s *APIServer) getImprovementAreaSqftByParcelId(ctx context.Context, parcel
 		JOIN core.parcel_improvements pi ON p.parcel_id = pi.parcel_id AND pi.legal_valid_range @> $1::timestamptz
 		JOIN core.improvements imp ON pi.improvement_id = imp.improvement_id
 		LEFT JOIN core.improvement_attributes attr ON imp.improvement_id = attr.improvement_id AND attr.legal_valid_range @> $1::timestamptz
-		WHERE p.public_id = ANY($2::uuid[]) AND imp.is_voided = false
+		WHERE p.public_id = ANY($2::uuid[]) AND NOT p.is_voided AND imp.is_voided = false
 		GROUP BY p.public_id
 	`
 	rows, err := s.db.Query(ctx, query, targetTime, parcelIds)
@@ -1567,7 +1567,7 @@ func (s *APIServer) getBedroomsByParcelId(ctx context.Context, parcelIds []strin
 		JOIN core.parcel_improvements pi ON p.parcel_id = pi.parcel_id AND pi.legal_valid_range @> $1::timestamptz
 		JOIN core.improvements imp ON pi.improvement_id = imp.improvement_id
 		LEFT JOIN core.improvement_attributes attr ON imp.improvement_id = attr.improvement_id AND attr.legal_valid_range @> $1::timestamptz
-		WHERE p.public_id = ANY($2::uuid[]) AND imp.is_voided = false
+		WHERE p.public_id = ANY($2::uuid[]) AND NOT p.is_voided AND imp.is_voided = false
 		GROUP BY p.public_id
 	`
 	rows, err := s.db.Query(ctx, query, targetTime, parcelIds)
@@ -1608,7 +1608,7 @@ func (s *APIServer) getBathroomsByParcelId(ctx context.Context, parcelIds []stri
 		JOIN core.parcel_improvements pi ON p.parcel_id = pi.parcel_id AND pi.legal_valid_range @> $1::timestamptz
 		JOIN core.improvements imp ON pi.improvement_id = imp.improvement_id
 		LEFT JOIN core.improvement_attributes attr ON imp.improvement_id = attr.improvement_id AND attr.legal_valid_range @> $1::timestamptz
-		WHERE p.public_id = ANY($2::uuid[]) AND imp.is_voided = false
+		WHERE p.public_id = ANY($2::uuid[]) AND NOT p.is_voided AND imp.is_voided = false
 		GROUP BY p.public_id
 	`
 	rows, err := s.db.Query(ctx, query, targetTime, parcelIds)
@@ -1649,7 +1649,7 @@ func (s *APIServer) getUnitsByParcelId(ctx context.Context, parcelIds []string, 
 		JOIN core.parcel_improvements pi ON p.parcel_id = pi.parcel_id AND pi.legal_valid_range @> $1::timestamptz
 		JOIN core.improvements imp ON pi.improvement_id = imp.improvement_id
 		LEFT JOIN core.improvement_attributes attr ON imp.improvement_id = attr.improvement_id AND attr.legal_valid_range @> $1::timestamptz
-		WHERE p.public_id = ANY($2::uuid[]) AND imp.is_voided = false
+		WHERE p.public_id = ANY($2::uuid[]) AND NOT p.is_voided AND imp.is_voided = false
 		GROUP BY p.public_id
 	`
 	rows, err := s.db.Query(ctx, query, targetTime, parcelIds)
@@ -1688,7 +1688,7 @@ func (s *APIServer) getPrimaryImprovementYearBuiltByParcelId(ctx context.Context
 		SELECT p.public_id::text, attr.year_built
 		FROM core.parcels p
 		JOIN core.get_primary_improvements(ARRAY(
-			SELECT p2.parcel_id FROM core.parcels p2 WHERE p2.public_id = ANY($2::uuid[])
+			SELECT p2.parcel_id FROM core.parcels p2 WHERE p2.public_id = ANY($2::uuid[]) AND NOT p2.is_voided
 		), $1::timestamptz) pimp ON p.parcel_id = pimp.parcel_id
 		JOIN core.improvements imp ON pimp.improvement_id = imp.improvement_id
 		LEFT JOIN core.improvement_attributes attr ON imp.improvement_id = attr.improvement_id AND attr.legal_valid_range @> $1::timestamptz
@@ -1732,7 +1732,7 @@ func (s *APIServer) getPrimaryImprovementEffectiveYearBuiltByParcelId(ctx contex
 		SELECT p.public_id::text, attr.effective_year_built
 		FROM core.parcels p
 		JOIN core.get_primary_improvements(ARRAY(
-			SELECT p2.parcel_id FROM core.parcels p2 WHERE p2.public_id = ANY($2::uuid[])
+			SELECT p2.parcel_id FROM core.parcels p2 WHERE p2.public_id = ANY($2::uuid[]) AND NOT p2.is_voided
 		), $1::timestamptz) pimp ON p.parcel_id = pimp.parcel_id
 		JOIN core.improvements imp ON pimp.improvement_id = imp.improvement_id
 		LEFT JOIN core.improvement_attributes attr ON imp.improvement_id = attr.improvement_id AND attr.legal_valid_range @> $1::timestamptz
@@ -1776,7 +1776,7 @@ func (s *APIServer) getPrimaryImprovementConditionIdByParcelId(ctx context.Conte
 		SELECT p.public_id::text, cond.public_id::text
 		FROM core.parcels p
 		JOIN core.get_primary_improvements(ARRAY(
-			SELECT p2.parcel_id FROM core.parcels p2 WHERE p2.public_id = ANY($2::uuid[])
+			SELECT p2.parcel_id FROM core.parcels p2 WHERE p2.public_id = ANY($2::uuid[]) AND NOT p2.is_voided
 		), $1::timestamptz) pimp ON p.parcel_id = pimp.parcel_id
 		JOIN core.improvements imp ON pimp.improvement_id = imp.improvement_id
 		LEFT JOIN core.improvement_attributes attr ON imp.improvement_id = attr.improvement_id AND attr.legal_valid_range @> $1::timestamptz
@@ -1823,7 +1823,7 @@ func (s *APIServer) getPrimaryImprovementTypeIdByParcelId(ctx context.Context, p
 		JOIN core.get_primary_improvements(ARRAY(
 			SELECT p2.parcel_id 
 			FROM core.parcels p2 
-			WHERE p2.public_id = ANY($2::uuid[])
+			WHERE p2.public_id = ANY($2::uuid[]) AND NOT p2.is_voided
 		), $1::timestamptz) pimp ON p.parcel_id = pimp.parcel_id
 		JOIN core.improvements imp ON pimp.improvement_id = imp.improvement_id
 		LEFT JOIN core.improvement_attributes attr ON imp.improvement_id = attr.improvement_id 
@@ -1868,6 +1868,7 @@ func (s *APIServer) getLandAreaSqftByFeatureId(ctx context.Context, featureIds [
 	query := `
 		SELECT pg.feature_id, pa.land_area_sq_m
 		FROM geo.parcel_geometry pg
+		JOIN core.parcels vp ON vp.parcel_id = pg.parcel_id AND NOT vp.is_voided
 		JOIN core.parcel_attributes pa ON pg.parcel_id = pa.parcel_id AND pa.legal_valid_range @> $1::timestamptz
 		WHERE pg.feature_id = ANY($2::bigint[]) AND pg.legal_valid_range @> $1::timestamptz
 	`
@@ -1908,6 +1909,7 @@ func (s *APIServer) getFrontageFtByFeatureId(ctx context.Context, featureIds []i
 	query := `
 		SELECT pg.feature_id, pa.frontage_m
 		FROM geo.parcel_geometry pg
+		JOIN core.parcels vp ON vp.parcel_id = pg.parcel_id AND NOT vp.is_voided
 		JOIN core.parcel_attributes pa ON pg.parcel_id = pa.parcel_id AND pa.legal_valid_range @> $1::timestamptz
 		WHERE pg.feature_id = ANY($2::bigint[]) AND pg.legal_valid_range @> $1::timestamptz
 	`
@@ -1948,6 +1950,7 @@ func (s *APIServer) getDepthFtByFeatureId(ctx context.Context, featureIds []int6
 	query := `
 		SELECT pg.feature_id, pa.depth_m
 		FROM geo.parcel_geometry pg
+		JOIN core.parcels vp ON vp.parcel_id = pg.parcel_id AND NOT vp.is_voided
 		JOIN core.parcel_attributes pa ON pg.parcel_id = pa.parcel_id AND pa.legal_valid_range @> $1::timestamptz
 		WHERE pg.feature_id = ANY($2::bigint[]) AND pg.legal_valid_range @> $1::timestamptz
 	`
@@ -1988,6 +1991,7 @@ func (s *APIServer) getLandUseIdByFeatureId(ctx context.Context, featureIds []in
 	query := `
 		SELECT pg.feature_id, lu.public_id::text
 		FROM geo.parcel_geometry pg
+		JOIN core.parcels vp ON vp.parcel_id = pg.parcel_id AND NOT vp.is_voided
 		JOIN core.parcel_attributes pa ON pg.parcel_id = pa.parcel_id AND pa.legal_valid_range @> $1::timestamptz
 		JOIN core.land_uses lu ON pa.land_use_id = lu.land_use_id
 		WHERE pg.feature_id = ANY($2::bigint[]) AND pg.legal_valid_range @> $1::timestamptz
@@ -2029,6 +2033,7 @@ func (s *APIServer) getZoningIdByFeatureId(ctx context.Context, featureIds []int
 	query := `
 		SELECT pg.feature_id, (array_remove(array_agg(DISTINCT z.public_id::text), NULL))[1]
 		FROM geo.parcel_geometry pg
+		JOIN core.parcels vp ON vp.parcel_id = pg.parcel_id AND NOT vp.is_voided
 		JOIN core.parcel_affordances pa ON pg.parcel_id = pa.parcel_id AND pa.legal_valid_range @> $1::timestamptz
 		JOIN core.zoning z ON pa.zoning_id = z.zoning_id
 		WHERE pg.feature_id = ANY($2::bigint[]) AND pg.legal_valid_range @> $1::timestamptz
@@ -2071,6 +2076,7 @@ func (s *APIServer) getImprovementAreaSqftByFeatureId(ctx context.Context, featu
 	query := `
 		SELECT pg.feature_id, COALESCE(SUM(attr.area_sq_m), 0.0)
 		FROM geo.parcel_geometry pg
+		JOIN core.parcels vp ON vp.parcel_id = pg.parcel_id AND NOT vp.is_voided
 		JOIN core.parcel_improvements pi ON pg.parcel_id = pi.parcel_id AND pi.legal_valid_range @> $1::timestamptz
 		JOIN core.improvements imp ON pi.improvement_id = imp.improvement_id
 		LEFT JOIN core.improvement_attributes attr ON imp.improvement_id = attr.improvement_id AND attr.legal_valid_range @> $1::timestamptz
@@ -2112,6 +2118,7 @@ func (s *APIServer) getBedroomsByFeatureId(ctx context.Context, featureIds []int
 	query := `
 		SELECT pg.feature_id, COALESCE(SUM(attr.bedrooms), 0)::int
 		FROM geo.parcel_geometry pg
+		JOIN core.parcels vp ON vp.parcel_id = pg.parcel_id AND NOT vp.is_voided
 		JOIN core.parcel_improvements pi ON pg.parcel_id = pi.parcel_id AND pi.legal_valid_range @> $1::timestamptz
 		JOIN core.improvements imp ON pi.improvement_id = imp.improvement_id
 		LEFT JOIN core.improvement_attributes attr ON imp.improvement_id = attr.improvement_id AND attr.legal_valid_range @> $1::timestamptz
@@ -2153,6 +2160,7 @@ func (s *APIServer) getBathroomsByFeatureId(ctx context.Context, featureIds []in
 	query := `
 		SELECT pg.feature_id, COALESCE(SUM(attr.bathrooms), 0)::int
 		FROM geo.parcel_geometry pg
+		JOIN core.parcels vp ON vp.parcel_id = pg.parcel_id AND NOT vp.is_voided
 		JOIN core.parcel_improvements pi ON pg.parcel_id = pi.parcel_id AND pi.legal_valid_range @> $1::timestamptz
 		JOIN core.improvements imp ON pi.improvement_id = imp.improvement_id
 		LEFT JOIN core.improvement_attributes attr ON imp.improvement_id = attr.improvement_id AND attr.legal_valid_range @> $1::timestamptz
@@ -2194,6 +2202,7 @@ func (s *APIServer) getUnitsByFeatureId(ctx context.Context, featureIds []int64,
 	query := `
 		SELECT pg.feature_id, COALESCE(SUM(attr.units), 0)::int
 		FROM geo.parcel_geometry pg
+		JOIN core.parcels vp ON vp.parcel_id = pg.parcel_id AND NOT vp.is_voided
 		JOIN core.parcel_improvements pi ON pg.parcel_id = pi.parcel_id AND pi.legal_valid_range @> $1::timestamptz
 		JOIN core.improvements imp ON pi.improvement_id = imp.improvement_id
 		LEFT JOIN core.improvement_attributes attr ON imp.improvement_id = attr.improvement_id AND attr.legal_valid_range @> $1::timestamptz
@@ -2235,6 +2244,7 @@ func (s *APIServer) getPrimaryImprovementYearBuiltByFeatureId(ctx context.Contex
 	query := `
 		SELECT pg.feature_id, attr.year_built
 		FROM geo.parcel_geometry pg
+		JOIN core.parcels vp ON vp.parcel_id = pg.parcel_id AND NOT vp.is_voided
 		JOIN core.get_primary_improvements(ARRAY(
 			SELECT pg2.parcel_id 
 			FROM geo.parcel_geometry pg2 
@@ -2282,6 +2292,7 @@ func (s *APIServer) getPrimaryImprovementEffectiveYearBuiltByFeatureId(ctx conte
 	query := `
 		SELECT pg.feature_id, attr.effective_year_built
 		FROM geo.parcel_geometry pg
+		JOIN core.parcels vp ON vp.parcel_id = pg.parcel_id AND NOT vp.is_voided
 		JOIN core.get_primary_improvements(ARRAY(
 			SELECT pg2.parcel_id 
 			FROM geo.parcel_geometry pg2 
@@ -2329,6 +2340,7 @@ func (s *APIServer) getPrimaryImprovementConditionIdByFeatureId(ctx context.Cont
 	query := `
 		SELECT pg.feature_id, cond.public_id::text
 		FROM geo.parcel_geometry pg
+		JOIN core.parcels vp ON vp.parcel_id = pg.parcel_id AND NOT vp.is_voided
 		JOIN core.get_primary_improvements(ARRAY(
 			SELECT pg2.parcel_id 
 			FROM geo.parcel_geometry pg2 
@@ -2388,7 +2400,7 @@ func (s *APIServer) getPrimaryImprovementTypeIdByFeatureId(ctx context.Context, 
 		LEFT JOIN core.improvement_attributes attr ON imp.improvement_id = attr.improvement_id 
 			AND attr.legal_valid_range @> $1::timestamptz
 		LEFT JOIN core.improvement_types imptype ON attr.improvement_type_id = imptype.improvement_type_id
-		WHERE imp.is_voided = false AND pg.legal_valid_range @> $1::timestamptz
+		WHERE imp.is_voided = false AND NOT p.is_voided AND pg.legal_valid_range @> $1::timestamptz
 	`
 	rows, err := s.db.Query(ctx, query, targetTime, featureIds)
 	if err != nil {

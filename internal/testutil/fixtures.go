@@ -32,7 +32,7 @@ const (
 	HistoricalParcel   = 1  // has an attributes row valid 2020-01-01..2024-01-01
 	MultiOwnerParcel   = 2  // owned 50/50 by parties 2 and 3
 	SecondaryImpParcel = 3  // also has secondary improvement 16
-	ImprovedParcels    = 15 // parcels 1..15 have primary improvement n
+	ImprovedParcels    = 15 // active parcels 1..15 have primary improvement n; voided parcel 20 has improvement 17
 	UnattachedAddress  = 21 // address on no parcel
 )
 

@@ -11,11 +11,15 @@ one port.
 | `civil.public.landuses.v1` | `LandUsesService` | Land uses and land-use types |
 | `civil.public.zoning.v1` | `ZoningService` | Zoning designations |
 | `civil.public.neighborhoods.v1` | `NeighborhoodService` | Neighborhood definitions and neighborhoods |
-| `civil.public.sales.v1` | `SalesService` | Sales by parcel or polygon |
 | `civil.public.valuations.v1` | `ValuationService` | Valuations |
-| `civil.public.tiles.v1` | `TileService` | Parcel vector tiles |
 | `civil.public.instance.v1` | `InstanceService` | Instance metadata and auth issuer (no token needed) |
 | `civil.public.dex.v1` | `DexService` | Dex OIDC client administration, when the instance runs Dex |
+
+`civil.public.sales.v1` (`SalesService`) and `civil.public.tiles.v1`
+(`TileService`) are defined but **not served yet**. The gateway serves sales
+comparables through `ParcelsService.GetSalesComparables`. It serves vector tiles
+over plain HTTP at `/tiles/get_parcel_tiles/{z}/{x}/{y}`, with the same bearer
+token, rather than through `TileService`.
 
 Requests are validated with [protovalidate](https://protovalidate.com) rules
 declared in the protos. For example, every parcel ID must be a UUID.

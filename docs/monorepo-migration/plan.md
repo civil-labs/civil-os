@@ -225,7 +225,7 @@ Integration tests use build tag `integration` and run through `mise run test:int
 - **Issuer split.** Dex's issuer is the host-facing `http://localhost:5556/dex`, so tokens work from the host and a browser. The gateway fetches keys over the compose network (`CIVIL_OS_GATEWAY_IDP_HOST=dex:5556/dex`).
 - **`migrate` reruns safely.** It creates `civil` from `template0` (the PostGIS image pre-installs PostGIS in `template1`) and sets the production `search_path`. It records applied files in `civil_os_dev.applied_migrations` (local only) and runs each file in one transaction. `seed` skips when parcels exist. A second `docker compose up` is a no-op.
 - **E2E covers more than planned:** an unauthenticated call is rejected, an unknown parcel update gives `NotFound`, plus instance metadata and the Dex admin API (`ListClients`). Each run writes a new frontage value, so reruns pass.
-- **Finding, not changed:** `services/tile-server/config.yaml` auto-publishes every geometry table, so Martin also serves raw `parcel_geometry`, the `*_history` tables and address coordinates. That exposes voided parcels and history through `/tiles/`. It is the production config too, so the owner decides.
+- **Finding, not changed:** `services/tile-server/config.yaml` auto-publishes every geometry table, so Martin also serves raw `parcel_geometry`, the `*_history` tables and address coordinates. That exposes voided parcels and history through `/tiles/`. It is the production config too, so it is deferred to `docs/tile-source-allowlist` (owner decision, 2026-11-14).
 
 ## PR 7: CI, release and publishing (`ci: workflows, release-please, npm SDK`)
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"io"
 	"log/slog"
 	"net/http"
@@ -26,6 +27,14 @@ type Claims struct {
 
 // RequireAuth is the middleware wrapper
 func RequireAuth(authServer string, idpHost string, allowedClientIDs []string, logger *slog.Logger) (func(http.Handler) http.Handler, error) {
+	switch {
+	case authServer == "":
+		return nil, errors.New("auth server is not configured")
+	case idpHost == "":
+		return nil, errors.New("IdP host is not configured")
+	case len(allowedClientIDs) == 0:
+		return nil, errors.New("no allowed client IDs are configured")
+	}
 
 	providerConfig := oidc.ProviderConfig{
 		IssuerURL:   "https://" + authServer,

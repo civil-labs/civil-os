@@ -153,6 +153,10 @@ The imported `.github/`, `mise.toml`, `go.mod` and `.gitignore` files stay as-is
 
 **4.3** In `services/tile-server/config.yaml`, change `connection_string` to `${CIVIL_OS_TILE_SERVER_DATABASE_URL}`.
 
+**4.4** *(Added by owner request after PR 3.)* Gateway auth fails fast. `main` handles `RequireAuth`'s error and exits, and `RequireAuth` returns an error for an empty auth server, IdP host or client ID list. As in spec §5.5, an invalid port or `ALLOWED_CLIENT_IDS` also stops startup.
+
+> Note for PR 6: `RequireAuth` hard-codes `https://` for the issuer and token URLs. A local Dex served over `http` will fail issuer verification, so PR 6 must either serve Dex over TLS in compose or let `CIVIL_OS_GATEWAY_AUTH_SERVER` carry its scheme. The second option is a small spec change, raised with the owner then.
+
 **Checks:** `go build ./... && go vet ./...` passes, and `grep -rn '"CIVIL_[A-Z]' services | grep -v CIVIL_OS_` finds nothing.
 
 ## PR 5: tests (`test: unit, handler, integration and migration suites`)

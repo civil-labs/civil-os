@@ -53,6 +53,7 @@ civil-os/
 │   └── gen/go/civil/public/...  generated, committed; the only importable generated code
 ├── internal/
 │   ├── gen/go/civil/mesh/...    generated, committed; mesh code (not importable externally)
+│   ├── envconfig/               shared CIVIL_OS_* env parsing (legacy rejection, log level, ports); approved deviation, 2026-11-14
 │   └── testutil/                shared test helpers (Postgres container, fixtures, fake OIDC issuer)
 ├── services/
 │   ├── gateway/                 package main + *_test.go, dockerfile
@@ -219,6 +220,7 @@ The rules:
   - The level is held in a `slog.LevelVar`, as the gateway already does, so it can be changed at runtime later without touching config.
   - The old `CIVIL_VERBOSE=true` corresponds to `DEBUG`.
   - The tile server (Martin, written in Rust) keeps its own `RUST_LOG` and is not covered by this variable.
+- **Invalid values fail fast** *(added 2026-11-14 with the owner-approved gateway auth fix)*. An unparseable port or an invalid or empty `CIVIL_OS_GATEWAY_ALLOWED_CLIENT_IDS` stops startup. Previously these logged a warning and fell back to a default or an empty list, which silently rejected every token. The gateway also exits if authentication setup fails, instead of starting with a nil auth middleware.
 - **Old names fail fast.** At startup, each Go service checks for any set variable that starts with `CIVIL_` but not `CIVIL_OS_`. If it finds one, it exits with code 1 and lists the offending names along with a pointer to this table in `docs/architecture.md`. That catches a half-migrated deployment immediately.
 - **No compatibility aliases.** The helm follow-up already has to change every image name, so it updates env vars in the same pass. The table in `docs/architecture.md` doubles as that follow-up's checklist.
 - **Clashes are ruled out.** Defaults are unique per service, so all four services can run on one host without setting a single port.

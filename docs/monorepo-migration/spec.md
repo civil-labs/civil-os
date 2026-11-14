@@ -292,7 +292,7 @@ These tasks wrap compose so that starting, resetting and testing the stack are o
 
 | Task | Runs | Notes |
 |---|---|---|
-| `up` | `docker compose up --build --wait`, then prints the gateway URL, the Dex issuer, the test user and a pointer to `mise run token` | Always rebuilds, so tests never run against stale images. The build cache keeps that fast. |
+| `up` | `docker compose up --build --wait`, then prints the gateway URL, the Dex issuer, a pointer to `mise run token`, the OAuth2 client settings (client ID and secret, redirect, authorize and token URLs, scope) for API clients such as Bruno, and the test username and password *(owner request, 2026-11-14)* | Always rebuilds, so tests never run against stale images. The build cache keeps that fast. |
 | `down` | `docker compose down -v --remove-orphans` | Always deletes the database volume. The data is synthetic and is re-seeded on `up`. |
 | `token` | the Dex password grant for the test user from `dev/dex.yaml`, with `curl` | Prints only the ID token on stdout, so `TOKEN=$(mise run token)` works. Exits non-zero if no token comes back. Uses `sed` for parsing, not `jq`. |
 | `test:e2e` | `go test -count=1 -tags e2e ./test/e2e/...` | Now depends on `up`, so one command starts the stack and runs the smoke tests. The stack keeps running afterwards for inspection. |

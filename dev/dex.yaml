@@ -26,6 +26,8 @@ oauth2:
 
 enablePasswordDB: true
 
+# The client and user below are also printed by `mise run up` (mise.toml) and
+# used by dev/token.sh and test/e2e. Keep them in sync.
 staticClients:
   - id: civil-os-dev
     name: civil-os local development

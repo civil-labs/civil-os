@@ -39,11 +39,22 @@ run = [
   "docker compose up --build --wait --wait-timeout 300",
   """echo '
 civil-os is up (synthetic data):
-  gateway   http://localhost:8080
-  Dex       http://localhost:5556/dex
-  test user dev@example.com / civil-os-dev-password
-  token     TOKEN=$(mise run token)
-  stop      mise run down   (deletes the database)' >&2""",
+  gateway        http://localhost:8080
+  Dex issuer     http://localhost:5556/dex
+  token          TOKEN=$(mise run token)
+  stop           mise run down   (deletes the database)
+
+OAuth2 client (dev/dex.yaml), e.g. for Bruno or Postman:
+  client_id      civil-os-dev
+  client_secret  civil-os-dev-secret
+  redirect_url   http://localhost:3000/callback
+  authorize_url  http://localhost:5556/dex/auth
+  token_url      http://localhost:5556/dex/token
+  scope          openid email profile
+
+Test user (password grant, or the Dex login page):
+  username       dev@example.com
+  password       civil-os-dev-password' >&2""",
 ]
 
 [tasks.down]

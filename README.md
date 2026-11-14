@@ -35,7 +35,9 @@ This starts the following, all on fictional data in open ocean:
 
 With [mise](https://mise.jdx.dev) installed (see [Development](#development)),
 `mise run up` and `mise run down` do the same, and `mise run test:e2e` starts
-the stack and runs the smoke tests in one go.
+the stack and runs the smoke tests in one go. `mise run up` also prints the
+OAuth2 client settings and test login, for API clients such as Bruno or
+Postman.
 
 ### Try the API with curl
 

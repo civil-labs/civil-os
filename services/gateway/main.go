@@ -153,6 +153,17 @@ func main() {
 		logger:         logger,
 	}
 
+	// Parcel writes are optional: without a writer host, UpdateParcel returns Unavailable.
+	if config.DBWriterHost != "" {
+		parcelsServer.dbWriterClient = meshparcelsv1connect.NewParcelWriteServiceClient(
+			http.DefaultClient,
+			"http://"+config.DBWriterHost,
+		)
+		logger.Info("parcel writes enabled", slog.String("writer_host", config.DBWriterHost))
+	} else {
+		logger.Info("parcel writes disabled: CIVIL_DB_WRITER_HOST is not set")
+	}
+
 	parcelsPath, parcelsHandler := parcelsv1connect.NewParcelsServiceHandler(
 		parcelsServer,
 		connect.WithInterceptors(validate.NewInterceptor()),

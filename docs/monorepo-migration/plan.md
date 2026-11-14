@@ -128,7 +128,7 @@ The imported `.github/`, `mise.toml`, `go.mod` and `.gitignore` files stay as-is
 **3.4 Gateway**
 - Rename the clients to the read services.
 - Add the optional writer client and route `ParcelServer.UpdateParcel` through it. With no writer host, return `Unavailable`.
-- Forward `traceparent` with a small Connect client interceptor.
+- Forward `traceparent` by copying the header onto the mesh request in `UpdateParcel`. *(Revised during implementation: it is the only forwarded call, so an interceptor isn't needed.)* The writer host is read from `CIVIL_DB_WRITER_HOST` until PR 4 renames it to `CIVIL_OS_GATEWAY_WRITER_HOST`.
 - Dex (spec §5.1): with no address, don't register the handler and log one `INFO` line; if `grpc.NewClient` fails, exit non-zero.
 - Have servers depend on the generated Connect client interfaces.
 

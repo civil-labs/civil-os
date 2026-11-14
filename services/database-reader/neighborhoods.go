@@ -19,7 +19,7 @@ func (s *APIServer) GetNeighborhoodDefinitions(
 		SELECT 
 			public_id::text, 
 			name
-		FROM public.neighborhood_definitions
+		FROM core.neighborhood_definitions
 	`)
 	if err != nil {
 		s.logger.Error("failed to query neighborhood definitions", slog.Any("error", err))
@@ -64,7 +64,7 @@ func (s *APIServer) GetNeighborhoods(
 		SELECT 
 			public_id::text, 
 			name
-		FROM public.neighborhoods
+		FROM core.neighborhoods
 	`)
 	if err != nil {
 		s.logger.Error("failed to query neighborhoods", slog.Any("error", err))

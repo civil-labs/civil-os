@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.1](https://github.com/civil-labs/civil-os/compare/v0.2.0...v0.2.1) (2026-11-14)
+
+
+### Features
+
+* docs, agent guardrails and mise stack tasks ([#11](https://github.com/civil-labs/civil-os/issues/11)) ([1cd6430](https://github.com/civil-labs/civil-os/commit/1cd6430f3be4139aeb5dbe9f7dabe76ad3a91c90))
+* **public-api:** publish the public API as @civil-labs/civil-os-api ([#10](https://github.com/civil-labs/civil-os/issues/10)) ([5e773c1](https://github.com/civil-labs/civil-os/commit/5e773c1e2bfdde87fc4788c42570a6333511a68e))
+
 ## 0.2.0 (2026-11-14)
 
 

@@ -3,7 +3,15 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Protobuf messages and ConnectRPC service definitions for the civil-os public API",
-  "keywords": ["civil-os", "javascript", "typescript", "ecmascript", "esm", "connectrpc", "protobuf"],
+  "keywords": [
+    "civil-os",
+    "javascript",
+    "typescript",
+    "ecmascript",
+    "esm",
+    "connectrpc",
+    "protobuf"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",

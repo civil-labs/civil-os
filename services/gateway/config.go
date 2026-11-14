@@ -16,6 +16,7 @@ type Config struct {
 	AuthServer          string
 	IDPHost             string // Use local address here. Its where the gateway will make requests for JWKS
 	DBReaderHost        string
+	DBWriterHost        string // Optional. Empty disables parcel writes (UpdateParcel returns Unavailable).
 	TileServerHost      string
 	DexGrpcAddress      string
 	AllowedClientsIds   []string
@@ -55,6 +56,7 @@ func LoadConfig(logger *slog.Logger) (*Config, error) {
 		IDPHost:             os.Getenv("CIVIL_IDP_HOST"),
 		TileServerHost:      os.Getenv("CIVIL_TILE_SERVER_HOST"),
 		DBReaderHost:        os.Getenv("CIVIL_DB_READER_HOST"),
+		DBWriterHost:        os.Getenv("CIVIL_DB_WRITER_HOST"),   // Not required
 		DexGrpcAddress:      os.Getenv("CIVIL_DEX_GRPC_ADDRESS"), // Not required, and will only be used if not empty
 		AllowedClientsIds:   getAllowedClientIdsEnv(),
 		InstanceMetadataUrl: os.Getenv("CIVIL_INSTANCE_METADATA_URL"),

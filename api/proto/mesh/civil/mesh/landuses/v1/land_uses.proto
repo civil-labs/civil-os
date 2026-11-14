@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package civil.mesh.landuses.v1;
 
-service LandUsesService {
+service LandUseReadService {
   rpc GetLandUses(GetLandUsesRequest) returns (GetLandUsesResponse) {}
 
   rpc GetLandUseTypes(GetLandUseTypesRequest) returns (GetLandUseTypesResponse) {}

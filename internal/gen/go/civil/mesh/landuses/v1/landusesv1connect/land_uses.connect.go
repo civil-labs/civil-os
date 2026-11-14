@@ -21,8 +21,8 @@ import (
 const _ = connect.IsAtLeastVersion1_13_0
 
 const (
-	// LandUsesServiceName is the fully-qualified name of the LandUsesService service.
-	LandUsesServiceName = "civil.mesh.landuses.v1.LandUsesService"
+	// LandUseReadServiceName is the fully-qualified name of the LandUseReadService service.
+	LandUseReadServiceName = "civil.mesh.landuses.v1.LandUseReadService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -33,107 +33,107 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// LandUsesServiceGetLandUsesProcedure is the fully-qualified name of the LandUsesService's
+	// LandUseReadServiceGetLandUsesProcedure is the fully-qualified name of the LandUseReadService's
 	// GetLandUses RPC.
-	LandUsesServiceGetLandUsesProcedure = "/civil.mesh.landuses.v1.LandUsesService/GetLandUses"
-	// LandUsesServiceGetLandUseTypesProcedure is the fully-qualified name of the LandUsesService's
-	// GetLandUseTypes RPC.
-	LandUsesServiceGetLandUseTypesProcedure = "/civil.mesh.landuses.v1.LandUsesService/GetLandUseTypes"
+	LandUseReadServiceGetLandUsesProcedure = "/civil.mesh.landuses.v1.LandUseReadService/GetLandUses"
+	// LandUseReadServiceGetLandUseTypesProcedure is the fully-qualified name of the
+	// LandUseReadService's GetLandUseTypes RPC.
+	LandUseReadServiceGetLandUseTypesProcedure = "/civil.mesh.landuses.v1.LandUseReadService/GetLandUseTypes"
 )
 
-// LandUsesServiceClient is a client for the civil.mesh.landuses.v1.LandUsesService service.
-type LandUsesServiceClient interface {
+// LandUseReadServiceClient is a client for the civil.mesh.landuses.v1.LandUseReadService service.
+type LandUseReadServiceClient interface {
 	GetLandUses(context.Context, *connect.Request[v1.GetLandUsesRequest]) (*connect.Response[v1.GetLandUsesResponse], error)
 	GetLandUseTypes(context.Context, *connect.Request[v1.GetLandUseTypesRequest]) (*connect.Response[v1.GetLandUseTypesResponse], error)
 }
 
-// NewLandUsesServiceClient constructs a client for the civil.mesh.landuses.v1.LandUsesService
+// NewLandUseReadServiceClient constructs a client for the civil.mesh.landuses.v1.LandUseReadService
 // service. By default, it uses the Connect protocol with the binary Protobuf Codec, asks for
 // gzipped responses, and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply
 // the connect.WithGRPC() or connect.WithGRPCWeb() options.
 //
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
 // http://api.acme.com or https://acme.com/grpc).
-func NewLandUsesServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) LandUsesServiceClient {
+func NewLandUseReadServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) LandUseReadServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
-	landUsesServiceMethods := v1.File_civil_mesh_landuses_v1_land_uses_proto.Services().ByName("LandUsesService").Methods()
-	return &landUsesServiceClient{
+	landUseReadServiceMethods := v1.File_civil_mesh_landuses_v1_land_uses_proto.Services().ByName("LandUseReadService").Methods()
+	return &landUseReadServiceClient{
 		getLandUses: connect.NewClient[v1.GetLandUsesRequest, v1.GetLandUsesResponse](
 			httpClient,
-			baseURL+LandUsesServiceGetLandUsesProcedure,
-			connect.WithSchema(landUsesServiceMethods.ByName("GetLandUses")),
+			baseURL+LandUseReadServiceGetLandUsesProcedure,
+			connect.WithSchema(landUseReadServiceMethods.ByName("GetLandUses")),
 			connect.WithClientOptions(opts...),
 		),
 		getLandUseTypes: connect.NewClient[v1.GetLandUseTypesRequest, v1.GetLandUseTypesResponse](
 			httpClient,
-			baseURL+LandUsesServiceGetLandUseTypesProcedure,
-			connect.WithSchema(landUsesServiceMethods.ByName("GetLandUseTypes")),
+			baseURL+LandUseReadServiceGetLandUseTypesProcedure,
+			connect.WithSchema(landUseReadServiceMethods.ByName("GetLandUseTypes")),
 			connect.WithClientOptions(opts...),
 		),
 	}
 }
 
-// landUsesServiceClient implements LandUsesServiceClient.
-type landUsesServiceClient struct {
+// landUseReadServiceClient implements LandUseReadServiceClient.
+type landUseReadServiceClient struct {
 	getLandUses     *connect.Client[v1.GetLandUsesRequest, v1.GetLandUsesResponse]
 	getLandUseTypes *connect.Client[v1.GetLandUseTypesRequest, v1.GetLandUseTypesResponse]
 }
 
-// GetLandUses calls civil.mesh.landuses.v1.LandUsesService.GetLandUses.
-func (c *landUsesServiceClient) GetLandUses(ctx context.Context, req *connect.Request[v1.GetLandUsesRequest]) (*connect.Response[v1.GetLandUsesResponse], error) {
+// GetLandUses calls civil.mesh.landuses.v1.LandUseReadService.GetLandUses.
+func (c *landUseReadServiceClient) GetLandUses(ctx context.Context, req *connect.Request[v1.GetLandUsesRequest]) (*connect.Response[v1.GetLandUsesResponse], error) {
 	return c.getLandUses.CallUnary(ctx, req)
 }
 
-// GetLandUseTypes calls civil.mesh.landuses.v1.LandUsesService.GetLandUseTypes.
-func (c *landUsesServiceClient) GetLandUseTypes(ctx context.Context, req *connect.Request[v1.GetLandUseTypesRequest]) (*connect.Response[v1.GetLandUseTypesResponse], error) {
+// GetLandUseTypes calls civil.mesh.landuses.v1.LandUseReadService.GetLandUseTypes.
+func (c *landUseReadServiceClient) GetLandUseTypes(ctx context.Context, req *connect.Request[v1.GetLandUseTypesRequest]) (*connect.Response[v1.GetLandUseTypesResponse], error) {
 	return c.getLandUseTypes.CallUnary(ctx, req)
 }
 
-// LandUsesServiceHandler is an implementation of the civil.mesh.landuses.v1.LandUsesService
+// LandUseReadServiceHandler is an implementation of the civil.mesh.landuses.v1.LandUseReadService
 // service.
-type LandUsesServiceHandler interface {
+type LandUseReadServiceHandler interface {
 	GetLandUses(context.Context, *connect.Request[v1.GetLandUsesRequest]) (*connect.Response[v1.GetLandUsesResponse], error)
 	GetLandUseTypes(context.Context, *connect.Request[v1.GetLandUseTypesRequest]) (*connect.Response[v1.GetLandUseTypesResponse], error)
 }
 
-// NewLandUsesServiceHandler builds an HTTP handler from the service implementation. It returns the
-// path on which to mount the handler and the handler itself.
+// NewLandUseReadServiceHandler builds an HTTP handler from the service implementation. It returns
+// the path on which to mount the handler and the handler itself.
 //
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
-func NewLandUsesServiceHandler(svc LandUsesServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	landUsesServiceMethods := v1.File_civil_mesh_landuses_v1_land_uses_proto.Services().ByName("LandUsesService").Methods()
-	landUsesServiceGetLandUsesHandler := connect.NewUnaryHandler(
-		LandUsesServiceGetLandUsesProcedure,
+func NewLandUseReadServiceHandler(svc LandUseReadServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	landUseReadServiceMethods := v1.File_civil_mesh_landuses_v1_land_uses_proto.Services().ByName("LandUseReadService").Methods()
+	landUseReadServiceGetLandUsesHandler := connect.NewUnaryHandler(
+		LandUseReadServiceGetLandUsesProcedure,
 		svc.GetLandUses,
-		connect.WithSchema(landUsesServiceMethods.ByName("GetLandUses")),
+		connect.WithSchema(landUseReadServiceMethods.ByName("GetLandUses")),
 		connect.WithHandlerOptions(opts...),
 	)
-	landUsesServiceGetLandUseTypesHandler := connect.NewUnaryHandler(
-		LandUsesServiceGetLandUseTypesProcedure,
+	landUseReadServiceGetLandUseTypesHandler := connect.NewUnaryHandler(
+		LandUseReadServiceGetLandUseTypesProcedure,
 		svc.GetLandUseTypes,
-		connect.WithSchema(landUsesServiceMethods.ByName("GetLandUseTypes")),
+		connect.WithSchema(landUseReadServiceMethods.ByName("GetLandUseTypes")),
 		connect.WithHandlerOptions(opts...),
 	)
-	return "/civil.mesh.landuses.v1.LandUsesService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/civil.mesh.landuses.v1.LandUseReadService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case LandUsesServiceGetLandUsesProcedure:
-			landUsesServiceGetLandUsesHandler.ServeHTTP(w, r)
-		case LandUsesServiceGetLandUseTypesProcedure:
-			landUsesServiceGetLandUseTypesHandler.ServeHTTP(w, r)
+		case LandUseReadServiceGetLandUsesProcedure:
+			landUseReadServiceGetLandUsesHandler.ServeHTTP(w, r)
+		case LandUseReadServiceGetLandUseTypesProcedure:
+			landUseReadServiceGetLandUseTypesHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
 	})
 }
 
-// UnimplementedLandUsesServiceHandler returns CodeUnimplemented from all methods.
-type UnimplementedLandUsesServiceHandler struct{}
+// UnimplementedLandUseReadServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedLandUseReadServiceHandler struct{}
 
-func (UnimplementedLandUsesServiceHandler) GetLandUses(context.Context, *connect.Request[v1.GetLandUsesRequest]) (*connect.Response[v1.GetLandUsesResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.landuses.v1.LandUsesService.GetLandUses is not implemented"))
+func (UnimplementedLandUseReadServiceHandler) GetLandUses(context.Context, *connect.Request[v1.GetLandUsesRequest]) (*connect.Response[v1.GetLandUsesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.landuses.v1.LandUseReadService.GetLandUses is not implemented"))
 }
 
-func (UnimplementedLandUsesServiceHandler) GetLandUseTypes(context.Context, *connect.Request[v1.GetLandUseTypesRequest]) (*connect.Response[v1.GetLandUseTypesResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.landuses.v1.LandUsesService.GetLandUseTypes is not implemented"))
+func (UnimplementedLandUseReadServiceHandler) GetLandUseTypes(context.Context, *connect.Request[v1.GetLandUseTypesRequest]) (*connect.Response[v1.GetLandUseTypesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.landuses.v1.LandUseReadService.GetLandUseTypes is not implemented"))
 }

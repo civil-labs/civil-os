@@ -4,7 +4,7 @@ package civil.mesh.valuations.v1;
 
 import "google/protobuf/timestamp.proto";
 
-service ValuationService {
+service ValuationReadService {
   rpc GetValuations(GetValuationsRequest) returns (GetValuationsResponse) {}
 }
 

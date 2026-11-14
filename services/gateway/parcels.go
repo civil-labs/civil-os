@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
 	publicparcelsv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/parcels/v1"
@@ -13,7 +14,8 @@ import (
 )
 
 type ParcelServer struct {
-	dbReaderClient meshparcelsv1connect.ParcelsServiceClient
+	dbReaderClient meshparcelsv1connect.ParcelReadServiceClient
+	dbWriterClient meshparcelsv1connect.ParcelWriteServiceClient // nil when writes are disabled
 	logger         *slog.Logger
 }
 
@@ -51,9 +53,31 @@ func (s *ParcelServer) UpdateParcel(
 
 	s.logger.Debug("received UpdateParcel request")
 
-	publicRes := &publicparcelsv1.UpdateParcelResponse{}
+	if s.dbWriterClient == nil {
+		return nil, connect.NewError(connect.CodeUnavailable, errors.New("writes are not enabled on this instance"))
+	}
 
-	return connect.NewResponse(publicRes), nil
+	meshReq := connect.NewRequest(&meshparcelsv1.UpdateParcelRequest{
+		ParcelId:     req.Msg.ParcelId,
+		AddressId:    req.Msg.AddressId,
+		LandUseId:    req.Msg.LandUseId,
+		LandAreaSqFt: req.Msg.LandAreaSqFt,
+		FrontageFt:   req.Msg.FrontageFt,
+		DepthFt:      req.Msg.DepthFt,
+		Properties:   req.Msg.Properties,
+	})
+	// Forward the caller's W3C trace context so the writer records it as trace_id.
+	if traceparent := req.Header().Get("traceparent"); traceparent != "" {
+		meshReq.Header().Set("traceparent", traceparent)
+	}
+
+	if _, err := s.dbWriterClient.UpdateParcel(ctx, meshReq); err != nil {
+		// Pass the writer's error code through unchanged (NotFound, InvalidArgument, ...).
+		s.logger.Warn("upstream UpdateParcel request failed", slog.Any("error", err))
+		return nil, err
+	}
+
+	return connect.NewResponse(&publicparcelsv1.UpdateParcelResponse{}), nil
 }
 
 func (s *ParcelServer) GetCategoricalParcelAttributeStatsById(

@@ -316,8 +316,8 @@ const file_civil_mesh_neighborhoods_v1_neighborhoods_proto_rawDesc = "" +
 	"\rneighborhoods\x18\x01 \x03(\v2H.civil.mesh.neighborhoods.v1.GetNeighborhoodsResponse.NeighborhoodsEntryR\rneighborhoods\x1ak\n" +
 	"\x12NeighborhoodsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12?\n" +
-	"\x05value\x18\x02 \x01(\v2).civil.mesh.neighborhoods.v1.NeighborhoodR\x05value:\x028\x012\xbb\x02\n" +
-	"\x13NeighborhoodService\x12\x9f\x01\n" +
+	"\x05value\x18\x02 \x01(\v2).civil.mesh.neighborhoods.v1.NeighborhoodR\x05value:\x028\x012\xbf\x02\n" +
+	"\x17NeighborhoodReadService\x12\x9f\x01\n" +
 	"\x1aGetNeighborhoodDefinitions\x12>.civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsRequest\x1a?.civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse\"\x00\x12\x81\x01\n" +
 	"\x10GetNeighborhoods\x124.civil.mesh.neighborhoods.v1.GetNeighborhoodsRequest\x1a5.civil.mesh.neighborhoods.v1.GetNeighborhoodsResponse\"\x00B\xa0\x02\n" +
 	"\x1fcom.civil.mesh.neighborhoods.v1B\x12NeighborhoodsProtoP\x01ZZgithub.com/civil-labs/civil-os/internal/gen/go/civil/mesh/neighborhoods/v1;neighborhoodsv1\xa2\x02\x03CMN\xaa\x02\x1bCivil.Mesh.Neighborhoods.V1\xca\x02\x1bCivil\\Mesh\\Neighborhoods\\V1\xe2\x02'Civil\\Mesh\\Neighborhoods\\V1\\GPBMetadata\xea\x02\x1eCivil::Mesh::Neighborhoods::V1b\x06proto3"
@@ -350,10 +350,10 @@ var file_civil_mesh_neighborhoods_v1_neighborhoods_proto_depIdxs = []int32{
 	7, // 1: civil.mesh.neighborhoods.v1.GetNeighborhoodsResponse.neighborhoods:type_name -> civil.mesh.neighborhoods.v1.GetNeighborhoodsResponse.NeighborhoodsEntry
 	1, // 2: civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsEntry.value:type_name -> civil.mesh.neighborhoods.v1.Neighborhood
 	1, // 3: civil.mesh.neighborhoods.v1.GetNeighborhoodsResponse.NeighborhoodsEntry.value:type_name -> civil.mesh.neighborhoods.v1.Neighborhood
-	2, // 4: civil.mesh.neighborhoods.v1.NeighborhoodService.GetNeighborhoodDefinitions:input_type -> civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsRequest
-	4, // 5: civil.mesh.neighborhoods.v1.NeighborhoodService.GetNeighborhoods:input_type -> civil.mesh.neighborhoods.v1.GetNeighborhoodsRequest
-	3, // 6: civil.mesh.neighborhoods.v1.NeighborhoodService.GetNeighborhoodDefinitions:output_type -> civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse
-	5, // 7: civil.mesh.neighborhoods.v1.NeighborhoodService.GetNeighborhoods:output_type -> civil.mesh.neighborhoods.v1.GetNeighborhoodsResponse
+	2, // 4: civil.mesh.neighborhoods.v1.NeighborhoodReadService.GetNeighborhoodDefinitions:input_type -> civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsRequest
+	4, // 5: civil.mesh.neighborhoods.v1.NeighborhoodReadService.GetNeighborhoods:input_type -> civil.mesh.neighborhoods.v1.GetNeighborhoodsRequest
+	3, // 6: civil.mesh.neighborhoods.v1.NeighborhoodReadService.GetNeighborhoodDefinitions:output_type -> civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse
+	5, // 7: civil.mesh.neighborhoods.v1.NeighborhoodReadService.GetNeighborhoods:output_type -> civil.mesh.neighborhoods.v1.GetNeighborhoodsResponse
 	6, // [6:8] is the sub-list for method output_type
 	4, // [4:6] is the sub-list for method input_type
 	4, // [4:4] is the sub-list for extension type_name

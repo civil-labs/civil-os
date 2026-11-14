@@ -160,7 +160,11 @@ Both repos are archived later, together with the other source repos.
 7. The editor-to-writer rename is complete everywhere in the repo, and parcel
    updates persist end to end through the gateway.
 8. The README, architecture overview and `CLAUDE.md` exist and are accurate.
-9. No AWS SDK dependency remains in the gateway.
+9. No AWS *coupling* remains in the gateway: backend discovery uses no cloud
+   API. *(Amended 2026-11-14 by owner decision during PR 2 review: optional
+   S3 support for instance metadata, via gocloud.dev `s3blob`, stays and still
+   pulls in the AWS SDK. Originally "No AWS SDK dependency remains in the
+   gateway.")*
 
 ## Manual steps for the owner (GitHub and npm configuration)
 

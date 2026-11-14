@@ -336,8 +336,8 @@ const file_civil_mesh_improvements_v1_improvements_proto_rawDesc = "" +
 	"\x16improvement_conditions\x18\x01 \x03(\v2W.civil.mesh.improvements.v1.GetImprovementConditionsResponse.ImprovementConditionsEntryR\x15improvementConditions\x1az\n" +
 	"\x1aImprovementConditionsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12F\n" +
-	"\x05value\x18\x02 \x01(\v20.civil.mesh.improvements.v1.ImprovementConditionR\x05value:\x028\x012\xba\x02\n" +
-	"\x13ImprovementsService\x12\x88\x01\n" +
+	"\x05value\x18\x02 \x01(\v20.civil.mesh.improvements.v1.ImprovementConditionR\x05value:\x028\x012\xbd\x02\n" +
+	"\x16ImprovementReadService\x12\x88\x01\n" +
 	"\x13GetImprovementTypes\x126.civil.mesh.improvements.v1.GetImprovementTypesRequest\x1a7.civil.mesh.improvements.v1.GetImprovementTypesResponse\"\x00\x12\x97\x01\n" +
 	"\x18GetImprovementConditions\x12;.civil.mesh.improvements.v1.GetImprovementConditionsRequest\x1a<.civil.mesh.improvements.v1.GetImprovementConditionsResponse\"\x00B\x98\x02\n" +
 	"\x1ecom.civil.mesh.improvements.v1B\x11ImprovementsProtoP\x01ZXgithub.com/civil-labs/civil-os/internal/gen/go/civil/mesh/improvements/v1;improvementsv1\xa2\x02\x03CMI\xaa\x02\x1aCivil.Mesh.Improvements.V1\xca\x02\x1aCivil\\Mesh\\Improvements\\V1\xe2\x02&Civil\\Mesh\\Improvements\\V1\\GPBMetadata\xea\x02\x1dCivil::Mesh::Improvements::V1b\x06proto3"
@@ -370,10 +370,10 @@ var file_civil_mesh_improvements_v1_improvements_proto_depIdxs = []int32{
 	7, // 1: civil.mesh.improvements.v1.GetImprovementConditionsResponse.improvement_conditions:type_name -> civil.mesh.improvements.v1.GetImprovementConditionsResponse.ImprovementConditionsEntry
 	0, // 2: civil.mesh.improvements.v1.GetImprovementTypesResponse.ImprovementTypesEntry.value:type_name -> civil.mesh.improvements.v1.ImprovementType
 	3, // 3: civil.mesh.improvements.v1.GetImprovementConditionsResponse.ImprovementConditionsEntry.value:type_name -> civil.mesh.improvements.v1.ImprovementCondition
-	1, // 4: civil.mesh.improvements.v1.ImprovementsService.GetImprovementTypes:input_type -> civil.mesh.improvements.v1.GetImprovementTypesRequest
-	4, // 5: civil.mesh.improvements.v1.ImprovementsService.GetImprovementConditions:input_type -> civil.mesh.improvements.v1.GetImprovementConditionsRequest
-	2, // 6: civil.mesh.improvements.v1.ImprovementsService.GetImprovementTypes:output_type -> civil.mesh.improvements.v1.GetImprovementTypesResponse
-	5, // 7: civil.mesh.improvements.v1.ImprovementsService.GetImprovementConditions:output_type -> civil.mesh.improvements.v1.GetImprovementConditionsResponse
+	1, // 4: civil.mesh.improvements.v1.ImprovementReadService.GetImprovementTypes:input_type -> civil.mesh.improvements.v1.GetImprovementTypesRequest
+	4, // 5: civil.mesh.improvements.v1.ImprovementReadService.GetImprovementConditions:input_type -> civil.mesh.improvements.v1.GetImprovementConditionsRequest
+	2, // 6: civil.mesh.improvements.v1.ImprovementReadService.GetImprovementTypes:output_type -> civil.mesh.improvements.v1.GetImprovementTypesResponse
+	5, // 7: civil.mesh.improvements.v1.ImprovementReadService.GetImprovementConditions:output_type -> civil.mesh.improvements.v1.GetImprovementConditionsResponse
 	6, // [6:8] is the sub-list for method output_type
 	4, // [4:6] is the sub-list for method input_type
 	4, // [4:4] is the sub-list for extension type_name

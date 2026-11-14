@@ -9,6 +9,8 @@ import (
 	dexv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/dex/v1"
 
 	"github.com/dexidp/dex/api/v2"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type DexServer struct {
@@ -34,7 +36,7 @@ func (s *DexServer) GetClient(
 
 	if err != nil {
 		s.logger.Error("upstream dex GetClient request failed", slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, dexUpstreamError(err)
 	}
 
 	if dexRes == nil {
@@ -83,7 +85,7 @@ func (s *DexServer) CreateClient(
 
 	if err != nil {
 		s.logger.Error("upstream dex CreateClient request failed", slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, dexUpstreamError(err)
 	}
 
 	if dexRes == nil {
@@ -130,7 +132,7 @@ func (s *DexServer) UpdateClient(
 
 	if err != nil {
 		s.logger.Error("upstream dex UpdateClient request failed", slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, dexUpstreamError(err)
 	}
 
 	if dexRes == nil {
@@ -162,7 +164,7 @@ func (s *DexServer) DeleteClient(
 
 	if err != nil {
 		s.logger.Error("upstream dex DeleteClient request failed", slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, dexUpstreamError(err)
 	}
 
 	if dexRes == nil {
@@ -188,7 +190,7 @@ func (s *DexServer) ListClients(
 
 	if err != nil {
 		s.logger.Error("upstream dex ListClients request failed", slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, dexUpstreamError(err)
 	}
 
 	if dexRes == nil {
@@ -239,7 +241,7 @@ func (s *DexServer) ListRefresh(
 
 	if err != nil {
 		s.logger.Error("upstream dex ListRefresh request failed", slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, dexUpstreamError(err)
 	}
 
 	if dexRes == nil {
@@ -289,7 +291,7 @@ func (s *DexServer) RevokeRefresh(
 
 	if err != nil {
 		s.logger.Error("upstream dex RevokeRefresh request failed", slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, dexUpstreamError(err)
 	}
 
 	if dexRes == nil {
@@ -301,4 +303,14 @@ func (s *DexServer) RevokeRefresh(
 	}
 
 	return connect.NewResponse(res), nil
+}
+
+// dexUpstreamError maps a failed Dex gRPC call to a Connect error. An
+// unreachable Dex is reported as Unavailable so callers can retry; every other
+// upstream failure stays Internal, as before.
+func dexUpstreamError(err error) error {
+	if status.Code(err) == codes.Unavailable {
+		return connect.NewError(connect.CodeUnavailable, errors.New("dex is unavailable"))
+	}
+	return connect.NewError(connect.CodeInternal, err)
 }

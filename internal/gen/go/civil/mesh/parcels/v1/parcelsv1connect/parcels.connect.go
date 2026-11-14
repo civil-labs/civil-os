@@ -21,8 +21,10 @@ import (
 const _ = connect.IsAtLeastVersion1_13_0
 
 const (
-	// ParcelsServiceName is the fully-qualified name of the ParcelsService service.
-	ParcelsServiceName = "civil.mesh.parcels.v1.ParcelsService"
+	// ParcelReadServiceName is the fully-qualified name of the ParcelReadService service.
+	ParcelReadServiceName = "civil.mesh.parcels.v1.ParcelReadService"
+	// ParcelWriteServiceName is the fully-qualified name of the ParcelWriteService service.
+	ParcelWriteServiceName = "civil.mesh.parcels.v1.ParcelWriteService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -33,115 +35,117 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// ParcelsServiceGetParcelsWithImprovementSummaryByParcelIdProcedure is the fully-qualified name of
-	// the ParcelsService's GetParcelsWithImprovementSummaryByParcelId RPC.
-	ParcelsServiceGetParcelsWithImprovementSummaryByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetParcelsWithImprovementSummaryByParcelId"
-	// ParcelsServiceGetParcelsWithImprovementSummaryByFeatureIdProcedure is the fully-qualified name of
-	// the ParcelsService's GetParcelsWithImprovementSummaryByFeatureId RPC.
-	ParcelsServiceGetParcelsWithImprovementSummaryByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetParcelsWithImprovementSummaryByFeatureId"
-	// ParcelsServiceGetNumericalParcelStatsByIdProcedure is the fully-qualified name of the
-	// ParcelsService's GetNumericalParcelStatsById RPC.
-	ParcelsServiceGetNumericalParcelStatsByIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetNumericalParcelStatsById"
-	// ParcelsServiceGetCategoricalParcelStatsByIdProcedure is the fully-qualified name of the
-	// ParcelsService's GetCategoricalParcelStatsById RPC.
-	ParcelsServiceGetCategoricalParcelStatsByIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetCategoricalParcelStatsById"
-	// ParcelsServiceGetEquityComparablesProcedure is the fully-qualified name of the ParcelsService's
-	// GetEquityComparables RPC.
-	ParcelsServiceGetEquityComparablesProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetEquityComparables"
-	// ParcelsServiceGetSalesComparablesProcedure is the fully-qualified name of the ParcelsService's
-	// GetSalesComparables RPC.
-	ParcelsServiceGetSalesComparablesProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetSalesComparables"
-	// ParcelsServiceGetParcelIdsByFeatureIdProcedure is the fully-qualified name of the
-	// ParcelsService's GetParcelIdsByFeatureId RPC.
-	ParcelsServiceGetParcelIdsByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetParcelIdsByFeatureId"
-	// ParcelsServiceGetEstimatedParcelsExtentWGS84Procedure is the fully-qualified name of the
-	// ParcelsService's GetEstimatedParcelsExtentWGS84 RPC.
-	ParcelsServiceGetEstimatedParcelsExtentWGS84Procedure = "/civil.mesh.parcels.v1.ParcelsService/GetEstimatedParcelsExtentWGS84"
-	// ParcelsServiceGetLandAreaSqftByParcelIdProcedure is the fully-qualified name of the
-	// ParcelsService's GetLandAreaSqftByParcelId RPC.
-	ParcelsServiceGetLandAreaSqftByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetLandAreaSqftByParcelId"
-	// ParcelsServiceGetFrontageFtByParcelIdProcedure is the fully-qualified name of the
-	// ParcelsService's GetFrontageFtByParcelId RPC.
-	ParcelsServiceGetFrontageFtByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetFrontageFtByParcelId"
-	// ParcelsServiceGetDepthFtByParcelIdProcedure is the fully-qualified name of the ParcelsService's
-	// GetDepthFtByParcelId RPC.
-	ParcelsServiceGetDepthFtByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetDepthFtByParcelId"
-	// ParcelsServiceGetLandUseIdByParcelIdProcedure is the fully-qualified name of the ParcelsService's
-	// GetLandUseIdByParcelId RPC.
-	ParcelsServiceGetLandUseIdByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetLandUseIdByParcelId"
-	// ParcelsServiceGetZoningIdByParcelIdProcedure is the fully-qualified name of the ParcelsService's
-	// GetZoningIdByParcelId RPC.
-	ParcelsServiceGetZoningIdByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetZoningIdByParcelId"
-	// ParcelsServiceGetImprovementAreaSqftByParcelIdProcedure is the fully-qualified name of the
-	// ParcelsService's GetImprovementAreaSqftByParcelId RPC.
-	ParcelsServiceGetImprovementAreaSqftByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetImprovementAreaSqftByParcelId"
-	// ParcelsServiceGetBedroomsByParcelIdProcedure is the fully-qualified name of the ParcelsService's
-	// GetBedroomsByParcelId RPC.
-	ParcelsServiceGetBedroomsByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetBedroomsByParcelId"
-	// ParcelsServiceGetBathroomsByParcelIdProcedure is the fully-qualified name of the ParcelsService's
-	// GetBathroomsByParcelId RPC.
-	ParcelsServiceGetBathroomsByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetBathroomsByParcelId"
-	// ParcelsServiceGetUnitsByParcelIdProcedure is the fully-qualified name of the ParcelsService's
-	// GetUnitsByParcelId RPC.
-	ParcelsServiceGetUnitsByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetUnitsByParcelId"
-	// ParcelsServiceGetPrimaryImprovementYearBuiltByParcelIdProcedure is the fully-qualified name of
-	// the ParcelsService's GetPrimaryImprovementYearBuiltByParcelId RPC.
-	ParcelsServiceGetPrimaryImprovementYearBuiltByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetPrimaryImprovementYearBuiltByParcelId"
-	// ParcelsServiceGetPrimaryImprovementEffectiveYearBuiltByParcelIdProcedure is the fully-qualified
-	// name of the ParcelsService's GetPrimaryImprovementEffectiveYearBuiltByParcelId RPC.
-	ParcelsServiceGetPrimaryImprovementEffectiveYearBuiltByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetPrimaryImprovementEffectiveYearBuiltByParcelId"
-	// ParcelsServiceGetPrimaryImprovementConditionIdByParcelIdProcedure is the fully-qualified name of
-	// the ParcelsService's GetPrimaryImprovementConditionIdByParcelId RPC.
-	ParcelsServiceGetPrimaryImprovementConditionIdByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetPrimaryImprovementConditionIdByParcelId"
-	// ParcelsServiceGetPrimaryImprovementTypeIdByParcelIdProcedure is the fully-qualified name of the
-	// ParcelsService's GetPrimaryImprovementTypeIdByParcelId RPC.
-	ParcelsServiceGetPrimaryImprovementTypeIdByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetPrimaryImprovementTypeIdByParcelId"
-	// ParcelsServiceGetLandAreaSqftByFeatureIdProcedure is the fully-qualified name of the
-	// ParcelsService's GetLandAreaSqftByFeatureId RPC.
-	ParcelsServiceGetLandAreaSqftByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetLandAreaSqftByFeatureId"
-	// ParcelsServiceGetFrontageFtByFeatureIdProcedure is the fully-qualified name of the
-	// ParcelsService's GetFrontageFtByFeatureId RPC.
-	ParcelsServiceGetFrontageFtByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetFrontageFtByFeatureId"
-	// ParcelsServiceGetDepthFtByFeatureIdProcedure is the fully-qualified name of the ParcelsService's
-	// GetDepthFtByFeatureId RPC.
-	ParcelsServiceGetDepthFtByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetDepthFtByFeatureId"
-	// ParcelsServiceGetLandUseIdByFeatureIdProcedure is the fully-qualified name of the
-	// ParcelsService's GetLandUseIdByFeatureId RPC.
-	ParcelsServiceGetLandUseIdByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetLandUseIdByFeatureId"
-	// ParcelsServiceGetZoningIdByFeatureIdProcedure is the fully-qualified name of the ParcelsService's
-	// GetZoningIdByFeatureId RPC.
-	ParcelsServiceGetZoningIdByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetZoningIdByFeatureId"
-	// ParcelsServiceGetImprovementAreaSqftByFeatureIdProcedure is the fully-qualified name of the
-	// ParcelsService's GetImprovementAreaSqftByFeatureId RPC.
-	ParcelsServiceGetImprovementAreaSqftByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetImprovementAreaSqftByFeatureId"
-	// ParcelsServiceGetBedroomsByFeatureIdProcedure is the fully-qualified name of the ParcelsService's
-	// GetBedroomsByFeatureId RPC.
-	ParcelsServiceGetBedroomsByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetBedroomsByFeatureId"
-	// ParcelsServiceGetBathroomsByFeatureIdProcedure is the fully-qualified name of the
-	// ParcelsService's GetBathroomsByFeatureId RPC.
-	ParcelsServiceGetBathroomsByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetBathroomsByFeatureId"
-	// ParcelsServiceGetUnitsByFeatureIdProcedure is the fully-qualified name of the ParcelsService's
-	// GetUnitsByFeatureId RPC.
-	ParcelsServiceGetUnitsByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetUnitsByFeatureId"
-	// ParcelsServiceGetPrimaryImprovementYearBuiltByFeatureIdProcedure is the fully-qualified name of
-	// the ParcelsService's GetPrimaryImprovementYearBuiltByFeatureId RPC.
-	ParcelsServiceGetPrimaryImprovementYearBuiltByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetPrimaryImprovementYearBuiltByFeatureId"
-	// ParcelsServiceGetPrimaryImprovementEffectiveYearBuiltByFeatureIdProcedure is the fully-qualified
-	// name of the ParcelsService's GetPrimaryImprovementEffectiveYearBuiltByFeatureId RPC.
-	ParcelsServiceGetPrimaryImprovementEffectiveYearBuiltByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetPrimaryImprovementEffectiveYearBuiltByFeatureId"
-	// ParcelsServiceGetPrimaryImprovementConditionIdByFeatureIdProcedure is the fully-qualified name of
-	// the ParcelsService's GetPrimaryImprovementConditionIdByFeatureId RPC.
-	ParcelsServiceGetPrimaryImprovementConditionIdByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetPrimaryImprovementConditionIdByFeatureId"
-	// ParcelsServiceGetPrimaryImprovementTypeIdByFeatureIdProcedure is the fully-qualified name of the
-	// ParcelsService's GetPrimaryImprovementTypeIdByFeatureId RPC.
-	ParcelsServiceGetPrimaryImprovementTypeIdByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelsService/GetPrimaryImprovementTypeIdByFeatureId"
-	// ParcelsServiceUpdateParcelProcedure is the fully-qualified name of the ParcelsService's
+	// ParcelReadServiceGetParcelsWithImprovementSummaryByParcelIdProcedure is the fully-qualified name
+	// of the ParcelReadService's GetParcelsWithImprovementSummaryByParcelId RPC.
+	ParcelReadServiceGetParcelsWithImprovementSummaryByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetParcelsWithImprovementSummaryByParcelId"
+	// ParcelReadServiceGetParcelsWithImprovementSummaryByFeatureIdProcedure is the fully-qualified name
+	// of the ParcelReadService's GetParcelsWithImprovementSummaryByFeatureId RPC.
+	ParcelReadServiceGetParcelsWithImprovementSummaryByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetParcelsWithImprovementSummaryByFeatureId"
+	// ParcelReadServiceGetNumericalParcelStatsByIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetNumericalParcelStatsById RPC.
+	ParcelReadServiceGetNumericalParcelStatsByIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetNumericalParcelStatsById"
+	// ParcelReadServiceGetCategoricalParcelStatsByIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetCategoricalParcelStatsById RPC.
+	ParcelReadServiceGetCategoricalParcelStatsByIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetCategoricalParcelStatsById"
+	// ParcelReadServiceGetEquityComparablesProcedure is the fully-qualified name of the
+	// ParcelReadService's GetEquityComparables RPC.
+	ParcelReadServiceGetEquityComparablesProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetEquityComparables"
+	// ParcelReadServiceGetSalesComparablesProcedure is the fully-qualified name of the
+	// ParcelReadService's GetSalesComparables RPC.
+	ParcelReadServiceGetSalesComparablesProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetSalesComparables"
+	// ParcelReadServiceGetParcelIdsByFeatureIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetParcelIdsByFeatureId RPC.
+	ParcelReadServiceGetParcelIdsByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetParcelIdsByFeatureId"
+	// ParcelReadServiceGetEstimatedParcelsExtentWGS84Procedure is the fully-qualified name of the
+	// ParcelReadService's GetEstimatedParcelsExtentWGS84 RPC.
+	ParcelReadServiceGetEstimatedParcelsExtentWGS84Procedure = "/civil.mesh.parcels.v1.ParcelReadService/GetEstimatedParcelsExtentWGS84"
+	// ParcelReadServiceGetLandAreaSqftByParcelIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetLandAreaSqftByParcelId RPC.
+	ParcelReadServiceGetLandAreaSqftByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetLandAreaSqftByParcelId"
+	// ParcelReadServiceGetFrontageFtByParcelIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetFrontageFtByParcelId RPC.
+	ParcelReadServiceGetFrontageFtByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetFrontageFtByParcelId"
+	// ParcelReadServiceGetDepthFtByParcelIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetDepthFtByParcelId RPC.
+	ParcelReadServiceGetDepthFtByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetDepthFtByParcelId"
+	// ParcelReadServiceGetLandUseIdByParcelIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetLandUseIdByParcelId RPC.
+	ParcelReadServiceGetLandUseIdByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetLandUseIdByParcelId"
+	// ParcelReadServiceGetZoningIdByParcelIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetZoningIdByParcelId RPC.
+	ParcelReadServiceGetZoningIdByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetZoningIdByParcelId"
+	// ParcelReadServiceGetImprovementAreaSqftByParcelIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetImprovementAreaSqftByParcelId RPC.
+	ParcelReadServiceGetImprovementAreaSqftByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetImprovementAreaSqftByParcelId"
+	// ParcelReadServiceGetBedroomsByParcelIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetBedroomsByParcelId RPC.
+	ParcelReadServiceGetBedroomsByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetBedroomsByParcelId"
+	// ParcelReadServiceGetBathroomsByParcelIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetBathroomsByParcelId RPC.
+	ParcelReadServiceGetBathroomsByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetBathroomsByParcelId"
+	// ParcelReadServiceGetUnitsByParcelIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetUnitsByParcelId RPC.
+	ParcelReadServiceGetUnitsByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetUnitsByParcelId"
+	// ParcelReadServiceGetPrimaryImprovementYearBuiltByParcelIdProcedure is the fully-qualified name of
+	// the ParcelReadService's GetPrimaryImprovementYearBuiltByParcelId RPC.
+	ParcelReadServiceGetPrimaryImprovementYearBuiltByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetPrimaryImprovementYearBuiltByParcelId"
+	// ParcelReadServiceGetPrimaryImprovementEffectiveYearBuiltByParcelIdProcedure is the
+	// fully-qualified name of the ParcelReadService's GetPrimaryImprovementEffectiveYearBuiltByParcelId
+	// RPC.
+	ParcelReadServiceGetPrimaryImprovementEffectiveYearBuiltByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetPrimaryImprovementEffectiveYearBuiltByParcelId"
+	// ParcelReadServiceGetPrimaryImprovementConditionIdByParcelIdProcedure is the fully-qualified name
+	// of the ParcelReadService's GetPrimaryImprovementConditionIdByParcelId RPC.
+	ParcelReadServiceGetPrimaryImprovementConditionIdByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetPrimaryImprovementConditionIdByParcelId"
+	// ParcelReadServiceGetPrimaryImprovementTypeIdByParcelIdProcedure is the fully-qualified name of
+	// the ParcelReadService's GetPrimaryImprovementTypeIdByParcelId RPC.
+	ParcelReadServiceGetPrimaryImprovementTypeIdByParcelIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetPrimaryImprovementTypeIdByParcelId"
+	// ParcelReadServiceGetLandAreaSqftByFeatureIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetLandAreaSqftByFeatureId RPC.
+	ParcelReadServiceGetLandAreaSqftByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetLandAreaSqftByFeatureId"
+	// ParcelReadServiceGetFrontageFtByFeatureIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetFrontageFtByFeatureId RPC.
+	ParcelReadServiceGetFrontageFtByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetFrontageFtByFeatureId"
+	// ParcelReadServiceGetDepthFtByFeatureIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetDepthFtByFeatureId RPC.
+	ParcelReadServiceGetDepthFtByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetDepthFtByFeatureId"
+	// ParcelReadServiceGetLandUseIdByFeatureIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetLandUseIdByFeatureId RPC.
+	ParcelReadServiceGetLandUseIdByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetLandUseIdByFeatureId"
+	// ParcelReadServiceGetZoningIdByFeatureIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetZoningIdByFeatureId RPC.
+	ParcelReadServiceGetZoningIdByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetZoningIdByFeatureId"
+	// ParcelReadServiceGetImprovementAreaSqftByFeatureIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetImprovementAreaSqftByFeatureId RPC.
+	ParcelReadServiceGetImprovementAreaSqftByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetImprovementAreaSqftByFeatureId"
+	// ParcelReadServiceGetBedroomsByFeatureIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetBedroomsByFeatureId RPC.
+	ParcelReadServiceGetBedroomsByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetBedroomsByFeatureId"
+	// ParcelReadServiceGetBathroomsByFeatureIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetBathroomsByFeatureId RPC.
+	ParcelReadServiceGetBathroomsByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetBathroomsByFeatureId"
+	// ParcelReadServiceGetUnitsByFeatureIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetUnitsByFeatureId RPC.
+	ParcelReadServiceGetUnitsByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetUnitsByFeatureId"
+	// ParcelReadServiceGetPrimaryImprovementYearBuiltByFeatureIdProcedure is the fully-qualified name
+	// of the ParcelReadService's GetPrimaryImprovementYearBuiltByFeatureId RPC.
+	ParcelReadServiceGetPrimaryImprovementYearBuiltByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetPrimaryImprovementYearBuiltByFeatureId"
+	// ParcelReadServiceGetPrimaryImprovementEffectiveYearBuiltByFeatureIdProcedure is the
+	// fully-qualified name of the ParcelReadService's
+	// GetPrimaryImprovementEffectiveYearBuiltByFeatureId RPC.
+	ParcelReadServiceGetPrimaryImprovementEffectiveYearBuiltByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetPrimaryImprovementEffectiveYearBuiltByFeatureId"
+	// ParcelReadServiceGetPrimaryImprovementConditionIdByFeatureIdProcedure is the fully-qualified name
+	// of the ParcelReadService's GetPrimaryImprovementConditionIdByFeatureId RPC.
+	ParcelReadServiceGetPrimaryImprovementConditionIdByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetPrimaryImprovementConditionIdByFeatureId"
+	// ParcelReadServiceGetPrimaryImprovementTypeIdByFeatureIdProcedure is the fully-qualified name of
+	// the ParcelReadService's GetPrimaryImprovementTypeIdByFeatureId RPC.
+	ParcelReadServiceGetPrimaryImprovementTypeIdByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetPrimaryImprovementTypeIdByFeatureId"
+	// ParcelWriteServiceUpdateParcelProcedure is the fully-qualified name of the ParcelWriteService's
 	// UpdateParcel RPC.
-	ParcelsServiceUpdateParcelProcedure = "/civil.mesh.parcels.v1.ParcelsService/UpdateParcel"
+	ParcelWriteServiceUpdateParcelProcedure = "/civil.mesh.parcels.v1.ParcelWriteService/UpdateParcel"
 )
 
-// ParcelsServiceClient is a client for the civil.mesh.parcels.v1.ParcelsService service.
-type ParcelsServiceClient interface {
+// ParcelReadServiceClient is a client for the civil.mesh.parcels.v1.ParcelReadService service.
+type ParcelReadServiceClient interface {
 	// Retrieves the value for a specified attribute for a given parcel
 	GetParcelsWithImprovementSummaryByParcelId(context.Context, *connect.Request[v1.GetParcelsWithImprovementSummaryByParcelIdRequest]) (*connect.Response[v1.GetParcelsWithImprovementSummaryByParcelIdResponse], error)
 	GetParcelsWithImprovementSummaryByFeatureId(context.Context, *connect.Request[v1.GetParcelsWithImprovementSummaryByFeatureIdRequest]) (*connect.Response[v1.GetParcelsWithImprovementSummaryByFeatureIdResponse], error)
@@ -179,235 +183,228 @@ type ParcelsServiceClient interface {
 	GetPrimaryImprovementEffectiveYearBuiltByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse], error)
 	GetPrimaryImprovementConditionIdByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementConditionIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementConditionIdByFeatureIdResponse], error)
 	GetPrimaryImprovementTypeIdByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementTypeIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementTypeIdByFeatureIdResponse], error)
-	UpdateParcel(context.Context, *connect.Request[v1.UpdateParcelRequest]) (*connect.Response[v1.UpdateParcelResponse], error)
 }
 
-// NewParcelsServiceClient constructs a client for the civil.mesh.parcels.v1.ParcelsService service.
-// By default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped
-// responses, and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
-// connect.WithGRPC() or connect.WithGRPCWeb() options.
+// NewParcelReadServiceClient constructs a client for the civil.mesh.parcels.v1.ParcelReadService
+// service. By default, it uses the Connect protocol with the binary Protobuf Codec, asks for
+// gzipped responses, and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply
+// the connect.WithGRPC() or connect.WithGRPCWeb() options.
 //
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
 // http://api.acme.com or https://acme.com/grpc).
-func NewParcelsServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ParcelsServiceClient {
+func NewParcelReadServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ParcelReadServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
-	parcelsServiceMethods := v1.File_civil_mesh_parcels_v1_parcels_proto.Services().ByName("ParcelsService").Methods()
-	return &parcelsServiceClient{
+	parcelReadServiceMethods := v1.File_civil_mesh_parcels_v1_parcels_proto.Services().ByName("ParcelReadService").Methods()
+	return &parcelReadServiceClient{
 		getParcelsWithImprovementSummaryByParcelId: connect.NewClient[v1.GetParcelsWithImprovementSummaryByParcelIdRequest, v1.GetParcelsWithImprovementSummaryByParcelIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetParcelsWithImprovementSummaryByParcelIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetParcelsWithImprovementSummaryByParcelId")),
+			baseURL+ParcelReadServiceGetParcelsWithImprovementSummaryByParcelIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetParcelsWithImprovementSummaryByParcelId")),
 			connect.WithClientOptions(opts...),
 		),
 		getParcelsWithImprovementSummaryByFeatureId: connect.NewClient[v1.GetParcelsWithImprovementSummaryByFeatureIdRequest, v1.GetParcelsWithImprovementSummaryByFeatureIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetParcelsWithImprovementSummaryByFeatureIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetParcelsWithImprovementSummaryByFeatureId")),
+			baseURL+ParcelReadServiceGetParcelsWithImprovementSummaryByFeatureIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetParcelsWithImprovementSummaryByFeatureId")),
 			connect.WithClientOptions(opts...),
 		),
 		getNumericalParcelStatsById: connect.NewClient[v1.GetNumericalParcelStatsByIdRequest, v1.GetNumericalParcelStatsByIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetNumericalParcelStatsByIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetNumericalParcelStatsById")),
+			baseURL+ParcelReadServiceGetNumericalParcelStatsByIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetNumericalParcelStatsById")),
 			connect.WithClientOptions(opts...),
 		),
 		getCategoricalParcelStatsById: connect.NewClient[v1.GetCategoricalParcelStatsByIdRequest, v1.GetCategoricalParcelStatsByIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetCategoricalParcelStatsByIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetCategoricalParcelStatsById")),
+			baseURL+ParcelReadServiceGetCategoricalParcelStatsByIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetCategoricalParcelStatsById")),
 			connect.WithClientOptions(opts...),
 		),
 		getEquityComparables: connect.NewClient[v1.GetEquityComparablesRequest, v1.GetEquityComparablesResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetEquityComparablesProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetEquityComparables")),
+			baseURL+ParcelReadServiceGetEquityComparablesProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetEquityComparables")),
 			connect.WithClientOptions(opts...),
 		),
 		getSalesComparables: connect.NewClient[v1.GetSalesComparablesRequest, v1.GetSalesComparablesResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetSalesComparablesProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetSalesComparables")),
+			baseURL+ParcelReadServiceGetSalesComparablesProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetSalesComparables")),
 			connect.WithClientOptions(opts...),
 		),
 		getParcelIdsByFeatureId: connect.NewClient[v1.GetParcelIdsByFeatureIdRequest, v1.GetParcelIdsByFeatureIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetParcelIdsByFeatureIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetParcelIdsByFeatureId")),
+			baseURL+ParcelReadServiceGetParcelIdsByFeatureIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetParcelIdsByFeatureId")),
 			connect.WithClientOptions(opts...),
 		),
 		getEstimatedParcelsExtentWGS84: connect.NewClient[v1.GetEstimatedParcelsExtentWGS84Request, v1.GetEstimatedParcelsExtentWGS84Response](
 			httpClient,
-			baseURL+ParcelsServiceGetEstimatedParcelsExtentWGS84Procedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetEstimatedParcelsExtentWGS84")),
+			baseURL+ParcelReadServiceGetEstimatedParcelsExtentWGS84Procedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetEstimatedParcelsExtentWGS84")),
 			connect.WithClientOptions(opts...),
 		),
 		getLandAreaSqftByParcelId: connect.NewClient[v1.GetLandAreaSqftByParcelIdRequest, v1.GetLandAreaSqftByParcelIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetLandAreaSqftByParcelIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetLandAreaSqftByParcelId")),
+			baseURL+ParcelReadServiceGetLandAreaSqftByParcelIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetLandAreaSqftByParcelId")),
 			connect.WithClientOptions(opts...),
 		),
 		getFrontageFtByParcelId: connect.NewClient[v1.GetFrontageFtByParcelIdRequest, v1.GetFrontageFtByParcelIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetFrontageFtByParcelIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetFrontageFtByParcelId")),
+			baseURL+ParcelReadServiceGetFrontageFtByParcelIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetFrontageFtByParcelId")),
 			connect.WithClientOptions(opts...),
 		),
 		getDepthFtByParcelId: connect.NewClient[v1.GetDepthFtByParcelIdRequest, v1.GetDepthFtByParcelIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetDepthFtByParcelIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetDepthFtByParcelId")),
+			baseURL+ParcelReadServiceGetDepthFtByParcelIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetDepthFtByParcelId")),
 			connect.WithClientOptions(opts...),
 		),
 		getLandUseIdByParcelId: connect.NewClient[v1.GetLandUseIdByParcelIdRequest, v1.GetLandUseIdByParcelIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetLandUseIdByParcelIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetLandUseIdByParcelId")),
+			baseURL+ParcelReadServiceGetLandUseIdByParcelIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetLandUseIdByParcelId")),
 			connect.WithClientOptions(opts...),
 		),
 		getZoningIdByParcelId: connect.NewClient[v1.GetZoningIdByParcelIdRequest, v1.GetZoningIdByParcelIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetZoningIdByParcelIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetZoningIdByParcelId")),
+			baseURL+ParcelReadServiceGetZoningIdByParcelIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetZoningIdByParcelId")),
 			connect.WithClientOptions(opts...),
 		),
 		getImprovementAreaSqftByParcelId: connect.NewClient[v1.GetImprovementAreaSqftByParcelIdRequest, v1.GetImprovementAreaSqftByParcelIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetImprovementAreaSqftByParcelIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetImprovementAreaSqftByParcelId")),
+			baseURL+ParcelReadServiceGetImprovementAreaSqftByParcelIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetImprovementAreaSqftByParcelId")),
 			connect.WithClientOptions(opts...),
 		),
 		getBedroomsByParcelId: connect.NewClient[v1.GetBedroomsByParcelIdRequest, v1.GetBedroomsByParcelIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetBedroomsByParcelIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetBedroomsByParcelId")),
+			baseURL+ParcelReadServiceGetBedroomsByParcelIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetBedroomsByParcelId")),
 			connect.WithClientOptions(opts...),
 		),
 		getBathroomsByParcelId: connect.NewClient[v1.GetBathroomsByParcelIdRequest, v1.GetBathroomsByParcelIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetBathroomsByParcelIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetBathroomsByParcelId")),
+			baseURL+ParcelReadServiceGetBathroomsByParcelIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetBathroomsByParcelId")),
 			connect.WithClientOptions(opts...),
 		),
 		getUnitsByParcelId: connect.NewClient[v1.GetUnitsByParcelIdRequest, v1.GetUnitsByParcelIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetUnitsByParcelIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetUnitsByParcelId")),
+			baseURL+ParcelReadServiceGetUnitsByParcelIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetUnitsByParcelId")),
 			connect.WithClientOptions(opts...),
 		),
 		getPrimaryImprovementYearBuiltByParcelId: connect.NewClient[v1.GetPrimaryImprovementYearBuiltByParcelIdRequest, v1.GetPrimaryImprovementYearBuiltByParcelIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetPrimaryImprovementYearBuiltByParcelIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetPrimaryImprovementYearBuiltByParcelId")),
+			baseURL+ParcelReadServiceGetPrimaryImprovementYearBuiltByParcelIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetPrimaryImprovementYearBuiltByParcelId")),
 			connect.WithClientOptions(opts...),
 		),
 		getPrimaryImprovementEffectiveYearBuiltByParcelId: connect.NewClient[v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest, v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetPrimaryImprovementEffectiveYearBuiltByParcelIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetPrimaryImprovementEffectiveYearBuiltByParcelId")),
+			baseURL+ParcelReadServiceGetPrimaryImprovementEffectiveYearBuiltByParcelIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetPrimaryImprovementEffectiveYearBuiltByParcelId")),
 			connect.WithClientOptions(opts...),
 		),
 		getPrimaryImprovementConditionIdByParcelId: connect.NewClient[v1.GetPrimaryImprovementConditionIdByParcelIdRequest, v1.GetPrimaryImprovementConditionIdByParcelIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetPrimaryImprovementConditionIdByParcelIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetPrimaryImprovementConditionIdByParcelId")),
+			baseURL+ParcelReadServiceGetPrimaryImprovementConditionIdByParcelIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetPrimaryImprovementConditionIdByParcelId")),
 			connect.WithClientOptions(opts...),
 		),
 		getPrimaryImprovementTypeIdByParcelId: connect.NewClient[v1.GetPrimaryImprovementTypeIdByParcelIdRequest, v1.GetPrimaryImprovementTypeIdByParcelIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetPrimaryImprovementTypeIdByParcelIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetPrimaryImprovementTypeIdByParcelId")),
+			baseURL+ParcelReadServiceGetPrimaryImprovementTypeIdByParcelIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetPrimaryImprovementTypeIdByParcelId")),
 			connect.WithClientOptions(opts...),
 		),
 		getLandAreaSqftByFeatureId: connect.NewClient[v1.GetLandAreaSqftByFeatureIdRequest, v1.GetLandAreaSqftByFeatureIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetLandAreaSqftByFeatureIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetLandAreaSqftByFeatureId")),
+			baseURL+ParcelReadServiceGetLandAreaSqftByFeatureIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetLandAreaSqftByFeatureId")),
 			connect.WithClientOptions(opts...),
 		),
 		getFrontageFtByFeatureId: connect.NewClient[v1.GetFrontageFtByFeatureIdRequest, v1.GetFrontageFtByFeatureIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetFrontageFtByFeatureIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetFrontageFtByFeatureId")),
+			baseURL+ParcelReadServiceGetFrontageFtByFeatureIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetFrontageFtByFeatureId")),
 			connect.WithClientOptions(opts...),
 		),
 		getDepthFtByFeatureId: connect.NewClient[v1.GetDepthFtByFeatureIdRequest, v1.GetDepthFtByFeatureIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetDepthFtByFeatureIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetDepthFtByFeatureId")),
+			baseURL+ParcelReadServiceGetDepthFtByFeatureIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetDepthFtByFeatureId")),
 			connect.WithClientOptions(opts...),
 		),
 		getLandUseIdByFeatureId: connect.NewClient[v1.GetLandUseIdByFeatureIdRequest, v1.GetLandUseIdByFeatureIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetLandUseIdByFeatureIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetLandUseIdByFeatureId")),
+			baseURL+ParcelReadServiceGetLandUseIdByFeatureIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetLandUseIdByFeatureId")),
 			connect.WithClientOptions(opts...),
 		),
 		getZoningIdByFeatureId: connect.NewClient[v1.GetZoningIdByFeatureIdRequest, v1.GetZoningIdByFeatureIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetZoningIdByFeatureIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetZoningIdByFeatureId")),
+			baseURL+ParcelReadServiceGetZoningIdByFeatureIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetZoningIdByFeatureId")),
 			connect.WithClientOptions(opts...),
 		),
 		getImprovementAreaSqftByFeatureId: connect.NewClient[v1.GetImprovementAreaSqftByFeatureIdRequest, v1.GetImprovementAreaSqftByFeatureIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetImprovementAreaSqftByFeatureIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetImprovementAreaSqftByFeatureId")),
+			baseURL+ParcelReadServiceGetImprovementAreaSqftByFeatureIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetImprovementAreaSqftByFeatureId")),
 			connect.WithClientOptions(opts...),
 		),
 		getBedroomsByFeatureId: connect.NewClient[v1.GetBedroomsByFeatureIdRequest, v1.GetBedroomsByFeatureIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetBedroomsByFeatureIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetBedroomsByFeatureId")),
+			baseURL+ParcelReadServiceGetBedroomsByFeatureIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetBedroomsByFeatureId")),
 			connect.WithClientOptions(opts...),
 		),
 		getBathroomsByFeatureId: connect.NewClient[v1.GetBathroomsByFeatureIdRequest, v1.GetBathroomsByFeatureIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetBathroomsByFeatureIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetBathroomsByFeatureId")),
+			baseURL+ParcelReadServiceGetBathroomsByFeatureIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetBathroomsByFeatureId")),
 			connect.WithClientOptions(opts...),
 		),
 		getUnitsByFeatureId: connect.NewClient[v1.GetUnitsByFeatureIdRequest, v1.GetUnitsByFeatureIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetUnitsByFeatureIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetUnitsByFeatureId")),
+			baseURL+ParcelReadServiceGetUnitsByFeatureIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetUnitsByFeatureId")),
 			connect.WithClientOptions(opts...),
 		),
 		getPrimaryImprovementYearBuiltByFeatureId: connect.NewClient[v1.GetPrimaryImprovementYearBuiltByFeatureIdRequest, v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetPrimaryImprovementYearBuiltByFeatureIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetPrimaryImprovementYearBuiltByFeatureId")),
+			baseURL+ParcelReadServiceGetPrimaryImprovementYearBuiltByFeatureIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetPrimaryImprovementYearBuiltByFeatureId")),
 			connect.WithClientOptions(opts...),
 		),
 		getPrimaryImprovementEffectiveYearBuiltByFeatureId: connect.NewClient[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest, v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetPrimaryImprovementEffectiveYearBuiltByFeatureIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetPrimaryImprovementEffectiveYearBuiltByFeatureId")),
+			baseURL+ParcelReadServiceGetPrimaryImprovementEffectiveYearBuiltByFeatureIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetPrimaryImprovementEffectiveYearBuiltByFeatureId")),
 			connect.WithClientOptions(opts...),
 		),
 		getPrimaryImprovementConditionIdByFeatureId: connect.NewClient[v1.GetPrimaryImprovementConditionIdByFeatureIdRequest, v1.GetPrimaryImprovementConditionIdByFeatureIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetPrimaryImprovementConditionIdByFeatureIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetPrimaryImprovementConditionIdByFeatureId")),
+			baseURL+ParcelReadServiceGetPrimaryImprovementConditionIdByFeatureIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetPrimaryImprovementConditionIdByFeatureId")),
 			connect.WithClientOptions(opts...),
 		),
 		getPrimaryImprovementTypeIdByFeatureId: connect.NewClient[v1.GetPrimaryImprovementTypeIdByFeatureIdRequest, v1.GetPrimaryImprovementTypeIdByFeatureIdResponse](
 			httpClient,
-			baseURL+ParcelsServiceGetPrimaryImprovementTypeIdByFeatureIdProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("GetPrimaryImprovementTypeIdByFeatureId")),
-			connect.WithClientOptions(opts...),
-		),
-		updateParcel: connect.NewClient[v1.UpdateParcelRequest, v1.UpdateParcelResponse](
-			httpClient,
-			baseURL+ParcelsServiceUpdateParcelProcedure,
-			connect.WithSchema(parcelsServiceMethods.ByName("UpdateParcel")),
+			baseURL+ParcelReadServiceGetPrimaryImprovementTypeIdByFeatureIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetPrimaryImprovementTypeIdByFeatureId")),
 			connect.WithClientOptions(opts...),
 		),
 	}
 }
 
-// parcelsServiceClient implements ParcelsServiceClient.
-type parcelsServiceClient struct {
+// parcelReadServiceClient implements ParcelReadServiceClient.
+type parcelReadServiceClient struct {
 	getParcelsWithImprovementSummaryByParcelId         *connect.Client[v1.GetParcelsWithImprovementSummaryByParcelIdRequest, v1.GetParcelsWithImprovementSummaryByParcelIdResponse]
 	getParcelsWithImprovementSummaryByFeatureId        *connect.Client[v1.GetParcelsWithImprovementSummaryByFeatureIdRequest, v1.GetParcelsWithImprovementSummaryByFeatureIdResponse]
 	getNumericalParcelStatsById                        *connect.Client[v1.GetNumericalParcelStatsByIdRequest, v1.GetNumericalParcelStatsByIdResponse]
@@ -442,201 +439,198 @@ type parcelsServiceClient struct {
 	getPrimaryImprovementEffectiveYearBuiltByFeatureId *connect.Client[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest, v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse]
 	getPrimaryImprovementConditionIdByFeatureId        *connect.Client[v1.GetPrimaryImprovementConditionIdByFeatureIdRequest, v1.GetPrimaryImprovementConditionIdByFeatureIdResponse]
 	getPrimaryImprovementTypeIdByFeatureId             *connect.Client[v1.GetPrimaryImprovementTypeIdByFeatureIdRequest, v1.GetPrimaryImprovementTypeIdByFeatureIdResponse]
-	updateParcel                                       *connect.Client[v1.UpdateParcelRequest, v1.UpdateParcelResponse]
 }
 
 // GetParcelsWithImprovementSummaryByParcelId calls
-// civil.mesh.parcels.v1.ParcelsService.GetParcelsWithImprovementSummaryByParcelId.
-func (c *parcelsServiceClient) GetParcelsWithImprovementSummaryByParcelId(ctx context.Context, req *connect.Request[v1.GetParcelsWithImprovementSummaryByParcelIdRequest]) (*connect.Response[v1.GetParcelsWithImprovementSummaryByParcelIdResponse], error) {
+// civil.mesh.parcels.v1.ParcelReadService.GetParcelsWithImprovementSummaryByParcelId.
+func (c *parcelReadServiceClient) GetParcelsWithImprovementSummaryByParcelId(ctx context.Context, req *connect.Request[v1.GetParcelsWithImprovementSummaryByParcelIdRequest]) (*connect.Response[v1.GetParcelsWithImprovementSummaryByParcelIdResponse], error) {
 	return c.getParcelsWithImprovementSummaryByParcelId.CallUnary(ctx, req)
 }
 
 // GetParcelsWithImprovementSummaryByFeatureId calls
-// civil.mesh.parcels.v1.ParcelsService.GetParcelsWithImprovementSummaryByFeatureId.
-func (c *parcelsServiceClient) GetParcelsWithImprovementSummaryByFeatureId(ctx context.Context, req *connect.Request[v1.GetParcelsWithImprovementSummaryByFeatureIdRequest]) (*connect.Response[v1.GetParcelsWithImprovementSummaryByFeatureIdResponse], error) {
+// civil.mesh.parcels.v1.ParcelReadService.GetParcelsWithImprovementSummaryByFeatureId.
+func (c *parcelReadServiceClient) GetParcelsWithImprovementSummaryByFeatureId(ctx context.Context, req *connect.Request[v1.GetParcelsWithImprovementSummaryByFeatureIdRequest]) (*connect.Response[v1.GetParcelsWithImprovementSummaryByFeatureIdResponse], error) {
 	return c.getParcelsWithImprovementSummaryByFeatureId.CallUnary(ctx, req)
 }
 
 // GetNumericalParcelStatsById calls
-// civil.mesh.parcels.v1.ParcelsService.GetNumericalParcelStatsById.
-func (c *parcelsServiceClient) GetNumericalParcelStatsById(ctx context.Context, req *connect.Request[v1.GetNumericalParcelStatsByIdRequest]) (*connect.Response[v1.GetNumericalParcelStatsByIdResponse], error) {
+// civil.mesh.parcels.v1.ParcelReadService.GetNumericalParcelStatsById.
+func (c *parcelReadServiceClient) GetNumericalParcelStatsById(ctx context.Context, req *connect.Request[v1.GetNumericalParcelStatsByIdRequest]) (*connect.Response[v1.GetNumericalParcelStatsByIdResponse], error) {
 	return c.getNumericalParcelStatsById.CallUnary(ctx, req)
 }
 
 // GetCategoricalParcelStatsById calls
-// civil.mesh.parcels.v1.ParcelsService.GetCategoricalParcelStatsById.
-func (c *parcelsServiceClient) GetCategoricalParcelStatsById(ctx context.Context, req *connect.Request[v1.GetCategoricalParcelStatsByIdRequest]) (*connect.Response[v1.GetCategoricalParcelStatsByIdResponse], error) {
+// civil.mesh.parcels.v1.ParcelReadService.GetCategoricalParcelStatsById.
+func (c *parcelReadServiceClient) GetCategoricalParcelStatsById(ctx context.Context, req *connect.Request[v1.GetCategoricalParcelStatsByIdRequest]) (*connect.Response[v1.GetCategoricalParcelStatsByIdResponse], error) {
 	return c.getCategoricalParcelStatsById.CallUnary(ctx, req)
 }
 
-// GetEquityComparables calls civil.mesh.parcels.v1.ParcelsService.GetEquityComparables.
-func (c *parcelsServiceClient) GetEquityComparables(ctx context.Context, req *connect.Request[v1.GetEquityComparablesRequest]) (*connect.Response[v1.GetEquityComparablesResponse], error) {
+// GetEquityComparables calls civil.mesh.parcels.v1.ParcelReadService.GetEquityComparables.
+func (c *parcelReadServiceClient) GetEquityComparables(ctx context.Context, req *connect.Request[v1.GetEquityComparablesRequest]) (*connect.Response[v1.GetEquityComparablesResponse], error) {
 	return c.getEquityComparables.CallUnary(ctx, req)
 }
 
-// GetSalesComparables calls civil.mesh.parcels.v1.ParcelsService.GetSalesComparables.
-func (c *parcelsServiceClient) GetSalesComparables(ctx context.Context, req *connect.Request[v1.GetSalesComparablesRequest]) (*connect.Response[v1.GetSalesComparablesResponse], error) {
+// GetSalesComparables calls civil.mesh.parcels.v1.ParcelReadService.GetSalesComparables.
+func (c *parcelReadServiceClient) GetSalesComparables(ctx context.Context, req *connect.Request[v1.GetSalesComparablesRequest]) (*connect.Response[v1.GetSalesComparablesResponse], error) {
 	return c.getSalesComparables.CallUnary(ctx, req)
 }
 
-// GetParcelIdsByFeatureId calls civil.mesh.parcels.v1.ParcelsService.GetParcelIdsByFeatureId.
-func (c *parcelsServiceClient) GetParcelIdsByFeatureId(ctx context.Context, req *connect.Request[v1.GetParcelIdsByFeatureIdRequest]) (*connect.Response[v1.GetParcelIdsByFeatureIdResponse], error) {
+// GetParcelIdsByFeatureId calls civil.mesh.parcels.v1.ParcelReadService.GetParcelIdsByFeatureId.
+func (c *parcelReadServiceClient) GetParcelIdsByFeatureId(ctx context.Context, req *connect.Request[v1.GetParcelIdsByFeatureIdRequest]) (*connect.Response[v1.GetParcelIdsByFeatureIdResponse], error) {
 	return c.getParcelIdsByFeatureId.CallUnary(ctx, req)
 }
 
 // GetEstimatedParcelsExtentWGS84 calls
-// civil.mesh.parcels.v1.ParcelsService.GetEstimatedParcelsExtentWGS84.
-func (c *parcelsServiceClient) GetEstimatedParcelsExtentWGS84(ctx context.Context, req *connect.Request[v1.GetEstimatedParcelsExtentWGS84Request]) (*connect.Response[v1.GetEstimatedParcelsExtentWGS84Response], error) {
+// civil.mesh.parcels.v1.ParcelReadService.GetEstimatedParcelsExtentWGS84.
+func (c *parcelReadServiceClient) GetEstimatedParcelsExtentWGS84(ctx context.Context, req *connect.Request[v1.GetEstimatedParcelsExtentWGS84Request]) (*connect.Response[v1.GetEstimatedParcelsExtentWGS84Response], error) {
 	return c.getEstimatedParcelsExtentWGS84.CallUnary(ctx, req)
 }
 
-// GetLandAreaSqftByParcelId calls civil.mesh.parcels.v1.ParcelsService.GetLandAreaSqftByParcelId.
-func (c *parcelsServiceClient) GetLandAreaSqftByParcelId(ctx context.Context, req *connect.Request[v1.GetLandAreaSqftByParcelIdRequest]) (*connect.Response[v1.GetLandAreaSqftByParcelIdResponse], error) {
+// GetLandAreaSqftByParcelId calls
+// civil.mesh.parcels.v1.ParcelReadService.GetLandAreaSqftByParcelId.
+func (c *parcelReadServiceClient) GetLandAreaSqftByParcelId(ctx context.Context, req *connect.Request[v1.GetLandAreaSqftByParcelIdRequest]) (*connect.Response[v1.GetLandAreaSqftByParcelIdResponse], error) {
 	return c.getLandAreaSqftByParcelId.CallUnary(ctx, req)
 }
 
-// GetFrontageFtByParcelId calls civil.mesh.parcels.v1.ParcelsService.GetFrontageFtByParcelId.
-func (c *parcelsServiceClient) GetFrontageFtByParcelId(ctx context.Context, req *connect.Request[v1.GetFrontageFtByParcelIdRequest]) (*connect.Response[v1.GetFrontageFtByParcelIdResponse], error) {
+// GetFrontageFtByParcelId calls civil.mesh.parcels.v1.ParcelReadService.GetFrontageFtByParcelId.
+func (c *parcelReadServiceClient) GetFrontageFtByParcelId(ctx context.Context, req *connect.Request[v1.GetFrontageFtByParcelIdRequest]) (*connect.Response[v1.GetFrontageFtByParcelIdResponse], error) {
 	return c.getFrontageFtByParcelId.CallUnary(ctx, req)
 }
 
-// GetDepthFtByParcelId calls civil.mesh.parcels.v1.ParcelsService.GetDepthFtByParcelId.
-func (c *parcelsServiceClient) GetDepthFtByParcelId(ctx context.Context, req *connect.Request[v1.GetDepthFtByParcelIdRequest]) (*connect.Response[v1.GetDepthFtByParcelIdResponse], error) {
+// GetDepthFtByParcelId calls civil.mesh.parcels.v1.ParcelReadService.GetDepthFtByParcelId.
+func (c *parcelReadServiceClient) GetDepthFtByParcelId(ctx context.Context, req *connect.Request[v1.GetDepthFtByParcelIdRequest]) (*connect.Response[v1.GetDepthFtByParcelIdResponse], error) {
 	return c.getDepthFtByParcelId.CallUnary(ctx, req)
 }
 
-// GetLandUseIdByParcelId calls civil.mesh.parcels.v1.ParcelsService.GetLandUseIdByParcelId.
-func (c *parcelsServiceClient) GetLandUseIdByParcelId(ctx context.Context, req *connect.Request[v1.GetLandUseIdByParcelIdRequest]) (*connect.Response[v1.GetLandUseIdByParcelIdResponse], error) {
+// GetLandUseIdByParcelId calls civil.mesh.parcels.v1.ParcelReadService.GetLandUseIdByParcelId.
+func (c *parcelReadServiceClient) GetLandUseIdByParcelId(ctx context.Context, req *connect.Request[v1.GetLandUseIdByParcelIdRequest]) (*connect.Response[v1.GetLandUseIdByParcelIdResponse], error) {
 	return c.getLandUseIdByParcelId.CallUnary(ctx, req)
 }
 
-// GetZoningIdByParcelId calls civil.mesh.parcels.v1.ParcelsService.GetZoningIdByParcelId.
-func (c *parcelsServiceClient) GetZoningIdByParcelId(ctx context.Context, req *connect.Request[v1.GetZoningIdByParcelIdRequest]) (*connect.Response[v1.GetZoningIdByParcelIdResponse], error) {
+// GetZoningIdByParcelId calls civil.mesh.parcels.v1.ParcelReadService.GetZoningIdByParcelId.
+func (c *parcelReadServiceClient) GetZoningIdByParcelId(ctx context.Context, req *connect.Request[v1.GetZoningIdByParcelIdRequest]) (*connect.Response[v1.GetZoningIdByParcelIdResponse], error) {
 	return c.getZoningIdByParcelId.CallUnary(ctx, req)
 }
 
 // GetImprovementAreaSqftByParcelId calls
-// civil.mesh.parcels.v1.ParcelsService.GetImprovementAreaSqftByParcelId.
-func (c *parcelsServiceClient) GetImprovementAreaSqftByParcelId(ctx context.Context, req *connect.Request[v1.GetImprovementAreaSqftByParcelIdRequest]) (*connect.Response[v1.GetImprovementAreaSqftByParcelIdResponse], error) {
+// civil.mesh.parcels.v1.ParcelReadService.GetImprovementAreaSqftByParcelId.
+func (c *parcelReadServiceClient) GetImprovementAreaSqftByParcelId(ctx context.Context, req *connect.Request[v1.GetImprovementAreaSqftByParcelIdRequest]) (*connect.Response[v1.GetImprovementAreaSqftByParcelIdResponse], error) {
 	return c.getImprovementAreaSqftByParcelId.CallUnary(ctx, req)
 }
 
-// GetBedroomsByParcelId calls civil.mesh.parcels.v1.ParcelsService.GetBedroomsByParcelId.
-func (c *parcelsServiceClient) GetBedroomsByParcelId(ctx context.Context, req *connect.Request[v1.GetBedroomsByParcelIdRequest]) (*connect.Response[v1.GetBedroomsByParcelIdResponse], error) {
+// GetBedroomsByParcelId calls civil.mesh.parcels.v1.ParcelReadService.GetBedroomsByParcelId.
+func (c *parcelReadServiceClient) GetBedroomsByParcelId(ctx context.Context, req *connect.Request[v1.GetBedroomsByParcelIdRequest]) (*connect.Response[v1.GetBedroomsByParcelIdResponse], error) {
 	return c.getBedroomsByParcelId.CallUnary(ctx, req)
 }
 
-// GetBathroomsByParcelId calls civil.mesh.parcels.v1.ParcelsService.GetBathroomsByParcelId.
-func (c *parcelsServiceClient) GetBathroomsByParcelId(ctx context.Context, req *connect.Request[v1.GetBathroomsByParcelIdRequest]) (*connect.Response[v1.GetBathroomsByParcelIdResponse], error) {
+// GetBathroomsByParcelId calls civil.mesh.parcels.v1.ParcelReadService.GetBathroomsByParcelId.
+func (c *parcelReadServiceClient) GetBathroomsByParcelId(ctx context.Context, req *connect.Request[v1.GetBathroomsByParcelIdRequest]) (*connect.Response[v1.GetBathroomsByParcelIdResponse], error) {
 	return c.getBathroomsByParcelId.CallUnary(ctx, req)
 }
 
-// GetUnitsByParcelId calls civil.mesh.parcels.v1.ParcelsService.GetUnitsByParcelId.
-func (c *parcelsServiceClient) GetUnitsByParcelId(ctx context.Context, req *connect.Request[v1.GetUnitsByParcelIdRequest]) (*connect.Response[v1.GetUnitsByParcelIdResponse], error) {
+// GetUnitsByParcelId calls civil.mesh.parcels.v1.ParcelReadService.GetUnitsByParcelId.
+func (c *parcelReadServiceClient) GetUnitsByParcelId(ctx context.Context, req *connect.Request[v1.GetUnitsByParcelIdRequest]) (*connect.Response[v1.GetUnitsByParcelIdResponse], error) {
 	return c.getUnitsByParcelId.CallUnary(ctx, req)
 }
 
 // GetPrimaryImprovementYearBuiltByParcelId calls
-// civil.mesh.parcels.v1.ParcelsService.GetPrimaryImprovementYearBuiltByParcelId.
-func (c *parcelsServiceClient) GetPrimaryImprovementYearBuiltByParcelId(ctx context.Context, req *connect.Request[v1.GetPrimaryImprovementYearBuiltByParcelIdRequest]) (*connect.Response[v1.GetPrimaryImprovementYearBuiltByParcelIdResponse], error) {
+// civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementYearBuiltByParcelId.
+func (c *parcelReadServiceClient) GetPrimaryImprovementYearBuiltByParcelId(ctx context.Context, req *connect.Request[v1.GetPrimaryImprovementYearBuiltByParcelIdRequest]) (*connect.Response[v1.GetPrimaryImprovementYearBuiltByParcelIdResponse], error) {
 	return c.getPrimaryImprovementYearBuiltByParcelId.CallUnary(ctx, req)
 }
 
 // GetPrimaryImprovementEffectiveYearBuiltByParcelId calls
-// civil.mesh.parcels.v1.ParcelsService.GetPrimaryImprovementEffectiveYearBuiltByParcelId.
-func (c *parcelsServiceClient) GetPrimaryImprovementEffectiveYearBuiltByParcelId(ctx context.Context, req *connect.Request[v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest]) (*connect.Response[v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse], error) {
+// civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementEffectiveYearBuiltByParcelId.
+func (c *parcelReadServiceClient) GetPrimaryImprovementEffectiveYearBuiltByParcelId(ctx context.Context, req *connect.Request[v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest]) (*connect.Response[v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse], error) {
 	return c.getPrimaryImprovementEffectiveYearBuiltByParcelId.CallUnary(ctx, req)
 }
 
 // GetPrimaryImprovementConditionIdByParcelId calls
-// civil.mesh.parcels.v1.ParcelsService.GetPrimaryImprovementConditionIdByParcelId.
-func (c *parcelsServiceClient) GetPrimaryImprovementConditionIdByParcelId(ctx context.Context, req *connect.Request[v1.GetPrimaryImprovementConditionIdByParcelIdRequest]) (*connect.Response[v1.GetPrimaryImprovementConditionIdByParcelIdResponse], error) {
+// civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementConditionIdByParcelId.
+func (c *parcelReadServiceClient) GetPrimaryImprovementConditionIdByParcelId(ctx context.Context, req *connect.Request[v1.GetPrimaryImprovementConditionIdByParcelIdRequest]) (*connect.Response[v1.GetPrimaryImprovementConditionIdByParcelIdResponse], error) {
 	return c.getPrimaryImprovementConditionIdByParcelId.CallUnary(ctx, req)
 }
 
 // GetPrimaryImprovementTypeIdByParcelId calls
-// civil.mesh.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByParcelId.
-func (c *parcelsServiceClient) GetPrimaryImprovementTypeIdByParcelId(ctx context.Context, req *connect.Request[v1.GetPrimaryImprovementTypeIdByParcelIdRequest]) (*connect.Response[v1.GetPrimaryImprovementTypeIdByParcelIdResponse], error) {
+// civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementTypeIdByParcelId.
+func (c *parcelReadServiceClient) GetPrimaryImprovementTypeIdByParcelId(ctx context.Context, req *connect.Request[v1.GetPrimaryImprovementTypeIdByParcelIdRequest]) (*connect.Response[v1.GetPrimaryImprovementTypeIdByParcelIdResponse], error) {
 	return c.getPrimaryImprovementTypeIdByParcelId.CallUnary(ctx, req)
 }
 
-// GetLandAreaSqftByFeatureId calls civil.mesh.parcels.v1.ParcelsService.GetLandAreaSqftByFeatureId.
-func (c *parcelsServiceClient) GetLandAreaSqftByFeatureId(ctx context.Context, req *connect.Request[v1.GetLandAreaSqftByFeatureIdRequest]) (*connect.Response[v1.GetLandAreaSqftByFeatureIdResponse], error) {
+// GetLandAreaSqftByFeatureId calls
+// civil.mesh.parcels.v1.ParcelReadService.GetLandAreaSqftByFeatureId.
+func (c *parcelReadServiceClient) GetLandAreaSqftByFeatureId(ctx context.Context, req *connect.Request[v1.GetLandAreaSqftByFeatureIdRequest]) (*connect.Response[v1.GetLandAreaSqftByFeatureIdResponse], error) {
 	return c.getLandAreaSqftByFeatureId.CallUnary(ctx, req)
 }
 
-// GetFrontageFtByFeatureId calls civil.mesh.parcels.v1.ParcelsService.GetFrontageFtByFeatureId.
-func (c *parcelsServiceClient) GetFrontageFtByFeatureId(ctx context.Context, req *connect.Request[v1.GetFrontageFtByFeatureIdRequest]) (*connect.Response[v1.GetFrontageFtByFeatureIdResponse], error) {
+// GetFrontageFtByFeatureId calls civil.mesh.parcels.v1.ParcelReadService.GetFrontageFtByFeatureId.
+func (c *parcelReadServiceClient) GetFrontageFtByFeatureId(ctx context.Context, req *connect.Request[v1.GetFrontageFtByFeatureIdRequest]) (*connect.Response[v1.GetFrontageFtByFeatureIdResponse], error) {
 	return c.getFrontageFtByFeatureId.CallUnary(ctx, req)
 }
 
-// GetDepthFtByFeatureId calls civil.mesh.parcels.v1.ParcelsService.GetDepthFtByFeatureId.
-func (c *parcelsServiceClient) GetDepthFtByFeatureId(ctx context.Context, req *connect.Request[v1.GetDepthFtByFeatureIdRequest]) (*connect.Response[v1.GetDepthFtByFeatureIdResponse], error) {
+// GetDepthFtByFeatureId calls civil.mesh.parcels.v1.ParcelReadService.GetDepthFtByFeatureId.
+func (c *parcelReadServiceClient) GetDepthFtByFeatureId(ctx context.Context, req *connect.Request[v1.GetDepthFtByFeatureIdRequest]) (*connect.Response[v1.GetDepthFtByFeatureIdResponse], error) {
 	return c.getDepthFtByFeatureId.CallUnary(ctx, req)
 }
 
-// GetLandUseIdByFeatureId calls civil.mesh.parcels.v1.ParcelsService.GetLandUseIdByFeatureId.
-func (c *parcelsServiceClient) GetLandUseIdByFeatureId(ctx context.Context, req *connect.Request[v1.GetLandUseIdByFeatureIdRequest]) (*connect.Response[v1.GetLandUseIdByFeatureIdResponse], error) {
+// GetLandUseIdByFeatureId calls civil.mesh.parcels.v1.ParcelReadService.GetLandUseIdByFeatureId.
+func (c *parcelReadServiceClient) GetLandUseIdByFeatureId(ctx context.Context, req *connect.Request[v1.GetLandUseIdByFeatureIdRequest]) (*connect.Response[v1.GetLandUseIdByFeatureIdResponse], error) {
 	return c.getLandUseIdByFeatureId.CallUnary(ctx, req)
 }
 
-// GetZoningIdByFeatureId calls civil.mesh.parcels.v1.ParcelsService.GetZoningIdByFeatureId.
-func (c *parcelsServiceClient) GetZoningIdByFeatureId(ctx context.Context, req *connect.Request[v1.GetZoningIdByFeatureIdRequest]) (*connect.Response[v1.GetZoningIdByFeatureIdResponse], error) {
+// GetZoningIdByFeatureId calls civil.mesh.parcels.v1.ParcelReadService.GetZoningIdByFeatureId.
+func (c *parcelReadServiceClient) GetZoningIdByFeatureId(ctx context.Context, req *connect.Request[v1.GetZoningIdByFeatureIdRequest]) (*connect.Response[v1.GetZoningIdByFeatureIdResponse], error) {
 	return c.getZoningIdByFeatureId.CallUnary(ctx, req)
 }
 
 // GetImprovementAreaSqftByFeatureId calls
-// civil.mesh.parcels.v1.ParcelsService.GetImprovementAreaSqftByFeatureId.
-func (c *parcelsServiceClient) GetImprovementAreaSqftByFeatureId(ctx context.Context, req *connect.Request[v1.GetImprovementAreaSqftByFeatureIdRequest]) (*connect.Response[v1.GetImprovementAreaSqftByFeatureIdResponse], error) {
+// civil.mesh.parcels.v1.ParcelReadService.GetImprovementAreaSqftByFeatureId.
+func (c *parcelReadServiceClient) GetImprovementAreaSqftByFeatureId(ctx context.Context, req *connect.Request[v1.GetImprovementAreaSqftByFeatureIdRequest]) (*connect.Response[v1.GetImprovementAreaSqftByFeatureIdResponse], error) {
 	return c.getImprovementAreaSqftByFeatureId.CallUnary(ctx, req)
 }
 
-// GetBedroomsByFeatureId calls civil.mesh.parcels.v1.ParcelsService.GetBedroomsByFeatureId.
-func (c *parcelsServiceClient) GetBedroomsByFeatureId(ctx context.Context, req *connect.Request[v1.GetBedroomsByFeatureIdRequest]) (*connect.Response[v1.GetBedroomsByFeatureIdResponse], error) {
+// GetBedroomsByFeatureId calls civil.mesh.parcels.v1.ParcelReadService.GetBedroomsByFeatureId.
+func (c *parcelReadServiceClient) GetBedroomsByFeatureId(ctx context.Context, req *connect.Request[v1.GetBedroomsByFeatureIdRequest]) (*connect.Response[v1.GetBedroomsByFeatureIdResponse], error) {
 	return c.getBedroomsByFeatureId.CallUnary(ctx, req)
 }
 
-// GetBathroomsByFeatureId calls civil.mesh.parcels.v1.ParcelsService.GetBathroomsByFeatureId.
-func (c *parcelsServiceClient) GetBathroomsByFeatureId(ctx context.Context, req *connect.Request[v1.GetBathroomsByFeatureIdRequest]) (*connect.Response[v1.GetBathroomsByFeatureIdResponse], error) {
+// GetBathroomsByFeatureId calls civil.mesh.parcels.v1.ParcelReadService.GetBathroomsByFeatureId.
+func (c *parcelReadServiceClient) GetBathroomsByFeatureId(ctx context.Context, req *connect.Request[v1.GetBathroomsByFeatureIdRequest]) (*connect.Response[v1.GetBathroomsByFeatureIdResponse], error) {
 	return c.getBathroomsByFeatureId.CallUnary(ctx, req)
 }
 
-// GetUnitsByFeatureId calls civil.mesh.parcels.v1.ParcelsService.GetUnitsByFeatureId.
-func (c *parcelsServiceClient) GetUnitsByFeatureId(ctx context.Context, req *connect.Request[v1.GetUnitsByFeatureIdRequest]) (*connect.Response[v1.GetUnitsByFeatureIdResponse], error) {
+// GetUnitsByFeatureId calls civil.mesh.parcels.v1.ParcelReadService.GetUnitsByFeatureId.
+func (c *parcelReadServiceClient) GetUnitsByFeatureId(ctx context.Context, req *connect.Request[v1.GetUnitsByFeatureIdRequest]) (*connect.Response[v1.GetUnitsByFeatureIdResponse], error) {
 	return c.getUnitsByFeatureId.CallUnary(ctx, req)
 }
 
 // GetPrimaryImprovementYearBuiltByFeatureId calls
-// civil.mesh.parcels.v1.ParcelsService.GetPrimaryImprovementYearBuiltByFeatureId.
-func (c *parcelsServiceClient) GetPrimaryImprovementYearBuiltByFeatureId(ctx context.Context, req *connect.Request[v1.GetPrimaryImprovementYearBuiltByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse], error) {
+// civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementYearBuiltByFeatureId.
+func (c *parcelReadServiceClient) GetPrimaryImprovementYearBuiltByFeatureId(ctx context.Context, req *connect.Request[v1.GetPrimaryImprovementYearBuiltByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse], error) {
 	return c.getPrimaryImprovementYearBuiltByFeatureId.CallUnary(ctx, req)
 }
 
 // GetPrimaryImprovementEffectiveYearBuiltByFeatureId calls
-// civil.mesh.parcels.v1.ParcelsService.GetPrimaryImprovementEffectiveYearBuiltByFeatureId.
-func (c *parcelsServiceClient) GetPrimaryImprovementEffectiveYearBuiltByFeatureId(ctx context.Context, req *connect.Request[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse], error) {
+// civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementEffectiveYearBuiltByFeatureId.
+func (c *parcelReadServiceClient) GetPrimaryImprovementEffectiveYearBuiltByFeatureId(ctx context.Context, req *connect.Request[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse], error) {
 	return c.getPrimaryImprovementEffectiveYearBuiltByFeatureId.CallUnary(ctx, req)
 }
 
 // GetPrimaryImprovementConditionIdByFeatureId calls
-// civil.mesh.parcels.v1.ParcelsService.GetPrimaryImprovementConditionIdByFeatureId.
-func (c *parcelsServiceClient) GetPrimaryImprovementConditionIdByFeatureId(ctx context.Context, req *connect.Request[v1.GetPrimaryImprovementConditionIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementConditionIdByFeatureIdResponse], error) {
+// civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementConditionIdByFeatureId.
+func (c *parcelReadServiceClient) GetPrimaryImprovementConditionIdByFeatureId(ctx context.Context, req *connect.Request[v1.GetPrimaryImprovementConditionIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementConditionIdByFeatureIdResponse], error) {
 	return c.getPrimaryImprovementConditionIdByFeatureId.CallUnary(ctx, req)
 }
 
 // GetPrimaryImprovementTypeIdByFeatureId calls
-// civil.mesh.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByFeatureId.
-func (c *parcelsServiceClient) GetPrimaryImprovementTypeIdByFeatureId(ctx context.Context, req *connect.Request[v1.GetPrimaryImprovementTypeIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementTypeIdByFeatureIdResponse], error) {
+// civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementTypeIdByFeatureId.
+func (c *parcelReadServiceClient) GetPrimaryImprovementTypeIdByFeatureId(ctx context.Context, req *connect.Request[v1.GetPrimaryImprovementTypeIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementTypeIdByFeatureIdResponse], error) {
 	return c.getPrimaryImprovementTypeIdByFeatureId.CallUnary(ctx, req)
 }
 
-// UpdateParcel calls civil.mesh.parcels.v1.ParcelsService.UpdateParcel.
-func (c *parcelsServiceClient) UpdateParcel(ctx context.Context, req *connect.Request[v1.UpdateParcelRequest]) (*connect.Response[v1.UpdateParcelResponse], error) {
-	return c.updateParcel.CallUnary(ctx, req)
-}
-
-// ParcelsServiceHandler is an implementation of the civil.mesh.parcels.v1.ParcelsService service.
-type ParcelsServiceHandler interface {
+// ParcelReadServiceHandler is an implementation of the civil.mesh.parcels.v1.ParcelReadService
+// service.
+type ParcelReadServiceHandler interface {
 	// Retrieves the value for a specified attribute for a given parcel
 	GetParcelsWithImprovementSummaryByParcelId(context.Context, *connect.Request[v1.GetParcelsWithImprovementSummaryByParcelIdRequest]) (*connect.Response[v1.GetParcelsWithImprovementSummaryByParcelIdResponse], error)
 	GetParcelsWithImprovementSummaryByFeatureId(context.Context, *connect.Request[v1.GetParcelsWithImprovementSummaryByFeatureIdRequest]) (*connect.Response[v1.GetParcelsWithImprovementSummaryByFeatureIdResponse], error)
@@ -674,443 +668,507 @@ type ParcelsServiceHandler interface {
 	GetPrimaryImprovementEffectiveYearBuiltByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse], error)
 	GetPrimaryImprovementConditionIdByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementConditionIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementConditionIdByFeatureIdResponse], error)
 	GetPrimaryImprovementTypeIdByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementTypeIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementTypeIdByFeatureIdResponse], error)
-	UpdateParcel(context.Context, *connect.Request[v1.UpdateParcelRequest]) (*connect.Response[v1.UpdateParcelResponse], error)
 }
 
-// NewParcelsServiceHandler builds an HTTP handler from the service implementation. It returns the
-// path on which to mount the handler and the handler itself.
+// NewParcelReadServiceHandler builds an HTTP handler from the service implementation. It returns
+// the path on which to mount the handler and the handler itself.
 //
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
-func NewParcelsServiceHandler(svc ParcelsServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	parcelsServiceMethods := v1.File_civil_mesh_parcels_v1_parcels_proto.Services().ByName("ParcelsService").Methods()
-	parcelsServiceGetParcelsWithImprovementSummaryByParcelIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetParcelsWithImprovementSummaryByParcelIdProcedure,
+func NewParcelReadServiceHandler(svc ParcelReadServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	parcelReadServiceMethods := v1.File_civil_mesh_parcels_v1_parcels_proto.Services().ByName("ParcelReadService").Methods()
+	parcelReadServiceGetParcelsWithImprovementSummaryByParcelIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetParcelsWithImprovementSummaryByParcelIdProcedure,
 		svc.GetParcelsWithImprovementSummaryByParcelId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetParcelsWithImprovementSummaryByParcelId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetParcelsWithImprovementSummaryByParcelId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetParcelsWithImprovementSummaryByFeatureIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetParcelsWithImprovementSummaryByFeatureIdProcedure,
+	parcelReadServiceGetParcelsWithImprovementSummaryByFeatureIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetParcelsWithImprovementSummaryByFeatureIdProcedure,
 		svc.GetParcelsWithImprovementSummaryByFeatureId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetParcelsWithImprovementSummaryByFeatureId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetParcelsWithImprovementSummaryByFeatureId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetNumericalParcelStatsByIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetNumericalParcelStatsByIdProcedure,
+	parcelReadServiceGetNumericalParcelStatsByIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetNumericalParcelStatsByIdProcedure,
 		svc.GetNumericalParcelStatsById,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetNumericalParcelStatsById")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetNumericalParcelStatsById")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetCategoricalParcelStatsByIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetCategoricalParcelStatsByIdProcedure,
+	parcelReadServiceGetCategoricalParcelStatsByIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetCategoricalParcelStatsByIdProcedure,
 		svc.GetCategoricalParcelStatsById,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetCategoricalParcelStatsById")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetCategoricalParcelStatsById")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetEquityComparablesHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetEquityComparablesProcedure,
+	parcelReadServiceGetEquityComparablesHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetEquityComparablesProcedure,
 		svc.GetEquityComparables,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetEquityComparables")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetEquityComparables")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetSalesComparablesHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetSalesComparablesProcedure,
+	parcelReadServiceGetSalesComparablesHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetSalesComparablesProcedure,
 		svc.GetSalesComparables,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetSalesComparables")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetSalesComparables")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetParcelIdsByFeatureIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetParcelIdsByFeatureIdProcedure,
+	parcelReadServiceGetParcelIdsByFeatureIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetParcelIdsByFeatureIdProcedure,
 		svc.GetParcelIdsByFeatureId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetParcelIdsByFeatureId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetParcelIdsByFeatureId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetEstimatedParcelsExtentWGS84Handler := connect.NewUnaryHandler(
-		ParcelsServiceGetEstimatedParcelsExtentWGS84Procedure,
+	parcelReadServiceGetEstimatedParcelsExtentWGS84Handler := connect.NewUnaryHandler(
+		ParcelReadServiceGetEstimatedParcelsExtentWGS84Procedure,
 		svc.GetEstimatedParcelsExtentWGS84,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetEstimatedParcelsExtentWGS84")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetEstimatedParcelsExtentWGS84")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetLandAreaSqftByParcelIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetLandAreaSqftByParcelIdProcedure,
+	parcelReadServiceGetLandAreaSqftByParcelIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetLandAreaSqftByParcelIdProcedure,
 		svc.GetLandAreaSqftByParcelId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetLandAreaSqftByParcelId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetLandAreaSqftByParcelId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetFrontageFtByParcelIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetFrontageFtByParcelIdProcedure,
+	parcelReadServiceGetFrontageFtByParcelIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetFrontageFtByParcelIdProcedure,
 		svc.GetFrontageFtByParcelId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetFrontageFtByParcelId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetFrontageFtByParcelId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetDepthFtByParcelIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetDepthFtByParcelIdProcedure,
+	parcelReadServiceGetDepthFtByParcelIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetDepthFtByParcelIdProcedure,
 		svc.GetDepthFtByParcelId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetDepthFtByParcelId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetDepthFtByParcelId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetLandUseIdByParcelIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetLandUseIdByParcelIdProcedure,
+	parcelReadServiceGetLandUseIdByParcelIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetLandUseIdByParcelIdProcedure,
 		svc.GetLandUseIdByParcelId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetLandUseIdByParcelId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetLandUseIdByParcelId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetZoningIdByParcelIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetZoningIdByParcelIdProcedure,
+	parcelReadServiceGetZoningIdByParcelIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetZoningIdByParcelIdProcedure,
 		svc.GetZoningIdByParcelId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetZoningIdByParcelId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetZoningIdByParcelId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetImprovementAreaSqftByParcelIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetImprovementAreaSqftByParcelIdProcedure,
+	parcelReadServiceGetImprovementAreaSqftByParcelIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetImprovementAreaSqftByParcelIdProcedure,
 		svc.GetImprovementAreaSqftByParcelId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetImprovementAreaSqftByParcelId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetImprovementAreaSqftByParcelId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetBedroomsByParcelIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetBedroomsByParcelIdProcedure,
+	parcelReadServiceGetBedroomsByParcelIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetBedroomsByParcelIdProcedure,
 		svc.GetBedroomsByParcelId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetBedroomsByParcelId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetBedroomsByParcelId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetBathroomsByParcelIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetBathroomsByParcelIdProcedure,
+	parcelReadServiceGetBathroomsByParcelIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetBathroomsByParcelIdProcedure,
 		svc.GetBathroomsByParcelId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetBathroomsByParcelId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetBathroomsByParcelId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetUnitsByParcelIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetUnitsByParcelIdProcedure,
+	parcelReadServiceGetUnitsByParcelIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetUnitsByParcelIdProcedure,
 		svc.GetUnitsByParcelId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetUnitsByParcelId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetUnitsByParcelId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetPrimaryImprovementYearBuiltByParcelIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetPrimaryImprovementYearBuiltByParcelIdProcedure,
+	parcelReadServiceGetPrimaryImprovementYearBuiltByParcelIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetPrimaryImprovementYearBuiltByParcelIdProcedure,
 		svc.GetPrimaryImprovementYearBuiltByParcelId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetPrimaryImprovementYearBuiltByParcelId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetPrimaryImprovementYearBuiltByParcelId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetPrimaryImprovementEffectiveYearBuiltByParcelIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetPrimaryImprovementEffectiveYearBuiltByParcelIdProcedure,
+	parcelReadServiceGetPrimaryImprovementEffectiveYearBuiltByParcelIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetPrimaryImprovementEffectiveYearBuiltByParcelIdProcedure,
 		svc.GetPrimaryImprovementEffectiveYearBuiltByParcelId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetPrimaryImprovementEffectiveYearBuiltByParcelId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetPrimaryImprovementEffectiveYearBuiltByParcelId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetPrimaryImprovementConditionIdByParcelIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetPrimaryImprovementConditionIdByParcelIdProcedure,
+	parcelReadServiceGetPrimaryImprovementConditionIdByParcelIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetPrimaryImprovementConditionIdByParcelIdProcedure,
 		svc.GetPrimaryImprovementConditionIdByParcelId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetPrimaryImprovementConditionIdByParcelId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetPrimaryImprovementConditionIdByParcelId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetPrimaryImprovementTypeIdByParcelIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetPrimaryImprovementTypeIdByParcelIdProcedure,
+	parcelReadServiceGetPrimaryImprovementTypeIdByParcelIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetPrimaryImprovementTypeIdByParcelIdProcedure,
 		svc.GetPrimaryImprovementTypeIdByParcelId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetPrimaryImprovementTypeIdByParcelId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetPrimaryImprovementTypeIdByParcelId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetLandAreaSqftByFeatureIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetLandAreaSqftByFeatureIdProcedure,
+	parcelReadServiceGetLandAreaSqftByFeatureIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetLandAreaSqftByFeatureIdProcedure,
 		svc.GetLandAreaSqftByFeatureId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetLandAreaSqftByFeatureId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetLandAreaSqftByFeatureId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetFrontageFtByFeatureIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetFrontageFtByFeatureIdProcedure,
+	parcelReadServiceGetFrontageFtByFeatureIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetFrontageFtByFeatureIdProcedure,
 		svc.GetFrontageFtByFeatureId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetFrontageFtByFeatureId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetFrontageFtByFeatureId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetDepthFtByFeatureIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetDepthFtByFeatureIdProcedure,
+	parcelReadServiceGetDepthFtByFeatureIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetDepthFtByFeatureIdProcedure,
 		svc.GetDepthFtByFeatureId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetDepthFtByFeatureId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetDepthFtByFeatureId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetLandUseIdByFeatureIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetLandUseIdByFeatureIdProcedure,
+	parcelReadServiceGetLandUseIdByFeatureIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetLandUseIdByFeatureIdProcedure,
 		svc.GetLandUseIdByFeatureId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetLandUseIdByFeatureId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetLandUseIdByFeatureId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetZoningIdByFeatureIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetZoningIdByFeatureIdProcedure,
+	parcelReadServiceGetZoningIdByFeatureIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetZoningIdByFeatureIdProcedure,
 		svc.GetZoningIdByFeatureId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetZoningIdByFeatureId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetZoningIdByFeatureId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetImprovementAreaSqftByFeatureIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetImprovementAreaSqftByFeatureIdProcedure,
+	parcelReadServiceGetImprovementAreaSqftByFeatureIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetImprovementAreaSqftByFeatureIdProcedure,
 		svc.GetImprovementAreaSqftByFeatureId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetImprovementAreaSqftByFeatureId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetImprovementAreaSqftByFeatureId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetBedroomsByFeatureIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetBedroomsByFeatureIdProcedure,
+	parcelReadServiceGetBedroomsByFeatureIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetBedroomsByFeatureIdProcedure,
 		svc.GetBedroomsByFeatureId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetBedroomsByFeatureId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetBedroomsByFeatureId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetBathroomsByFeatureIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetBathroomsByFeatureIdProcedure,
+	parcelReadServiceGetBathroomsByFeatureIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetBathroomsByFeatureIdProcedure,
 		svc.GetBathroomsByFeatureId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetBathroomsByFeatureId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetBathroomsByFeatureId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetUnitsByFeatureIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetUnitsByFeatureIdProcedure,
+	parcelReadServiceGetUnitsByFeatureIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetUnitsByFeatureIdProcedure,
 		svc.GetUnitsByFeatureId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetUnitsByFeatureId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetUnitsByFeatureId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetPrimaryImprovementYearBuiltByFeatureIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetPrimaryImprovementYearBuiltByFeatureIdProcedure,
+	parcelReadServiceGetPrimaryImprovementYearBuiltByFeatureIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetPrimaryImprovementYearBuiltByFeatureIdProcedure,
 		svc.GetPrimaryImprovementYearBuiltByFeatureId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetPrimaryImprovementYearBuiltByFeatureId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetPrimaryImprovementYearBuiltByFeatureId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetPrimaryImprovementEffectiveYearBuiltByFeatureIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetPrimaryImprovementEffectiveYearBuiltByFeatureIdProcedure,
+	parcelReadServiceGetPrimaryImprovementEffectiveYearBuiltByFeatureIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetPrimaryImprovementEffectiveYearBuiltByFeatureIdProcedure,
 		svc.GetPrimaryImprovementEffectiveYearBuiltByFeatureId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetPrimaryImprovementEffectiveYearBuiltByFeatureId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetPrimaryImprovementEffectiveYearBuiltByFeatureId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetPrimaryImprovementConditionIdByFeatureIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetPrimaryImprovementConditionIdByFeatureIdProcedure,
+	parcelReadServiceGetPrimaryImprovementConditionIdByFeatureIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetPrimaryImprovementConditionIdByFeatureIdProcedure,
 		svc.GetPrimaryImprovementConditionIdByFeatureId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetPrimaryImprovementConditionIdByFeatureId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetPrimaryImprovementConditionIdByFeatureId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceGetPrimaryImprovementTypeIdByFeatureIdHandler := connect.NewUnaryHandler(
-		ParcelsServiceGetPrimaryImprovementTypeIdByFeatureIdProcedure,
+	parcelReadServiceGetPrimaryImprovementTypeIdByFeatureIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetPrimaryImprovementTypeIdByFeatureIdProcedure,
 		svc.GetPrimaryImprovementTypeIdByFeatureId,
-		connect.WithSchema(parcelsServiceMethods.ByName("GetPrimaryImprovementTypeIdByFeatureId")),
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetPrimaryImprovementTypeIdByFeatureId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	parcelsServiceUpdateParcelHandler := connect.NewUnaryHandler(
-		ParcelsServiceUpdateParcelProcedure,
-		svc.UpdateParcel,
-		connect.WithSchema(parcelsServiceMethods.ByName("UpdateParcel")),
-		connect.WithHandlerOptions(opts...),
-	)
-	return "/civil.mesh.parcels.v1.ParcelsService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/civil.mesh.parcels.v1.ParcelReadService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case ParcelsServiceGetParcelsWithImprovementSummaryByParcelIdProcedure:
-			parcelsServiceGetParcelsWithImprovementSummaryByParcelIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetParcelsWithImprovementSummaryByFeatureIdProcedure:
-			parcelsServiceGetParcelsWithImprovementSummaryByFeatureIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetNumericalParcelStatsByIdProcedure:
-			parcelsServiceGetNumericalParcelStatsByIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetCategoricalParcelStatsByIdProcedure:
-			parcelsServiceGetCategoricalParcelStatsByIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetEquityComparablesProcedure:
-			parcelsServiceGetEquityComparablesHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetSalesComparablesProcedure:
-			parcelsServiceGetSalesComparablesHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetParcelIdsByFeatureIdProcedure:
-			parcelsServiceGetParcelIdsByFeatureIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetEstimatedParcelsExtentWGS84Procedure:
-			parcelsServiceGetEstimatedParcelsExtentWGS84Handler.ServeHTTP(w, r)
-		case ParcelsServiceGetLandAreaSqftByParcelIdProcedure:
-			parcelsServiceGetLandAreaSqftByParcelIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetFrontageFtByParcelIdProcedure:
-			parcelsServiceGetFrontageFtByParcelIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetDepthFtByParcelIdProcedure:
-			parcelsServiceGetDepthFtByParcelIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetLandUseIdByParcelIdProcedure:
-			parcelsServiceGetLandUseIdByParcelIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetZoningIdByParcelIdProcedure:
-			parcelsServiceGetZoningIdByParcelIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetImprovementAreaSqftByParcelIdProcedure:
-			parcelsServiceGetImprovementAreaSqftByParcelIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetBedroomsByParcelIdProcedure:
-			parcelsServiceGetBedroomsByParcelIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetBathroomsByParcelIdProcedure:
-			parcelsServiceGetBathroomsByParcelIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetUnitsByParcelIdProcedure:
-			parcelsServiceGetUnitsByParcelIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetPrimaryImprovementYearBuiltByParcelIdProcedure:
-			parcelsServiceGetPrimaryImprovementYearBuiltByParcelIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetPrimaryImprovementEffectiveYearBuiltByParcelIdProcedure:
-			parcelsServiceGetPrimaryImprovementEffectiveYearBuiltByParcelIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetPrimaryImprovementConditionIdByParcelIdProcedure:
-			parcelsServiceGetPrimaryImprovementConditionIdByParcelIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetPrimaryImprovementTypeIdByParcelIdProcedure:
-			parcelsServiceGetPrimaryImprovementTypeIdByParcelIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetLandAreaSqftByFeatureIdProcedure:
-			parcelsServiceGetLandAreaSqftByFeatureIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetFrontageFtByFeatureIdProcedure:
-			parcelsServiceGetFrontageFtByFeatureIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetDepthFtByFeatureIdProcedure:
-			parcelsServiceGetDepthFtByFeatureIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetLandUseIdByFeatureIdProcedure:
-			parcelsServiceGetLandUseIdByFeatureIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetZoningIdByFeatureIdProcedure:
-			parcelsServiceGetZoningIdByFeatureIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetImprovementAreaSqftByFeatureIdProcedure:
-			parcelsServiceGetImprovementAreaSqftByFeatureIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetBedroomsByFeatureIdProcedure:
-			parcelsServiceGetBedroomsByFeatureIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetBathroomsByFeatureIdProcedure:
-			parcelsServiceGetBathroomsByFeatureIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetUnitsByFeatureIdProcedure:
-			parcelsServiceGetUnitsByFeatureIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetPrimaryImprovementYearBuiltByFeatureIdProcedure:
-			parcelsServiceGetPrimaryImprovementYearBuiltByFeatureIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetPrimaryImprovementEffectiveYearBuiltByFeatureIdProcedure:
-			parcelsServiceGetPrimaryImprovementEffectiveYearBuiltByFeatureIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetPrimaryImprovementConditionIdByFeatureIdProcedure:
-			parcelsServiceGetPrimaryImprovementConditionIdByFeatureIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceGetPrimaryImprovementTypeIdByFeatureIdProcedure:
-			parcelsServiceGetPrimaryImprovementTypeIdByFeatureIdHandler.ServeHTTP(w, r)
-		case ParcelsServiceUpdateParcelProcedure:
-			parcelsServiceUpdateParcelHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetParcelsWithImprovementSummaryByParcelIdProcedure:
+			parcelReadServiceGetParcelsWithImprovementSummaryByParcelIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetParcelsWithImprovementSummaryByFeatureIdProcedure:
+			parcelReadServiceGetParcelsWithImprovementSummaryByFeatureIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetNumericalParcelStatsByIdProcedure:
+			parcelReadServiceGetNumericalParcelStatsByIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetCategoricalParcelStatsByIdProcedure:
+			parcelReadServiceGetCategoricalParcelStatsByIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetEquityComparablesProcedure:
+			parcelReadServiceGetEquityComparablesHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetSalesComparablesProcedure:
+			parcelReadServiceGetSalesComparablesHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetParcelIdsByFeatureIdProcedure:
+			parcelReadServiceGetParcelIdsByFeatureIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetEstimatedParcelsExtentWGS84Procedure:
+			parcelReadServiceGetEstimatedParcelsExtentWGS84Handler.ServeHTTP(w, r)
+		case ParcelReadServiceGetLandAreaSqftByParcelIdProcedure:
+			parcelReadServiceGetLandAreaSqftByParcelIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetFrontageFtByParcelIdProcedure:
+			parcelReadServiceGetFrontageFtByParcelIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetDepthFtByParcelIdProcedure:
+			parcelReadServiceGetDepthFtByParcelIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetLandUseIdByParcelIdProcedure:
+			parcelReadServiceGetLandUseIdByParcelIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetZoningIdByParcelIdProcedure:
+			parcelReadServiceGetZoningIdByParcelIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetImprovementAreaSqftByParcelIdProcedure:
+			parcelReadServiceGetImprovementAreaSqftByParcelIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetBedroomsByParcelIdProcedure:
+			parcelReadServiceGetBedroomsByParcelIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetBathroomsByParcelIdProcedure:
+			parcelReadServiceGetBathroomsByParcelIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetUnitsByParcelIdProcedure:
+			parcelReadServiceGetUnitsByParcelIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetPrimaryImprovementYearBuiltByParcelIdProcedure:
+			parcelReadServiceGetPrimaryImprovementYearBuiltByParcelIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetPrimaryImprovementEffectiveYearBuiltByParcelIdProcedure:
+			parcelReadServiceGetPrimaryImprovementEffectiveYearBuiltByParcelIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetPrimaryImprovementConditionIdByParcelIdProcedure:
+			parcelReadServiceGetPrimaryImprovementConditionIdByParcelIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetPrimaryImprovementTypeIdByParcelIdProcedure:
+			parcelReadServiceGetPrimaryImprovementTypeIdByParcelIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetLandAreaSqftByFeatureIdProcedure:
+			parcelReadServiceGetLandAreaSqftByFeatureIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetFrontageFtByFeatureIdProcedure:
+			parcelReadServiceGetFrontageFtByFeatureIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetDepthFtByFeatureIdProcedure:
+			parcelReadServiceGetDepthFtByFeatureIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetLandUseIdByFeatureIdProcedure:
+			parcelReadServiceGetLandUseIdByFeatureIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetZoningIdByFeatureIdProcedure:
+			parcelReadServiceGetZoningIdByFeatureIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetImprovementAreaSqftByFeatureIdProcedure:
+			parcelReadServiceGetImprovementAreaSqftByFeatureIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetBedroomsByFeatureIdProcedure:
+			parcelReadServiceGetBedroomsByFeatureIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetBathroomsByFeatureIdProcedure:
+			parcelReadServiceGetBathroomsByFeatureIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetUnitsByFeatureIdProcedure:
+			parcelReadServiceGetUnitsByFeatureIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetPrimaryImprovementYearBuiltByFeatureIdProcedure:
+			parcelReadServiceGetPrimaryImprovementYearBuiltByFeatureIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetPrimaryImprovementEffectiveYearBuiltByFeatureIdProcedure:
+			parcelReadServiceGetPrimaryImprovementEffectiveYearBuiltByFeatureIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetPrimaryImprovementConditionIdByFeatureIdProcedure:
+			parcelReadServiceGetPrimaryImprovementConditionIdByFeatureIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetPrimaryImprovementTypeIdByFeatureIdProcedure:
+			parcelReadServiceGetPrimaryImprovementTypeIdByFeatureIdHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
 	})
 }
 
-// UnimplementedParcelsServiceHandler returns CodeUnimplemented from all methods.
-type UnimplementedParcelsServiceHandler struct{}
+// UnimplementedParcelReadServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedParcelReadServiceHandler struct{}
 
-func (UnimplementedParcelsServiceHandler) GetParcelsWithImprovementSummaryByParcelId(context.Context, *connect.Request[v1.GetParcelsWithImprovementSummaryByParcelIdRequest]) (*connect.Response[v1.GetParcelsWithImprovementSummaryByParcelIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetParcelsWithImprovementSummaryByParcelId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetParcelsWithImprovementSummaryByParcelId(context.Context, *connect.Request[v1.GetParcelsWithImprovementSummaryByParcelIdRequest]) (*connect.Response[v1.GetParcelsWithImprovementSummaryByParcelIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetParcelsWithImprovementSummaryByParcelId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetParcelsWithImprovementSummaryByFeatureId(context.Context, *connect.Request[v1.GetParcelsWithImprovementSummaryByFeatureIdRequest]) (*connect.Response[v1.GetParcelsWithImprovementSummaryByFeatureIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetParcelsWithImprovementSummaryByFeatureId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetParcelsWithImprovementSummaryByFeatureId(context.Context, *connect.Request[v1.GetParcelsWithImprovementSummaryByFeatureIdRequest]) (*connect.Response[v1.GetParcelsWithImprovementSummaryByFeatureIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetParcelsWithImprovementSummaryByFeatureId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetNumericalParcelStatsById(context.Context, *connect.Request[v1.GetNumericalParcelStatsByIdRequest]) (*connect.Response[v1.GetNumericalParcelStatsByIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetNumericalParcelStatsById is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetNumericalParcelStatsById(context.Context, *connect.Request[v1.GetNumericalParcelStatsByIdRequest]) (*connect.Response[v1.GetNumericalParcelStatsByIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetNumericalParcelStatsById is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetCategoricalParcelStatsById(context.Context, *connect.Request[v1.GetCategoricalParcelStatsByIdRequest]) (*connect.Response[v1.GetCategoricalParcelStatsByIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetCategoricalParcelStatsById is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetCategoricalParcelStatsById(context.Context, *connect.Request[v1.GetCategoricalParcelStatsByIdRequest]) (*connect.Response[v1.GetCategoricalParcelStatsByIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetCategoricalParcelStatsById is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetEquityComparables(context.Context, *connect.Request[v1.GetEquityComparablesRequest]) (*connect.Response[v1.GetEquityComparablesResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetEquityComparables is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetEquityComparables(context.Context, *connect.Request[v1.GetEquityComparablesRequest]) (*connect.Response[v1.GetEquityComparablesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetEquityComparables is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetSalesComparables(context.Context, *connect.Request[v1.GetSalesComparablesRequest]) (*connect.Response[v1.GetSalesComparablesResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetSalesComparables is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetSalesComparables(context.Context, *connect.Request[v1.GetSalesComparablesRequest]) (*connect.Response[v1.GetSalesComparablesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetSalesComparables is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetParcelIdsByFeatureId(context.Context, *connect.Request[v1.GetParcelIdsByFeatureIdRequest]) (*connect.Response[v1.GetParcelIdsByFeatureIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetParcelIdsByFeatureId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetParcelIdsByFeatureId(context.Context, *connect.Request[v1.GetParcelIdsByFeatureIdRequest]) (*connect.Response[v1.GetParcelIdsByFeatureIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetParcelIdsByFeatureId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetEstimatedParcelsExtentWGS84(context.Context, *connect.Request[v1.GetEstimatedParcelsExtentWGS84Request]) (*connect.Response[v1.GetEstimatedParcelsExtentWGS84Response], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetEstimatedParcelsExtentWGS84 is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetEstimatedParcelsExtentWGS84(context.Context, *connect.Request[v1.GetEstimatedParcelsExtentWGS84Request]) (*connect.Response[v1.GetEstimatedParcelsExtentWGS84Response], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetEstimatedParcelsExtentWGS84 is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetLandAreaSqftByParcelId(context.Context, *connect.Request[v1.GetLandAreaSqftByParcelIdRequest]) (*connect.Response[v1.GetLandAreaSqftByParcelIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetLandAreaSqftByParcelId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetLandAreaSqftByParcelId(context.Context, *connect.Request[v1.GetLandAreaSqftByParcelIdRequest]) (*connect.Response[v1.GetLandAreaSqftByParcelIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetLandAreaSqftByParcelId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetFrontageFtByParcelId(context.Context, *connect.Request[v1.GetFrontageFtByParcelIdRequest]) (*connect.Response[v1.GetFrontageFtByParcelIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetFrontageFtByParcelId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetFrontageFtByParcelId(context.Context, *connect.Request[v1.GetFrontageFtByParcelIdRequest]) (*connect.Response[v1.GetFrontageFtByParcelIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetFrontageFtByParcelId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetDepthFtByParcelId(context.Context, *connect.Request[v1.GetDepthFtByParcelIdRequest]) (*connect.Response[v1.GetDepthFtByParcelIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetDepthFtByParcelId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetDepthFtByParcelId(context.Context, *connect.Request[v1.GetDepthFtByParcelIdRequest]) (*connect.Response[v1.GetDepthFtByParcelIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetDepthFtByParcelId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetLandUseIdByParcelId(context.Context, *connect.Request[v1.GetLandUseIdByParcelIdRequest]) (*connect.Response[v1.GetLandUseIdByParcelIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetLandUseIdByParcelId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetLandUseIdByParcelId(context.Context, *connect.Request[v1.GetLandUseIdByParcelIdRequest]) (*connect.Response[v1.GetLandUseIdByParcelIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetLandUseIdByParcelId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetZoningIdByParcelId(context.Context, *connect.Request[v1.GetZoningIdByParcelIdRequest]) (*connect.Response[v1.GetZoningIdByParcelIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetZoningIdByParcelId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetZoningIdByParcelId(context.Context, *connect.Request[v1.GetZoningIdByParcelIdRequest]) (*connect.Response[v1.GetZoningIdByParcelIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetZoningIdByParcelId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetImprovementAreaSqftByParcelId(context.Context, *connect.Request[v1.GetImprovementAreaSqftByParcelIdRequest]) (*connect.Response[v1.GetImprovementAreaSqftByParcelIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetImprovementAreaSqftByParcelId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetImprovementAreaSqftByParcelId(context.Context, *connect.Request[v1.GetImprovementAreaSqftByParcelIdRequest]) (*connect.Response[v1.GetImprovementAreaSqftByParcelIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetImprovementAreaSqftByParcelId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetBedroomsByParcelId(context.Context, *connect.Request[v1.GetBedroomsByParcelIdRequest]) (*connect.Response[v1.GetBedroomsByParcelIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetBedroomsByParcelId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetBedroomsByParcelId(context.Context, *connect.Request[v1.GetBedroomsByParcelIdRequest]) (*connect.Response[v1.GetBedroomsByParcelIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetBedroomsByParcelId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetBathroomsByParcelId(context.Context, *connect.Request[v1.GetBathroomsByParcelIdRequest]) (*connect.Response[v1.GetBathroomsByParcelIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetBathroomsByParcelId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetBathroomsByParcelId(context.Context, *connect.Request[v1.GetBathroomsByParcelIdRequest]) (*connect.Response[v1.GetBathroomsByParcelIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetBathroomsByParcelId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetUnitsByParcelId(context.Context, *connect.Request[v1.GetUnitsByParcelIdRequest]) (*connect.Response[v1.GetUnitsByParcelIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetUnitsByParcelId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetUnitsByParcelId(context.Context, *connect.Request[v1.GetUnitsByParcelIdRequest]) (*connect.Response[v1.GetUnitsByParcelIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetUnitsByParcelId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetPrimaryImprovementYearBuiltByParcelId(context.Context, *connect.Request[v1.GetPrimaryImprovementYearBuiltByParcelIdRequest]) (*connect.Response[v1.GetPrimaryImprovementYearBuiltByParcelIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetPrimaryImprovementYearBuiltByParcelId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetPrimaryImprovementYearBuiltByParcelId(context.Context, *connect.Request[v1.GetPrimaryImprovementYearBuiltByParcelIdRequest]) (*connect.Response[v1.GetPrimaryImprovementYearBuiltByParcelIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementYearBuiltByParcelId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetPrimaryImprovementEffectiveYearBuiltByParcelId(context.Context, *connect.Request[v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest]) (*connect.Response[v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetPrimaryImprovementEffectiveYearBuiltByParcelId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetPrimaryImprovementEffectiveYearBuiltByParcelId(context.Context, *connect.Request[v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest]) (*connect.Response[v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementEffectiveYearBuiltByParcelId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetPrimaryImprovementConditionIdByParcelId(context.Context, *connect.Request[v1.GetPrimaryImprovementConditionIdByParcelIdRequest]) (*connect.Response[v1.GetPrimaryImprovementConditionIdByParcelIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetPrimaryImprovementConditionIdByParcelId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetPrimaryImprovementConditionIdByParcelId(context.Context, *connect.Request[v1.GetPrimaryImprovementConditionIdByParcelIdRequest]) (*connect.Response[v1.GetPrimaryImprovementConditionIdByParcelIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementConditionIdByParcelId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetPrimaryImprovementTypeIdByParcelId(context.Context, *connect.Request[v1.GetPrimaryImprovementTypeIdByParcelIdRequest]) (*connect.Response[v1.GetPrimaryImprovementTypeIdByParcelIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByParcelId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetPrimaryImprovementTypeIdByParcelId(context.Context, *connect.Request[v1.GetPrimaryImprovementTypeIdByParcelIdRequest]) (*connect.Response[v1.GetPrimaryImprovementTypeIdByParcelIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementTypeIdByParcelId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetLandAreaSqftByFeatureId(context.Context, *connect.Request[v1.GetLandAreaSqftByFeatureIdRequest]) (*connect.Response[v1.GetLandAreaSqftByFeatureIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetLandAreaSqftByFeatureId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetLandAreaSqftByFeatureId(context.Context, *connect.Request[v1.GetLandAreaSqftByFeatureIdRequest]) (*connect.Response[v1.GetLandAreaSqftByFeatureIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetLandAreaSqftByFeatureId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetFrontageFtByFeatureId(context.Context, *connect.Request[v1.GetFrontageFtByFeatureIdRequest]) (*connect.Response[v1.GetFrontageFtByFeatureIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetFrontageFtByFeatureId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetFrontageFtByFeatureId(context.Context, *connect.Request[v1.GetFrontageFtByFeatureIdRequest]) (*connect.Response[v1.GetFrontageFtByFeatureIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetFrontageFtByFeatureId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetDepthFtByFeatureId(context.Context, *connect.Request[v1.GetDepthFtByFeatureIdRequest]) (*connect.Response[v1.GetDepthFtByFeatureIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetDepthFtByFeatureId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetDepthFtByFeatureId(context.Context, *connect.Request[v1.GetDepthFtByFeatureIdRequest]) (*connect.Response[v1.GetDepthFtByFeatureIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetDepthFtByFeatureId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetLandUseIdByFeatureId(context.Context, *connect.Request[v1.GetLandUseIdByFeatureIdRequest]) (*connect.Response[v1.GetLandUseIdByFeatureIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetLandUseIdByFeatureId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetLandUseIdByFeatureId(context.Context, *connect.Request[v1.GetLandUseIdByFeatureIdRequest]) (*connect.Response[v1.GetLandUseIdByFeatureIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetLandUseIdByFeatureId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetZoningIdByFeatureId(context.Context, *connect.Request[v1.GetZoningIdByFeatureIdRequest]) (*connect.Response[v1.GetZoningIdByFeatureIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetZoningIdByFeatureId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetZoningIdByFeatureId(context.Context, *connect.Request[v1.GetZoningIdByFeatureIdRequest]) (*connect.Response[v1.GetZoningIdByFeatureIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetZoningIdByFeatureId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetImprovementAreaSqftByFeatureId(context.Context, *connect.Request[v1.GetImprovementAreaSqftByFeatureIdRequest]) (*connect.Response[v1.GetImprovementAreaSqftByFeatureIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetImprovementAreaSqftByFeatureId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetImprovementAreaSqftByFeatureId(context.Context, *connect.Request[v1.GetImprovementAreaSqftByFeatureIdRequest]) (*connect.Response[v1.GetImprovementAreaSqftByFeatureIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetImprovementAreaSqftByFeatureId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetBedroomsByFeatureId(context.Context, *connect.Request[v1.GetBedroomsByFeatureIdRequest]) (*connect.Response[v1.GetBedroomsByFeatureIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetBedroomsByFeatureId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetBedroomsByFeatureId(context.Context, *connect.Request[v1.GetBedroomsByFeatureIdRequest]) (*connect.Response[v1.GetBedroomsByFeatureIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetBedroomsByFeatureId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetBathroomsByFeatureId(context.Context, *connect.Request[v1.GetBathroomsByFeatureIdRequest]) (*connect.Response[v1.GetBathroomsByFeatureIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetBathroomsByFeatureId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetBathroomsByFeatureId(context.Context, *connect.Request[v1.GetBathroomsByFeatureIdRequest]) (*connect.Response[v1.GetBathroomsByFeatureIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetBathroomsByFeatureId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetUnitsByFeatureId(context.Context, *connect.Request[v1.GetUnitsByFeatureIdRequest]) (*connect.Response[v1.GetUnitsByFeatureIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetUnitsByFeatureId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetUnitsByFeatureId(context.Context, *connect.Request[v1.GetUnitsByFeatureIdRequest]) (*connect.Response[v1.GetUnitsByFeatureIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetUnitsByFeatureId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetPrimaryImprovementYearBuiltByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementYearBuiltByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetPrimaryImprovementYearBuiltByFeatureId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetPrimaryImprovementYearBuiltByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementYearBuiltByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementYearBuiltByFeatureId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetPrimaryImprovementEffectiveYearBuiltByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetPrimaryImprovementEffectiveYearBuiltByFeatureId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetPrimaryImprovementEffectiveYearBuiltByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementEffectiveYearBuiltByFeatureId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetPrimaryImprovementConditionIdByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementConditionIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementConditionIdByFeatureIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetPrimaryImprovementConditionIdByFeatureId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetPrimaryImprovementConditionIdByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementConditionIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementConditionIdByFeatureIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementConditionIdByFeatureId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) GetPrimaryImprovementTypeIdByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementTypeIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementTypeIdByFeatureIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByFeatureId is not implemented"))
+func (UnimplementedParcelReadServiceHandler) GetPrimaryImprovementTypeIdByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementTypeIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementTypeIdByFeatureIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementTypeIdByFeatureId is not implemented"))
 }
 
-func (UnimplementedParcelsServiceHandler) UpdateParcel(context.Context, *connect.Request[v1.UpdateParcelRequest]) (*connect.Response[v1.UpdateParcelResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelsService.UpdateParcel is not implemented"))
+// ParcelWriteServiceClient is a client for the civil.mesh.parcels.v1.ParcelWriteService service.
+type ParcelWriteServiceClient interface {
+	// Corrects the current legal record of a parcel's attributes in place.
+	// Only fields present in the request change; properties replaces the
+	// stored JSON object.
+	UpdateParcel(context.Context, *connect.Request[v1.UpdateParcelRequest]) (*connect.Response[v1.UpdateParcelResponse], error)
+}
+
+// NewParcelWriteServiceClient constructs a client for the civil.mesh.parcels.v1.ParcelWriteService
+// service. By default, it uses the Connect protocol with the binary Protobuf Codec, asks for
+// gzipped responses, and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply
+// the connect.WithGRPC() or connect.WithGRPCWeb() options.
+//
+// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
+// http://api.acme.com or https://acme.com/grpc).
+func NewParcelWriteServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ParcelWriteServiceClient {
+	baseURL = strings.TrimRight(baseURL, "/")
+	parcelWriteServiceMethods := v1.File_civil_mesh_parcels_v1_parcels_proto.Services().ByName("ParcelWriteService").Methods()
+	return &parcelWriteServiceClient{
+		updateParcel: connect.NewClient[v1.UpdateParcelRequest, v1.UpdateParcelResponse](
+			httpClient,
+			baseURL+ParcelWriteServiceUpdateParcelProcedure,
+			connect.WithSchema(parcelWriteServiceMethods.ByName("UpdateParcel")),
+			connect.WithClientOptions(opts...),
+		),
+	}
+}
+
+// parcelWriteServiceClient implements ParcelWriteServiceClient.
+type parcelWriteServiceClient struct {
+	updateParcel *connect.Client[v1.UpdateParcelRequest, v1.UpdateParcelResponse]
+}
+
+// UpdateParcel calls civil.mesh.parcels.v1.ParcelWriteService.UpdateParcel.
+func (c *parcelWriteServiceClient) UpdateParcel(ctx context.Context, req *connect.Request[v1.UpdateParcelRequest]) (*connect.Response[v1.UpdateParcelResponse], error) {
+	return c.updateParcel.CallUnary(ctx, req)
+}
+
+// ParcelWriteServiceHandler is an implementation of the civil.mesh.parcels.v1.ParcelWriteService
+// service.
+type ParcelWriteServiceHandler interface {
+	// Corrects the current legal record of a parcel's attributes in place.
+	// Only fields present in the request change; properties replaces the
+	// stored JSON object.
+	UpdateParcel(context.Context, *connect.Request[v1.UpdateParcelRequest]) (*connect.Response[v1.UpdateParcelResponse], error)
+}
+
+// NewParcelWriteServiceHandler builds an HTTP handler from the service implementation. It returns
+// the path on which to mount the handler and the handler itself.
+//
+// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
+// and JSON codecs. They also support gzip compression.
+func NewParcelWriteServiceHandler(svc ParcelWriteServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	parcelWriteServiceMethods := v1.File_civil_mesh_parcels_v1_parcels_proto.Services().ByName("ParcelWriteService").Methods()
+	parcelWriteServiceUpdateParcelHandler := connect.NewUnaryHandler(
+		ParcelWriteServiceUpdateParcelProcedure,
+		svc.UpdateParcel,
+		connect.WithSchema(parcelWriteServiceMethods.ByName("UpdateParcel")),
+		connect.WithHandlerOptions(opts...),
+	)
+	return "/civil.mesh.parcels.v1.ParcelWriteService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case ParcelWriteServiceUpdateParcelProcedure:
+			parcelWriteServiceUpdateParcelHandler.ServeHTTP(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	})
+}
+
+// UnimplementedParcelWriteServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedParcelWriteServiceHandler struct{}
+
+func (UnimplementedParcelWriteServiceHandler) UpdateParcel(context.Context, *connect.Request[v1.UpdateParcelRequest]) (*connect.Response[v1.UpdateParcelResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelWriteService.UpdateParcel is not implemented"))
 }

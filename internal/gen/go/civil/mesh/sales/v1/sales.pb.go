@@ -365,8 +365,8 @@ const file_civil_mesh_sales_v1_sales_proto_rawDesc = "" +
 	"\x0emin_sale_price\x18\x03 \x01(\tR\fminSalePrice\x12$\n" +
 	"\x0emax_sale_price\x18\x04 \x01(\tR\fmaxSalePrice\"L\n" +
 	"\x19GetSalesByPolygonResponse\x12/\n" +
-	"\x05sales\x18\x01 \x03(\v2\x19.civil.mesh.sales.v1.SaleR\x05sales2\x83\x02\n" +
-	"\fSalesService\x12z\n" +
+	"\x05sales\x18\x01 \x03(\v2\x19.civil.mesh.sales.v1.SaleR\x05sales2\x86\x02\n" +
+	"\x0fSaleReadService\x12z\n" +
 	"\x12GetSalesByParcelId\x12..civil.mesh.sales.v1.GetSalesByParcelIdRequest\x1a/.civil.mesh.sales.v1.GetSalesByParcelIdResponse\"\x03\x90\x02\x01\x12w\n" +
 	"\x11GetSalesByPolygon\x12-.civil.mesh.sales.v1.GetSalesByPolygonRequest\x1a..civil.mesh.sales.v1.GetSalesByPolygonResponse\"\x03\x90\x02\x01B\xe0\x01\n" +
 	"\x17com.civil.mesh.sales.v1B\n" +
@@ -399,10 +399,10 @@ var file_civil_mesh_sales_v1_sales_proto_depIdxs = []int32{
 	0, // 1: civil.mesh.sales.v1.GetSalesByParcelIdResponse.sales:type_name -> civil.mesh.sales.v1.Sale
 	6, // 2: civil.mesh.sales.v1.GetSalesByPolygonRequest.time_range:type_name -> google.type.Interval
 	0, // 3: civil.mesh.sales.v1.GetSalesByPolygonResponse.sales:type_name -> civil.mesh.sales.v1.Sale
-	1, // 4: civil.mesh.sales.v1.SalesService.GetSalesByParcelId:input_type -> civil.mesh.sales.v1.GetSalesByParcelIdRequest
-	3, // 5: civil.mesh.sales.v1.SalesService.GetSalesByPolygon:input_type -> civil.mesh.sales.v1.GetSalesByPolygonRequest
-	2, // 6: civil.mesh.sales.v1.SalesService.GetSalesByParcelId:output_type -> civil.mesh.sales.v1.GetSalesByParcelIdResponse
-	4, // 7: civil.mesh.sales.v1.SalesService.GetSalesByPolygon:output_type -> civil.mesh.sales.v1.GetSalesByPolygonResponse
+	1, // 4: civil.mesh.sales.v1.SaleReadService.GetSalesByParcelId:input_type -> civil.mesh.sales.v1.GetSalesByParcelIdRequest
+	3, // 5: civil.mesh.sales.v1.SaleReadService.GetSalesByPolygon:input_type -> civil.mesh.sales.v1.GetSalesByPolygonRequest
+	2, // 6: civil.mesh.sales.v1.SaleReadService.GetSalesByParcelId:output_type -> civil.mesh.sales.v1.GetSalesByParcelIdResponse
+	4, // 7: civil.mesh.sales.v1.SaleReadService.GetSalesByPolygon:output_type -> civil.mesh.sales.v1.GetSalesByPolygonResponse
 	6, // [6:8] is the sub-list for method output_type
 	4, // [4:6] is the sub-list for method input_type
 	4, // [4:4] is the sub-list for extension type_name

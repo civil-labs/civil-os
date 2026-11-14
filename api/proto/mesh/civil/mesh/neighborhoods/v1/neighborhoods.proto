@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package civil.mesh.neighborhoods.v1;
 
-service NeighborhoodService {
+service NeighborhoodReadService {
   rpc GetNeighborhoodDefinitions(GetNeighborhoodDefinitionsRequest) returns (GetNeighborhoodDefinitionsResponse) {}
 
   rpc GetNeighborhoods(GetNeighborhoodsRequest) returns (GetNeighborhoodsResponse) {}

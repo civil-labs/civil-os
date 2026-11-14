@@ -169,8 +169,8 @@ const file_civil_mesh_valuations_v1_valuations_proto_rawDesc = "" +
 	"valuations\x1ab\n" +
 	"\x0fValuationsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x129\n" +
-	"\x05value\x18\x02 \x01(\v2#.civil.mesh.valuations.v1.ValuationR\x05value:\x028\x012\x86\x01\n" +
-	"\x10ValuationService\x12r\n" +
+	"\x05value\x18\x02 \x01(\v2#.civil.mesh.valuations.v1.ValuationR\x05value:\x028\x012\x8a\x01\n" +
+	"\x14ValuationReadService\x12r\n" +
 	"\rGetValuations\x12..civil.mesh.valuations.v1.GetValuationsRequest\x1a/.civil.mesh.valuations.v1.GetValuationsResponse\"\x00B\x88\x02\n" +
 	"\x1ccom.civil.mesh.valuations.v1B\x0fValuationsProtoP\x01ZTgithub.com/civil-labs/civil-os/internal/gen/go/civil/mesh/valuations/v1;valuationsv1\xa2\x02\x03CMV\xaa\x02\x18Civil.Mesh.Valuations.V1\xca\x02\x18Civil\\Mesh\\Valuations\\V1\xe2\x02$Civil\\Mesh\\Valuations\\V1\\GPBMetadata\xea\x02\x1bCivil::Mesh::Valuations::V1b\x06proto3"
 
@@ -198,8 +198,8 @@ var file_civil_mesh_valuations_v1_valuations_proto_depIdxs = []int32{
 	4, // 0: civil.mesh.valuations.v1.Valuation.valuation_timestamp:type_name -> google.protobuf.Timestamp
 	3, // 1: civil.mesh.valuations.v1.GetValuationsResponse.valuations:type_name -> civil.mesh.valuations.v1.GetValuationsResponse.ValuationsEntry
 	0, // 2: civil.mesh.valuations.v1.GetValuationsResponse.ValuationsEntry.value:type_name -> civil.mesh.valuations.v1.Valuation
-	1, // 3: civil.mesh.valuations.v1.ValuationService.GetValuations:input_type -> civil.mesh.valuations.v1.GetValuationsRequest
-	2, // 4: civil.mesh.valuations.v1.ValuationService.GetValuations:output_type -> civil.mesh.valuations.v1.GetValuationsResponse
+	1, // 3: civil.mesh.valuations.v1.ValuationReadService.GetValuations:input_type -> civil.mesh.valuations.v1.GetValuationsRequest
+	2, // 4: civil.mesh.valuations.v1.ValuationReadService.GetValuations:output_type -> civil.mesh.valuations.v1.GetValuationsResponse
 	4, // [4:5] is the sub-list for method output_type
 	3, // [3:4] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name

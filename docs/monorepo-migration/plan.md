@@ -122,12 +122,13 @@ The imported `.github/`, `mise.toml`, `go.mod` and `.gitignore` files stay as-is
   4. Check `properties` parses as a JSON object.
   5. Run a dynamic `UPDATE core.parcel_attributes SET … , trace_id=$n WHERE parcel_id=$1 AND legal_valid_range @> now()`, setting only the fields present. Zero rows returns `FailedPrecondition`.
 - Map Postgres check violation `23514` on `properties_size_limit` to `InvalidArgument`.
+- *(Clarified during implementation.)* `land_area_sq_ft`, `frontage_ft` and `depth_ft` must be finite and non-negative, else `InvalidArgument`. The mesh request has no protovalidate rules, so the writer checks for itself.
 - `trace_id` comes from parsing the `traceparent` header, else 16 random bytes as hex.
 
 **3.4 Gateway**
 - Rename the clients to the read services.
 - Add the optional writer client and route `ParcelServer.UpdateParcel` through it. With no writer host, return `Unavailable`.
-- Forward `traceparent` with a small Connect client interceptor.
+- Forward `traceparent` by copying the header onto the mesh request in `UpdateParcel`. *(Revised during implementation: it is the only forwarded call, so an interceptor isn't needed.)* The writer host is read from `CIVIL_DB_WRITER_HOST` until PR 4 renames it to `CIVIL_OS_GATEWAY_WRITER_HOST`.
 - Dex (spec §5.1): with no address, don't register the handler and log one `INFO` line; if `grpc.NewClient` fails, exit non-zero.
 - Have servers depend on the generated Connect client interfaces.
 
@@ -135,7 +136,7 @@ The imported `.github/`, `mise.toml`, `go.mod` and `.gitignore` files stay as-is
 
 **Checks**
 - `go build ./... && go vet ./...` passes.
-- `go list -m all | grep -c aws-sdk` prints `0`.
+- `git grep aws-sdk-go-v2 -- services` finds nothing, and `servicediscovery` is gone from `go.mod`. The AWS SDK remains only through gocloud `s3blob` (spec F6, amended 2026-11-14).
 - `buf lint` passes.
 
 ## PR 4: env var contract and log level (`feat!: CIVIL_OS_ env var contract`)

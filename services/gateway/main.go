@@ -116,32 +116,32 @@ func main() {
 
 	dbReaderAddress := "http://" + config.DBReaderHost
 
-	meshClient := meshparcelsv1connect.NewParcelsServiceClient(
+	meshClient := meshparcelsv1connect.NewParcelReadServiceClient(
 		http.DefaultClient,
 		dbReaderAddress, // The Envoy-routable address for the db-reader service
 	)
 
-	meshImprovementsClient := meshimprovementsv1connect.NewImprovementsServiceClient(
+	meshImprovementsClient := meshimprovementsv1connect.NewImprovementReadServiceClient(
 		http.DefaultClient,
 		dbReaderAddress,
 	)
 
-	meshLandUsesClient := meshlandusesv1connect.NewLandUsesServiceClient(
+	meshLandUsesClient := meshlandusesv1connect.NewLandUseReadServiceClient(
 		http.DefaultClient,
 		dbReaderAddress,
 	)
 
-	meshZoningClient := meshzoningv1connect.NewZoningServiceClient(
+	meshZoningClient := meshzoningv1connect.NewZoningReadServiceClient(
 		http.DefaultClient,
 		dbReaderAddress,
 	)
 
-	meshValuationsClient := meshvaluationsv1connect.NewValuationServiceClient(
+	meshValuationsClient := meshvaluationsv1connect.NewValuationReadServiceClient(
 		http.DefaultClient,
 		dbReaderAddress,
 	)
 
-	meshNeighborhoodsClient := meshneighborhoodsv1connect.NewNeighborhoodServiceClient(
+	meshNeighborhoodsClient := meshneighborhoodsv1connect.NewNeighborhoodReadServiceClient(
 		http.DefaultClient,
 		dbReaderAddress,
 	)
@@ -151,6 +151,17 @@ func main() {
 	parcelsServer := &ParcelServer{
 		dbReaderClient: meshClient,
 		logger:         logger,
+	}
+
+	// Parcel writes are optional: without a writer host, UpdateParcel returns Unavailable.
+	if config.DBWriterHost != "" {
+		parcelsServer.dbWriterClient = meshparcelsv1connect.NewParcelWriteServiceClient(
+			http.DefaultClient,
+			"http://"+config.DBWriterHost,
+		)
+		logger.Info("parcel writes enabled", slog.String("writer_host", config.DBWriterHost))
+	} else {
+		logger.Info("parcel writes disabled: CIVIL_DB_WRITER_HOST is not set")
 	}
 
 	parcelsPath, parcelsHandler := parcelsv1connect.NewParcelsServiceHandler(
@@ -232,33 +243,34 @@ func main() {
 
 	mux.Handle(neighborhoodsPath, CORSMiddleware(auth(neighborhoodsHandler), logger))
 
-	// Create gRPC connection to Dex if an address is provided
+	// The Dex admin API is only served when a Dex gRPC endpoint is configured
+	// (jurisdictions without their own OIDC server run Dex as their IdP).
+	// Unset: the DexService path is not registered, so calls get Unimplemented/404.
 	if config.DexGrpcAddress != "" {
 
-		// Native gRPC expects just the hostname and port, not the protocol
+		// Native gRPC expects just the hostname and port, not the protocol.
+		// grpc.NewClient does not dial; it only fails on an invalid target, which is
+		// a misconfiguration, so refuse to start rather than run without the API.
 		conn, err := grpc.NewClient(config.DexGrpcAddress, grpc.WithAuthority("idp"), grpc.WithTransportCredentials(insecure.NewCredentials()))
-
 		if err != nil {
-
-			logger.Error("failed to connect to the dex instance's gRPC endpoint", slog.Any("error", err))
-
-		} else {
-
-			logger.Debug("connected to the dex instance's gRPC endpoint")
-
-			dexServer := &DexServer{
-				dexClient: api.NewDexClient(conn),
-				logger:    logger,
-			}
-
-			dexPath, dexHandler := dexv1connect.NewDexServiceHandler(
-				dexServer,
-				connect.WithInterceptors(validate.NewInterceptor()),
-			)
-
-			mux.Handle(dexPath, CORSMiddleware(auth(dexHandler), logger))
+			logger.Error("invalid Dex gRPC address", slog.String("address", config.DexGrpcAddress), slog.Any("error", err))
+			os.Exit(1)
 		}
 
+		dexServer := &DexServer{
+			dexClient: api.NewDexClient(conn),
+			logger:    logger,
+		}
+
+		dexPath, dexHandler := dexv1connect.NewDexServiceHandler(
+			dexServer,
+			connect.WithInterceptors(validate.NewInterceptor()),
+		)
+
+		mux.Handle(dexPath, CORSMiddleware(auth(dexHandler), logger))
+		logger.Info("Dex admin API enabled", slog.String("address", config.DexGrpcAddress))
+	} else {
+		logger.Info("Dex admin API disabled: CIVIL_DEX_GRPC_ADDRESS is not set")
 	}
 
 	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), logger))

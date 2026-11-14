@@ -1,9 +1,12 @@
+# Build from the repository root:
+#   docker build -f services/tile-server/dockerfile .
+
 # Use the official Martin image
 FROM ghcr.io/maplibre/martin:1.15.0
 
 # Copy the local config file into the container
 # We put it in /etc/martin/ to follow standard linux conventions
-COPY config.yaml /etc/martin/config.yaml
+COPY services/tile-server/config.yaml /etc/martin/config.yaml
 
 # Run Martin using the config file
 # Since the base image sets the ENTRYPOINT to "martin", 

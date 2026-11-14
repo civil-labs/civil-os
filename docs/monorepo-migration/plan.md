@@ -95,8 +95,9 @@ The imported `.github/`, `mise.toml`, `go.mod` and `.gitignore` files stay as-is
   - `go build -o /app/<bin> ./services/<svc>`;
   - runtime `alpine` pinned to the current stable 3.x tag;
   - user, port and `grpc_health_probe` unchanged.
-- `services/tile-server/dockerfile` is unchanged.
-- Add a root `.dockerignore`: `.git`, `docs`, `sdk`, `test`, `api/gen/openapi`, `**/node_modules`.
+- `services/tile-server/dockerfile`: only its `COPY` path changes, to `services/tile-server/config.yaml`. That way all four images share the repo root as their build context, so PR 7's image matrix needs no per-service context. *(Revised during implementation.)*
+- Add a root `.dockerignore`: `.git`, `.github`, `.claude`, `docs`, `sdk`, `test`, `dev`, `database`, `api/proto`, `api/gen/openapi`, `**/node_modules`, `*.md`.
+- Images are pinned to `golang:1.26.1-alpine3.23` (builder) and `alpine:3.24` (runtime). The runtime pin is to the minor version, so security patch releases are still picked up.
 
 **Checks**
 - `go build ./... && go vet ./...` passes.

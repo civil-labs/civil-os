@@ -1,0 +1,294 @@
+# Plan: civil-os open-source Go monorepo
+
+| | |
+|---|---|
+| **Implements** | [`spec.md`](spec.md) (accepted in `a0b6838`), which implements [`intent.md`](intent.md) (`475ff11`) |
+| **Author** | Claude (drafted for Jackson, owner / approving engineer) |
+| **Date** | 2026-11-13 |
+| **Status** | Reviewed by the owner on 2026-11-14 (generated JS index required; `internal/envconfig` deviation approved). Accepted when committed. |
+
+## Ground rules
+
+- **Branches and PRs.** Work happens on short-lived branches and lands in eight PRs (PR 1–PR 8 below). The agent never pushes to `main`; the owner merges each PR.
+- **Each step is one commit** with a conventional-commit message, and every commit from PR 2 onward builds (`go build ./...`).
+- **Plan and code stay in sync.** If implementation departs from this plan, `plan.md` is updated in the same commit. If the departure changes the spec, the agent stops and asks the owner first.
+- **Verification before "done".** Each PR's checks are run and their output pasted into the PR description before the PR is reported as done.
+- **Source repos are read-only.** The agent works from fresh clones in the session scratchpad and never touches the working copies in `~/development/civil-*`.
+- **Protected paths.** No edits to helm, gitops or jurisdiction repos. No jurisdiction names in any file, commit message or PR text.
+
+## Environment prerequisites (owner, before PR 1)
+
+| # | Need | Why | Status on this machine |
+|---|---|---|---|
+| E1 | Network access for the session to `github.com`, `pypi.org` / `files.pythonhosted.org`, `proxy.golang.org`, `sum.golang.org`, `buf.build`, `registry.npmjs.org`, Docker Hub and `ghcr.io` | Clones, git-filter-repo, Go modules, buf remote plugins, image pulls | Sandbox prompts per host |
+| E2 | Docker daemon reachable from the session | testcontainers integration tests, compose, e2e and image builds | **Not reachable from inside the sandbox.** Either approve sandbox bypass for docker commands, or the owner runs the docker-based checks and pastes the output. |
+| E3 | `git-filter-repo` | History import | Installed by the owner on 2026-11-14. |
+| E4 | PR 1 merged with **"Create a merge commit"** (not squash), *before* squash-only branch protection is enabled | A squash merge would flatten the imported histories (spec §3) | Owner action at merge time |
+
+## PR 1: import history (`chore/import-history`)
+
+Every commit in this PR is a pure import with no content edits. The repo doesn't build in this PR, because there is still no root `go.mod`.
+
+**1.1** Confirm `git filter-repo --version` runs. It is already installed (E3).
+
+**1.2** For each repo, in this order:
+
+| Repo (branch) | filter-repo arguments |
+|---|---|
+| civil-blueprints (`master`) | `--path proto/ --path buf.yaml --path buf.gen.yaml --path buf.lock --path-rename proto/:api/proto/ --path-rename buf.yaml:api/buf.yaml --path-rename buf.gen.yaml:api/buf.gen.yaml --path-rename buf.lock:api/buf.lock` |
+| civil-database-schema (`main`) | `--path manifests/ --path Dockerfile --invert-paths`, then `--to-subdirectory-filter database` |
+| civil-gateway (`master`) | `--to-subdirectory-filter services/gateway` |
+| civil-database-reader (`main`) | `--to-subdirectory-filter services/database-reader` |
+| civil-database-editor (`main`) | `--to-subdirectory-filter services/database-writer` |
+| civil-tile-server (`main`) | `--to-subdirectory-filter services/tile-server` |
+
+For each repo:
+1. Run `git clone https://github.com/civil-labs/<repo>` into the scratchpad.
+2. Apply the filter.
+3. In civil-os, run `git fetch <clone> <branch>`, then `git merge --allow-unrelated-histories -m "chore: import <repo> history into <path>"`.
+
+The imported `.github/`, `mise.toml`, `go.mod` and `.gitignore` files stay as-is in this PR and are removed in PR 2.
+
+**Checks**
+- For each prefix, `diff -r` of the prefix against the filtered clone's HEAD is empty.
+- `git log --oneline -- services/gateway/auth.go | wc -l` is greater than 1, and the same for `services/database-reader/parcels.go`, `api/proto/mesh/civil/mesh/parcels/v1/parcels.proto` and `database/atlas.hcl`.
+- `git ls-files | grep -E '(^|/)manifests/|database/Dockerfile'` returns nothing.
+
+## PR 2: single module and build (`refactor/single-module`)
+
+**2.1 Root scaffolding**
+- **Add** `go.mod` (`module github.com/civil-labs/civil-os`, `go 1.26.1`) and `mise.toml` with these pins: go 1.26.1, buf 1.66.1, node 22, atlas 1.3.0.
+- **`mise.toml` tasks:** `generate`, `build`, `test`, `test:integration`, `test:e2e`, `lint`, `check`, `up`, `db:diff`, `db:validate`. The last two are ported from the schema repo's task.
+- **Add to `.gitignore`:** `api/gen/openapi/`, `sdk/js/gen/`, `node_modules/`, and service binaries (`/services/*/gateway`, `/reader`, `/writer`).
+- **Delete:** `services/*/go.mod`, `go.sum`, `mise.toml`, `.gitignore` and `.github/`; `database/mise.toml` and `database/.github/`; `api/.github/` and `api/mise.toml` if present.
+
+**2.2 Code generation**
+- `api/buf.yaml`: module paths `proto/public` and `proto/mesh`, with deps unchanged.
+- Replace `api/buf.gen.yaml` with two templates:
+  - `buf.gen.public.yaml`: Go and Connect → `api/gen/go`, prefix `github.com/civil-labs/civil-os/api/gen/go`; ES → `sdk/js/gen`; OpenAPI → `api/gen/openapi`.
+  - `buf.gen.mesh.yaml`: Go and Connect → `internal/gen/go`, prefix `github.com/civil-labs/civil-os/internal/gen/go`.
+- `mise run generate` runs `buf generate --template … --path proto/<x>` for each template. Commit `api/gen/go/**` and `internal/gen/go/**`.
+
+**2.3 Rewrite imports**
+- Rewrite `github.com/civil-labs/civil-api-go/civil/public/` to `github.com/civil-labs/civil-os/api/gen/go/civil/public/`, and `…/civil-api-go/civil/mesh/` to `github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/`, across `services/**/*.go`.
+- Run `go mod tidy`. This is the dependency unification accepted as C5.
+
+**2.4 Writer rename and temporary stub**
+- In `services/database-writer/`, rename the binary to `writer`, the user to `writeruser`, and "reader" strings in logs to "writer". Delete the two obsolete stub RPCs.
+- Temporarily embed `parcelsv1connect.UnimplementedParcelsServiceHandler` so the package builds. PR 3 replaces this.
+
+**2.5 Dockerfiles**
+- Rewrite `services/{gateway,database-reader,database-writer}/dockerfile`:
+  - build context is the repo root: `COPY go.mod go.sum ./`, `go mod download`, `COPY . .`;
+  - `go build -o /app/<bin> ./services/<svc>`;
+  - runtime `alpine` pinned to the current stable 3.x tag;
+  - user, port and `grpc_health_probe` unchanged.
+- `services/tile-server/dockerfile` is unchanged.
+- Add a root `.dockerignore`: `.git`, `docs`, `sdk`, `test`, `api/gen/openapi`, `**/node_modules`.
+
+**Checks**
+- `go build ./... && go vet ./...` passes.
+- `grep -r civil-api-go --include=*.go .` finds nothing.
+- `docker build -f services/<svc>/dockerfile .` succeeds for all 4 (needs E2).
+
+## PR 3: mesh read/write split, writer, gateway changes (`feat!: split mesh parcels into read/write services`)
+
+**3.1 Protos** (`api/proto/mesh/civil/mesh/*/v1/*.proto`)
+- Rename the services: `ParcelReadService`, `ImprovementReadService`, `LandUseReadService`, `ZoningReadService`, `ValuationReadService`, `NeighborhoodReadService`, `SaleReadService`.
+- Move `UpdateParcel` into a new `ParcelWriteService` in the same `parcels.proto`. Messages are unchanged.
+- Run `buf lint`, then `mise run generate`.
+
+**3.2 Reader** (`services/database-reader/main.go`): register the `*ReadService` handlers and put the new names in the health checker. No SQL changes.
+
+**3.3 Writer** (`services/database-writer/parcels.go`, `main.go`)
+- Remove the stub and serve `ParcelWriteService` plus health.
+- `UpdateParcel` follows spec §5.3, in one `pgx` transaction:
+  1. `SELECT parcel_id FROM core.parcels WHERE public_id=$1 AND NOT is_voided FOR UPDATE`; if nothing comes back, return `NotFound`.
+  2. Resolve `address_id` and `land_use_id` via their `public_id`s; a missing one returns `InvalidArgument` naming the field.
+  3. Convert ft to m and sq ft to sq m.
+  4. Check `properties` parses as a JSON object.
+  5. Run a dynamic `UPDATE core.parcel_attributes SET … , trace_id=$n WHERE parcel_id=$1 AND legal_valid_range @> now()`, setting only the fields present. Zero rows returns `FailedPrecondition`.
+- Map Postgres check violation `23514` on `properties_size_limit` to `InvalidArgument`.
+- `trace_id` comes from parsing the `traceparent` header, else 16 random bytes as hex.
+
+**3.4 Gateway**
+- Rename the clients to the read services.
+- Add the optional writer client and route `ParcelServer.UpdateParcel` through it. With no writer host, return `Unavailable`.
+- Forward `traceparent` with a small Connect client interceptor.
+- Dex (spec §5.1): with no address, don't register the handler and log one `INFO` line; if `grpc.NewClient` fails, exit non-zero.
+- Have servers depend on the generated Connect client interfaces.
+
+**3.5 AWS removal:** delete `services/gateway/backend.go` and run `go mod tidy`.
+
+**Checks**
+- `go build ./... && go vet ./...` passes.
+- `go list -m all | grep -c aws-sdk` prints `0`.
+- `buf lint` passes.
+
+## PR 4: env var contract and log level (`feat!: CIVIL_OS_ env var contract`)
+
+**4.1** Add a new package, `internal/envconfig`, with the helpers used by all three services:
+- `LogLevel(service) (slog.Level, error)`: per-service variable, then shared, then `INFO`; parsed with `UnmarshalText`;
+- `RejectLegacy() error`: finds any set `CIVIL_*` that isn't `CIVIL_OS_*`;
+- `Port(key, default)`;
+- `Required(keys…)`.
+
+> **Deviation from spec §2:** the spec allows only generated code and test helpers under `internal/`. A shared package avoids three copies of the legacy-variable and log-level logic. **The owner approved this deviation on 2026-11-14.** The same commit amends spec §2 to list `internal/envconfig`.
+
+**4.2** Rewrite `services/*/config.go` to the names in spec §5.5. Reader and writer default ports become `50051` and `50052`. Delete `getVerboseEnv`, and use a `slog.LevelVar` in every service.
+
+**4.3** In `services/tile-server/config.yaml`, change `connection_string` to `${CIVIL_OS_TILE_SERVER_DATABASE_URL}`.
+
+**Checks:** `go build ./... && go vet ./...` passes, and `grep -rn '"CIVIL_[A-Z]' services | grep -v CIVIL_OS_` finds nothing.
+
+## PR 5: tests (`test: unit, handler, integration and migration suites`)
+
+**5.1 Testability refactor:** each service's `main()` becomes `run(ctx, cfg, logger) error` plus a thin `main`, with no behavior change.
+
+**5.2 Synthetic fixtures** (`database/fixtures/synthetic.sql`)
+- **Contents:** a fictional country/administrative area, land use types and land uses, zoning with attributes, one neighborhood definition and neighborhoods, 20 parcels, improvements, addresses and one valuation.
+- **Parcels:** each has a fixed UUID, geometry, attributes and history-compatible ranges. Parcel geometries sit in an empty ocean area so they can't resemble a real place.
+- **Format:** every row uses fixed UUIDs that tests import as constants from `internal/testutil/fixtures.go`.
+
+**5.3 Shared helpers** (`internal/testutil/`)
+- `postgres.go`: testcontainers PostGIS, pinned to the same image as compose. Applies `database/migrations/*.sql` in filename order and loads the fixtures.
+- `oidc.go`: a fake issuer, meaning an RSA key, a JWKS endpoint, discovery and a token minting helper.
+
+Integration tests use build tag `integration` and run through `mise run test:integration`.
+
+**5.4 Tests**
+
+| File | Covers (spec §8) |
+|---|---|
+| `internal/envconfig/envconfig_test.go` | Levels in any case and with offsets, invalid level, per-service override, legacy rejection, required and default handling, all three services' configs from one shared environment |
+| `services/gateway/mappers_test.go` | Every `map*` function: nil, empty and partial input |
+| `services/gateway/cors_test.go`, `auth_test.go` | CORS preflight and headers; auth valid / wrong client / expired / bad signature / missing |
+| `services/gateway/handlers_test.go` | `httptest` fake mesh servers for every public RPC: mapping, error passthrough, protovalidate rejection; `UpdateParcel` with and without a writer; Dex unset → `Unimplemented`, unreachable → `Unavailable`, fake `DexClient` RPCs |
+| `services/database-writer/parcels_unit_test.go` | Unit conversion, `properties` validation, `traceparent` parsing |
+| `services/database-reader/integration_test.go` | Every read RPC by parcel and by feature, plus not-found cases |
+| `services/database-writer/integration_test.go` | Full and partial update, unit round trip through the reader's SQL, `properties` replace, unknown parcel / address / land use, voided parcel, oversized `properties`, history row with `trace_id` |
+| `database/migrations_test.go` | All migrations apply to an empty DB; `atlas.sum` file list matches the directory |
+
+**Checks:**
+- `go test ./...` passes.
+- `go test -tags integration ./...` passes (needs E2).
+- Coverage report attached to the PR.
+
+## PR 6: local stack and e2e (`feat: docker compose quickstart`)
+
+**6.1 Files**
+- `compose.yaml` with services `db`, `migrate`, `seed`, `dex`, `database-reader`, `database-writer`, `tile-server` and `gateway`:
+  - health checks on each service;
+  - `depends_on` with `service_completed_successfully` or `service_healthy`;
+  - the gateway on `localhost:8080`;
+  - all env vars use the `CIVIL_OS_*` names.
+- `dev/dex.yaml`: static client `civil-os-dev`, static user `dev@example.com` with a documented throwaway password, gRPC API on `:5557`.
+- `dev/instance-metadata.json`: synthetic metadata.
+
+**6.2 E2E tests** (`test/e2e/smoke_test.go`, tag `e2e`)
+1. Wait for health checks.
+2. Get a token from Dex with the password grant.
+3. Read a fixture parcel, update its `frontage_ft`, then read it back to confirm the change.
+4. Fetch a tile covering the fixtures and expect a non-empty MVT.
+
+**Checks:** from a fresh `git clone` into the scratchpad, `docker compose up --wait && go test -tags e2e ./test/e2e/...` passes (needs E2).
+
+## PR 7: CI, release and publishing (`ci: workflows, release-please, npm SDK`)
+
+**7.1 SDK package** (`sdk/js/`)
+- `package.json`: `@civil-labs/civil-os-api`, version `0.1.0`, the same exports and deps as civil-api-js, plus `publishConfig.access: public` and `repository` pointing at civil-os.
+- **Generated index (owner requirement).** `index.js` and `index.d.ts` are **never hand-written or committed**.
+  - `sdk/js/scripts/gen-index.mjs` walks `sdk/js/gen/**` and writes one `export *` line per generated `*_pb.js` / `*_pb.d.ts`, sorted for stable output.
+  - It runs as part of `mise run generate` and as the npm `prepack` script, so `npm pack` and `npm publish` always rebuild it.
+  - `sdk/js/index.js` and `sdk/js/index.d.ts` are added to `.gitignore`.
+  - A new public proto is exported automatically, with no manual step.
+- `README.md`.
+
+**7.2 Release-please files**
+- `release-please-config.json`:
+  - package `.`, type `go`, with `include-component-in-tag: false`;
+  - package `api/proto/public`, type `simple`, with `component: public-api` and an `extra-files` json updater on `sdk/js/package.json` `$.version`;
+  - `bump-minor-pre-major` and `bump-patch-for-minor-pre-major` set to true.
+- `.release-please-manifest.json`: `{".": "0.2.0", "api/proto/public": "0.1.0"}`.
+
+**7.3 Workflows** (spec §6.3)
+- `ci.yml`:
+  - `mise install go buf node` (no Atlas);
+  - `go build`, `vet` and `test`;
+  - `test -tags integration` (Docker is available on GitHub-hosted runners);
+  - `buf lint`, `buf format --diff --exit-code`;
+  - generated-code freshness: `mise run generate && git diff --exit-code api/gen/go internal/gen/go`;
+  - `buf breaking api/proto/public --against '.git#tag=<last public-api tag>'`. This is skipped while no tag exists, and allowed to fail when the PR title has `!`;
+  - an e2e job running `docker compose up --wait` and the e2e tests;
+  - the no-customer-data check: `scripts/check-denylist.sh` reads newline-separated patterns from the `CUSTOMER_DENYLIST` secret and greps the tree. It skips with a warning when the secret is absent, as on forks.
+- `pr-title.yml`: `amannn/action-semantic-pull-request` pinned to a version.
+- `release-please.yml`: `googleapis/release-please-action`, pinned, with the App token from `RELEASE_PLEASE_APP_ID` and `RELEASE_PLEASE_PRIVATE_KEY`.
+- `images.yml`:
+  - a matrix over the four services, built from the repo root context;
+  - `:sha-<short>` on `main`, `:vX.Y.Z` on `v*` tags;
+  - attestations kept from the old workflows.
+- `migrations-release.yml`: on `v*`, runs `kubectl create configmap civil-os-db-migrations-vX-Y-Z --from-file=database/migrations --dry-run=client -o yaml` and uploads the result to the release.
+- `public-api-release.yml`: on `public-api-v*`, runs `mise run generate`, `node sdk/js/scripts/gen-index.mjs` and `npm publish --provenance` (`id-token: write`), and uploads `openapi.yaml` to the release.
+
+**Checks**
+- `actionlint` passes on all workflows.
+- Run release-please in dry-run mode locally: `npx release-please release-pr --dry-run …`. It must propose both streams (spec acceptance 6).
+- `npm pack --dry-run` in `sdk/js` lists the generated files and index.
+- The generated `index.js` has one export per public proto file, 10 today, compared against `find api/proto/public -name '*.proto' | wc -l`.
+- A Node smoke import (`node -e "import('@civil-labs/civil-os-api')"` against the packed tarball) succeeds.
+
+## PR 8: docs and agent guardrails (`docs: README, architecture, CLAUDE.md, setup`)
+
+**8.1 Documents**
+- `README.md`: what civil-os is, the quickstart, the curl walkthrough (token, read, update, tile), releases and the license.
+- `docs/architecture.md`:
+  - the service map and public vs mesh APIs;
+  - the read/write split;
+  - the bitemporal model in brief;
+  - the §5.5 env var table with old-to-new mapping;
+  - the load-balancing note and the release streams.
+- `docs/github-setup.md`: the intent's manual steps as an exact checklist. It lists the secret names (`RELEASE_PLEASE_APP_ID`, `RELEASE_PLEASE_PRIVATE_KEY`, `CUSTOMER_DENYLIST`), npm org and trusted publishing, branch protection, GHCR visibility, and the E4 merge-commit note.
+
+**8.2 `CLAUDE.md`** (one page or less): the commands, the layout, these rules, and known mistakes.
+- **Commands:** `mise run …`.
+- **Rules:**
+  - never edit `*/gen/`;
+  - conventional commits;
+  - Read/Write mesh naming;
+  - no customer data;
+  - run `mise run db:validate` locally after any migration change.
+
+**8.3 Hook:** `.claude/settings.json` gets a `PreToolUse` hook (`.claude/hooks/block-gen-edits.sh`) that blocks Edit and Write under `api/gen/` and `internal/gen/`.
+
+**Checks:**
+- Follow every README command verbatim from a fresh clone.
+- The hook blocks a test edit to `api/gen/go/...`.
+
+## Final verification (before reporting the effort done)
+
+1. Run on the tip of the last PR:
+   - `mise run check` (build, vet, unit, lint, format, generated-code freshness, breaking);
+   - `go test -tags integration ./...`;
+   - the e2e suite;
+   - `docker build` for all four images.
+
+   Paste the output.
+2. A fresh-context verifier subagent reviews the cumulative diff against `spec.md` §1 and §12 and reports any unmet requirement.
+3. Owner checks after merge: CI is green on `main`, the `:sha-` images appear under `ghcr.io/civil-labs/civil-os/*`, and the first release-please PR shows `v0.2.0` and `public-api-v0.1.0`.
+
+## Risks
+
+| # | Risk | Mitigation |
+|---|---|---|
+| R1 | A squash merge of PR 1 erases the imported history. | E4: the owner merges PR 1 with a merge commit before enabling squash-only. |
+| R2 | Docker is unavailable inside the agent sandbox, so integration, e2e and image checks can't run. | E2: bypass approval per command, or the owner runs and pastes. The PR isn't reported done without that output. |
+| R3 | Synthetic fixtures must satisfy a large bitemporal schema (≈70 tables, exclusion constraints, history triggers) and Martin's `get_parcel_tiles`. | Build fixtures against the migrated DB in PR 5 first and iterate until migrations plus seed load cleanly before writing any assertions. Only populate the tables the reader's queries touch. |
+| R4 | release-please `extra-files` may not accept a path outside the package directory (`api/proto/public` → `sdk/js/package.json`). | Verify in the PR 7 dry run. Fallback: make `sdk/js` the Public API package path and add `api/proto/public/**` changes to it via `additional-paths` (supported in recent release-please). Record whichever is used in this plan. |
+| R5 | `buf generate` uses remote plugins from buf.build, which has rate limits and needs network access. | E1. If rate limited, retry; pin plugin versions in the templates. |
+| R6 | The dependency bump changes reader or writer behavior. | Integration tests in PR 5 cover every reader RPC. The bump lands in PR 2 but is only proven by PR 5, so PRs 2–4 are not deployed in between. |
+| R7 | Mesh renames break any caller outside this repo. | None exist: the only mesh callers are the gateway and the old repos, which keep their old images until the helm follow-up. |
+| R8 | The `atlas.sum` hash isn't checked in CI (C6). | Local `mise run db:validate`, written into `CLAUDE.md`. CI still checks the file list and that migrations apply. |
+
+## Out of scope for this plan (per intent)
+
+Helm, gitops and jurisdiction repo changes; archiving the source repos; switching civil-lvt-shift to npm; GitHub, npm and GHCR settings (owner, `docs/github-setup.md`); OPA and audit logging; non-JS SDKs; Renovate or Dependabot.

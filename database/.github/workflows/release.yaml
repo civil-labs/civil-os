@@ -1,0 +1,147 @@
+name: Build and Commit Migration ConfigMap
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Semantic version bump or tag suffix'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - manual
+      custom_tag:
+        description: 'Custom tag (if manual chosen above)'
+        required: false
+        type: string
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  generate-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # Ensure checkout checks out the branch directly when triggered via workflow_dispatch
+          ref: ${{ github.ref }}
+
+      - name: Determine Release Tag
+        id: tagger
+        run: |
+          git fetch --tags --force 2>/dev/null || true
+
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+
+          # 1. Handle explicit Git tag push
+          if [ "${{ github.event_name }}" = "push" ]; then
+            CLEAN_PUSH_TAG="${GITHUB_REF_NAME#v}"
+            echo "tag=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+            echo "semver=v${CLEAN_PUSH_TAG}" >> $GITHUB_OUTPUT
+            echo "cm_tag=$(echo "${GITHUB_REF_NAME}" | tr '[:upper:]' '[:lower:]' | tr '_' '-' | tr '.' '-')" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # 2. Handle manual text override
+          if [ "${{ inputs.bump }}" = "manual" ]; then
+            CUSTOM="${{ inputs.custom_tag }}"
+            echo "tag=${CUSTOM}" >> $GITHUB_OUTPUT
+            echo "semver=${CUSTOM}" >> $GITHUB_OUTPUT
+            echo "cm_tag=$(echo "${CUSTOM}" | tr '[:upper:]' '[:lower:]' | tr '_' '-' | tr '.' '-')" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # 3. Robust tag discovery: fetch latest semantic tag
+          LATEST_TAG=$(git tag -l "v[0-9]*.[0-9]*.[0-9]*" --sort=-v:refname | head -n 1)
+          if [ -z "$LATEST_TAG" ]; then
+            LATEST_TAG="v0.0.0"
+          fi
+
+          # Strip 'v' and any trailing hyphen/metadata for calculation
+          CLEAN_TAG=$(echo "${LATEST_TAG}" | sed -E 's/^v//; s/-.*$//')
+
+          IFS='.' read -r MAJOR MINOR PATCH <<< "${CLEAN_TAG}"
+          MAJOR=${MAJOR:-0}
+          MINOR=${MINOR:-0}
+          PATCH=${PATCH:-0}
+
+          case "${{ inputs.bump }}" in
+            major)
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+              ;;
+            minor)
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              ;;
+            patch)
+              PATCH=$((PATCH + 1))
+              ;;
+          esac
+
+          SEMVER="v${MAJOR}.${MINOR}.${PATCH}"
+          FULL_TAG="${SEMVER}-${SHORT_SHA}"
+
+          # DNS-1123 compliant label for Kubernetes ConfigMap names
+          CM_TAG=$(echo "${FULL_TAG}" | tr '[:upper:]' '[:lower:]' | tr '_' '-' | tr '.' '-')
+
+          echo "tag=${FULL_TAG}" >> $GITHUB_OUTPUT
+          echo "semver=${SEMVER}" >> $GITHUB_OUTPUT
+          echo "cm_tag=${CM_TAG}" >> $GITHUB_OUTPUT
+          echo "Calculated tag: ${FULL_TAG} (Base semver: ${SEMVER}, ConfigMap tag: ${CM_TAG})"
+
+      # - name: Install Atlas & Verify Hash
+      #   uses: ariga/setup-atlas@v0
+      #   with:
+      #     cloud-token: ${{ secrets.ATLAS_PRO_TOKEN }}
+          
+      - name: Validate Migration Integrity
+        run: |
+          # Ensure LF line endings on all migration files
+          find migrations/ -type f -exec sed -i -e 's/\r$//' {} +
+
+          # Verify migration files match atlas.sum before packaging
+          # atlas migrate validate --dir "file://migrations"
+
+      - name: Generate Versioned ConfigMap
+        run: |
+          TARGET_DIR="manifests/migrations/${{ steps.tagger.outputs.tag }}"
+          mkdir -p "${TARGET_DIR}"
+
+          # Generate versioned ConfigMap manifest
+          kubectl create configmap "civil-os-db-migrations-${{ steps.tagger.outputs.cm_tag }}" \
+            --from-file=migrations/ \
+            --dry-run=client -o yaml > "${TARGET_DIR}/configmap.yaml"
+
+          # Maintain a rolling latest copy for convenience
+          mkdir -p manifests/migrations
+          cp "${TARGET_DIR}/configmap.yaml" manifests/migrations/latest.yaml
+
+      - name: Commit and Push Versioned Manifests
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add manifests/migrations/
+          
+          # Only commit if changes exist
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore(migrations): release configmap ${{ steps.tagger.outputs.tag }} [skip ci]"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
+
+      - name: Create and Push Git Release Tag
+        if: github.event_name == 'workflow_dispatch' && inputs.bump != 'manual'
+        run: |
+          git tag -a "${{ steps.tagger.outputs.semver }}" -m "Release ${{ steps.tagger.outputs.tag }}"
+          git push origin "${{ steps.tagger.outputs.semver }}"

@@ -1,0 +1,21 @@
+version: v2
+
+# Define both modules from the centralized config
+modules:
+  - path: proto/public
+    name: buf.build/civillabs/civil-blueprints-public
+  - path: proto/mesh
+    name: buf.build/civillabs/civil-blueprints-mesh
+
+deps:
+  - buf.build/bufbuild/protovalidate
+  - buf.build/googleapis/googleapis
+  - buf.build/gnostic/gnostic
+
+lint:
+  use:
+    - STANDARD
+
+breaking:
+  use:
+    - FILE

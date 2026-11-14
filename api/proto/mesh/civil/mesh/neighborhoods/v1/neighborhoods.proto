@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package civil.mesh.neighborhoods.v1;
+
+service NeighborhoodService {
+  rpc GetNeighborhoodDefinitions(GetNeighborhoodDefinitionsRequest) returns (GetNeighborhoodDefinitionsResponse) {}
+
+  rpc GetNeighborhoods(GetNeighborhoodsRequest) returns (GetNeighborhoodsResponse) {}
+}
+
+message NeighborhoodDefinition {
+  string id = 1;
+  string name = 2;
+  bool is_legal = 3;
+}
+
+message Neighborhood {
+  string id = 1;
+  string name = 2;
+}
+
+message GetNeighborhoodDefinitionsRequest {}
+
+message GetNeighborhoodDefinitionsResponse {
+  map<string, Neighborhood> neighborhoods = 1;
+}
+
+message GetNeighborhoodsRequest {}
+
+message GetNeighborhoodsResponse {
+  map<string, Neighborhood> neighborhoods = 1;
+}

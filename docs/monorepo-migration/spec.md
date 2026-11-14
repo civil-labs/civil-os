@@ -42,7 +42,7 @@
 ```
 civil-os/
 ├── go.mod / go.sum              module github.com/civil-labs/civil-os
-├── mise.toml                    go, buf, node pinned; atlas pinned for local authoring only; tasks: generate, build, test, lint, check, up, db:diff, db:validate
+├── mise.toml                    go, buf, node pinned; atlas pinned for local authoring only; tasks: generate, build, test, lint, check, up, down, token, test:*, db:diff, db:validate
 ├── compose.yaml                 local stack (§7)
 ├── README.md  CLAUDE.md  LICENSE (MIT, unchanged)
 ├── release-please-config.json  .release-please-manifest.json
@@ -286,6 +286,19 @@ Later SDKs (Python, Rust, Swift) add jobs to `public-api-release.yml` and direct
 
 Instance metadata is a synthetic `dev/instance-metadata.json`, mounted and read through gocloud `file://`. The README shows how to get a token from Dex and make an authenticated read, an update and a tile request with `curl`.
 
+### 7.1 `mise` tasks for the stack *(added 2026-11-14, owner decision)*
+
+These tasks wrap compose so that starting, resetting and testing the stack are one command each. `docker compose` still works directly.
+
+| Task | Runs | Notes |
+|---|---|---|
+| `up` | `docker compose up --build --wait`, then prints the gateway URL, the Dex issuer, a pointer to `mise run token`, the OAuth2 client settings (client ID and secret, redirect, authorize and token URLs, scope) for API clients such as Bruno, and the test username and password *(owner request, 2026-11-14)* | Always rebuilds, so tests never run against stale images. The build cache keeps that fast. |
+| `down` | `docker compose down -v --remove-orphans` | Always deletes the database volume. The data is synthetic and is re-seeded on `up`. |
+| `token` | the Dex password grant for the test user from `dev/dex.yaml`, with `curl` | Prints only the ID token on stdout, so `TOKEN=$(mise run token)` works. Exits non-zero if no token comes back. Uses `sed` for parsing, not `jq`. |
+| `test:e2e` | `go test -count=1 -tags e2e ./test/e2e/...` | Now depends on `up`, so one command starts the stack and runs the smoke tests. The stack keeps running afterwards for inspection. |
+
+There's no `logs` task; `docker compose logs` is enough. The CI e2e job runs `mise run test:e2e`, so the tasks are exercised on every PR. It keeps its logs-on-failure step and always ends with `mise run down`.
+
 **Synthetic fixtures** (`database/fixtures/synthetic.sql`):
 - About 20 parcels with geometries in a fictional area, with addresses, land uses, zoning, one neighborhood definition, improvements and one valuation.
 - All IDs are fixed UUIDs, so tests can assert on them.
@@ -312,7 +325,7 @@ The no-customer-data check is a CI step that greps the tree for a denylist of kn
   - the bitemporal data model in brief;
   - the full env var table from §5.5, including the old → new mapping for the helm follow-up;
   - the load-balancing note (§5.1) and the release streams.
-- **`CLAUDE.md` (≤ 1 page):** commands (`mise run generate|build|test|check|up`), layout, conventions (conventional commits, Read/Write mesh naming, never edit `*/gen/`), the no-customer-data rule, and known mistakes.
+- **`CLAUDE.md` (≤ 1 page):** commands (`mise run generate|build|test|check|up|down|token`), layout, conventions (conventional commits, Read/Write mesh naming, never edit `*/gen/`), the no-customer-data rule, and known mistakes.
 - **`docs/github-setup.md`:** the intent's manual steps, written as an exact checklist (secrets and their names, branch protection settings, App permissions, GHCR visibility, npm org and trusted publishing).
 
 ## 10. Areas of concern
@@ -345,7 +358,7 @@ Each criterion maps to the intent's success criterion with the same number.
 1. A single PR in civil-os can change a proto, the generated code and every consumer, and CI passes on it.
 2. `images.yml` builds all 4 images. On a release tag they appear as `ghcr.io/civil-labs/civil-os/<svc>:vX.Y.Z`.
 3. `git log -- services/gateway/auth.go` and `git blame` show pre-migration commits.
-4. On a fresh clone, `mise install && docker compose up --wait` succeeds and the README curl walkthrough works.
+4. On a fresh clone, `mise install && docker compose up --wait` succeeds and the README curl walkthrough works. `mise run up`, `mise run test:e2e`, `mise run token` and `mise run down` work as described in §7.1.
 5. `ci.yml` runs unit, handler, integration, e2e, migration and contract layers, and all pass.
 6. `release-please --dry-run` (or the first release PR) proposes both an app release and a `public-api` release.
 7. `grep -ri editor` finds no service reference (excluding docs history). An e2e update persists and reads back through the gateway.

@@ -305,9 +305,33 @@ Integration tests use build tag `integration` and run through `mise run test:int
 
 **8.3 Hook:** `.claude/settings.json` gets a `PreToolUse` hook (`.claude/hooks/block-gen-edits.sh`) that blocks Edit and Write under `api/gen/` and `internal/gen/`.
 
+
+**8.4 Stack tasks (spec §7.1, added 2026-11-14 at the owner's request)**
+- `mise.toml`:
+  - add `up`, `down` and `token`;
+  - make `test:e2e` depend on `up`.
+- `token` is a small POSIX `sh` script, `dev/token.sh`, called by the task. It writes only the token to stdout and errors to stderr.
+- `ci.yml` e2e job:
+  - `mise run test:e2e` replaces the separate compose-up and `go test` steps;
+  - logs on failure stay;
+  - teardown becomes `mise run down`.
+- Docs: README (a mise variant alongside the plain compose quickstart, plus `TOKEN=$(mise run token)` as an alternative), `CLAUDE.md` commands, the `test/e2e` package comment.
+- **Checks for 8.4:**
+  - from a fresh clone, `mise run test:e2e` brings the stack up and passes;
+  - `TOKEN=$(mise run token)` works in the README curl calls;
+  - after `mise run down`, `docker compose ps -a` and `docker volume ls` show no civil-os containers or volumes;
+  - CI's e2e job passes using the tasks.
 **Checks:**
 - Follow every README command verbatim from a fresh clone.
 - The hook blocks a test edit to `api/gen/go/...`.
+
+**Clarified during implementation (2026-11-14):**
+- **The load-balancing note follows the code, not spec §5.1.** The gateway calls the reader and writer with `http.DefaultClient` over `http://`, which is HTTP/1.1 with a keep-alive pool, not one HTTP/2 connection. `docs/architecture.md` describes it that way. Balancing is still per connection under `ClusterIP` and ztunnel.
+- **`SalesService` and `TileService` are defined but not served.** The gateway registers neither. Sales comparables go through `ParcelsService`, and tiles through the `/tiles/` proxy. The docs say so.
+- **No `mise run up` task** (spec §2/§9 listed one). The docs use `docker compose up --build --wait` directly.
+- **`mise run check` is build + vet + buf lint + unit tests.** `buf format`, generated-code freshness and `buf breaking` run in CI only. `CLAUDE.md` lists them.
+- **The hook also covers `sdk/js/gen/` and `MultiEdit`.** It parses `file_path` with `sed`, because `jq` isn't guaranteed on contributor machines.
+- **The first release PR (#9) proposed only `v0.2.0`** (spec acceptance 6). No user-facing commit had touched `api/proto/public` since the bootstrap SHA, and squash merges keep only the PR title, so no `Release-As:` footer could survive. PR #10 (`feat(public-api): …`, adds `api/proto/public/README.md`) triggers `public-api-v0.1.0`.
 
 ## Final verification (before reporting the effort done)
 

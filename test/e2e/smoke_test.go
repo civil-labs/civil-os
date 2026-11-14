@@ -2,8 +2,10 @@
 
 // Package e2e runs smoke tests against a running compose stack:
 //
-//	docker compose up --wait
-//	go test -tags e2e ./test/e2e/...
+//	mise run test:e2e  // starts or rebuilds the stack, then runs these tests
+//
+// or, without mise: docker compose up --build --wait, then
+// go test -tags e2e ./test/e2e/...
 //
 // CIVIL_OS_E2E_GATEWAY_URL and CIVIL_OS_E2E_ISSUER_URL override the defaults
 // (http://localhost:8080 and http://localhost:5556/dex).

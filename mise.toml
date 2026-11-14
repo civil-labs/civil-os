@@ -28,8 +28,42 @@ description = "Run integration tests against a PostGIS test container (needs Doc
 run = "go test -tags integration ./..."
 
 [tasks."test:e2e"]
-description = "Run end-to-end smoke tests against the compose stack (start it with `docker compose up --wait`)"
+description = "Start (or rebuild) the compose stack, then run the end-to-end smoke tests against it"
+depends = ["up"]
 run = "go test -count=1 -tags e2e ./test/e2e/..."
+
+[tasks.up]
+description = "Build and start the full local stack on synthetic data, and wait until it is healthy"
+quiet = true # don't echo the commands; compose's own progress output still shows
+run = [
+  "docker compose up --build --wait --wait-timeout 300",
+  """echo '
+civil-os is up (synthetic data):
+  gateway        http://localhost:8080
+  Dex issuer     http://localhost:5556/dex
+  token          TOKEN=$(mise run token)
+  stop           mise run down   (deletes the database)
+
+OAuth2 client (dev/dex.yaml), e.g. for Bruno or Postman:
+  client_id      civil-os-dev
+  client_secret  civil-os-dev-secret
+  redirect_url   http://localhost:3000/callback
+  authorize_url  http://localhost:5556/dex/auth
+  token_url      http://localhost:5556/dex/token
+  scope          openid email profile
+
+Test user (password grant, or the Dex login page):
+  username       dev@example.com
+  password       civil-os-dev-password' >&2""",
+]
+
+[tasks.down]
+description = "Stop the local stack and delete its database volume"
+run = "docker compose down -v --remove-orphans"
+
+[tasks.token]
+description = "Print an ID token for the local test user (use as TOKEN=$(mise run token))"
+run = "sh dev/token.sh"
 
 [tasks.lint]
 description = "Vet Go code and lint protos"

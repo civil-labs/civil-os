@@ -31,18 +31,20 @@ jobs:
           pkg_version=$(node -p "require('./sdk/js/package.json').version")
           echo "tag=$tag_version package=$pkg_version"
           test "$tag_version" = "$pkg_version"
-      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
-        with:
-          node-version: 22
-          registry-url: https://registry.npmjs.org
+      # Node comes from mise.toml. Trusted publishing needs npm >= 11.5.1;
+      # Node 22 ships npm 10.
       - name: Use an npm that supports trusted publishing
-        run: npm install -g npm@11
+        run: npm install -g npm@11.21.1
       - name: Publish to npm
         working-directory: sdk/js
         env:
-          # Unused when npm trusted publishing is configured for this repo.
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --provenance --access public
+          # Only needed without trusted publishing; empty otherwise.
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -n "$NPM_TOKEN" ]; then
+            npm config set //registry.npmjs.org/:_authToken "$NPM_TOKEN"
+          fi
+          npm publish --provenance --access public
       - name: Attach openapi.yaml to the release
         env:
           GH_TOKEN: ${{ github.token }}

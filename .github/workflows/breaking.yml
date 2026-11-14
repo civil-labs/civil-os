@@ -1,0 +1,57 @@
+name: Public API breaking changes
+
+# buf breaking on the public module against the last public-api release
+# (spec §4.3). A separate workflow so it re-runs, cheaply, when the PR title
+# is edited: marking a PR as breaking (`feat!:`) is what allows the break.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: breaking-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  MISE_DISABLE_TOOLS: atlas
+  MISE_TRUSTED_CONFIG_PATHS: ${{ github.workspace }}
+  BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
+
+jobs:
+  buf-breaking:
+    name: Public API breaking changes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          fetch-depth: 0 # needs the public-api-v* tags
+      - uses: jdx/mise-action@6612f0ef07ed2a736cd1e00a94a065522dd41195 # v5.2.5
+        with:
+          install_args: buf
+      - name: buf breaking against the last public-api release
+        working-directory: api
+        env:
+          # Via env, never interpolated into the script: titles are untrusted.
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          tag=$(git describe --tags --abbrev=0 --match 'public-api-v*' 2>/dev/null || true)
+          if [ -z "$tag" ]; then
+            echo "::notice::No public-api release yet; skipping buf breaking"
+            exit 0
+          fi
+          echo "Comparing against $tag"
+          # The public module is the input; the mesh module may change freely.
+          if buf breaking proto/public --against "../.git#tag=${tag},subdir=api/proto/public"; then
+            exit 0
+          fi
+          # Squash merges keep only the title, so only a `type!:` / `type(scope)!:`
+          # title makes release-please treat this as breaking.
+          re='^[a-z]+(\([^)]*\))?!: '
+          if [[ $PR_TITLE =~ $re ]]; then
+            echo "::warning::Breaking public API change, allowed because the PR title is marked breaking."
+            exit 0
+          fi
+          echo "::error::Breaking public API change. If intended, mark the PR title breaking, e.g. \`feat!: ...\` or \`feat(public-api)!: ...\`."
+          exit 1

@@ -43,12 +43,11 @@ jobs:
         run: go test -tags integration ./...
 
   proto:
-    name: Protos, generated code and breaking changes
+    # buf breaking runs in breaking.yml, which also re-runs when the PR title changes.
+    name: Protos and generated code
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
-        with:
-          fetch-depth: 0 # buf breaking compares against the last public-api tag
       - uses: jdx/mise-action@6612f0ef07ed2a736cd1e00a94a065522dd41195 # v5.2.5
         with:
           install_args: go buf node
@@ -65,21 +64,6 @@ jobs:
             echo "::error::Generated Go code is stale. Run \`mise run generate\` and commit the result."
             exit 1
           }
-      - name: buf breaking (public API, against the last public-api release)
-        if: github.event_name == 'pull_request'
-        # A PR whose title declares a breaking change (`!`) may break the contract.
-        continue-on-error: ${{ contains(github.event.pull_request.title, '!') }}
-        working-directory: api
-        run: |
-          tag=$(git describe --tags --abbrev=0 --match 'public-api-v*' 2>/dev/null || true)
-          if [ -z "$tag" ]; then
-            echo "::notice::No public-api release yet; skipping buf breaking"
-            exit 0
-          fi
-          echo "Comparing against $tag"
-          # The public module is the input; the mesh module may change freely.
-          buf breaking proto/public --against "../.git#tag=${tag},subdir=api/proto/public"
-
   sdk:
     name: JS SDK packs and imports
     runs-on: ubuntu-latest

@@ -1,0 +1,10 @@
+[tools]
+atlas = "1.3.0"
+
+[tasks.build-migration]
+description = "Builds versioned migration"
+run = '''
+git add --renormalize .
+git ls-files -z | xargs -0 sed -i 's/\r$//'
+atlas migrate diff --env local
+'''

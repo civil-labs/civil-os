@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package civil.public.zoning.v1;
+
+service ZoningService {
+  rpc GetZoning(GetZoningRequest) returns (GetZoningResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message Zoning {
+  string id = 1;
+  string name = 2;
+  string code = 3;
+  float max_far = 4;
+  float min_lot_size_sq_ft = 5;
+  float max_height_ft = 6;
+  float max_dwelling_units_per_acre = 7;
+  float max_lot_coverage_pct = 8;
+}
+
+message GetZoningRequest {}
+
+message GetZoningResponse {
+  map<string, Zoning> zoning = 1;
+}

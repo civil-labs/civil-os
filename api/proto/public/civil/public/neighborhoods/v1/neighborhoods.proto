@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package civil.public.neighborhoods.v1;
+
+import "buf/validate/validate.proto";
+import "gnostic/openapi/v3/annotations.proto";
+
+service NeighborhoodService {
+  rpc GetNeighborhoodDefinitions(GetNeighborhoodDefinitionsRequest) returns (GetNeighborhoodDefinitionsResponse) {}
+
+  rpc GetNeighborhoods(GetNeighborhoodsRequest) returns (GetNeighborhoodsResponse) {}
+}
+
+message NeighborhoodDefinition {
+  string id = 1 [
+    (buf.validate.field).string.uuid = true,
+
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier for the neighborhood definition."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+
+  string name = 2;
+
+  bool is_legal = 3;
+}
+
+message Neighborhood {
+  string id = 1 [
+    (buf.validate.field).string.uuid = true,
+
+    (gnostic.openapi.v3.property) = {
+      description: "The unique identifier for the neighborhood."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+
+  string name = 2;
+}
+
+message GetNeighborhoodDefinitionsRequest {}
+
+message GetNeighborhoodDefinitionsResponse {
+  map<string, Neighborhood> neighborhoods = 1 [(gnostic.openapi.v3.property) = {description: "Map of neighborhoods keyed by the UUID neighborhood ID"}];
+}
+
+message GetNeighborhoodsRequest {}
+
+message GetNeighborhoodsResponse {
+  map<string, Neighborhood> neighborhoods = 1 [(gnostic.openapi.v3.property) = {description: "Map of neighborhoods keyed by the UUID neighborhood definition ID"}];
+}

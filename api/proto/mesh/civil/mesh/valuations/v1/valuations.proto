@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package civil.mesh.valuations.v1;
+
+import "google/protobuf/timestamp.proto";
+
+service ValuationService {
+  rpc GetValuations(GetValuationsRequest) returns (GetValuationsResponse) {}
+}
+
+message Valuation {
+  string id = 1;
+
+  google.protobuf.Timestamp valuation_timestamp = 2;
+}
+
+message GetValuationsRequest {}
+
+message GetValuationsResponse {
+  map<string, Valuation> valuations = 1;
+}

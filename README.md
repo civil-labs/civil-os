@@ -33,10 +33,14 @@ This starts the following, all on fictional data in open ocean:
 
 `docker compose down -v` stops everything and deletes the database.
 
+With [mise](https://mise.jdx.dev) installed (see [Development](#development)),
+`mise run up` and `mise run down` do the same, and `mise run test:e2e` starts
+the stack and runs the smoke tests in one go.
+
 ### Try the API with curl
 
 Get an ID token for the local test user. These are throwaway credentials from
-`dev/dex.yaml`:
+`dev/dex.yaml`. With mise, `TOKEN=$(mise run token)` does the same:
 
 ```sh
 TOKEN=$(curl -s http://localhost:5556/dex/token \
@@ -92,7 +96,10 @@ mise trust && mise install
 mise run generate          # regenerate code from api/proto
 mise run check             # build, vet, buf lint, unit and handler tests
 mise run test:integration  # reader, writer and migration tests (needs Docker)
-mise run test:e2e          # smoke tests against a running compose stack
+mise run up                # build and start the local stack, wait until healthy
+mise run test:e2e          # (re)start the stack, then run the smoke tests against it
+TOKEN=$(mise run token)    # ID token for the local test user
+mise run down              # stop the stack and delete its database
 ```
 
 Generated Go code under `api/gen/` and `internal/gen/` is committed. Edit the

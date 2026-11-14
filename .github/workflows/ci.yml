@@ -114,16 +114,16 @@ jobs:
       - uses: jdx/mise-action@6612f0ef07ed2a736cd1e00a94a065522dd41195 # v5.2.5
         with:
           install_args: go
-      - name: Start the stack
-        run: docker compose up --build --wait --wait-timeout 300
-      - name: Smoke tests
-        run: go test -count=1 -tags e2e ./test/e2e/...
+      - name: Start the stack and run the smoke tests
+        run: mise run test:e2e
+      - name: Token task works
+        run: test -n "$(mise run token)"
       - name: Logs on failure
         if: failure()
         run: docker compose logs --no-color
       - name: Stop the stack
         if: always()
-        run: docker compose down -v
+        run: mise run down
 
   customer-data:
     name: No customer-specific data

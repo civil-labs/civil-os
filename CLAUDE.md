@@ -10,8 +10,10 @@ This repo is **public**.
 mise run generate          # regenerate api/gen, internal/gen, sdk/js/gen from api/proto
 mise run check             # go build, go vet, buf lint, unit + handler tests
 mise run test:integration  # testcontainers PostGIS: reader, writer, migrations (needs Docker)
-docker compose up --build --wait && mise run test:e2e   # full stack + smoke tests
-docker compose down -v
+mise run up                # build + start the compose stack on synthetic data
+mise run test:e2e          # starts/rebuilds the stack, then runs the smoke tests
+TOKEN=$(mise run token)    # bearer token for the local test user
+mise run down              # stop the stack and delete its database
 mise run db:validate       # Atlas, local only: run (or ask the owner to) after any migration change
 ```
 

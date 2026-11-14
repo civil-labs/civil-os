@@ -25,7 +25,7 @@ func (s *NeighborhoodServer) GetNeighborhoodDefinitions(
 	meshRes, err := s.dbReaderClient.GetNeighborhoodDefinitions(ctx, meshReq)
 	if err != nil {
 		s.logger.Error("upstream GetNeighborhoodDefinitions request failed", slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err // keep the mesh status code
 	}
 
 	publicNeighborhoods := make(map[string]*publicneighborhoodsv1.Neighborhood, len(meshRes.Msg.Neighborhoods))
@@ -54,7 +54,7 @@ func (s *NeighborhoodServer) GetNeighborhoods(
 	meshRes, err := s.dbReaderClient.GetNeighborhoods(ctx, meshReq)
 	if err != nil {
 		s.logger.Error("upstream GetNeighborhoods request failed", slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err // keep the mesh status code
 	}
 
 	publicNeighborhoods := make(map[string]*publicneighborhoodsv1.Neighborhood, len(meshRes.Msg.Neighborhoods))

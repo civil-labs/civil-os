@@ -25,7 +25,7 @@ func (s *ValuationServer) GetValuations(
 	meshRes, err := s.dbReaderClient.GetValuations(ctx, meshReq)
 	if err != nil {
 		s.logger.Error("upstream GetValuations request failed", slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err // keep the mesh status code
 	}
 
 	publicValuations := make(map[string]*publicvaluationsv1.Valuation, len(meshRes.Msg.Valuations))

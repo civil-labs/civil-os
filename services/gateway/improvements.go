@@ -25,7 +25,7 @@ func (s *ImprovementServer) GetImprovementTypes(
 	meshRes, err := s.dbReaderClient.GetImprovementTypes(ctx, meshReq)
 	if err != nil {
 		s.logger.Error("upstream GetImprovementTypes request failed", slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err // keep the mesh status code
 	}
 
 	publicRes := &publicimprovementsv1.GetImprovementTypesResponse{
@@ -45,7 +45,7 @@ func (s *ImprovementServer) GetImprovementConditions(
 	meshRes, err := s.dbReaderClient.GetImprovementConditions(ctx, meshReq)
 	if err != nil {
 		s.logger.Error("upstream GetImprovementConditions request failed", slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err // keep the mesh status code
 	}
 
 	publicRes := &publicimprovementsv1.GetImprovementConditionsResponse{

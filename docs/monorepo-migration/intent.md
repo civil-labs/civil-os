@@ -54,6 +54,10 @@ civil-os is a single public repo with one Go module. In it:
 5. **A newcomer or an AI agent can understand and run the app from the repo.**
    The repo provides a README, an architecture overview, a `CLAUDE.md`, and
    `docker compose up` on synthetic data.
+   *(Amended 2026-11-14 by owner decision during PR 8: `mise run up`, `down`
+   and `token` wrap the compose stack, so starting it, resetting it and getting
+   a test token are each one command. The goal is to make testing easier.
+   Plain `docker compose` keeps working.)*
 6. **Tests cover the stack:** unit, gateway handler, integration (Postgres + PostGIS)
    and end-to-end smoke tests, all running in CI.
 7. **Backend discovery is cloud-neutral.** The gateway finds backends through
@@ -153,7 +157,8 @@ Both repos are archived later, together with the other source repos.
 2. All four images build from civil-os under `ghcr.io/civil-labs/civil-os/<service>`.
 3. Source history is preserved where practical (nice to have).
 4. `docker compose up` works from a fresh clone and serves the full stack on
-   synthetic data.
+   synthetic data. `mise run up` does the same, `mise run test:e2e` runs against
+   it, and `mise run down` removes it. *(Amended 2026-11-14, owner decision.)*
 5. Every test layer (unit, handler, integration, e2e smoke, contract checks) passes
    in CI.
 6. A release-please dry run produces both an app release and a Public API release.

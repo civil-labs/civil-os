@@ -26,6 +26,8 @@ plugins:
     include_imports: true
     opt:
       - target=js+dts
+      # Node's ESM loader needs explicit extensions on relative imports.
+      - import_extension=js
   # Committed? No: attached to Public API releases.
   - remote: buf.build/community/sudorandom-connect-openapi
     out: gen/openapi

@@ -12,6 +12,7 @@ run = [
   "rm -rf gen/go ../internal/gen/go gen/openapi ../sdk/js/gen",
   "buf generate proto/public --template buf.gen.public.yaml",
   "buf generate proto/mesh --template buf.gen.mesh.yaml",
+  "node ../sdk/js/scripts/gen-index.mjs",
 ]
 
 [tasks.build]

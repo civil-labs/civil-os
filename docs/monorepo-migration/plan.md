@@ -271,6 +271,17 @@ Integration tests use build tag `integration` and run through `mise run test:int
 - The generated `index.js` has one export per public proto file, 10 today, compared against `find api/proto/public -name '*.proto' | wc -l`.
 - A Node smoke import (`node -e "import('@civil-labs/civil-os-api')"` against the packed tarball) succeeds.
 
+**Clarified during implementation (2026-11-14):**
+- **SDK imports need `.js` extensions.** `api/buf.gen.public.yaml` sets `import_extension=js` on the `es` plugin; without it the generated files import each other extensionlessly and Node ESM can't load the package. The SDK license is MIT, matching the repo `LICENSE`.
+- **The index exports only `gen/civil/public/**`.** Vendored dependency code (protovalidate, googleapis, gnostic) is still packed, because the public files import it, but it isn't re-exported.
+- **Manifest starts at `0.0.0`, with `initial-version`.** release-please treats the manifest value as the *last released* version, so `{".": "0.2.0"}` would make the first release `v0.3.0` (or `v1.0.0` without the pre-major flags) given the `feat!` commits. Instead the manifest is `0.0.0` for both packages, and the config sets `initial-version` to `0.2.0` (app) and `0.1.0` (public API), with `bootstrap-sha` at the PR 1 merge so old history is ignored. This was read from the release-please v17 source, not run: the `--dry-run` check needs a GitHub token, which wasn't used outside the sandbox. The first real release PR is the check.
+- **`extra-files` path starts with `/`.** Without the leading slash release-please resolves it under the package path (`api/proto/public/sdk/js/package.json`), and `../` is rejected. `/sdk/js/package.json` is repo-root-relative.
+- **`buf breaking` takes the public module as its input**, not `--path`: `buf breaking proto/public --against "../.git#tag=<tag>,subdir=api/proto/public"`, run from `api/`. Checked against a temporary local tag: a clean tree passes, and renaming a public message fails with exit 100.
+- **Workflow actions are pinned to commit SHAs**, with the version in a comment. The images use the GitHub Actions build cache and build `linux/amd64` only, as the old workflows did.
+- **`public-api-release.yml` installs npm 11**, which npm trusted publishing needs. It also passes `NPM_TOKEN` if set, so either publishing method works. A step checks that `sdk/js/package.json` matches the tag before publishing.
+- **Release assets wait for the release.** The tag can arrive just before release-please creates the GitHub Release, so the upload steps retry `gh release view` for up to a minute.
+- **The denylist check prints file names only**, never the matching line, so CI logs don't repeat customer terms.
+
 ## PR 8: docs and agent guardrails (`docs: README, architecture, CLAUDE.md, setup`)
 
 **8.1 Documents**

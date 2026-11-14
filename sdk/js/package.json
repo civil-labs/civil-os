@@ -1,0 +1,42 @@
+{
+  "name": "@civil-labs/civil-os-api",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Protobuf messages and ConnectRPC service definitions for the civil-os public API",
+  "keywords": ["civil-os", "javascript", "typescript", "ecmascript", "esm", "connectrpc", "protobuf"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/civil-labs/civil-os.git",
+    "directory": "sdk/js"
+  },
+  "homepage": "https://github.com/civil-labs/civil-os/tree/main/sdk/js#readme",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    }
+  },
+  "files": [
+    "gen",
+    "index.js",
+    "index.d.ts",
+    "README.md"
+  ],
+  "scripts": {
+    "prepack": "node scripts/gen-index.mjs"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.11.0"
+  },
+  "peerDependencies": {
+    "@connectrpc/connect": "^2.0.0",
+    "@connectrpc/connect-web": "^2.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

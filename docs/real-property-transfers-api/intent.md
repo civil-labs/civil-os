@@ -42,10 +42,10 @@ to read transfer history, apart from the latest price that
 
 ## Constraints
 
-- **Timing.** No `public-api-v*` release exists yet. Removing `TileService` and
-  `SalesService` before the first public API release means they never ship, and
-  the change isn't breaking for anyone. If a release happens first, the removal
-  is a breaking change (`feat!:`), which pre-1.0 means a minor bump.
+- **This is a breaking change.** The owner chose to finish the monorepo
+  migration and release `public-api-v0.1.0` first, with both services still in
+  it. Removing them is therefore a breaking change (`feat!:`), which pre-1.0
+  means a minor bump.
 - **Leave `ParcelsService.GetSalesComparables` alone.** It already reads
   transfers, and its name and shape are out of scope here. Renaming it to match
   "transfers" would be a separate breaking change.

@@ -155,7 +155,7 @@ The imported `.github/`, `mise.toml`, `go.mod` and `.gitignore` files stay as-is
 
 **4.4** *(Added by owner request after PR 3.)* Gateway auth fails fast. `main` handles `RequireAuth`'s error and exits, and `RequireAuth` returns an error for an empty auth server, IdP host or client ID list. As in spec §5.5, an invalid port or `ALLOWED_CLIENT_IDS` also stops startup.
 
-> Note for PR 6: `RequireAuth` hard-codes `https://` for the issuer and token URLs. A local Dex served over `http` will fail issuer verification, so PR 6 must either serve Dex over TLS in compose or let `CIVIL_OS_GATEWAY_AUTH_SERVER` carry its scheme. The second option is a small spec change, raised with the owner then.
+> Note for PR 6, **resolved 2026-11-14 (owner chose option 1) and implemented as PR 5 step 5.0**: `CIVIL_OS_GATEWAY_AUTH_SERVER` may carry its scheme (`http://dex:5556`); a bare host keeps the `https://` default. Doing it in PR 5 lets the auth tests use a plain-http fake issuer.
 
 **Checks:** `go build ./... && go vet ./...` passes, and `grep -rn '"CIVIL_[A-Z]' services | grep -v CIVIL_OS_` finds nothing.
 

@@ -87,10 +87,7 @@ func (s *InstanceServer) GetInstanceMetadata(
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to construct metadata response"))
 	}
 
-	authIssuerURL := s.config.AuthServer
-	if authIssuerURL != "" && !strings.HasPrefix(authIssuerURL, "http://") && !strings.HasPrefix(authIssuerURL, "https://") {
-		authIssuerURL = "https://" + authIssuerURL
-	}
+	authIssuerURL := issuerURL(s.config.AuthServer)
 
 	res := &instancev1.GetInstanceMetadataResponse{
 		Metadata:      structValue,

@@ -6,7 +6,8 @@
   "packages": {
     ".": {
       "release-type": "go",
-      "include-component-in-tag": false
+      "include-component-in-tag": false,
+      "initial-version": "0.2.0"
     },
     "api/proto/public": {
       "release-type": "simple",
@@ -15,10 +16,11 @@
       "extra-files": [
         {
           "type": "json",
-          "path": "sdk/js/package.json",
+          "path": "/sdk/js/package.json",
           "jsonpath": "$.version"
         }
-      ]
+      ],
+      "initial-version": "0.1.0"
     }
   }
 }

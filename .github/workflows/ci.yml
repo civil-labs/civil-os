@@ -1,0 +1,136 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # Atlas is a local authoring tool only (spec §6.4); never install it in CI.
+  MISE_DISABLE_TOOLS: atlas
+  MISE_TRUSTED_CONFIG_PATHS: ${{ github.workspace }}
+  # Optional: raises buf.build rate limits for remote plugins. Empty on forks.
+  BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
+
+jobs:
+  go:
+    name: Go build, vet, unit and integration tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
+        with:
+          install_args: go
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: go-${{ runner.os }}-${{ hashFiles('go.sum') }}
+          restore-keys: go-${{ runner.os }}-
+      - run: go build ./...
+      - run: go vet ./... && go vet -tags integration ./... && go vet -tags e2e ./...
+      - name: Unit and handler tests
+        run: go test ./...
+      - name: Integration and migration tests (PostGIS testcontainer)
+        run: go test -tags integration ./...
+
+  proto:
+    name: Protos, generated code and breaking changes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          fetch-depth: 0 # buf breaking compares against the last public-api tag
+      - uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
+        with:
+          install_args: go buf node
+      - name: buf lint
+        working-directory: api
+        run: buf lint
+      - name: buf format
+        working-directory: api
+        run: buf format --diff --exit-code
+      - name: Generated Go code is up to date
+        run: |
+          mise run generate
+          git diff --exit-code -- api/gen/go internal/gen/go || {
+            echo "::error::Generated Go code is stale. Run \`mise run generate\` and commit the result."
+            exit 1
+          }
+      - name: buf breaking (public API, against the last public-api release)
+        if: github.event_name == 'pull_request'
+        # A PR whose title declares a breaking change (`!`) may break the contract.
+        continue-on-error: ${{ contains(github.event.pull_request.title, '!') }}
+        working-directory: api
+        run: |
+          tag=$(git describe --tags --abbrev=0 --match 'public-api-v*' 2>/dev/null || true)
+          if [ -z "$tag" ]; then
+            echo "::notice::No public-api release yet; skipping buf breaking"
+            exit 0
+          fi
+          echo "Comparing against $tag"
+          # The public module is the input; the mesh module may change freely.
+          buf breaking proto/public --against "../.git#tag=${tag},subdir=api/proto/public"
+
+  sdk:
+    name: JS SDK packs and imports
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
+        with:
+          install_args: go buf node
+      - run: mise run generate
+      - name: One export per public proto
+        run: |
+          exports=$(grep -c '^export' sdk/js/index.js)
+          protos=$(find api/proto/public -name '*.proto' | wc -l)
+          echo "exports=$exports protos=$protos"
+          test "$exports" -eq "$protos"
+      - name: Pack, install and import
+        run: |
+          npm pack --pack-destination "$RUNNER_TEMP" ./sdk/js
+          mkdir "$RUNNER_TEMP/smoke" && cd "$RUNNER_TEMP/smoke"
+          npm init -y >/dev/null && npm pkg set type=module
+          npm install --no-audit --no-fund "$RUNNER_TEMP"/civil-labs-civil-os-api-*.tgz @connectrpc/connect@2 @connectrpc/connect-web@2
+          node --input-type=module -e '
+            const api = await import("@civil-labs/civil-os-api");
+            if (api.ParcelsService?.typeName !== "civil.public.parcels.v1.ParcelsService") throw new Error("ParcelsService missing");
+            console.log("imported", Object.keys(api).length, "exports");'
+
+  e2e:
+    name: E2E (docker compose)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
+        with:
+          install_args: go
+      - name: Start the stack
+        run: docker compose up --build --wait --wait-timeout 300
+      - name: Smoke tests
+        run: go test -count=1 -tags e2e ./test/e2e/...
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs --no-color
+      - name: Stop the stack
+        if: always()
+        run: docker compose down -v
+
+  customer-data:
+    name: No customer-specific data
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - name: Check tracked files against CUSTOMER_DENYLIST
+        env:
+          CUSTOMER_DENYLIST: ${{ secrets.CUSTOMER_DENYLIST }}
+        run: sh scripts/check-denylist.sh

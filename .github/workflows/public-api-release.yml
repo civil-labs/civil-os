@@ -1,0 +1,54 @@
+name: Public API release
+
+# On a public-api-vX.Y.Z tag: publish @civil-labs/civil-os-api to npm with
+# provenance and attach the public OpenAPI spec to the GitHub Release.
+on:
+  push:
+    tags: ['public-api-v*']
+
+permissions:
+  contents: write # upload the release asset
+  id-token: write # npm provenance / trusted publishing
+
+env:
+  MISE_DISABLE_TOOLS: atlas
+  MISE_TRUSTED_CONFIG_PATHS: ${{ github.workspace }}
+  BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
+        with:
+          install_args: go buf node
+      - name: Generate the SDK and OpenAPI spec
+        run: mise run generate
+      - name: Package version matches the tag
+        run: |
+          tag_version="${GITHUB_REF_NAME#public-api-v}"
+          pkg_version=$(node -p "require('./sdk/js/package.json').version")
+          echo "tag=$tag_version package=$pkg_version"
+          test "$tag_version" = "$pkg_version"
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - name: Use an npm that supports trusted publishing
+        run: npm install -g npm@11
+      - name: Publish to npm
+        working-directory: sdk/js
+        env:
+          # Unused when npm trusted publishing is configured for this repo.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
+      - name: Attach openapi.yaml to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in 1 2 3 4 5 6; do
+            gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 && break
+            sleep 10
+          done
+          gh release upload "$GITHUB_REF_NAME" api/gen/openapi/openapi.yaml --clobber

@@ -192,6 +192,14 @@ Integration tests use build tag `integration` and run through `mise run test:int
 - `go test -tags integration ./...` passes (needs E2).
 - Coverage report attached to the PR.
 
+**Clarified during implementation (2026-11-14):**
+- **search_path.** The reader uses unqualified table names and relies on the database-level `search_path = core, geo, extensions, public` that cluster infrastructure sets. The fixture file and `internal/testutil` set the same path, so tests match production. Compose (PR 6) must set it too.
+- **Reader bug fixed.** `GetValuations`, `GetNeighborhoodDefinitions` and `GetNeighborhoods` read from `public.*`, but the tables live in `core`, so they failed in every deployment. They are now qualified as `core.*`.
+- **Gateway error codes.** Fourteen handlers wrapped every mesh error as `Internal`. To meet spec §8 (mesh error-code propagation), they now return the mesh error unchanged, as the per-attribute RPCs and `UpdateParcel` already did.
+- **`atlas.sum` check is stronger than planned.** `database/migrations_test.go` recomputes Atlas's per-file and total hashes, so an edited migration fails CI without an Atlas licence.
+- **Test database per test.** One PostGIS container per test binary. Migrations and fixtures load once into a template database, and each test gets its own `CREATE DATABASE … TEMPLATE` clone.
+- **Open questions for the owner, pinned by tests rather than changed:** the reader still returns voided parcels from the attribute and summary RPCs (`TestVoidedParcelVisibility`). The comparables requests' `selected_parcel_ids` have no `uuid` rule.
+
 ## PR 6: local stack and e2e (`feat: docker compose quickstart`)
 
 **6.1 Files**

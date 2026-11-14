@@ -483,3 +483,40 @@ func TestHealth(t *testing.T) {
 		t.Errorf("status %d body %s", res.StatusCode, body)
 	}
 }
+
+// TestComparablesRequireUUIDs: selected_parcel_ids must be UUIDs on both
+// comparables RPCs; a malformed ID is rejected before the mesh is called.
+func TestComparablesRequireUUIDs(t *testing.T) {
+	g := startGateway(t, nil)
+	for _, md := range methods(t, parcelsv1connect.ParcelsServiceName) {
+		if md.Name() != "GetEquityComparables" && md.Name() != "GetSalesComparables" {
+			continue
+		}
+		t.Run(string(md.Name()), func(t *testing.T) {
+			ids := md.Input().Fields().ByName("selected_parcel_ids")
+			for _, tc := range []struct {
+				id   string
+				want connect.Code
+			}{
+				{testutil.ParcelID(1), 0},
+				{"parcel-1", connect.CodeInvalidArgument},
+				{"", connect.CodeInvalidArgument},
+			} {
+				req := dynamicpb.NewMessage(md.Input())
+				fillValid(req, 3)
+				list := req.Mutable(ids).List()
+				list.Append(protoreflect.ValueOfString(tc.id))
+
+				g.mesh.reset(0)
+				_, err := g.call(t, md, req, nil)
+				calls := g.mesh.reset(0)
+				if code := connect.CodeOf(err); err != nil && code != tc.want || err == nil && tc.want != 0 {
+					t.Errorf("id %q: got %v (%v), want %v", tc.id, code, err, tc.want)
+				}
+				if tc.want != 0 && len(calls) != 0 {
+					t.Errorf("id %q reached the mesh", tc.id)
+				}
+			}
+		})
+	}
+}

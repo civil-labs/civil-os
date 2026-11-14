@@ -4,7 +4,7 @@ route_prefix: '/tiles'
 base_path: '/tiles'
 
 postgres:
-  connection_string: $DATABASE_URL
+  connection_string: ${CIVIL_OS_TILE_SERVER_DATABASE_URL}
   auto_bounds: skip
   pool_size: 20
 

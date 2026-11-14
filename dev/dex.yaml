@@ -1,0 +1,41 @@
+# Local Dex for the compose stack. Everything here is a throwaway for local
+# development; never reuse these credentials anywhere else.
+#
+#   user:          dev@example.com / civil-os-dev-password
+#   client:        civil-os-dev / civil-os-dev-secret
+#   password grant: see README.md ("Quickstart")
+#
+# The issuer is the host-facing URL so tokens work from the host and a
+# browser; the gateway fetches signing keys over the compose network
+# (CIVIL_OS_GATEWAY_IDP_HOST=dex:5556/dex).
+issuer: http://localhost:5556/dex
+
+storage:
+  type: memory
+
+web:
+  http: 0.0.0.0:5556
+
+# Dex admin API, used by the gateway's DexService (CIVIL_OS_GATEWAY_DEX_GRPC_ADDRESS).
+grpc:
+  addr: 0.0.0.0:5557
+
+oauth2:
+  passwordConnector: local
+  skipApprovalScreen: true
+
+enablePasswordDB: true
+
+staticClients:
+  - id: civil-os-dev
+    name: civil-os local development
+    secret: civil-os-dev-secret
+    redirectURIs:
+      - http://localhost:3000/callback
+
+staticPasswords:
+  - email: dev@example.com
+    # bcrypt of "civil-os-dev-password"
+    hash: "$2a$10$ATOD0fNmmkODUIV02HF3Leyy1UbB1tCQjTLKuKzrd/6OcbiJfzd4q"
+    username: dev
+    userID: 7d9b1c0e-0000-4000-8000-000000000001

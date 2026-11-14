@@ -25,6 +25,6 @@ RUN wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health
 # Switch to the non-root user
 USER 1001
 
-EXPOSE 8080
+EXPOSE 50051
 
 CMD ["/app/reader"]

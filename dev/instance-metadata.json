@@ -1,0 +1,8 @@
+{
+  "name": "Fixture Province (local development)",
+  "description": "Synthetic civil-os instance for docker compose. All data is fictional and sits in open ocean.",
+  "country": "ZZ",
+  "center": { "longitude": -139.9992, "latitude": -39.999 },
+  "bounds": { "west": -140.0, "south": -40.0, "east": -139.9984, "north": -39.998 },
+  "default_zoom": 17
+}

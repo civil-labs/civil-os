@@ -75,7 +75,6 @@ func historyCount(t *testing.T, pool *pgxpool.Pool, n int) int {
 	return count
 }
 
-
 func near(a, b float64) bool { return math.Abs(a-b) <= 1e-9*math.Max(1, math.Abs(b)) }
 
 func update(t *testing.T, c parcelsv1connect.ParcelWriteServiceClient, msg *parcelsv1.UpdateParcelRequest) error {

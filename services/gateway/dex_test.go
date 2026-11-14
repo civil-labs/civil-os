@@ -17,6 +17,7 @@ import (
 	"google.golang.org/protobuf/types/dynamicpb"
 
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/dex/v1/dexv1connect"
+	"github.com/civil-labs/civil-os/internal/testutil"
 )
 
 // fakeDex is an in-process Dex gRPC API. It records each request and
@@ -197,8 +198,9 @@ func TestDexUnreachable(t *testing.T) {
 }
 
 func TestDexInvalidAddress(t *testing.T) {
+	iss := testutil.NewIssuer(t)
 	cfg := &Config{
-		AuthServer: "http://127.0.0.1:1", IDPHost: "127.0.0.1:1", AllowedClientsIds: []string{testClientID},
+		AuthServer: iss.URL, IDPHost: iss.Host, AllowedClientsIds: []string{testClientID},
 		DexGrpcAddress: "%zz", // grpc.NewClient rejects little beyond malformed URLs
 	}
 	if _, err := newHandler(cfg, discardLogger()); err == nil {

@@ -40,6 +40,9 @@ jobs:
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: ${{ env.IMAGE }}
+          # Never publish :latest (spec F9). metadata-action adds it to semver
+          # tags by default (latest=auto).
+          flavor: latest=false
           tags: |
             type=sha,prefix=sha-,enable=${{ github.ref == 'refs/heads/main' }}
             type=semver,pattern=v{{version}}

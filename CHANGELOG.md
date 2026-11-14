@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/civil-labs/civil-os/compare/v0.2.1...v0.2.2) (2026-11-14)
+
+
+### Bug Fixes
+
+* **ci:** no :latest tag, exact Node/npm pins, stricter breaking-change bypass ([#14](https://github.com/civil-labs/civil-os/issues/14)) ([7b77248](https://github.com/civil-labs/civil-os/commit/7b77248dfda95cbbbeb78a3d78881505e1d64d54))
+
 ## [0.2.1](https://github.com/civil-labs/civil-os/compare/v0.2.0...v0.2.1) (2026-11-14)
 
 

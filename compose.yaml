@@ -1,0 +1,154 @@
+# civil-os local stack on synthetic data.
+#
+#   docker compose up --wait     # build and start everything
+#   docker compose down -v       # stop and delete the database
+#
+# Gateway: http://localhost:8080   Dex (OIDC): http://localhost:5556/dex
+# Every password and secret here is a local-development throwaway.
+name: civil-os
+
+x-postgres-client: &postgres-client
+  image: postgis/postgis:18-3.6
+  environment:
+    PGHOST: db
+    PGUSER: postgres
+    PGPASSWORD: civil-os-dev
+  restart: "no"
+
+x-go-service: &go-service
+  restart: unless-stopped
+  depends_on:
+    seed:
+      condition: service_completed_successfully
+
+services:
+  db:
+    image: postgis/postgis:18-3.6
+    environment:
+      POSTGRES_PASSWORD: civil-os-dev
+    volumes:
+      - db-data:/var/lib/postgresql
+    healthcheck:
+      # TCP, not the socket: the image's init phase runs a socket-only server.
+      test: ["CMD", "pg_isready", "-U", "postgres", "-h", "127.0.0.1"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  migrate:
+    <<: *postgres-client
+    entrypoint: ["sh", "/dev-scripts/migrate.sh"]
+    volumes:
+      - ./database/migrations:/migrations:ro
+      - ./dev/migrate.sh:/dev-scripts/migrate.sh:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  seed:
+    <<: *postgres-client
+    entrypoint: ["sh", "/dev-scripts/seed.sh"]
+    volumes:
+      - ./database/fixtures:/fixtures:ro
+      - ./dev/seed.sh:/dev-scripts/seed.sh:ro
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  dex:
+    image: ghcr.io/dexidp/dex:v2.44.0
+    command: ["dex", "serve", "/etc/dex/config.yaml"]
+    volumes:
+      - ./dev/dex.yaml:/etc/dex/config.yaml:ro
+    ports:
+      - "127.0.0.1:5556:5556"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:5556/dex/.well-known/openid-configuration"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  database-reader:
+    <<: *go-service
+    build:
+      context: .
+      dockerfile: services/database-reader/dockerfile
+    environment:
+      CIVIL_OS_LOG_LEVEL: INFO
+      CIVIL_OS_READER_DB_HOST: db
+      CIVIL_OS_READER_DB_USER: postgres
+      CIVIL_OS_READER_DB_PASS: civil-os-dev
+      CIVIL_OS_READER_DB_NAME: civil
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O- --header 'Content-Type: application/json' --post-data '{}' http://127.0.0.1:50051/grpc.health.v1.Health/Check | grep -q SERVING"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  database-writer:
+    <<: *go-service
+    build:
+      context: .
+      dockerfile: services/database-writer/dockerfile
+    environment:
+      CIVIL_OS_LOG_LEVEL: INFO
+      CIVIL_OS_WRITER_DB_HOST: db
+      CIVIL_OS_WRITER_DB_USER: postgres
+      CIVIL_OS_WRITER_DB_PASS: civil-os-dev
+      CIVIL_OS_WRITER_DB_NAME: civil
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O- --header 'Content-Type: application/json' --post-data '{}' http://127.0.0.1:50052/grpc.health.v1.Health/Check | grep -q SERVING"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  tile-server:
+    <<: *go-service
+    build:
+      context: .
+      dockerfile: services/tile-server/dockerfile
+    environment:
+      CIVIL_OS_TILE_SERVER_DATABASE_URL: postgres://postgres:civil-os-dev@db:5432/civil?sslmode=disable
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/tiles/health"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  gateway:
+    build:
+      context: .
+      dockerfile: services/gateway/dockerfile
+    restart: unless-stopped
+    environment:
+      CIVIL_OS_LOG_LEVEL: INFO
+      # Tokens carry the host-facing issuer; keys are fetched over the compose network.
+      CIVIL_OS_GATEWAY_AUTH_SERVER: http://localhost:5556/dex
+      CIVIL_OS_GATEWAY_IDP_HOST: dex:5556/dex
+      CIVIL_OS_GATEWAY_ALLOWED_CLIENT_IDS: '["civil-os-dev"]'
+      CIVIL_OS_GATEWAY_READER_HOST: database-reader:50051
+      CIVIL_OS_GATEWAY_WRITER_HOST: database-writer:50052
+      CIVIL_OS_GATEWAY_TILE_SERVER_HOST: tile-server:3000
+      CIVIL_OS_GATEWAY_DEX_GRPC_ADDRESS: dex:5557
+      CIVIL_OS_GATEWAY_INSTANCE_METADATA_URL: file:///etc/civil-os/instance-metadata.json
+    volumes:
+      - ./dev/instance-metadata.json:/etc/civil-os/instance-metadata.json:ro
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      dex:
+        condition: service_healthy
+      database-reader:
+        condition: service_healthy
+      database-writer:
+        condition: service_healthy
+      tile-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/health"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  db-data:

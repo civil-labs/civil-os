@@ -122,6 +122,7 @@ The imported `.github/`, `mise.toml`, `go.mod` and `.gitignore` files stay as-is
   4. Check `properties` parses as a JSON object.
   5. Run a dynamic `UPDATE core.parcel_attributes SET … , trace_id=$n WHERE parcel_id=$1 AND legal_valid_range @> now()`, setting only the fields present. Zero rows returns `FailedPrecondition`.
 - Map Postgres check violation `23514` on `properties_size_limit` to `InvalidArgument`.
+- *(Clarified during implementation.)* `land_area_sq_ft`, `frontage_ft` and `depth_ft` must be finite and non-negative, else `InvalidArgument`. The mesh request has no protovalidate rules, so the writer checks for itself.
 - `trace_id` comes from parsing the `traceparent` header, else 16 random bytes as hex.
 
 **3.4 Gateway**

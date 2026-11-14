@@ -198,7 +198,9 @@ Integration tests use build tag `integration` and run through `mise run test:int
 - **Gateway error codes.** Fourteen handlers wrapped every mesh error as `Internal`. To meet spec §8 (mesh error-code propagation), they now return the mesh error unchanged, as the per-attribute RPCs and `UpdateParcel` already did.
 - **`atlas.sum` check is stronger than planned.** `database/migrations_test.go` recomputes Atlas's per-file and total hashes, so an edited migration fails CI without an Atlas licence.
 - **Test database per test.** One PostGIS container per test binary. Migrations and fixtures load once into a template database, and each test gets its own `CREATE DATABASE … TEMPLATE` clone.
-- **Open questions for the owner, pinned by tests rather than changed:** the reader still returns voided parcels from the attribute and summary RPCs (`TestVoidedParcelVisibility`). The comparables requests' `selected_parcel_ids` have no `uuid` rule.
+- **Voided parcels (owner decision, 2026-11-14):** every current read hides voided parcels. Separate APIs for them will come later. The attribute RPCs and summaries were changed to match the comparables, tiles and writer. Every by-ID and by-feature reader test asks for the voided parcel and requires it to be absent.
+- **Comparables IDs (owner decision, 2026-11-14):** each item of `selected_parcel_ids` on `GetEquityComparables` and `GetSalesComparables` must be a UUID.
+- **Deferred to their own features:** the timeout on the startup JWKS fetch (`docs/idp-startup-resilience`), Dex address validation (`docs/dex-address-validation`) and `traceparent` in the CORS allow-list (`docs/browser-trace-propagation`).
 
 ## PR 6: local stack and e2e (`feat: docker compose quickstart`)
 

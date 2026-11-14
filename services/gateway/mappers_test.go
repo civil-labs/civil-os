@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	validate "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -59,8 +60,15 @@ func scalar(fd protoreflect.FieldDescriptor, i int) protoreflect.Value {
 	case protoreflect.BoolKind:
 		return protoreflect.ValueOfBool(true)
 	case protoreflect.EnumKind:
+		// A value the field's enum.in rule allows, else the first non-zero
+		// value (zero is UNSPECIFIED, which rules usually exclude).
+		if rules, ok := proto.GetExtension(fd.Options(), validate.E_Field).(*validate.FieldRules); ok {
+			if in := rules.GetEnum().GetIn(); len(in) > 0 {
+				return protoreflect.ValueOfEnum(protoreflect.EnumNumber(in[0]))
+			}
+		}
 		vals := fd.Enum().Values()
-		return protoreflect.ValueOfEnum(vals.Get(vals.Len() - 1).Number())
+		return protoreflect.ValueOfEnum(vals.Get(min(1, vals.Len()-1)).Number())
 	case protoreflect.Int32Kind, protoreflect.Sint32Kind, protoreflect.Sfixed32Kind:
 		return protoreflect.ValueOfInt32(int32(n))
 	case protoreflect.Int64Kind, protoreflect.Sint64Kind, protoreflect.Sfixed64Kind:

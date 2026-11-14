@@ -55,7 +55,7 @@ curl -s http://localhost:8080/civil.public.parcels.v1.ParcelsService/GetParcelsW
   -d '{"parcelIds": ["a0000000-0000-4000-8000-000000000002"]}'
 ```
 
-Update its frontage, then read it back:
+Update its frontage, then read it back. `UpdateParcel` returns an empty `{}`:
 
 ```sh
 curl -s http://localhost:8080/civil.public.parcels.v1.ParcelsService/UpdateParcel \

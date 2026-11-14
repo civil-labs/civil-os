@@ -305,6 +305,22 @@ Integration tests use build tag `integration` and run through `mise run test:int
 
 **8.3 Hook:** `.claude/settings.json` gets a `PreToolUse` hook (`.claude/hooks/block-gen-edits.sh`) that blocks Edit and Write under `api/gen/` and `internal/gen/`.
 
+
+**8.4 Stack tasks (spec §7.1, added 2026-11-14 at the owner's request)**
+- `mise.toml`:
+  - add `up`, `down` and `token`;
+  - make `test:e2e` depend on `up`.
+- `token` is a small POSIX `sh` script, `dev/token.sh`, called by the task. It writes only the token to stdout and errors to stderr.
+- `ci.yml` e2e job:
+  - `mise run test:e2e` replaces the separate compose-up and `go test` steps;
+  - logs on failure stay;
+  - teardown becomes `mise run down`.
+- Docs: README (a mise variant alongside the plain compose quickstart, plus `TOKEN=$(mise run token)` as an alternative), `CLAUDE.md` commands, the `test/e2e` package comment.
+- **Checks for 8.4:**
+  - from a fresh clone, `mise run test:e2e` brings the stack up and passes;
+  - `TOKEN=$(mise run token)` works in the README curl calls;
+  - after `mise run down`, `docker compose ps -a` and `docker volume ls` show no civil-os containers or volumes;
+  - CI's e2e job passes using the tasks.
 **Checks:**
 - Follow every README command verbatim from a fresh clone.
 - The hook blocks a test edit to `api/gen/go/...`.

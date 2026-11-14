@@ -1,16 +1,18 @@
 package main
 
 import (
-	"fmt"
+	"errors"
 	"log/slog"
-	"os"
-	"strconv"
-	"strings"
+
+	"github.com/civil-labs/civil-os/internal/envconfig"
 )
 
-// Config holds all the runtime configuration
+const service = envconfig.Writer
+
+// Config holds all the runtime configuration. See spec §5.5 / docs/architecture.md
+// for the CIVIL_OS_WRITER_* variables.
 type Config struct {
-	Verbose          bool
+	LogLevel         slog.Level
 	Port             uint16
 	DatabaseHost     string
 	DatabasePort     uint16
@@ -19,76 +21,33 @@ type Config struct {
 	DatabaseName     string
 }
 
-func LoadConfig(logger *slog.Logger) (*Config, error) {
-	// Define the list of required environment variables
-	required := []string{
-		"CIVIL_DB_HOST",
-		"CIVIL_DB_USER",
-		"CIVIL_DB_PASS",
-		"CIVIL_DB_NAME",
+// LoadConfig reads the writer's configuration from env. It fails on any
+// legacy CIVIL_* variable, a missing required variable, or an invalid value.
+func LoadConfig(env envconfig.Env) (*Config, error) {
+	if err := env.RejectLegacy(); err != nil {
+		return nil, err
 	}
 
-	// Loop through and check for missing ones
-	var missing []string
-	for _, key := range required {
-		if os.Getenv(key) == "" {
-			missing = append(missing, key)
-		}
+	key := func(setting string) string { return envconfig.Key(service, setting) }
+
+	if err := env.Require(key("DB_HOST"), key("DB_USER"), key("DB_PASS"), key("DB_NAME")); err != nil {
+		return nil, err
 	}
 
-	// If any are missing, return a detailed error
-	if len(missing) > 0 {
-		return nil, fmt.Errorf("missing required environment variables: %s", strings.Join(missing, ", "))
+	level, levelErr := env.LogLevel(service)
+	port, portErr := env.Port(key("PORT"), 50052)
+	dbPort, dbPortErr := env.Port(key("DB_PORT"), 5432)
+	if err := errors.Join(levelErr, portErr, dbPortErr); err != nil {
+		return nil, err
 	}
 
-	// Return the populated config struct
-	// You can also set defaults here for optional vars (like Port)
 	return &Config{
-		Verbose:          getVerboseEnv(logger),
-		Port:             getPortEnv("CIVIL_PORT", 50051, logger),
-		DatabaseHost:     os.Getenv("CIVIL_DB_HOST"),
-		DatabasePort:     getPortEnv("CIVIL_DB_PORT", 5432, logger),
-		DatabaseUsername: os.Getenv("CIVIL_DB_USER"),
-		DatabasePassword: os.Getenv("CIVIL_DB_PASS"),
-		DatabaseName:     os.Getenv("CIVIL_DB_NAME"),
+		LogLevel:         level,
+		Port:             port,
+		DatabaseHost:     env.Get(key("DB_HOST")),
+		DatabasePort:     dbPort,
+		DatabaseUsername: env.Get(key("DB_USER")),
+		DatabasePassword: env.Get(key("DB_PASS")),
+		DatabaseName:     env.Get(key("DB_NAME")),
 	}, nil
-}
-
-// Helper for optional variables
-func getEnv(key string, fallback string) string {
-	if value, exists := os.LookupEnv(key); exists {
-		return value
-	}
-	return fallback
-}
-
-func getPortEnv(key string, fallback uint16, logger *slog.Logger) uint16 {
-	if value, exists := os.LookupEnv(key); exists {
-		var intValue, err = strconv.ParseUint(value, 10, 16)
-
-		if err != nil {
-			logger.Warn("Failure in parsing integer. Falling back to default", slog.Any("error", err), slog.Int("applied_default", int(fallback)))
-			return fallback
-		}
-
-		return uint16(intValue)
-	} else {
-		return fallback
-	}
-
-}
-
-func getVerboseEnv(logger *slog.Logger) bool {
-	if value, exists := os.LookupEnv("CIVIL_VERBOSE"); exists {
-		boolValue, err := strconv.ParseBool(value)
-
-		if err != nil {
-			logger.Warn("Failure in parsing CIVIL_VERBOSE. Falling back to default", slog.Any("error", err), slog.Bool("applied_default", false))
-			return false
-		}
-
-		return boolValue
-	}
-
-	return false
 }

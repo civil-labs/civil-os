@@ -33,6 +33,8 @@ import (
 	meshvaluationsv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/valuations/v1/valuationsv1connect"
 	meshzoningv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/zoning/v1/zoningv1connect"
 
+	"github.com/civil-labs/civil-os/internal/envconfig"
+
 	"connectrpc.com/connect"
 	"connectrpc.com/grpchealth"
 	"connectrpc.com/validate"
@@ -43,23 +45,19 @@ func main() {
 	_, cancelApp := context.WithCancel(context.Background())
 	defer cancelApp()
 
-	var programLevel = new(slog.LevelVar)
+	// Log at INFO until the configured level is known; a LevelVar lets the
+	// level change without rebuilding the logger.
+	logLevel := new(slog.LevelVar)
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: logLevel}))
+	slog.SetDefault(logger)
 
-	programLevel.Set(slog.LevelInfo)
-
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		Level: programLevel,
-	}))
-
-	config, err := LoadConfig(logger)
+	config, err := LoadConfig(envconfig.FromOS())
 	if err != nil {
 		logger.Error("failed to load config", slog.Any("error", err))
 		os.Exit(1)
 	}
-
-	if config.Verbose {
-		programLevel.Set(slog.LevelDebug)
-	}
+	logLevel.Set(config.LogLevel)
+	logger.Info("log level set", slog.String("log_level", config.LogLevel.String()))
 
 	logger.Info("Starting proxy", slog.Any("address", config.TileServerHost))
 
@@ -113,6 +111,10 @@ func main() {
 	}
 
 	auth, err := RequireAuth(config.AuthServer, config.IDPHost, config.AllowedClientsIds, logger)
+	if err != nil {
+		logger.Error("failed to set up authentication", slog.Any("error", err))
+		os.Exit(1)
+	}
 
 	dbReaderAddress := "http://" + config.DBReaderHost
 
@@ -161,7 +163,7 @@ func main() {
 		)
 		logger.Info("parcel writes enabled", slog.String("writer_host", config.DBWriterHost))
 	} else {
-		logger.Info("parcel writes disabled: CIVIL_DB_WRITER_HOST is not set")
+		logger.Info("parcel writes disabled: CIVIL_OS_GATEWAY_WRITER_HOST is not set")
 	}
 
 	parcelsPath, parcelsHandler := parcelsv1connect.NewParcelsServiceHandler(
@@ -270,7 +272,7 @@ func main() {
 		mux.Handle(dexPath, CORSMiddleware(auth(dexHandler), logger))
 		logger.Info("Dex admin API enabled", slog.String("address", config.DexGrpcAddress))
 	} else {
-		logger.Info("Dex admin API disabled: CIVIL_DEX_GRPC_ADDRESS is not set")
+		logger.Info("Dex admin API disabled: CIVIL_OS_GATEWAY_DEX_GRPC_ADDRESS is not set")
 	}
 
 	mux.Handle("/tiles/", CORSMiddleware(auth(proxy), logger))

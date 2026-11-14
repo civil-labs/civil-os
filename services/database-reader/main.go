@@ -13,6 +13,8 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"github.com/civil-labs/civil-os/internal/envconfig"
+
 	"connectrpc.com/grpchealth"
 
 	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/improvements/v1/improvementsv1connect"
@@ -33,22 +35,22 @@ func main() {
 	ctxApp, cancelApp := context.WithCancel(context.Background())
 	defer cancelApp()
 
-	opts := &slog.HandlerOptions{
-		Level: slog.LevelDebug, // Show debug logs!
-	}
+	// Log at INFO until the configured level is known; a LevelVar lets the
+	// level change without rebuilding the logger.
+	logLevel := new(slog.LevelVar)
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: logLevel}))
+	slog.SetDefault(logger)
 
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, opts))
-
-	config, err := LoadConfig(logger)
-
+	config, err := LoadConfig(envconfig.FromOS())
 	if err != nil {
 		logger.Error("failed to load config", slog.Any("error", err))
 		os.Exit(1)
 	}
+	logLevel.Set(config.LogLevel)
 
 	logger.Info("service initialized",
 		slog.Int("grpc_port", int(config.Port)),
-		slog.Bool("verbose", config.Verbose),
+		slog.String("log_level", config.LogLevel.String()),
 	)
 
 	dbPoolConfig, err := BuildPoolConfig(config)

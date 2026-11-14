@@ -153,6 +153,8 @@ func validString(fd protoreflect.FieldDescriptor) string {
 	return name + "-value"
 }
 
+func discardLogger() *slog.Logger { return slog.New(slog.DiscardHandler) }
+
 type gateway struct {
 	url    string
 	mesh   *fakeMesh
@@ -193,7 +195,7 @@ func startGateway(t *testing.T, mutate func(*Config)) *gateway {
 	if mutate != nil {
 		mutate(cfg)
 	}
-	h, err := newHandler(cfg, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	h, err := newHandler(cfg, discardLogger())
 	if err != nil {
 		t.Fatal(err)
 	}

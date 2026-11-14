@@ -18,7 +18,8 @@ In **Settings → Rules → Rulesets**, add one ruleset for `main`:
 - [ ] Require these status checks to pass. They appear in the list once they've
   run at least once:
   - `Go build, vet, unit and integration tests`
-  - `Protos, generated code and breaking changes`
+  - `Protos and generated code`
+  - `Public API breaking changes`
   - `JS SDK packs and imports`
   - `E2E (docker compose)`
   - `No customer-specific data`

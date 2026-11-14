@@ -333,6 +333,11 @@ Integration tests use build tag `integration` and run through `mise run test:int
 - **The hook also covers `sdk/js/gen/` and `MultiEdit`.** It parses `file_path` with `sed`, because `jq` isn't guaranteed on contributor machines.
 - **The first release PR (#9) proposed only `v0.2.0`** (spec acceptance 6). No user-facing commit had touched `api/proto/public` since the bootstrap SHA, and squash merges keep only the PR title, so no `Release-As:` footer could survive. PR #10 (`feat(public-api): …`, adds `api/proto/public/README.md`) triggers `public-api-v0.1.0`.
 
+**Fixed after the final verification (2026-11-14):**
+- **F9:** `images.yml` sets `flavor: latest=false`. metadata-action's default `latest=auto` had tagged `v0.2.0` and `v0.2.1` as `:latest`, which still points at `v0.2.1`.
+- **N4:** Node is pinned exactly (`22.23.4` in `mise.toml`), and so is npm (`11.21.1`). `public-api-release.yml` now uses the mise-installed Node instead of `setup-node`, and writes an npm token only when `NPM_TOKEN` is set.
+- **§4.3 bypass:** `buf breaking` moved to its own `breaking.yml`, which also re-runs when a PR title is edited. It allows a break only when the title matches `type!:` or `type(scope)!:`. A `!` elsewhere in the title no longer counts. Squash merges keep only the title, so a `BREAKING CHANGE` footer in the PR body can't mark a PR breaking.
+
 ## Final verification (before reporting the effort done)
 
 1. Run on the tip of the last PR:

@@ -309,6 +309,14 @@ Integration tests use build tag `integration` and run through `mise run test:int
 - Follow every README command verbatim from a fresh clone.
 - The hook blocks a test edit to `api/gen/go/...`.
 
+**Clarified during implementation (2026-11-14):**
+- **The load-balancing note follows the code, not spec §5.1.** The gateway calls the reader and writer with `http.DefaultClient` over `http://`, which is HTTP/1.1 with a keep-alive pool, not one HTTP/2 connection. `docs/architecture.md` describes it that way. Balancing is still per connection under `ClusterIP` and ztunnel.
+- **`SalesService` and `TileService` are defined but not served.** The gateway registers neither. Sales comparables go through `ParcelsService`, and tiles through the `/tiles/` proxy. The docs say so.
+- **No `mise run up` task** (spec §2/§9 listed one). The docs use `docker compose up --build --wait` directly.
+- **`mise run check` is build + vet + buf lint + unit tests.** `buf format`, generated-code freshness and `buf breaking` run in CI only. `CLAUDE.md` lists them.
+- **The hook also covers `sdk/js/gen/` and `MultiEdit`.** It parses `file_path` with `sed`, because `jq` isn't guaranteed on contributor machines.
+- **The first release PR (#9) proposed only `v0.2.0`** (spec acceptance 6). No user-facing commit had touched `api/proto/public` since the bootstrap SHA, and squash merges keep only the PR title, so no `Release-As:` footer could survive. PR #10 (`feat(public-api): …`, adds `api/proto/public/README.md`) triggers `public-api-v0.1.0`.
+
 ## Final verification (before reporting the effort done)
 
 1. Run on the tip of the last PR:

@@ -56,6 +56,8 @@ The imported `.github/`, `mise.toml`, `go.mod` and `.gitignore` files stay as-is
 
 ## PR 2: single module and build (`refactor/single-module`)
 
+**2.0 Remove customer hostnames.** This step was added during PR 1, when a scan found two customer hostnames in the OpenAPI `servers` block of `api/proto/public/civil/public/parcels/v1/parcels.proto`. They are replaced with `http://localhost:8080`, the compose gateway. The imported history still contains them; the owner accepted that, since civil-blueprints is already public.
+
 **2.1 Root scaffolding**
 - **Add** `go.mod` (`module github.com/civil-labs/civil-os`, `go 1.26.1`) and `mise.toml` with these pins: go 1.26.1, buf 1.66.1, node 22, atlas 1.3.0.
 - **`mise.toml` tasks:** `generate`, `build`, `test`, `test:integration`, `test:e2e`, `lint`, `check`, `up`, `db:diff`, `db:validate`. The last two are ported from the schema repo's task.

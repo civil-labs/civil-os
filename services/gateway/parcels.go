@@ -36,7 +36,7 @@ func (s *ParcelServer) GetParcelsWithImprovementSummaryByParcelId(
 	meshRes, err := s.dbReaderClient.GetParcelsWithImprovementSummaryByParcelId(ctx, meshReq)
 	if err != nil {
 		s.logger.Error("upstream GetParcelsWithImprovementSummaryByParcelId request failed", slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err // keep the mesh status code
 	}
 
 	publicRes := &publicparcelsv1.GetParcelsWithImprovementSummaryByParcelIdResponse{
@@ -136,7 +136,7 @@ func (s *ParcelServer) GetEquityComparables(
 
 	if err != nil {
 		s.logger.Error("upstream GetEquityComparables request failed", slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err // keep the mesh status code
 	}
 
 	publicRes := &publicparcelsv1.GetEquityComparablesResponse{
@@ -164,7 +164,7 @@ func (s *ParcelServer) GetSalesComparables(
 
 	if err != nil {
 		s.logger.Error("upstream GetSalesComparables request failed", slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err // keep the mesh status code
 	}
 
 	publicRes := &publicparcelsv1.GetSalesComparablesResponse{
@@ -270,7 +270,7 @@ func (s *ParcelServer) GetParcelsWithImprovementSummaryByFeatureId(
 	meshRes, err := s.dbReaderClient.GetParcelsWithImprovementSummaryByFeatureId(ctx, meshReq)
 	if err != nil {
 		s.logger.Error("upstream GetParcelsWithImprovementSummaryByFeatureId request failed", slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err // keep the mesh status code
 	}
 
 	publicRes := &publicparcelsv1.GetParcelsWithImprovementSummaryByFeatureIdResponse{
@@ -294,7 +294,7 @@ func (s *ParcelServer) GetParcelIdsByFeatureId(
 	meshRes, err := s.dbReaderClient.GetParcelIdsByFeatureId(ctx, meshReq)
 	if err != nil {
 		s.logger.Error("upstream GetParcelIdsByFeatureId request failed", slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err // keep the mesh status code
 	}
 
 	publicRes := &publicparcelsv1.GetParcelIdsByFeatureIdResponse{
@@ -316,7 +316,7 @@ func (s *ParcelServer) GetEstimatedParcelsExtentWGS84(
 	meshRes, err := s.dbReaderClient.GetEstimatedParcelsExtentWGS84(ctx, meshReq)
 	if err != nil {
 		s.logger.Error("upstream GetEstimatedParcelsExtentWGS84 request failed", slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err // keep the mesh status code
 	}
 
 	publicRes := &publicparcelsv1.GetEstimatedParcelsExtentWGS84Response{

@@ -36,11 +36,12 @@ func RequireAuth(authServer string, idpHost string, allowedClientIDs []string, l
 		return nil, errors.New("no allowed client IDs are configured")
 	}
 
+	issuer := issuerURL(authServer)
 	providerConfig := oidc.ProviderConfig{
-		IssuerURL:   "https://" + authServer,
-		AuthURL:     "https://" + authServer,
-		TokenURL:    "https://" + authServer + "/token",
-		UserInfoURL: "https://" + authServer + "/userinfo",
+		IssuerURL:   issuer,
+		AuthURL:     issuer,
+		TokenURL:    issuer + "/token",
+		UserInfoURL: issuer + "/userinfo",
 		JWKSURL:     "http://" + idpHost + "/keys",
 		Algorithms:  []string{"RS256"}, // Dex uses RS256 by default
 	}
@@ -143,4 +144,16 @@ func DumpRawJWKS(jwksURL string, logger *slog.Logger) {
 	}
 
 	logger.Debug("JWKS response", slog.Any("status", resp.StatusCode), slog.Any("payload", string(body)))
+}
+
+// issuerURL returns the OIDC issuer for the configured auth server. A value
+// with an explicit http:// or https:// scheme is used as given (for example a
+// local Dex at http://dex:5556); a bare host keeps the historical https://
+// default. A trailing slash is removed so the issuer matches token "iss" claims.
+func issuerURL(authServer string) string {
+	issuer := authServer
+	if !strings.HasPrefix(issuer, "http://") && !strings.HasPrefix(issuer, "https://") {
+		issuer = "https://" + issuer
+	}
+	return strings.TrimSuffix(issuer, "/")
 }

@@ -41,10 +41,6 @@ import (
 )
 
 func main() {
-	// Create context, logger, and config first
-	_, cancelApp := context.WithCancel(context.Background())
-	defer cancelApp()
-
 	// Log at INFO until the configured level is known; a LevelVar lets the
 	// level change without rebuilding the logger.
 	logLevel := new(slog.LevelVar)
@@ -59,6 +55,60 @@ func main() {
 	logLevel.Set(config.LogLevel)
 	logger.Info("log level set", slog.String("log_level", config.LogLevel.String()))
 
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	if err := run(ctx, config, logger); err != nil {
+		logger.Error("gateway stopped with an error", slog.Any("error", err))
+		os.Exit(1)
+	}
+	logger.Info("teardown complete. exiting.")
+}
+
+// run serves the gateway until ctx is cancelled (SIGINT/SIGTERM), then shuts
+// down gracefully.
+func run(ctx context.Context, config *Config, logger *slog.Logger) error {
+	handler, err := newHandler(config, logger)
+	if err != nil {
+		return err
+	}
+
+	p := new(http.Protocols)
+	p.SetHTTP1(true)
+	// Use h2c so we can serve HTTP/2 without TLS.
+	p.SetUnencryptedHTTP2(true)
+	httpSrv := http.Server{
+		Addr:      fmt.Sprintf(":%d", config.Port),
+		Handler:   handler,
+		Protocols: p,
+	}
+
+	serverErr := make(chan error, 1)
+	go func() {
+		logger.Info("starting connect server", slog.Int("port", int(config.Port)))
+		serverErr <- httpSrv.ListenAndServe()
+	}()
+
+	select {
+	case err := <-serverErr:
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			return fmt.Errorf("server crashed: %w", err)
+		}
+		return nil
+	case <-ctx.Done():
+		logger.Info("received shutdown signal")
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+		defer cancel()
+		if err := httpSrv.Shutdown(shutdownCtx); err != nil {
+			return fmt.Errorf("HTTP graceful shutdown failed: %w", err)
+		}
+		return nil
+	}
+}
+
+// newHandler builds the gateway's HTTP handler: public Connect services backed
+// by the mesh, the tile proxy, the optional Dex admin API, and health checks.
+func newHandler(config *Config, logger *slog.Logger) (http.Handler, error) {
 	logger.Info("Starting proxy", slog.Any("address", config.TileServerHost))
 
 	// Create the Reverse Proxy for the Tile Server with a custom Director
@@ -112,8 +162,7 @@ func main() {
 
 	auth, err := RequireAuth(config.AuthServer, config.IDPHost, config.AllowedClientsIds, logger)
 	if err != nil {
-		logger.Error("failed to set up authentication", slog.Any("error", err))
-		os.Exit(1)
+		return nil, fmt.Errorf("failed to set up authentication: %w", err)
 	}
 
 	dbReaderAddress := "http://" + config.DBReaderHost
@@ -255,8 +304,7 @@ func main() {
 		// a misconfiguration, so refuse to start rather than run without the API.
 		conn, err := grpc.NewClient(config.DexGrpcAddress, grpc.WithAuthority("idp"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
-			logger.Error("invalid Dex gRPC address", slog.String("address", config.DexGrpcAddress), slog.Any("error", err))
-			os.Exit(1)
+			return nil, fmt.Errorf("invalid Dex gRPC address %q: %w", config.DexGrpcAddress, err)
 		}
 
 		dexServer := &DexServer{
@@ -287,61 +335,7 @@ func main() {
 	healthPath, healthHandler := grpchealth.NewHandler(checker)
 	mux.Handle(healthPath, healthHandler)
 
-	listenPort := fmt.Sprintf(":%d", config.Port)
-
-	p := new(http.Protocols)
-	p.SetHTTP1(true)
-
-	// Use h2c so we can serve HTTP/2 without TLS.
-	p.SetUnencryptedHTTP2(true)
-	httpSrv := http.Server{
-		Addr:      listenPort,
-		Handler:   mux,
-		Protocols: p,
-	}
-
-	shutdownSig := make(chan os.Signal, 1)
-	signal.Notify(shutdownSig, os.Interrupt, syscall.SIGTERM)
-
-	serverErr := make(chan error, 1)
-
-	// Start the HTTP server in a background goroutine
-	go func() {
-		logger.Info("starting connect server", slog.Int("port", int(config.Port)))
-		serverErr <- httpSrv.ListenAndServe()
-	}()
-
-	// This is inited by default to go's int zero value, zero
-	var exitCode int
-
-	// Block main() until something happens
-	select {
-	case err := <-serverErr:
-		// The server crashed prematurely
-		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			logger.Error("server crashed", slog.Any("error", err))
-			exitCode = 1
-		}
-	case sig := <-shutdownSig:
-		// Graceful shutdown signal received
-		logger.Info("received shutdown signal", slog.String("signal", sig.String()))
-
-		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 15*time.Second)
-		defer shutdownCancel()
-
-		if err := httpSrv.Shutdown(shutdownCtx); err != nil {
-			logger.Error("HTTP graceful shutdown failed", slog.Any("error", err))
-			exitCode = 1
-		}
-	}
-
-	// This block runs no matter how the select statement unblocked.
-	slog.Info("stopping background workers...")
-	cancelApp()
-
-	slog.Info("teardown complete. exiting.")
-	os.Exit(exitCode)
-
+	return mux, nil
 }
 
 func CORSMiddleware(next http.Handler, logger *slog.Logger) http.Handler {

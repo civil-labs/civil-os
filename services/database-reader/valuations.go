@@ -21,7 +21,7 @@ func (s *APIServer) GetValuations(
 		SELECT 
 			public_id::text, 
 			valuation_date
-		FROM public.valuations
+		FROM core.valuations
 	`)
 	if err != nil {
 		s.logger.Error("failed to query valuations", slog.Any("error", err))

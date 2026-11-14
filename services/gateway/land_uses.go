@@ -25,7 +25,7 @@ func (s *LandUseServer) GetLandUses(
 	meshRes, err := s.dbReaderClient.GetLandUses(ctx, meshReq)
 	if err != nil {
 		s.logger.Error("upstream GetLandUses request failed", slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err // keep the mesh status code
 	}
 
 	publicRes := &publiclandusesv1.GetLandUsesResponse{
@@ -45,7 +45,7 @@ func (s *LandUseServer) GetLandUseTypes(
 	meshRes, err := s.dbReaderClient.GetLandUseTypes(ctx, meshReq)
 	if err != nil {
 		s.logger.Error("upstream GetLandUseTypes request failed", slog.Any("error", err))
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err // keep the mesh status code
 	}
 
 	publicRes := &publiclandusesv1.GetLandUseTypesResponse{

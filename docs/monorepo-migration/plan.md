@@ -155,7 +155,7 @@ The imported `.github/`, `mise.toml`, `go.mod` and `.gitignore` files stay as-is
 
 **4.4** *(Added by owner request after PR 3.)* Gateway auth fails fast. `main` handles `RequireAuth`'s error and exits, and `RequireAuth` returns an error for an empty auth server, IdP host or client ID list. As in spec §5.5, an invalid port or `ALLOWED_CLIENT_IDS` also stops startup.
 
-> Note for PR 6: `RequireAuth` hard-codes `https://` for the issuer and token URLs. A local Dex served over `http` will fail issuer verification, so PR 6 must either serve Dex over TLS in compose or let `CIVIL_OS_GATEWAY_AUTH_SERVER` carry its scheme. The second option is a small spec change, raised with the owner then.
+> Note for PR 6, **resolved 2026-11-14 (owner chose option 1) and implemented as PR 5 step 5.0**: `CIVIL_OS_GATEWAY_AUTH_SERVER` may carry its scheme (`http://dex:5556`); a bare host keeps the `https://` default. Doing it in PR 5 lets the auth tests use a plain-http fake issuer.
 
 **Checks:** `go build ./... && go vet ./...` passes, and `grep -rn '"CIVIL_[A-Z]' services | grep -v CIVIL_OS_` finds nothing.
 
@@ -191,6 +191,16 @@ Integration tests use build tag `integration` and run through `mise run test:int
 - `go test ./...` passes.
 - `go test -tags integration ./...` passes (needs E2).
 - Coverage report attached to the PR.
+
+**Clarified during implementation (2026-11-14):**
+- **search_path.** The reader uses unqualified table names and relies on the database-level `search_path = core, geo, extensions, public` that cluster infrastructure sets. The fixture file and `internal/testutil` set the same path, so tests match production. Compose (PR 6) must set it too.
+- **Reader bug fixed.** `GetValuations`, `GetNeighborhoodDefinitions` and `GetNeighborhoods` read from `public.*`, but the tables live in `core`, so they failed in every deployment. They are now qualified as `core.*`.
+- **Gateway error codes.** Fourteen handlers wrapped every mesh error as `Internal`. To meet spec §8 (mesh error-code propagation), they now return the mesh error unchanged, as the per-attribute RPCs and `UpdateParcel` already did.
+- **`atlas.sum` check is stronger than planned.** `database/migrations_test.go` recomputes Atlas's per-file and total hashes, so an edited migration fails CI without an Atlas licence.
+- **Test database per test.** One PostGIS container per test binary. Migrations and fixtures load once into a template database, and each test gets its own `CREATE DATABASE … TEMPLATE` clone.
+- **Voided parcels (owner decision, 2026-11-14):** every current read hides voided parcels. Separate APIs for them will come later. The attribute RPCs and summaries were changed to match the comparables, tiles and writer. Every by-ID and by-feature reader test asks for the voided parcel and requires it to be absent.
+- **Comparables IDs (owner decision, 2026-11-14):** each item of `selected_parcel_ids` on `GetEquityComparables` and `GetSalesComparables` must be a UUID.
+- **Deferred to their own features:** the timeout on the startup JWKS fetch (`docs/idp-startup-resilience`), Dex address validation (`docs/dex-address-validation`) and `traceparent` in the CORS allow-list (`docs/browser-trace-propagation`).
 
 ## PR 6: local stack and e2e (`feat: docker compose quickstart`)
 

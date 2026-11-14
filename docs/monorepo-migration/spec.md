@@ -199,7 +199,7 @@ The scheme is `CIVIL_OS_<SERVICE>_<SETTING>`, with `<SERVICE>` one of `GATEWAY`,
 |---|---|---|---|---|
 | all Go services | `CIVIL_VERBOSE` (bool) | `CIVIL_OS_LOG_LEVEL`, overridden per service by `CIVIL_OS_<SERVICE>_LOG_LEVEL` | no | `INFO` |
 | gateway | `CIVIL_PORT` | `CIVIL_OS_GATEWAY_PORT` | no | `8080` |
-| gateway | `CIVIL_AUTH_SERVER` | `CIVIL_OS_GATEWAY_AUTH_SERVER` | yes | |
+| gateway | `CIVIL_AUTH_SERVER` | `CIVIL_OS_GATEWAY_AUTH_SERVER`: the OIDC issuer. Either a bare host (`https://` assumed, as before) or a full URL with `http://` or `https://` *(amended 2026-11-14, owner decision, so local Dex can run over http)* | yes | |
 | gateway | `CIVIL_IDP_HOST` | `CIVIL_OS_GATEWAY_IDP_HOST` | yes | |
 | gateway | `CIVIL_ALLOWED_CLIENT_IDS` | `CIVIL_OS_GATEWAY_ALLOWED_CLIENT_IDS` (JSON array) | yes | |
 | gateway | `CIVIL_INSTANCE_METADATA_URL` | `CIVIL_OS_GATEWAY_INSTANCE_METADATA_URL` | yes | |

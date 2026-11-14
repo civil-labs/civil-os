@@ -703,7 +703,11 @@ message GetEquityComparablesRequest {
 
   repeated ComparableCriteria criteria = 2;
 
-  repeated string selected_parcel_ids = 3;
+  repeated string selected_parcel_ids = 3 [(buf.validate.field).repeated = {
+    items: {
+      string: {uuid: true}
+    }
+  }];
 }
 
 message GetEquityComparablesResponse {
@@ -719,7 +723,11 @@ message GetSalesComparablesRequest {
 
   repeated ComparableCriteria criteria = 2;
 
-  repeated string selected_parcel_ids = 3;
+  repeated string selected_parcel_ids = 3 [(buf.validate.field).repeated = {
+    items: {
+      string: {uuid: true}
+    }
+  }];
 
   google.type.Interval time_range = 4 [(buf.validate.field).cel = {
     id: "valid_time_range"

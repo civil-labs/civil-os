@@ -4684,22 +4684,24 @@ const file_civil_public_parcels_v1_parcels_proto_rawDesc = "" +
 	"sale_price\x18\x06 \x01(\tR\tsalePrice\x12L\n" +
 	"\n" +
 	"attributes\x18\a \x03(\v2,.civil.public.parcels.v1.ComparableAttributeR\n" +
-	"attributes\"\xb4\x02\n" +
+	"attributes\"\xc3\x02\n" +
 	"\x1bGetEquityComparablesRequest\x12\x9b\x01\n" +
 	"\vwkt_polygon\x18\x01 \x01(\tBz\xbaHwru\x18\x90N2p^(?i)(POINT|LINESTRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION)\\s*(Z|M|ZM)?\\s*\\(.*\\)$R\n" +
 	"wktPolygon\x12G\n" +
-	"\bcriteria\x18\x02 \x03(\v2+.civil.public.parcels.v1.ComparableCriteriaR\bcriteria\x12.\n" +
-	"\x13selected_parcel_ids\x18\x03 \x03(\tR\x11selectedParcelIds\"\xe9\x01\n" +
+	"\bcriteria\x18\x02 \x03(\v2+.civil.public.parcels.v1.ComparableCriteriaR\bcriteria\x12=\n" +
+	"\x13selected_parcel_ids\x18\x03 \x03(\tB\r\xbaH\n" +
+	"\x92\x01\a\"\x05r\x03\xb0\x01\x01R\x11selectedParcelIds\"\xe9\x01\n" +
 	"\x1cGetEquityComparablesResponse\x12\\\n" +
 	"\aparcels\x18\x01 \x03(\v2B.civil.public.parcels.v1.GetEquityComparablesResponse.ParcelsEntryR\aparcels\x1ak\n" +
 	"\fParcelsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12E\n" +
-	"\x05value\x18\x02 \x01(\v2/.civil.public.parcels.v1.EquityComparableParcelR\x05value:\x028\x01\"\xfc\x03\n" +
+	"\x05value\x18\x02 \x01(\v2/.civil.public.parcels.v1.EquityComparableParcelR\x05value:\x028\x01\"\x8b\x04\n" +
 	"\x1aGetSalesComparablesRequest\x12\x9b\x01\n" +
 	"\vwkt_polygon\x18\x01 \x01(\tBz\xbaHwru\x18\x90N2p^(?i)(POINT|LINESTRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION)\\s*(Z|M|ZM)?\\s*\\(.*\\)$R\n" +
 	"wktPolygon\x12G\n" +
-	"\bcriteria\x18\x02 \x03(\v2+.civil.public.parcels.v1.ComparableCriteriaR\bcriteria\x12.\n" +
-	"\x13selected_parcel_ids\x18\x03 \x03(\tR\x11selectedParcelIds\x12\xc6\x01\n" +
+	"\bcriteria\x18\x02 \x03(\v2+.civil.public.parcels.v1.ComparableCriteriaR\bcriteria\x12=\n" +
+	"\x13selected_parcel_ids\x18\x03 \x03(\tB\r\xbaH\n" +
+	"\x92\x01\a\"\x05r\x03\xb0\x01\x01R\x11selectedParcelIds\x12\xc6\x01\n" +
 	"\n" +
 	"time_range\x18\x04 \x01(\v2\x15.google.type.IntervalB\x8f\x01\xbaH\x8b\x01\xba\x01\x87\x01\n" +
 	"\x10valid_time_range\x12\"start_time must be before end_time\x1aO!has(this.start_time) || !has(this.end_time) || this.start_time < this.end_timeR\ttimeRange\"\xe5\x01\n" +

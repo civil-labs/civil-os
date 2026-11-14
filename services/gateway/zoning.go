@@ -5,9 +5,9 @@ import (
 	"log/slog"
 
 	"connectrpc.com/connect"
-	meshzoningv1 "github.com/civil-labs/civil-api-go/civil/mesh/zoning/v1"
-	meshzoningv1connect "github.com/civil-labs/civil-api-go/civil/mesh/zoning/v1/zoningv1connect"
-	publiczoningv1 "github.com/civil-labs/civil-api-go/civil/public/zoning/v1"
+	publiczoningv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/zoning/v1"
+	meshzoningv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/zoning/v1"
+	meshzoningv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/zoning/v1/zoningv1connect"
 )
 
 type ZoningServer struct {

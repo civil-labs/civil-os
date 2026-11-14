@@ -33,8 +33,10 @@ option (gnostic.openapi.v3.document) = {
   }
 
   servers: [
-    {url: "https://leepa.civillabs.app"},
-    {url: "https://louisville.civillabs.app"}
+    {
+      url: "http://localhost:8080"
+      description: "Local stack (docker compose up)"
+    }
   ]
 };
 

@@ -5,9 +5,9 @@ import (
 	"log/slog"
 
 	"connectrpc.com/connect"
-	meshlandusesv1 "github.com/civil-labs/civil-api-go/civil/mesh/landuses/v1"
-	meshlandusesv1connect "github.com/civil-labs/civil-api-go/civil/mesh/landuses/v1/landusesv1connect"
-	publiclandusesv1 "github.com/civil-labs/civil-api-go/civil/public/landuses/v1"
+	publiclandusesv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/landuses/v1"
+	meshlandusesv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/landuses/v1"
+	meshlandusesv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/landuses/v1/landusesv1connect"
 )
 
 type LandUseServer struct {

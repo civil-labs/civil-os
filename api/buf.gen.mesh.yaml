@@ -1,0 +1,22 @@
+# Mesh (service-to-service) API: Go only, under internal/ so it is not
+# importable outside this module. Run via `mise run generate`.
+version: v2
+managed:
+  enabled: true
+  override:
+    - file_option: go_package_prefix
+      value: github.com/civil-labs/civil-os/internal/gen/go
+  disable:
+    - file_option: go_package
+      module: buf.build/bufbuild/protovalidate
+    - file_option: go_package
+      module: buf.build/gnostic/gnostic
+    - file_option: go_package
+      module: buf.build/googleapis/googleapis
+plugins:
+  - remote: buf.build/protocolbuffers/go:v1.36.12
+    out: ../internal/gen/go
+    opt: paths=source_relative
+  - remote: buf.build/connectrpc/go:v1.19.1
+    out: ../internal/gen/go
+    opt: paths=source_relative

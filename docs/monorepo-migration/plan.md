@@ -56,6 +56,18 @@ The imported `.github/`, `mise.toml`, `go.mod` and `.gitignore` files stay as-is
 
 ## PR 2: single module and build (`refactor/single-module`)
 
+**2.0 Remove customer hostnames.** This step was added during PR 1, when a scan found two customer hostnames in the OpenAPI `servers` block of `api/proto/public/civil/public/parcels/v1/parcels.proto`. They are replaced with `http://localhost:8080`, the compose gateway. The imported history still contains them; the owner accepted that, since civil-blueprints is already public.
+
+> **Commit order (revised during implementation).** Step 2.1 on its own would not build, because the editor's stubs don't compile against any API version. To keep every commit building, PR 2 lands as:
+> - **A** = 2.1 plus 2.4's stub. The root module still depends on `civil-api-go`, unified to its newest pin.
+> - **B** = 2.2.
+> - **C** = 2.3, which drops `civil-api-go`.
+> - **D** = 2.5 plus 2.4's binary and user rename in the writer dockerfile.
+>
+> Dependency unification only moved the writer: `civil-api-go` from April to August, `x/sync` 0.19 → 0.20 and `x/text` 0.33 → 0.37. `go mod tidy` changed no other pin.
+>
+> Also, `database/.gitattributes` moved to the root `.gitattributes`, with paths prefixed by `database/`.
+
 **2.1 Root scaffolding**
 - **Add** `go.mod` (`module github.com/civil-labs/civil-os`, `go 1.26.1`) and `mise.toml` with these pins: go 1.26.1, buf 1.66.1, node 22, atlas 1.3.0.
 - **`mise.toml` tasks:** `generate`, `build`, `test`, `test:integration`, `test:e2e`, `lint`, `check`, `up`, `db:diff`, `db:validate`. The last two are ported from the schema repo's task.
@@ -83,8 +95,9 @@ The imported `.github/`, `mise.toml`, `go.mod` and `.gitignore` files stay as-is
   - `go build -o /app/<bin> ./services/<svc>`;
   - runtime `alpine` pinned to the current stable 3.x tag;
   - user, port and `grpc_health_probe` unchanged.
-- `services/tile-server/dockerfile` is unchanged.
-- Add a root `.dockerignore`: `.git`, `docs`, `sdk`, `test`, `api/gen/openapi`, `**/node_modules`.
+- `services/tile-server/dockerfile`: only its `COPY` path changes, to `services/tile-server/config.yaml`. That way all four images share the repo root as their build context, so PR 7's image matrix needs no per-service context. *(Revised during implementation.)*
+- Add a root `.dockerignore`: `.git`, `.github`, `.claude`, `docs`, `sdk`, `test`, `dev`, `database`, `api/proto`, `api/gen/openapi`, `**/node_modules`, `*.md`.
+- Images are pinned to `golang:1.26.1-alpine3.23` (builder) and `alpine:3.24` (runtime). The runtime pin is to the minor version, so security patch releases are still picked up.
 
 **Checks**
 - `go build ./... && go vet ./...` passes.

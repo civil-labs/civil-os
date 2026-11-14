@@ -6,7 +6,7 @@ import (
 	"log/slog"
 
 	"connectrpc.com/connect"
-	zoningv1 "github.com/civil-labs/civil-api-go/civil/mesh/zoning/v1"
+	zoningv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/zoning/v1"
 )
 
 func (s *APIServer) GetZoning(

@@ -1,0 +1,14 @@
+# Build context is the repo root; only Go sources, go.mod/go.sum and
+# service configs are needed by the images.
+.git
+.github
+.claude
+docs
+sdk
+test
+dev
+database
+api/proto
+api/gen/openapi
+**/node_modules
+*.md

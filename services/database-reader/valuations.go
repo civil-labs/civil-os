@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
-	meshvaluationsv1 "github.com/civil-labs/civil-api-go/civil/mesh/valuations/v1"
+	meshvaluationsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/valuations/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

@@ -15,12 +15,12 @@ import (
 
 	"connectrpc.com/grpchealth"
 
-	"github.com/civil-labs/civil-api-go/civil/mesh/improvements/v1/improvementsv1connect"
-	"github.com/civil-labs/civil-api-go/civil/mesh/landuses/v1/landusesv1connect"
-	"github.com/civil-labs/civil-api-go/civil/mesh/parcels/v1/parcelsv1connect"
-	"github.com/civil-labs/civil-api-go/civil/mesh/zoning/v1/zoningv1connect"
-	meshneighborhoodsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/neighborhoods/v1/neighborhoodsv1connect"
-	meshvaluationsv1connect "github.com/civil-labs/civil-api-go/civil/mesh/valuations/v1/valuationsv1connect"
+	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/improvements/v1/improvementsv1connect"
+	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/landuses/v1/landusesv1connect"
+	meshneighborhoodsv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/neighborhoods/v1/neighborhoodsv1connect"
+	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1/parcelsv1connect"
+	meshvaluationsv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/valuations/v1/valuationsv1connect"
+	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/zoning/v1/zoningv1connect"
 )
 
 type APIServer struct {

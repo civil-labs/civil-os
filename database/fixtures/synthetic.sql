@@ -35,7 +35,7 @@
 --       2  2022-06-15  parcel 2: party 1 -> 2 and 3 (0.5 each)
 --       3  2023-09-01  parcels 6 and 7, improvements 6 and 7: party 10 -> 6 (n = 6), 7 (n = 7); code 2
 --       4  2024-02-01  voided parcel 20 and improvement 17 only: never visible
---       5  2024-05-01  parcels 19 and voided 20: party 1 -> 9 (19), 10 (20)
+--       5  2024-05-01  parcels 19 and voided 20: parties 1 and 2 (0.5 each) -> 9 (19); 1 -> 10 (20)
 --       6  2025-01-10  parcel 5: party 4 -> 5; no amount, no recording
 --       7  2022-01-15  parcel 8: party 3 as grantor, no grantee recorded
 --     Transfers other than 6 have deed book FX-B<n>, page <n> and URI
@@ -282,7 +282,7 @@ FROM (VALUES (1, 5, 9, true, 1.0000), (1, 5, 4, false, 1.0000),
              (3, 6, 10, true, 1.0000), (3, 6, 6, false, 1.0000),
              (3, 7, 10, true, 1.0000), (3, 7, 7, false, 1.0000),
              (4, 20, 1, true, 1.0000), (4, 20, 10, false, 1.0000),
-             (5, 19, 1, true, 1.0000), (5, 19, 9, false, 1.0000),
+             (5, 19, 1, true, 0.5000), (5, 19, 2, true, 0.5000), (5, 19, 9, false, 1.0000),
              (5, 20, 1, true, 1.0000), (5, 20, 10, false, 1.0000),
              (6, 5, 4, true, 1.0000), (6, 5, 5, false, 1.0000),
              (7, 8, 3, true, 1.0000)) v(transfer_n, parcel_n, party_n, is_grantor, share)

@@ -45,7 +45,7 @@ const (
 	MultiGranteeTransfer   = 2 // parcel 2: party 1 -> parties 2 and 3 at 0.5 each
 	MultiParcelTransfer    = 3 // parcels 6 and 7 plus improvements 6 and 7
 	VoidedOnlyTransfer     = 4 // only voided parcel 20 and improvement 17: never visible
-	PartlyVoidedTransfer   = 5 // parcels 19 and voided 20
+	PartlyVoidedTransfer   = 5 // parcels 19 (two grantors at 0.5 each) and voided 20
 	NoRecordingTransfer    = 6 // no amount and no deed columns
 	MissingGranteeTransfer = 7 // parcel 8 with a grantor and no grantee
 )

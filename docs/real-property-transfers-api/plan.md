@@ -89,7 +89,7 @@ helper for public IDs and `trace_id = 'fixture'`:
   | 3 | 6 | party 10 (1.0) | party 6 (1.0) |
   | 3 | 7 | party 10 (1.0) | party 7 (1.0) |
   | 4 | 20 (voided) | party 1 (1.0) | party 10 (1.0) |
-  | 5 | 19 | party 1 (1.0) | party 9 (1.0) |
+  | 5 | 19 | parties 1 and 2 (0.5 each) | party 9 (1.0) |
   | 5 | 20 (voided) | party 1 (1.0) | party 10 (1.0) |
   | 6 | 5 | party 4 (1.0) | party 5 (1.0) |
   | 7 | 8 | party 3 (1.0) | — |

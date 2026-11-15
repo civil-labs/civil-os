@@ -15,11 +15,7 @@ one port.
 | `civil.public.instance.v1` | `InstanceService` | Instance metadata and auth issuer (no token needed) |
 | `civil.public.dex.v1` | `DexService` | Dex OIDC client administration, when the instance runs Dex |
 
-`civil.public.sales.v1` (`SalesService`) and `civil.public.tiles.v1`
-(`TileService`) are defined but **not served yet**. The gateway serves sales
-comparables through `ParcelsService.GetSalesComparables`. It serves vector tiles
-over plain HTTP at `/tiles/get_parcel_tiles/{z}/{x}/{y}`, with the same bearer
-token, rather than through `TileService`.
+Sales comparables are served by `ParcelsService.GetSalesComparables`.
 
 Requests are validated with [protovalidate](https://protovalidate.com) rules
 declared in the protos. For example, every parcel ID must be a UUID.
@@ -33,6 +29,22 @@ declared in the protos. For example, every parcel ID must be a UUID.
 - **Anything else:** the OpenAPI spec (`openapi.yaml`) is attached to every
   `public-api-v*` GitHub Release. You can also generate your own client from
   these protos with [buf](https://buf.build).
+
+## Vector tiles
+
+Map tiles aren't part of this protobuf API. The gateway serves them over plain
+HTTP, with the same bearer token as the RPCs:
+
+- `GET /tiles/get_parcel_tiles/{z}/{x}/{y}` returns a Mapbox Vector Tile of
+  parcel geometries.
+- `GET /tiles/get_parcel_tiles` returns its [TileJSON](https://github.com/mapbox/tilejson-spec),
+  which map libraries such as MapLibre can use as a source URL.
+
+The tiles are served by [Martin](https://maplibre.org/martin/) behind the
+gateway. Which tile sources are published, and whether the TileJSON is a
+guaranteed contract, is decided by
+[`docs/tile-source-allowlist`](../../../docs/tile-source-allowlist/intent.md).
+Until then, treat `get_parcel_tiles` as the only supported source.
 
 ## Versioning and compatibility
 

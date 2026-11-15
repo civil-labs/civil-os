@@ -43,6 +43,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          echo "V6 check: forcing the detection job to fail"
+          exit 1
           if [ "$GITHUB_EVENT_NAME" != pull_request ]; then
             code=true
           elif [ "$CHANGED_FILES" -ge 3000 ]; then

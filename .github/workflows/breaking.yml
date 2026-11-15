@@ -23,14 +23,42 @@ jobs:
   buf-breaking:
     name: Public API breaking changes
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read # list the PR's changed files
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 0 # needs the public-api-v* tags
-      - uses: jdx/mise-action@6612f0ef07ed2a736cd1e00a94a065522dd41195 # v5.2.5
+      # Skips buf breaking, at the job level, when no public API file changed
+      # (docs/docs-only-ci/spec.md). The job still runs and reports, so the
+      # check is safe to make required. If this step fails, the job fails.
+      - name: Does the PR touch the public API?
+        id: scope
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          CHANGED_FILES: ${{ github.event.pull_request.changed_files }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$CHANGED_FILES" -ge 3000 ]; then
+            public=true # the files API can't list them all
+          else
+            public=$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR/files" \
+              --jq '.[] | .filename, (.previous_filename // empty)' | sh scripts/touches-public-api.sh)
+          fi
+          echo "public=$public" >> "$GITHUB_OUTPUT"
+          echo "Public API files changed: $public"
+      - name: No public API change
+        if: steps.scope.outputs.public == 'false'
+        run: echo "::notice::No public API files changed; buf breaking skipped"
+      - if: steps.scope.outputs.public != 'false'
+        uses: jdx/mise-action@6612f0ef07ed2a736cd1e00a94a065522dd41195 # v5.2.5
         with:
           install_args: buf
       - name: buf breaking against the last public-api release
+        if: steps.scope.outputs.public != 'false'
         working-directory: api
         env:
           # Via env, never interpolated into the script: titles are untrusted.

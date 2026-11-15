@@ -20,8 +20,49 @@ env:
   BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
 
 jobs:
+  # Decides whether the code jobs below can be skipped: only for a pull request
+  # whose every changed file is docs (docs/docs-only-ci/spec.md).
+  changes:
+    name: Detect docs-only changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read # list the PR's changed files
+    outputs:
+      code: ${{ steps.classify.outputs.code }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - name: Test the classification scripts
+        run: sh scripts/changed-code_test.sh
+      - name: Classify the changed files
+        id: classify
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          CHANGED_FILES: ${{ github.event.pull_request.changed_files }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_EVENT_NAME" != pull_request ]; then
+            code=true
+          elif [ "$CHANGED_FILES" -ge 3000 ]; then
+            # The files API lists at most 3,000 files, so the list can't be complete.
+            code=true
+          else
+            # Renames list both names, so code moved into docs/ is still code.
+            code=$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR/files" \
+              --jq '.[] | .filename, (.previous_filename // empty)' | sh scripts/changed-code.sh)
+          fi
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          echo "Code changed: $code"
+
+  # The four code jobs skip only when `changes` explicitly says "false". If it
+  # fails or gives no output, they run: `!cancelled()` overrides the default of
+  # skipping when a needed job failed, and a skipped required check would pass.
   go:
     name: Go build, vet, unit and integration tests
+    needs: changes
+    if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
@@ -45,6 +86,8 @@ jobs:
   proto:
     # buf breaking runs in breaking.yml, which also re-runs when the PR title changes.
     name: Protos and generated code
+    needs: changes
+    if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
@@ -66,6 +109,8 @@ jobs:
           }
   sdk:
     name: JS SDK packs and imports
+    needs: changes
+    if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
@@ -92,6 +137,8 @@ jobs:
 
   e2e:
     name: E2E (docker compose)
+    needs: changes
+    if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0

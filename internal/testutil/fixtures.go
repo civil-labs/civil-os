@@ -21,6 +21,9 @@ const (
 	ValuationPrefix            = "60000000"
 	NeighborhoodDefPrefix      = "70000000"
 	NeighborhoodPrefix         = "71000000"
+	TransferPrefix             = "90000000"
+	TransferCodeTypePrefix     = "91000000"
+	TransferCodePrefix         = "92000000"
 	ParcelPrefix               = "a0000000"
 )
 
@@ -36,10 +39,24 @@ const (
 	UnattachedAddress  = 21 // address on no parcel
 )
 
+// Real property transfers; see the header of database/fixtures/synthetic.sql.
+const (
+	TransferCount          = 7
+	MultiGranteeTransfer   = 2 // parcel 2: party 1 -> parties 2 and 3 at 0.5 each
+	MultiParcelTransfer    = 3 // parcels 6 and 7 plus improvements 6 and 7
+	VoidedOnlyTransfer     = 4 // only voided parcel 20 and improvement 17: never visible
+	PartlyVoidedTransfer   = 5 // parcels 19 and voided 20
+	NoRecordingTransfer    = 6 // no amount and no deed columns
+	MissingGranteeTransfer = 7 // parcel 8 with a grantor and no grantee
+)
+
 // FixtureID returns the public ID of row n with the given prefix.
 func FixtureID(prefix string, n int) string {
 	return fmt.Sprintf("%s-0000-4000-8000-%012d", prefix, n)
 }
+
+// TransferID returns the public ID of fixture real property transfer n.
+func TransferID(n int) string { return FixtureID(TransferPrefix, n) }
 
 // ParcelID returns the public ID of fixture parcel n.
 func ParcelID(n int) string { return FixtureID(ParcelPrefix, n) }

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package civil.public.recordings.v1;
+
+// A document recorded with the county clerk, such as a deed or a corrective
+// deed. It carries recording metadata only, never what the document says.
+//
+// This package has no service yet. Other APIs, such as real property
+// transfers, return recordings that evidence their records.
+message Recording {
+  // The recording book. Unset when not recorded.
+  optional string book = 1;
+  // The page within the book. Unset when not recorded.
+  optional string page = 2;
+  // A link to the recorded document. Unset when not recorded.
+  optional string uri = 3;
+}

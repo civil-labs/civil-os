@@ -1,0 +1,222 @@
+syntax = "proto3";
+
+package civil.public.transfers.v1;
+
+import "buf/validate/validate.proto";
+import "civil/public/pagination/v1/pagination.proto";
+import "civil/public/recordings/v1/recording.proto";
+import "google/protobuf/timestamp.proto";
+import "google/type/interval.proto";
+
+// Reads real property transfers: conveyances of parcels and improvements
+// between parties.
+//
+// Results are ordered newest first (`transfer_time` descending, then
+// `transfer_id` descending). Voided parcels and improvements are left out of
+// every transfer, and a transfer with none left is not returned.
+service RealPropertyTransfersService {
+  // Returns the requested transfers. Unknown IDs are left out.
+  rpc GetTransfersById(GetTransfersByIdRequest) returns (GetTransfersByIdResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns a page of the transfers that involve any of the parcels.
+  rpc GetTransfersByParcelId(GetTransfersByParcelIdRequest) returns (GetTransfersByParcelIdResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Returns a page of the transfers that involve the parcels with any of the
+  // map feature IDs.
+  rpc GetTransfersByFeatureId(GetTransfersByFeatureIdRequest) returns (GetTransfersByFeatureIdResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+// One real property transfer.
+message RealPropertyTransfer {
+  // The transfer's UUID.
+  string transfer_id = 1;
+  // When the transfer took effect.
+  google.protobuf.Timestamp transfer_time = 2;
+  // The amount paid, as a decimal string with up to 15 digits and 4 decimal
+  // places. Unset when no amount was recorded (for example gifts or nominal
+  // transfers). Returned as stored: a negative amount is a data error to be
+  // reconciled.
+  optional string transfer_amount = 3;
+  // The recorded documents that evidence the transfer. Empty when none is
+  // recorded.
+  repeated civil.public.recordings.v1.Recording recordings = 4;
+  // The parcels conveyed. A transfer has at least one parcel or improvement.
+  // Every visible parcel is listed, not only the ones a lookup asked for.
+  repeated TransferredParcel parcels = 5;
+  // The improvements conveyed.
+  repeated TransferredImprovement improvements = 6;
+  // Classification codes, such as whether the sale was qualified.
+  repeated TransferCode codes = 7;
+  // Every party in any grantors or grantees list, once each, ordered by
+  // party_id. Shares refer to these by party_id.
+  repeated TransferParty parties = 8;
+}
+
+// A parcel conveyed by a transfer.
+message TransferredParcel {
+  // The parcel's UUID.
+  string parcel_id = 1;
+  // The map feature ID of the parcel's current geometry.
+  optional int64 feature_id = 2;
+  // The parties conveying the parcel. An empty grantors or grantees list is
+  // valid: it means the transfer's records are incomplete for this parcel (no
+  // party was recorded, or only voided ones), which is a data problem to
+  // reconcile. The parcel is still returned so the gap is visible.
+  repeated TransferShare grantors = 3;
+  // The parties receiving the parcel. Empty lists are valid, as for grantors.
+  repeated TransferShare grantees = 4;
+}
+
+// An improvement conveyed by a transfer.
+message TransferredImprovement {
+  // The improvement's UUID.
+  string improvement_id = 1;
+  // The parties conveying the improvement. Empty lists are valid, as on
+  // TransferredParcel.
+  repeated TransferShare grantors = 2;
+  // The parties receiving the improvement.
+  repeated TransferShare grantees = 3;
+}
+
+// A party's share of one parcel or improvement in a transfer.
+message TransferShare {
+  // The party's UUID. Always present in RealPropertyTransfer.parties.
+  string party_id = 1;
+  // The share conveyed, as a decimal string in (0, 1] with up to 4 decimal
+  // places.
+  string transferred_share = 2;
+}
+
+// A party to a transfer, as it was at the time of the transfer.
+message TransferParty {
+  // The party's UUID.
+  string party_id = 1;
+  // The party's name at the time of the transfer. Unset when none was
+  // recorded for that time.
+  optional string name = 2;
+  // The party's formatted mailing address at the time of the transfer. Unset
+  // when none was recorded for that time.
+  optional string mailing_address = 3;
+}
+
+// A classification code on a transfer.
+message TransferCode {
+  // The code's UUID.
+  string code_id = 1;
+  string name = 2;
+  optional string description = 3;
+  // The code's type. Unset for an untyped code.
+  optional TransferCodeType type = 4;
+}
+
+// The type a transfer code belongs to, such as sale qualification.
+message TransferCodeType {
+  // The code type's UUID.
+  string code_type_id = 1;
+  string name = 2;
+  optional string description = 3;
+}
+
+// A transfer in a page of results, with its cursor.
+message RealPropertyTransferEdge {
+  // This transfer's position: pass it as `after` to continue after it.
+  string cursor = 1;
+  RealPropertyTransfer node = 2;
+}
+
+message GetTransfersByIdRequest {
+  // 1 to 100 unique transfer UUIDs.
+  repeated string transfer_ids = 1 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 100
+    unique: true
+    items: {
+      string: {uuid: true}
+    }
+  }];
+}
+
+message GetTransfersByIdResponse {
+  // The visible requested transfers, newest first.
+  repeated RealPropertyTransfer transfers = 1;
+}
+
+message GetTransfersByParcelIdRequest {
+  // 1 to 100 unique parcel UUIDs.
+  repeated string parcel_ids = 1 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 100
+    unique: true
+    items: {
+      string: {uuid: true}
+    }
+  }];
+
+  // Only transfers in [start_time, end_time). Either bound may be omitted.
+  google.type.Interval time_range = 2 [(buf.validate.field).cel = {
+    id: "valid_time_range"
+    message: "start_time must be before end_time"
+    expression: "!has(this.start_time) || !has(this.end_time) || this.start_time < this.end_time"
+  }];
+
+  // The page size, 1 to 100. Defaults to 25.
+  optional int32 first = 3 [(buf.validate.field).int32 = {
+    gte: 1
+    lte: 100
+  }];
+
+  // Return the transfers after this cursor, from a previous page of the same
+  // request.
+  optional string after = 4 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 512
+  }];
+}
+
+message GetTransfersByParcelIdResponse {
+  repeated RealPropertyTransferEdge edges = 1;
+  civil.public.pagination.v1.PageInfo page_info = 2;
+}
+
+message GetTransfersByFeatureIdRequest {
+  // 1 to 100 unique map feature IDs.
+  repeated int64 feature_ids = 1 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 100
+    unique: true
+    items: {
+      int64: {gt: 0}
+    }
+  }];
+
+  // Only transfers in [start_time, end_time). Either bound may be omitted.
+  google.type.Interval time_range = 2 [(buf.validate.field).cel = {
+    id: "valid_time_range"
+    message: "start_time must be before end_time"
+    expression: "!has(this.start_time) || !has(this.end_time) || this.start_time < this.end_time"
+  }];
+
+  // The page size, 1 to 100. Defaults to 25.
+  optional int32 first = 3 [(buf.validate.field).int32 = {
+    gte: 1
+    lte: 100
+  }];
+
+  // Return the transfers after this cursor, from a previous page of the same
+  // request.
+  optional string after = 4 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 512
+  }];
+}
+
+message GetTransfersByFeatureIdResponse {
+  repeated RealPropertyTransferEdge edges = 1;
+  civil.public.pagination.v1.PageInfo page_info = 2;
+}

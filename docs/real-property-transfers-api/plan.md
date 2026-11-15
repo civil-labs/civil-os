@@ -224,8 +224,12 @@ integration" and "Pagination (reader integration)" test rows. Two notes:
 **4.1 Public protos**, with protovalidate rules and the same
 `idempotency_level = NO_SIDE_EFFECTS` option as the other read RPCs:
 - `api/proto/public/civil/public/pagination/v1/pagination.proto`: `PageInfo`.
-- `api/proto/public/civil/public/recordings/v1/recording.proto`: `Recording`,
-  with `string.uri` on `uri` when set.
+- `api/proto/public/civil/public/recordings/v1/recording.proto`: `Recording`.
+  (Changed during PR 4: no protovalidate rules on response fields, `string.uri`
+  included. The gateway only validates requests, so a response rule would
+  document a contract nothing enforces, and a client that validates responses
+  would reject stored data the spec says to return as-is for reconciliation.
+  Limits on response fields are documented in comments instead.)
 - `api/proto/public/civil/public/transfers/v1/transfers.proto`:
   `RealPropertyTransfersService` and its messages. The requests carry the
   rules from the spec: unique, 1..100 IDs (`string.uuid` or `int64.gt: 0`),

@@ -17,7 +17,7 @@ how the workflow decides, and how it fails safe. The order of the work goes in
 |---|---|
 | Which jobs skip | All four code jobs in `ci.yml`: `Go build, vet, unit and integration tests`, `Protos and generated code`, `JS SDK packs and imports` and `E2E (docker compose)`. Nothing they build or test reads Markdown: no `go:embed`, no test fixture, and no script reads a `.md` file (checked on 2026-11-15; the only references are comments). |
 | The docs rule | A file is docs when its path starts with `docs/` or ends in `.md`, including shipped READMEs. `sdk/js/README.md` is packed into the npm tarball, but the SDK job tests packing and importing, not the README, so a README-only change gains nothing from it. `CHANGELOG.md` files are docs too. Release-please PRs still run everything, because they also change `.release-please-manifest.json` and `sdk/js/package.json`. |
-| Other workflows | `breaking.yml` gets a positive `paths` filter: it runs only when `api/proto/public/**`, `api/buf.yaml` or `api/buf.lock` changes. It isn't a required check, so skipping the whole workflow is safe. A positive filter is narrower than "not docs-only": a Go-only PR can't break the public API either. This touches the same file as [`../breaking-check-baseline/intent.md`](../breaking-check-baseline/intent.md); whichever lands second rebases. If the breaking check is ever made required, this filter must move to the job level like the others. |
+| Other workflows | `breaking.yml` skips `buf breaking` at the **job level** unless the PR changes `api/proto/public/**`, `api/buf.yaml` or `api/buf.lock`: the job still runs and reports success. This is narrower than "not docs-only", since a Go-only PR can't break the public API either. *Amended 2026-11-15, while planning:* the signed-off decision was a workflow-level `paths` filter, which is only safe while the check isn't required. `docs/github-setup.md` lists it as required, though the live ruleset doesn't, so the owner chose the job-level skip, which is safe either way. This touches the same file as [`../breaking-check-baseline/intent.md`](../breaking-check-baseline/intent.md); whichever lands second rebases. |
 | Large PRs | A PR whose `changed_files` count is 3,000 or more is treated as code without listing its files. The pull request files API returns at most 3,000 files, so a longer list can't be checked completely. |
 
 ## Behaviour
@@ -83,22 +83,17 @@ can't let untested code through, because of the fail-safe above.
 
 ### `breaking.yml`
 
-```yaml
-on:
-  pull_request:
-    types: [opened, synchronize, reopened, edited]
-    paths:
-      - api/proto/public/**
-      - api/buf.yaml
-      - api/buf.lock
-```
+The workflow's triggers don't change, so it runs on every PR and re-runs when
+the title is edited. Inside the existing job:
 
-GitHub evaluates `paths` against the PR's whole diff, so editing the title of
-a PR that changes public protos should still re-run the check. That's what
-lets a `!` added to the title clear a breaking change. **To verify** on a real
-PR (see Tests), since the documentation doesn't spell out `edited`. If it
-doesn't hold, the filter moves into the job as an `if:` on the same
-`changes`-style file list.
+- A first step lists the PR's files the same way as the `changes` job and
+  pipes them to `scripts/touches-public-api.sh`, which prints `true` when any
+  path is `api/proto/public/...`, `api/buf.yaml` or `api/buf.lock` (or the
+  list is empty), else `false`. A PR with 3,000 or more files counts as
+  `true`.
+- The `buf breaking` steps run when that output is `!= 'false'`, so a failure
+  to classify runs the check instead of skipping it.
+- When skipped, the job prints a notice and succeeds.
 
 ## Classification cases
 
@@ -126,7 +121,7 @@ from `services/x.go` to `docs/x.go` contains a code path.
 | Layer | Coverage |
 |---|---|
 | Script | `scripts/changed-code_test.sh`, run by the `changes` job on every event and locally with `sh scripts/changed-code_test.sh`. |
-| Workflow | Checked on real PRs after the change merges, since workflow logic can't run locally: a docs-only PR shows the four code jobs as skipped and can merge; a PR with one Go change runs everything; a PR renaming a Go file into `docs/` runs everything; the next push to `main` runs everything. A proto-only PR runs `breaking.yml`, and re-runs it when its title is edited; a Go-only PR doesn't run it. |
+| Workflow | Checked on real PRs after the change merges, since workflow logic can't run locally: a docs-only PR shows the four code jobs as skipped and can merge; a PR with one Go change runs everything; a PR renaming a Go file into `docs/` runs everything; the next push to `main` runs everything. A proto-only PR runs `buf breaking`; a Go-only PR's breaking check passes without running it. |
 | Fail-safe | One throwaway PR where the `changes` job is forced to fail (for example `exit 1` in a test commit, never merged): the code jobs still run. |
 
 ## Docs to update

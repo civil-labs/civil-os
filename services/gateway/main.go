@@ -20,6 +20,7 @@ import (
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/landuses/v1/landusesv1connect"
 	publicneighborhoodsv1connect "github.com/civil-labs/civil-os/api/gen/go/civil/public/neighborhoods/v1/neighborhoodsv1connect"
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/parcels/v1/parcelsv1connect"
+	publictransfersv1connect "github.com/civil-labs/civil-os/api/gen/go/civil/public/transfers/v1/transfersv1connect"
 	publicvaluationsv1connect "github.com/civil-labs/civil-os/api/gen/go/civil/public/valuations/v1/valuationsv1connect"
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/zoning/v1/zoningv1connect"
 	"github.com/dexidp/dex/api/v2"
@@ -30,6 +31,7 @@ import (
 	meshlandusesv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/landuses/v1/landusesv1connect"
 	meshneighborhoodsv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/neighborhoods/v1/neighborhoodsv1connect"
 	meshparcelsv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1/parcelsv1connect"
+	meshtransfersv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/transfers/v1/transfersv1connect"
 	meshvaluationsv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/valuations/v1/valuationsv1connect"
 	meshzoningv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/zoning/v1/zoningv1connect"
 
@@ -197,6 +199,11 @@ func newHandler(config *Config, logger *slog.Logger) (http.Handler, error) {
 		dbReaderAddress,
 	)
 
+	meshTransfersClient := meshtransfersv1connect.NewRealPropertyTransferReadServiceClient(
+		http.DefaultClient,
+		dbReaderAddress,
+	)
+
 	mux := http.NewServeMux()
 
 	parcelsServer := &ParcelServer{
@@ -293,6 +300,18 @@ func newHandler(config *Config, logger *slog.Logger) (http.Handler, error) {
 	)
 
 	mux.Handle(neighborhoodsPath, CORSMiddleware(auth(neighborhoodsHandler), logger))
+
+	transfersServer := &TransferServer{
+		dbReaderClient: meshTransfersClient,
+		logger:         logger,
+	}
+
+	transfersPath, transfersHandler := publictransfersv1connect.NewRealPropertyTransfersServiceHandler(
+		transfersServer,
+		connect.WithInterceptors(validate.NewInterceptor()),
+	)
+
+	mux.Handle(transfersPath, CORSMiddleware(auth(transfersHandler), logger))
 
 	// The Dex admin API is only served when a Dex gRPC endpoint is configured
 	// (jurisdictions without their own OIDC server run Dex as their IdP).

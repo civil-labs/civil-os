@@ -89,6 +89,20 @@ container. [Atlas](https://atlasgo.io) is used only on a developer machine to
 generate them (`mise run db:diff`) and to check `atlas.sum`
 (`mise run db:validate`).
 
+### Vector tiles
+
+Tiles aren't an RPC. The gateway proxies `/tiles/` to Martin unchanged, behind
+the same OIDC check as the public API, and Martin serves under the `/tiles`
+base path (`services/tile-server/config.yaml`). Clients use:
+
+- `/tiles/get_parcel_tiles/{z}/{x}/{y}`: a Mapbox Vector Tile of parcel
+  geometries from `core.get_parcel_tiles`;
+- `/tiles/get_parcel_tiles`: its TileJSON.
+
+They're documented in prose in
+[`api/proto/public/README.md`](../api/proto/public/README.md#vector-tiles),
+not in the OpenAPI spec.
+
 > **Known gap:** Martin publishes every geometry table it finds, not just
 > `get_parcel_tiles`, including voided parcels and history. See
 > [`docs/tile-source-allowlist/intent.md`](tile-source-allowlist/intent.md).

@@ -164,3 +164,5 @@ result stops the verification, and the fix goes in a follow-up `ci:` PR.
 As in the spec: skipping on push to `main`, a merge queue, the breaking-check
 baseline, speeding up the code jobs, skipping by other kinds of change, and
 reconciling `docs/github-setup.md` with the live ruleset.
+
+<!-- V2 check: docs-only PR. -->

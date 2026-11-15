@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package civil.public.pagination.v1;
+
+// Pagination state for a connection, following the GraphQL Cursor
+// Connections Specification (https://relay.dev/graphql/connections.htm).
+//
+// Paginated requests take `first` (the page size) and `after` (a cursor from
+// a previous page). To read every page, repeat the request with
+// `after = page_info.end_cursor` while `has_next_page` is true.
+//
+// Cursors are opaque: don't parse or build them. A cursor is only valid for
+// the request filter it came from.
+message PageInfo {
+  // Whether more results follow this page.
+  bool has_next_page = 1;
+  // Whether results precede this page. True exactly when the request set
+  // `after`.
+  bool has_previous_page = 2;
+  // The cursor of the first edge. Unset when the page is empty.
+  optional string start_cursor = 3;
+  // The cursor of the last edge: pass it as `after` to read the next page.
+  // Unset when the page is empty.
+  optional string end_cursor = 4;
+}

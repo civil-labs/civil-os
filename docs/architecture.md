@@ -30,7 +30,7 @@ serves one jurisdiction.
 | Service | Code | Default port | Role |
 |---|---|---|---|
 | gateway | `services/gateway` | 8080 | The only public entry point. Validates OIDC ID tokens, applies CORS, serves the public API, maps public requests to mesh calls, and proxies `/tiles/` to the tile server. |
-| database-reader | `services/database-reader` | 50051 | Serves every mesh `*ReadService` with read-only SQL. |
+| database-reader | `services/database-reader` | 50051 | Serves every mesh `*ReadService` with read-only SQL: parcels, improvements, land uses, zoning, valuations, neighborhoods and real property transfers. |
 | database-writer | `services/database-writer` | 50052 | Serves `ParcelWriteService` (`UpdateParcel`). Optional: without it, the gateway answers writes with `Unavailable`. |
 | tile-server | `services/tile-server` | 3000 | [Martin](https://maplibre.org/martin/), serving vector tiles from the database's `core.get_parcel_tiles` function. |
 

@@ -234,8 +234,24 @@ func TestTransferContents(t *testing.T) {
 			t.Errorf("parcels = %v, want only parcel 19", transferParcelIDs(tr))
 		}
 		// Party 10 was only a grantee on voided parcel 20.
-		if want := []string{partyID(1), partyID(9)}; !slices.Equal(partyIDs(tr), want) {
+		if want := []string{partyID(1), partyID(2), partyID(9)}; !slices.Equal(partyIDs(tr), want) {
 			t.Errorf("parties = %v, want %v", partyIDs(tr), want)
+		}
+	})
+
+	t.Run("several grantors", func(t *testing.T) {
+		tr := oneTransfer(t, r, tu.PartlyVoidedTransfer)
+		p := tr.GetParcels()[0]
+		if !slices.Equal(shareParties(p.GetGrantors()), []string{partyID(1), partyID(2)}) {
+			t.Fatalf("parcel 19 grantors = %v, want parties 1 and 2", shareParties(p.GetGrantors()))
+		}
+		for _, s := range p.GetGrantors() {
+			if s.GetTransferredShare() != "0.5000" {
+				t.Errorf("grantor %s share = %q, want 0.5000", s.GetPartyId(), s.GetTransferredShare())
+			}
+		}
+		if !slices.Equal(shareParties(p.GetGrantees()), []string{partyID(9)}) {
+			t.Errorf("parcel 19 grantees = %v, want party 9", shareParties(p.GetGrantees()))
 		}
 	})
 

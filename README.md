@@ -1,7 +1,8 @@
 # civil-os
 
 civil-os is an open-source platform for parcel and property data. It stores
-parcels, their geometry, attributes, improvements, zoning, sales and valuations
+parcels, their geometry, attributes, improvements, zoning, real property
+transfers and valuations
 in a bitemporal PostGIS database. It serves them through an authenticated API
 and vector map tiles.
 

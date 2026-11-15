@@ -12,8 +12,13 @@ one port.
 | `civil.public.zoning.v1` | `ZoningService` | Zoning designations |
 | `civil.public.neighborhoods.v1` | `NeighborhoodService` | Neighborhood definitions and neighborhoods |
 | `civil.public.valuations.v1` | `ValuationService` | Valuations |
+| `civil.public.transfers.v1` | `RealPropertyTransfersService` | Real property transfers by transfer, parcel or map feature, with grantors, grantees, shares, codes and recordings. Paginated. |
 | `civil.public.instance.v1` | `InstanceService` | Instance metadata and auth issuer (no token needed) |
 | `civil.public.dex.v1` | `DexService` | Dex OIDC client administration, when the instance runs Dex |
+
+Two packages only hold messages that other services share:
+`civil.public.pagination.v1` (`PageInfo`) and `civil.public.recordings.v1`
+(`Recording`, a document recorded with the county clerk).
 
 Sales comparables are served by `ParcelsService.GetSalesComparables`.
 
@@ -29,6 +34,31 @@ declared in the protos. For example, every parcel ID must be a UUID.
 - **Anything else:** the OpenAPI spec (`openapi.yaml`) is attached to every
   `public-api-v*` GitHub Release. You can also generate your own client from
   these protos with [buf](https://buf.build).
+
+## Pagination
+
+APIs that can return many results are paginated with cursors, following the
+GraphQL [Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+`RealPropertyTransfersService` is the first. New paginated RPCs follow the
+same pattern:
+
+- **Request:** `optional int32 first` (the page size) and
+  `optional string after` (a cursor from a previous page).
+- **Response:** `repeated <Thing>Edge edges`, each with a `cursor` and the
+  `node`, and a `civil.public.pagination.v1.PageInfo page_info`.
+- **Page size:** `first` is 1 to 100, and defaults to 25 when unset. A larger
+  value is rejected with `InvalidArgument`, not reduced. The limits are part of
+  the contract and the same on every instance.
+- **Reading every page:** repeat the request with
+  `after = page_info.end_cursor` while `page_info.has_next_page` is true. Use
+  `has_next_page`, not the number of edges, to detect the end.
+- **Cursors are opaque.** Don't parse or build them. A cursor is only valid
+  with the same filter (IDs and time range) as the request it came from;
+  otherwise the request fails with `InvalidArgument`. `first` may change
+  between pages.
+- **Consistency:** pages are keyset-based, so results added or removed between
+  requests don't shift later pages, but there's no snapshot either.
+- Only forward pagination (`first` / `after`) is supported for now.
 
 ## Vector tiles
 

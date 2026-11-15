@@ -32,6 +32,8 @@ import (
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/instance/v1/instancev1connect"
 	parcelsv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/parcels/v1"
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/parcels/v1/parcelsv1connect"
+	transfersv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/transfers/v1"
+	"github.com/civil-labs/civil-os/api/gen/go/civil/public/transfers/v1/transfersv1connect"
 	tu "github.com/civil-labs/civil-os/internal/testutil"
 )
 
@@ -187,6 +189,50 @@ func TestSmoke(t *testing.T) {
 		}
 		if ct := res.Header.Get("Content-Type"); !strings.Contains(ct, "protobuf") {
 			t.Errorf("tile Content-Type %q", ct)
+		}
+	})
+
+	t.Run("tile JSON", func(t *testing.T) {
+		req, _ := http.NewRequest(http.MethodGet, gatewayURL+"/tiles/get_parcel_tiles", nil)
+		req.Header.Set("Authorization", "Bearer "+token)
+		res, err := httpClient.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer res.Body.Close()
+		var tj struct {
+			Tiles []string `json:"tiles"`
+		}
+		if err := json.NewDecoder(res.Body).Decode(&tj); err != nil || res.StatusCode != http.StatusOK || len(tj.Tiles) == 0 {
+			t.Errorf("TileJSON: status %d, tiles %v, err %v", res.StatusCode, tj.Tiles, err)
+		}
+	})
+
+	t.Run("real property transfers", func(t *testing.T) {
+		transfers := transfersv1connect.NewRealPropertyTransfersServiceClient(httpClient, gatewayURL)
+		res, err := transfers.GetTransfersByParcelId(ctx, authed(token, &transfersv1.GetTransfersByParcelIdRequest{
+			ParcelIds: []string{tu.ParcelID(tu.MultiOwnerParcel)},
+		}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(res.Msg.Edges) != 1 || res.Msg.Edges[0].GetNode().GetTransferId() != tu.TransferID(tu.MultiGranteeTransfer) {
+			t.Fatalf("parcel %d transfers = %v", tu.MultiOwnerParcel, res.Msg.Edges)
+		}
+		tr := res.Msg.Edges[0].GetNode()
+		if len(tr.GetParcels()) != 1 || len(tr.GetParcels()[0].GetGrantees()) != 2 || len(tr.GetParties()) != 3 {
+			t.Errorf("transfer %d = %v, want 2 grantee shares and 3 parties", tu.MultiGranteeTransfer, tr)
+		}
+		if pi := res.Msg.GetPageInfo(); pi.GetHasNextPage() || pi.GetEndCursor() != res.Msg.Edges[0].GetCursor() {
+			t.Errorf("page info = %v", pi)
+		}
+
+		tooBig := int32(101)
+		_, err = transfers.GetTransfersByParcelId(ctx, authed(token, &transfersv1.GetTransfersByParcelIdRequest{
+			ParcelIds: []string{tu.ParcelID(1)}, First: &tooBig,
+		}))
+		if code := connect.CodeOf(err); code != connect.CodeInvalidArgument {
+			t.Errorf("first = 101: got %v (%v), want InvalidArgument", code, err)
 		}
 	})
 

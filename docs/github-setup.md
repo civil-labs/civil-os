@@ -24,6 +24,16 @@ In **Settings → Rules → Rulesets**, add one ruleset for `main`:
   - `E2E (docker compose)`
   - `No customer-specific data`
   - `conventional-title`
+
+  Two notes on these checks:
+  - On PRs that only change `docs/` or `*.md` files, the Go, protos, SDK and
+    e2e jobs are skipped by an `if:` condition, which counts as passing. They
+    depend on the `Detect docs-only changes` job, which is deliberately **not**
+    required: if it fails, the code jobs run anyway.
+  - `Public API breaking changes` skips `buf breaking` itself when no public
+    API file changed, and still reports, so it's safe to require. (It isn't in
+    the live ruleset at the moment; see
+    [`breaking-check-baseline/intent.md`](breaking-check-baseline/intent.md).)
 - [ ] Bypass list: repository admins only, if anyone. The release-please App
   doesn't need to bypass, because its release PRs are merged like any other.
 

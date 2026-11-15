@@ -22,6 +22,10 @@ CI also runs these, so run them before you push:
 - a generated-code freshness check: `git diff --exit-code api/gen/go internal/gen/go` after `generate`;
 - `buf breaking` on the public module.
 
+PRs that only change `docs/` or `*.md` files skip CI's Go, protos, SDK and e2e
+jobs (`scripts/changed-code.sh`). If a docs change affects anything a build or
+test reads, run `mise run check` yourself.
+
 ## Layout
 
 | Path | What |

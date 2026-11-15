@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+package civil.mesh.transfers.v1;
+
+import "civil/mesh/pagination/v1/pagination.proto";
+import "civil/mesh/recordings/v1/recording.proto";
+import "google/protobuf/timestamp.proto";
+import "google/type/interval.proto";
+
+// Reads real property transfers. Served by the database reader; see
+// docs/real-property-transfers-api/spec.md for the contract.
+service RealPropertyTransferReadService {
+  rpc GetTransfersById(GetTransfersByIdRequest) returns (GetTransfersByIdResponse) {}
+
+  rpc GetTransfersByParcelId(GetTransfersByParcelIdRequest) returns (GetTransfersByParcelIdResponse) {}
+
+  rpc GetTransfersByFeatureId(GetTransfersByFeatureIdRequest) returns (GetTransfersByFeatureIdResponse) {}
+}
+
+message RealPropertyTransfer {
+  string transfer_id = 1;
+  google.protobuf.Timestamp transfer_time = 2;
+  optional string transfer_amount = 3;
+  repeated civil.mesh.recordings.v1.Recording recordings = 4;
+  repeated TransferredParcel parcels = 5;
+  repeated TransferredImprovement improvements = 6;
+  repeated TransferCode codes = 7;
+  repeated TransferParty parties = 8;
+}
+
+message TransferredParcel {
+  string parcel_id = 1;
+  optional int64 feature_id = 2;
+  // Empty when the transfer's records are incomplete for this parcel.
+  repeated TransferShare grantors = 3;
+  repeated TransferShare grantees = 4;
+}
+
+message TransferredImprovement {
+  string improvement_id = 1;
+  repeated TransferShare grantors = 2;
+  repeated TransferShare grantees = 3;
+}
+
+message TransferShare {
+  string party_id = 1;
+  string transferred_share = 2;
+}
+
+message TransferParty {
+  string party_id = 1;
+  optional string name = 2;
+  optional string mailing_address = 3;
+}
+
+message TransferCode {
+  string code_id = 1;
+  string name = 2;
+  optional string description = 3;
+  optional TransferCodeType type = 4;
+}
+
+message TransferCodeType {
+  string code_type_id = 1;
+  string name = 2;
+  optional string description = 3;
+}
+
+message RealPropertyTransferEdge {
+  string cursor = 1;
+  RealPropertyTransfer node = 2;
+}
+
+message GetTransfersByIdRequest {
+  repeated string transfer_ids = 1;
+}
+
+message GetTransfersByIdResponse {
+  repeated RealPropertyTransfer transfers = 1;
+}
+
+message GetTransfersByParcelIdRequest {
+  repeated string parcel_ids = 1;
+  google.type.Interval time_range = 2;
+  optional int32 first = 3;
+  optional string after = 4;
+}
+
+message GetTransfersByParcelIdResponse {
+  repeated RealPropertyTransferEdge edges = 1;
+  civil.mesh.pagination.v1.PageInfo page_info = 2;
+}
+
+message GetTransfersByFeatureIdRequest {
+  repeated int64 feature_ids = 1;
+  google.type.Interval time_range = 2;
+  optional int32 first = 3;
+  optional string after = 4;
+}
+
+message GetTransfersByFeatureIdResponse {
+  repeated RealPropertyTransferEdge edges = 1;
+  civil.mesh.pagination.v1.PageInfo page_info = 2;
+}
+
+// The decoded form of an edge cursor. Internal to the reader: clients only
+// see its base64url encoding.
+message TransferCursor {
+  uint32 version = 1;
+  google.protobuf.Timestamp transfer_time = 2;
+  string transfer_id = 3;
+  // SHA-256 of the canonical request filter, so a cursor can't be reused
+  // with a different filter.
+  bytes filter_hash = 4;
+}

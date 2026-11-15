@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package civil.mesh.recordings.v1;
+
+// A document recorded with the county clerk; the mesh copy of
+// civil.public.recordings.v1.Recording. Recording metadata only.
+message Recording {
+  optional string book = 1;
+  optional string page = 2;
+  optional string uri = 3;
+}

@@ -24,6 +24,8 @@ const (
 // A document recorded with the county clerk, such as a deed or a corrective
 // deed. It carries recording metadata only, never what the document says.
 //
+// V5 check: a public proto change runs buf breaking.
+//
 // This package has no service yet. Other APIs, such as real property
 // transfers, return recordings that evidence their records.
 type Recording struct {

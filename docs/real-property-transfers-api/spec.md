@@ -344,7 +344,8 @@ dates without adding tests that rely on them.
 
 **Effect on `GetSalesComparables`:** it reads `real_property_transfer_party_parcels`
 today. It doesn't check grantee rows, so with the fixtures it returns a latest sale
-for parcels 2, 5, 6, 7, 8 and 19. No test checks sale fields at the moment, so nothing should break. A
+for parcels 2, 6, 7, 8 and 19. Parcel 5 isn't one: its latest transfer is 6,
+which has no amount, and the handler skips candidates without a price. No test checks sale fields at the moment, so nothing should break. A
 reader integration test should pin the new values.
 
 ## Tests
@@ -352,7 +353,7 @@ reader integration test should pin the new values.
 | Layer | Coverage |
 |---|---|
 | Gateway handler tests (`handlers_test.go`) | validation on every RPC: non-UUID IDs, too many IDs, duplicates, an inverted `time_range`. The mesh is never called for invalid input. Mapping round-trip of a fully populated transfer. |
-| Reader integration (`integration_test.go`) | transfer 2 has two grantee shares at 0.5 and three entries in `parties`; transfer 3 lists parties 6, 7 and 10 once each in `parties`, with party 10 as grantor on both parcels; every `party_id` in a share is in `parties`; transfer 7 returns parcel 8 with one grantor and an empty `grantees` list; a party voided by the test (committed, then restored, since the reader reads through its own pool) disappears from `parties` and from its share lists while its parcel entry stays; transfer 3 lists both parcels and both improvements when queried by parcel 6 alone; transfer 4 is missing by ID, by parcel 20 and by feature 1020; transfer 5 lists only parcel 19; parcel 5 returns 6 then 1; `time_range` excludes transfer 1 at 2022-01-01; a null amount is unset, not an empty string; transfer 6 has an empty `recordings` list and transfer 1 has exactly one; unknown IDs return an empty list. |
+| Reader integration (`integration_test.go`) | transfer 2 has two grantee shares at 0.5 and three entries in `parties`; transfer 3 lists parties 6, 7 and 10 once each in `parties`, with party 10 as grantor on both parcels; every `party_id` in a share is in `parties`; transfer 7 returns parcel 8 with one grantor and an empty `grantees` list; a party voided by the test (committed: each test gets its own copy of the fixture database from `testutil.FixtureDatabase`, so nothing needs restoring) disappears from `parties` and from its share lists while its parcel entry stays; transfer 3 lists both parcels and both improvements when queried by parcel 6 alone; transfer 4 is missing by ID, by parcel 20 and by feature 1020; transfer 5 lists only parcel 19; parcel 5 returns 6 then 1; `time_range` excludes transfer 1 at 2022-01-01; a null amount is unset, not an empty string; transfer 6 has an empty `recordings` list and transfer 1 has exactly one; unknown IDs return an empty list. |
 | Pagination (reader integration) | parcel 5 with `first = 1` returns transfer 6 with `has_next_page = true` and `has_previous_page = false`; its `end_cursor` as `after` returns transfer 1 with `has_next_page = false` and `has_previous_page = true`; a page past the end has no edges and no `start_cursor` / `end_cursor`; a cursor from parcel 5 reused for parcel 2, a malformed cursor and an unknown version all fail with `InvalidArgument`; `first = 500` sent directly to the reader is clamped to 100. The fixtures are enough, so no bulk insert is needed. |
 | Pagination (gateway handler) | `first = 0` and `first = 101` are rejected without calling the mesh; an unset `first` reaches the mesh as 25; cursors pass through unchanged. |
 | e2e (`test/e2e`) | `GetTransfersByParcelId` for parcel 2 through the gateway with a bearer token returns transfer 2. `/tiles/get_parcel_tiles/...` still works. |

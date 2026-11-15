@@ -4,7 +4,7 @@
 |---|---|
 | **Author / product owner** | Jackson |
 | **Date** | 2026-11-15 |
-| **Status** | Draft. Decisions marked **Proposed** need the owner's sign-off. Accepted when merged. |
+| **Status** | Decisions signed off by the owner on 2026-11-15. Accepted when merged. |
 | **Intent** | [`intent.md`](intent.md) |
 
 This spec sets out the behaviour: what counts as docs-only, which jobs skip,
@@ -15,10 +15,10 @@ how the workflow decides, and how it fails safe. The order of the work goes in
 
 | Question | Decision |
 |---|---|
-| Which jobs skip | **Proposed:** all four code jobs in `ci.yml`: `Go build, vet, unit and integration tests`, `Protos and generated code`, `JS SDK packs and imports` and `E2E (docker compose)`. Nothing they build or test reads Markdown: no `go:embed`, no test fixture, and no script reads a `.md` file (checked on 2026-11-15; the only references are comments). |
-| The docs rule | **Proposed:** a file is docs when its path starts with `docs/` or ends in `.md`, including shipped READMEs. `sdk/js/README.md` is packed into the npm tarball, but the SDK job tests packing and importing, not the README, so a README-only change gains nothing from it. `CHANGELOG.md` files are docs too. Release-please PRs still run everything, because they also change `.release-please-manifest.json` and `sdk/js/package.json`. |
-| Other workflows | **Proposed:** `breaking.yml` gets a positive `paths` filter: it runs only when `api/proto/public/**`, `api/buf.yaml` or `api/buf.lock` changes. It isn't a required check, so skipping the whole workflow is safe. A positive filter is narrower than "not docs-only": a Go-only PR can't break the public API either. This touches the same file as [`../breaking-check-baseline/intent.md`](../breaking-check-baseline/intent.md); whichever lands second rebases. If the breaking check is ever made required, this filter must move to the job level like the others. |
-| Large PRs | **Proposed:** a PR whose `changed_files` count is 3,000 or more is treated as code without listing its files. The pull request files API returns at most 3,000 files, so a longer list can't be checked completely. |
+| Which jobs skip | All four code jobs in `ci.yml`: `Go build, vet, unit and integration tests`, `Protos and generated code`, `JS SDK packs and imports` and `E2E (docker compose)`. Nothing they build or test reads Markdown: no `go:embed`, no test fixture, and no script reads a `.md` file (checked on 2026-11-15; the only references are comments). |
+| The docs rule | A file is docs when its path starts with `docs/` or ends in `.md`, including shipped READMEs. `sdk/js/README.md` is packed into the npm tarball, but the SDK job tests packing and importing, not the README, so a README-only change gains nothing from it. `CHANGELOG.md` files are docs too. Release-please PRs still run everything, because they also change `.release-please-manifest.json` and `sdk/js/package.json`. |
+| Other workflows | `breaking.yml` gets a positive `paths` filter: it runs only when `api/proto/public/**`, `api/buf.yaml` or `api/buf.lock` changes. It isn't a required check, so skipping the whole workflow is safe. A positive filter is narrower than "not docs-only": a Go-only PR can't break the public API either. This touches the same file as [`../breaking-check-baseline/intent.md`](../breaking-check-baseline/intent.md); whichever lands second rebases. If the breaking check is ever made required, this filter must move to the job level like the others. |
+| Large PRs | A PR whose `changed_files` count is 3,000 or more is treated as code without listing its files. The pull request files API returns at most 3,000 files, so a longer list can't be checked completely. |
 
 ## Behaviour
 

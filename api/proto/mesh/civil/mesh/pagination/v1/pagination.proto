@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package civil.mesh.pagination.v1;
+
+// Relay-style page info (https://relay.dev/graphql/connections.htm), the mesh
+// copy of civil.public.pagination.v1.PageInfo. Cursors are opaque.
+message PageInfo {
+  bool has_next_page = 1;
+  bool has_previous_page = 2;
+  optional string start_cursor = 3;
+  optional string end_cursor = 4;
+}

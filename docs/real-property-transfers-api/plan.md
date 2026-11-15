@@ -292,7 +292,7 @@ PR 2's removals if it's already merged); `mise run test:integration`;
 |---|---|
 | The generic `TestPublicRPCs` checks that the mesh request equals the public request. If `fillValid` leaves the optional `first` unset, the gateway's default of 25 makes them differ. | Check what `fillValid` does with optional scalars first. If it leaves them unset, set `first` in the test request or compare with the default applied. Don't weaken the generic check. |
 | `fillValid` may not produce a valid cursor, and the fake mesh doesn't decode it anyway. | Fine for gateway tests, since the gateway passes cursors through. Cursor decoding is tested in the reader. |
-| Party-attribute lookups `as of transfer_timestamp` can return more than one row if attribute ranges overlap in real data. | The schema's range constraints should prevent overlap. The query uses `LEFT JOIN LATERAL ... LIMIT 1` ordered by the range start, so a bad row can't duplicate a party. |
+| Party-attribute lookups `as of transfer_timestamp` could return more than one row if attribute ranges overlapped. | Resolved in PR 3: `party_attributes` and `address_attributes` have exclusion constraints (`no_overlapping_party_attributes`, `no_overlapping_address_attributes`), so a plain `LEFT JOIN` can't duplicate a party. |
 | Large multi-parcel transfers. | Accepted in the spec's "Known limits". |
 | A release is cut between PR 2 and PR 4. | The owner holds the release-please PR until PR 4 merges. |
 

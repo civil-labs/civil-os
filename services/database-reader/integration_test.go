@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/genproto/googleapis/type/interval"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -24,6 +25,7 @@ import (
 	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/neighborhoods/v1/neighborhoodsv1connect"
 	parcelsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1"
 	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1/parcelsv1connect"
+	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/transfers/v1/transfersv1connect"
 	valuationsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/valuations/v1"
 	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/valuations/v1/valuationsv1connect"
 	zoningv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/zoning/v1"
@@ -43,11 +45,18 @@ type readerClients struct {
 	zoning        zoningv1connect.ZoningReadServiceClient
 	valuations    valuationsv1connect.ValuationReadServiceClient
 	neighborhoods neighborhoodsv1connect.NeighborhoodReadServiceClient
+	transfers     transfersv1connect.RealPropertyTransferReadServiceClient
 }
 
 func startReader(t *testing.T) readerClients {
 	t.Helper()
-	pool := tu.FixtureDatabase(t).Pool(t)
+	return startReaderOn(t, tu.FixtureDatabase(t).Pool(t))
+}
+
+// startReaderOn serves the reader from pool, for tests that also change the
+// database directly.
+func startReaderOn(t *testing.T, pool *pgxpool.Pool) readerClients {
+	t.Helper()
 	srv := httptest.NewServer(newHandler(pool, slog.New(slog.DiscardHandler)))
 	t.Cleanup(srv.Close)
 	c := http.DefaultClient
@@ -58,6 +67,7 @@ func startReader(t *testing.T) readerClients {
 		zoning:        zoningv1connect.NewZoningReadServiceClient(c, srv.URL),
 		valuations:    valuationsv1connect.NewValuationReadServiceClient(c, srv.URL),
 		neighborhoods: neighborhoodsv1connect.NewNeighborhoodReadServiceClient(c, srv.URL),
+		transfers:     transfersv1connect.NewRealPropertyTransferReadServiceClient(c, srv.URL),
 	}
 }
 

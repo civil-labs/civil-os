@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"google.golang.org/genproto/googleapis/type/interval"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	improvementsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/improvements/v1"
@@ -558,6 +559,65 @@ func TestEquityComparables(t *testing.T) {
 	if keys := sortedKeys(poly.Msg.Parcels); len(keys) != 4 {
 		t.Errorf("polygon: got %d parcels %v, want parcels 1-4", len(keys), keys)
 	}
+}
+
+// TestSalesComparables pins the latest sale the fixture transfers give each
+// parcel. A parcel whose latest transfer in range has no amount isn't a
+// comparable: parcel 5's latest transfer (6) has none, until the range ends
+// before it and transfer 1 becomes the latest.
+func TestSalesComparables(t *testing.T) {
+	r := startReader(t)
+	ctx := context.Background()
+
+	all := make([]int, tu.ParcelCount)
+	for i := range all {
+		all[i] = i + 1
+	}
+	type sale struct {
+		time  string
+		price string
+	}
+	check := func(name string, timeRange *interval.Interval, want map[int]sale) {
+		t.Helper()
+		res, err := r.parcels.GetSalesComparables(ctx, connect.NewRequest(&parcelsv1.GetSalesComparablesRequest{
+			SelectedParcelIds: ids(tu.ParcelPrefix, all...),
+			TimeRange:         timeRange,
+		}))
+		if err != nil {
+			t.Fatalf("%s: %v", name, err)
+		}
+		if len(res.Msg.Parcels) != len(want) {
+			t.Errorf("%s: got parcels %v, want %d", name, sortedKeys(res.Msg.Parcels), len(want))
+		}
+		for n, w := range want {
+			got := res.Msg.Parcels[tu.ParcelID(n)]
+			if got == nil {
+				t.Errorf("%s: parcel %d missing", name, n)
+				continue
+			}
+			if ts := got.GetSaleTime().AsTime().UTC().Format(time.DateOnly); ts != w.time || got.GetSalePrice() != w.price {
+				t.Errorf("%s: parcel %d sale = %s %s, want %s %s", name, n, ts, got.GetSalePrice(), w.time, w.price)
+			}
+		}
+	}
+
+	check("no range", nil, map[int]sale{
+		2:  {"2022-06-15", "310000.0000"},
+		6:  {"2023-09-01", "520000.0000"},
+		7:  {"2023-09-01", "520000.0000"},
+		8:  {"2022-01-15", "140000.0000"},
+		19: {"2024-05-01", "180000.0000"},
+	})
+	check("before transfer 6", &interval.Interval{
+		EndTime: timestamppb.New(time.Date(2024, 12, 31, 0, 0, 0, 0, time.UTC)),
+	}, map[int]sale{
+		2:  {"2022-06-15", "310000.0000"},
+		5:  {"2021-03-01", "250000.0000"},
+		6:  {"2023-09-01", "520000.0000"},
+		7:  {"2023-09-01", "520000.0000"},
+		8:  {"2022-01-15", "140000.0000"},
+		19: {"2024-05-01", "180000.0000"},
+	})
 }
 
 // TestVoidedParcelHidden checks the voided parcel still has current rows

@@ -13,6 +13,8 @@
 --   52000000 improvement qualities 53000000 improvements
 --   60000000 valuations           70000000 neighborhood defs  71000000 neighborhoods
 --   80000000 countries            81000000 administrative areas
+--   90000000 real property transfers
+--   91000000 transfer code types  92000000 transfer codes
 --   a0000000 parcels (1..20; feature_id = 1000 + n)
 --
 -- Shape of the data (tests rely on it):
@@ -28,6 +30,19 @@
 --   * Neighborhoods (legal definition 1): parcels 1-10 North, 11-20 South.
 --   * Valuation 1 (2025 roll): parcel market value 100000 + 5000n, assessed 90%.
 --   * Address 21 is attached to no parcel, for update tests.
+--   * Real property transfers 1-7 (docs/real-property-transfers-api/spec.md):
+--       1  2021-03-01  parcel 5: party 9 -> 4; codes 1 and 3
+--       2  2022-06-15  parcel 2: party 1 -> 2 and 3 (0.5 each)
+--       3  2023-09-01  parcels 6 and 7, improvements 6 and 7: party 10 -> 6 (n = 6), 7 (n = 7); code 2
+--       4  2024-02-01  voided parcel 20 and improvement 17 only: never visible
+--       5  2024-05-01  parcels 19 and voided 20: party 1 -> 9 (19), 10 (20)
+--       6  2025-01-10  parcel 5: party 4 -> 5; no amount, no recording
+--       7  2022-01-15  parcel 8: party 3 as grantor, no grantee recorded
+--     Transfers other than 6 have deed book FX-B<n>, page <n> and URI
+--     https://recordings.example.invalid/FX-<n>. The latest grantee of each
+--     parcel is its current owner (except parcel 8), but parcel_parties
+--     ranges all start 2020-01-01: ownership history isn't modelled, so the
+--     dates deliberately don't match the transfers.
 --
 -- Run after all migrations. Not for production databases.
 
@@ -232,5 +247,63 @@ SELECT i.improvement_id, v.valuation_id, 80000 + 2000 * k, (80000 + 2000 * k) * 
 FROM generate_series(1, 17) k
 JOIN core.improvements i ON i.public_id = pg_temp.fid('53000000', k)
 CROSS JOIN core.valuations v;
+
+-- Real property transfers -------------------------------------------------------------
+
+INSERT INTO core.real_property_transfer_code_types (public_id, name, description, trace_id)
+VALUES (pg_temp.fid('91000000', 1), 'Fixture Qualification', 'Fixture qualification of a sale', 'fixture');
+
+INSERT INTO core.real_property_transfer_codes (public_id, real_property_transfer_code_type_id, name, description, trace_id)
+SELECT pg_temp.fid('92000000', v.n), ct.real_property_transfer_code_type_id, v.name, v.description, 'fixture'
+FROM (VALUES (1, 1, 'Fixture Qualified', 'Fixture arm''s-length sale'),
+             (2, 1, 'Fixture Unqualified', NULL),
+             (3, NULL, 'Fixture Untyped', NULL)) v(n, type_n, name, description)
+LEFT JOIN core.real_property_transfer_code_types ct ON ct.public_id = pg_temp.fid('91000000', v.type_n);
+
+INSERT INTO core.real_property_transfers (public_id, legacy_id, transfer_timestamp, transfer_amount, deed_book, deed_page, deed_uri, trace_id)
+SELECT pg_temp.fid('90000000', v.n), 'FX-RPT-' || v.n, v.ts, v.amount,
+       CASE WHEN v.n <> 6 THEN 'FX-B' || v.n END,
+       CASE WHEN v.n <> 6 THEN v.n::text END,
+       CASE WHEN v.n <> 6 THEN 'https://recordings.example.invalid/FX-' || v.n END,
+       'fixture'
+FROM (VALUES (1, timestamptz '2021-03-01 00:00:00+00', 250000.0000),
+             (2, timestamptz '2022-06-15 00:00:00+00', 310000.0000),
+             (3, timestamptz '2023-09-01 00:00:00+00', 520000.0000),
+             (4, timestamptz '2024-02-01 00:00:00+00', 90000.0000),
+             (5, timestamptz '2024-05-01 00:00:00+00', 180000.0000),
+             (6, timestamptz '2025-01-10 00:00:00+00', NULL),
+             (7, timestamptz '2022-01-15 00:00:00+00', 140000.0000)) v(n, ts, amount);
+
+-- (transfer, parcel, party, is_grantor, share)
+INSERT INTO core.real_property_transfer_party_parcels (real_property_transfer_id, parcel_id, party_id, is_grantor, transferred_share, trace_id)
+SELECT t.real_property_transfer_id, p.parcel_id, pt.party_id, v.is_grantor, v.share, 'fixture'
+FROM (VALUES (1, 5, 9, true, 1.0000), (1, 5, 4, false, 1.0000),
+             (2, 2, 1, true, 1.0000), (2, 2, 2, false, 0.5000), (2, 2, 3, false, 0.5000),
+             (3, 6, 10, true, 1.0000), (3, 6, 6, false, 1.0000),
+             (3, 7, 10, true, 1.0000), (3, 7, 7, false, 1.0000),
+             (4, 20, 1, true, 1.0000), (4, 20, 10, false, 1.0000),
+             (5, 19, 1, true, 1.0000), (5, 19, 9, false, 1.0000),
+             (5, 20, 1, true, 1.0000), (5, 20, 10, false, 1.0000),
+             (6, 5, 4, true, 1.0000), (6, 5, 5, false, 1.0000),
+             (7, 8, 3, true, 1.0000)) v(transfer_n, parcel_n, party_n, is_grantor, share)
+JOIN core.real_property_transfers t ON t.public_id = pg_temp.fid('90000000', v.transfer_n)
+JOIN core.parcels p ON p.public_id = pg_temp.fid('a0000000', v.parcel_n)
+JOIN core.parties pt ON pt.public_id = pg_temp.fid('30000000', v.party_n);
+
+-- (transfer, improvement, party, is_grantor, share)
+INSERT INTO core.real_property_transfer_party_improvements (real_property_transfer_id, improvement_id, party_id, is_grantor, transferred_share, trace_id)
+SELECT t.real_property_transfer_id, i.improvement_id, pt.party_id, v.is_grantor, v.share, 'fixture'
+FROM (VALUES (3, 6, 10, true, 1.0000), (3, 6, 6, false, 1.0000),
+             (3, 7, 10, true, 1.0000), (3, 7, 7, false, 1.0000),
+             (4, 17, 1, true, 1.0000), (4, 17, 10, false, 1.0000)) v(transfer_n, improvement_n, party_n, is_grantor, share)
+JOIN core.real_property_transfers t ON t.public_id = pg_temp.fid('90000000', v.transfer_n)
+JOIN core.improvements i ON i.public_id = pg_temp.fid('53000000', v.improvement_n)
+JOIN core.parties pt ON pt.public_id = pg_temp.fid('30000000', v.party_n);
+
+INSERT INTO core.real_property_transfer_code_assignments (real_property_transfer_id, real_property_transfer_code_id, trace_id)
+SELECT t.real_property_transfer_id, c.real_property_transfer_code_id, 'fixture'
+FROM (VALUES (1, 1), (1, 3), (3, 2)) v(transfer_n, code_n)
+JOIN core.real_property_transfers t ON t.public_id = pg_temp.fid('90000000', v.transfer_n)
+JOIN core.real_property_transfer_codes c ON c.public_id = pg_temp.fid('92000000', v.code_n);
 
 COMMIT;

@@ -27,6 +27,7 @@ import (
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/landuses/v1/landusesv1connect"
 	publicneighborhoodsv1connect "github.com/civil-labs/civil-os/api/gen/go/civil/public/neighborhoods/v1/neighborhoodsv1connect"
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/parcels/v1/parcelsv1connect"
+	publictransfersv1connect "github.com/civil-labs/civil-os/api/gen/go/civil/public/transfers/v1/transfersv1connect"
 	publicvaluationsv1connect "github.com/civil-labs/civil-os/api/gen/go/civil/public/valuations/v1/valuationsv1connect"
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/zoning/v1/zoningv1connect"
 	"github.com/civil-labs/civil-os/internal/testutil"
@@ -238,6 +239,7 @@ var publicServices = []string{
 	zoningv1connect.ZoningServiceName,
 	publicvaluationsv1connect.ValuationServiceName,
 	publicneighborhoodsv1connect.NeighborhoodServiceName,
+	publictransfersv1connect.RealPropertyTransfersServiceName,
 }
 
 // localMethods answer without calling the mesh.

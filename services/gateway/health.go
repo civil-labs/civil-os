@@ -1,5 +1,7 @@
 package main
 
+// V3 check: a Go-only change runs every code job.
+
 import (
 	"encoding/json"
 	"net/http"

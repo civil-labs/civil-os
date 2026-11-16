@@ -31,9 +31,13 @@ In **Settings → Rules → Rulesets**, add one ruleset for `main`:
     depend on the `Detect docs-only changes` job, which is deliberately **not**
     required: if it fails, the code jobs run anyway.
   - `Public API breaking changes` skips `buf breaking` itself when no public
-    API file changed, and still reports, so it's safe to require. (It isn't in
-    the live ruleset at the moment; see
-    [`breaking-check-baseline/intent.md`](breaking-check-baseline/intent.md).)
+    API file changed, and still reports, so it's safe to require. It compares
+    each PR against the PR's base, so it only fails for a break the PR makes
+    itself, and release-please PRs are also checked against the last
+    `public-api-v*` tag
+    ([`breaking-check-baseline/spec.md`](breaking-check-baseline/spec.md)).
+    It isn't in the live ruleset yet: the owner adds it once it has run green
+    on a few PRs.
 - [ ] Bypass list: repository admins only, if anyone. The release-please App
   doesn't need to bypass, because its release PRs are merged like any other.
 

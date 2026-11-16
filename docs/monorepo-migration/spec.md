@@ -135,6 +135,7 @@ The rules:
 
 This resolves intent open question Q2.
 - **`buf breaking`** runs on every PR against the last `public-api-v*` tag and checks `api/proto/public` only.
+  - *Amended 2026-11-16:* per-PR checks now compare against the PR's base, and release PRs also compare against the last tag. See [`../breaking-check-baseline/spec.md`](../breaking-check-baseline/spec.md).
   - A breaking change **fails** the check unless the PR title marks it breaking (`feat!:` / `BREAKING CHANGE`). Such a title makes release-please bump the Public API version.
   - Before 1.0, a breaking change bumps the minor version.
 - **The mesh protos have no breaking check.**

@@ -13,14 +13,19 @@ import (
 )
 
 func TestIDCursor(t *testing.T) {
+	const (
+		party  = "30000000-0000-4000-8000-000000000003"
+		other  = "30000000-0000-4000-8000-000000000004"
+		parcel = "a0000000-0000-4000-8000-000000000002"
+	)
 	at := timestamppb.New(time.Date(2022, 6, 1, 0, 0, 0, 0, time.UTC))
-	hash := idFilterHash("GetParcelsByPartyId", "party-3", at)
+	hash := idFilterHash("GetParcelsByPartyId", party, at)
 
-	c, err := encodeIDCursor("parcel-2", hash)
+	c, err := encodeIDCursor(parcel, hash)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, err := decodeIDCursor(c, hash); err != nil || got != "parcel-2" {
+	if got, err := decodeIDCursor(c, hash); err != nil || got != parcel {
 		t.Fatalf("round trip = %q, %v", got, err)
 	}
 
@@ -38,12 +43,13 @@ func TestIDCursor(t *testing.T) {
 	}{
 		"malformed base64":   {"not base64!", hash},
 		"malformed protobuf": {base64.RawURLEncoding.EncodeToString([]byte{0xff, 0xff}), hash},
-		"version 2":          {encode(&paginationv1.IdCursor{Version: 2, LastId: "parcel-2", FilterHash: hash}), hash},
+		"version 2":          {encode(&paginationv1.IdCursor{Version: 2, LastId: parcel, FilterHash: hash}), hash},
 		"no last ID":         {encode(&paginationv1.IdCursor{Version: 1, FilterHash: hash}), hash},
-		"different RPC":      {c, idFilterHash("GetParcelsByAddressId", "party-3", at)},
-		"different ID":       {c, idFilterHash("GetParcelsByPartyId", "party-4", at)},
-		"different time":     {c, idFilterHash("GetParcelsByPartyId", "party-3", later)},
-		"time unset":         {c, idFilterHash("GetParcelsByPartyId", "party-3", nil)},
+		"last ID not a UUID": {encode(&paginationv1.IdCursor{Version: 1, LastId: "x' OR 1=1", FilterHash: hash}), hash},
+		"different RPC":      {c, idFilterHash("GetParcelsByAddressId", party, at)},
+		"different ID":       {c, idFilterHash("GetParcelsByPartyId", other, at)},
+		"different time":     {c, idFilterHash("GetParcelsByPartyId", party, later)},
+		"time unset":         {c, idFilterHash("GetParcelsByPartyId", party, nil)},
 	} {
 		if _, err := decodeIDCursor(tc.cursor, tc.hash); connect.CodeOf(err) != connect.CodeInvalidArgument {
 			t.Errorf("%s: got %v, want InvalidArgument", name, err)

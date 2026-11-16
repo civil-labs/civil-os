@@ -16,7 +16,7 @@ validated. The order of the work goes in `plan.md`.
 | Question | Decision |
 |---|---|
 | The baseline | **The first parent of the checked-out merge commit**, not `github.event.pull_request.base.sha`. On `pull_request`, `actions/checkout` checks out `refs/pull/N/merge`, which is the PR's head merged into the base branch's current tip, and `HEAD^1` is that tip. Comparing `HEAD` with `HEAD^1` checks exactly the change this PR would make to the base. `base.sha` in the event payload can lag behind the base tip that the merge ref was built from: the intent's `edited` re-runs are a case where it does. If it lags, any break merged to `main` in between would be blamed on this PR, which is the bug this work fixes. |
-| Release-time check | **Yes, on the release-please PR, as a second step in the same job.** When the PR's head branch starts with `release-please--`, the job also runs `buf breaking` against the last `public-api-v*` tag. If that finds a break, the public API's new version in `.release-please-manifest.json` must be a breaking bump over the tag: the major version before 1.0 is 0, so the minor must rise; from 1.0, the major must rise. Otherwise the job fails and tells the owner how to correct the release (below). With no tag yet, the step is skipped with a notice. This catches a break merged without `!`, whether the per-PR check was skipped, failed and was merged anyway (it isn't required today), or the PR was merged by an admin bypass. |
+| Release-time check | **Yes, on the release-please PR, as a second step in the same job.** When the PR's head branch starts with `release-please--`, the job also runs `buf breaking` against the last `public-api-v*` tag. If that finds a break, the public API's new version in `.release-please-manifest.json` must be a breaking bump over the tag: the major version before 1.0 is 0, so the minor must rise; from 1.0, the major must rise. Otherwise the job fails and tells the owner how to correct the release (below). With no tag yet, the step is skipped with a notice. This catches a break merged without `!`, whether the per-PR check was skipped, failed and was merged anyway (it isn't required today), or the PR was merged by an admin bypass. *Amended 2026-11-16, while planning:* the step runs on every release-please PR, whatever the public-API scope step reports. A release of the root package alone doesn't touch `api/proto/public/`, so a scope-gated step would miss a break merged under a title release-please ignores (for example `refactor:`), which never reaches a public API release. |
 | Merge-group and push events | **No new triggers.** There's no merge queue, and `push` to `main` has no PR title to read. If a merge queue is added, its `merge_group` trigger needs the same `HEAD^1` baseline (a merge-group commit's first parent is the queue's base) and a way to read each grouped PR's title. That's work for the merge-queue change, and it's recorded in a workflow comment. |
 | Edited titles | **They still work.** `edited` re-runs the job. The merge ref, and so `HEAD^1`, is the current base, not the base at the time the PR was opened, so fixing a title re-checks against the right baseline. A base-branch change also arrives as `edited` and re-checks against the new base. A body-only edit re-runs the check too; that's cheap and harmless. |
 | Required check | **Ask the owner to add `Public API breaking changes` to the `Main Squash Only` ruleset** once this lands and has passed on a few unrelated PRs. With the baseline fixed, it's no longer red for unrelated reasons, and `docs/github-setup.md` already lists it as required. The ruleset is outside the repo, so the owner makes this change. |
@@ -59,8 +59,12 @@ belonged to the tag baseline, and a base commit always exists.
 ### Release-time check (release-please PRs only)
 
 Runs after the per-PR step, only when `github.head_ref` starts with
-`release-please--`. Release PRs change `api/proto/public/CHANGELOG.md`, so the
-scope step already reports `true` for them.
+`release-please--`, and **whatever the scope step reports**. A release PR
+touches `api/proto/public/CHANGELOG.md` only when the public API is part of
+the release. A root-only release doesn't, and a break merged under a title
+release-please ignores would then never be checked. With the step always
+running, that release fails: the break is found, and the public API version
+hasn't moved. The `buf` setup runs whenever either check needs it.
 
 1. Find the last tag:
    `git describe --tags --abbrev=0 --match 'public-api-v*' HEAD^1`. No tag:

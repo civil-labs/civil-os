@@ -22,7 +22,11 @@
   checked. Their branches, and the scratch base branch, are deleted.
 - **`ci:` doesn't trigger a release.**
 
-## Clarification of the spec (recorded here, no spec change)
+## Spec amendment (in this PR)
+
+The owner asked for this to be amended in `spec.md` (the release-time
+decision row and the "Release-time check" section), in the same commit series
+as this plan.
 
 The spec says release PRs "change `api/proto/public/CHANGELOG.md`, so the
 scope step already reports `true` for them". That's only true when the public
@@ -181,7 +185,7 @@ looks for `release-please--branches--main`.
 |---|---|
 | A merge ref whose first parent isn't the base. | GitHub builds `refs/pull/N/merge` with the base as first parent. The step checks that `HEAD^2` exists, and V2 confirms the parent in its log line. |
 | `base.sha` vs `HEAD^1` confusion in a later edit. | The comment on the step says why it uses `HEAD^1`. |
-| A break merged unmarked under a type that release-please ignores. | The release-time step runs on every release PR (the clarification above). Making the check required closes the gap at the PR. |
+| A break merged unmarked under a type that release-please ignores. | The release-time step runs on every release PR (the amendment above). Making the check required closes the gap at the PR. |
 | The release-time error blocks a release the owner wants out. | The check isn't required yet. Once it is, the fix is a `Release-As:` footer or a `fix!:` commit, as the error says. |
 | `jq` missing on a future runner image. | The step fails visibly instead of passing. |
 | Fork PRs. | Unchanged from today: the repo takes PRs from branches. |

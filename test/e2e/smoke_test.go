@@ -26,12 +26,16 @@ import (
 
 	"connectrpc.com/connect"
 
+	addressesv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/addresses/v1"
+	"github.com/civil-labs/civil-os/api/gen/go/civil/public/addresses/v1/addressesv1connect"
 	dexv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/dex/v1"
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/dex/v1/dexv1connect"
 	instancev1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/instance/v1"
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/instance/v1/instancev1connect"
 	parcelsv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/parcels/v1"
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/parcels/v1/parcelsv1connect"
+	partiesv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/parties/v1"
+	"github.com/civil-labs/civil-os/api/gen/go/civil/public/parties/v1/partiesv1connect"
 	transfersv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/transfers/v1"
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/transfers/v1/transfersv1connect"
 	tu "github.com/civil-labs/civil-os/internal/testutil"
@@ -233,6 +237,66 @@ func TestSmoke(t *testing.T) {
 		}))
 		if code := connect.CodeOf(err); code != connect.CodeInvalidArgument {
 			t.Errorf("first = 101: got %v (%v), want InvalidArgument", code, err)
+		}
+	})
+
+	t.Run("addresses and parties", func(t *testing.T) {
+		// Parcel 3 -> its owner, party 3 -> the owner's parcels and mailing address.
+		parties := partiesv1connect.NewPartiesServiceClient(httpClient, gatewayURL)
+		pr, err := parties.GetPartiesById(ctx, authed(token, &partiesv1.GetPartiesByIdRequest{
+			PartyIds: []string{tu.PartyID(3)},
+		}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		owner := pr.Msg.GetParties()[tu.PartyID(3)]
+		if owner.GetName() != "Fixture Owner 3" || owner.GetMailingAddressId() != tu.AddressID(3) {
+			t.Fatalf("party 3 = %v", owner)
+		}
+
+		one := int32(1)
+		pp, err := parties.GetParcelsByPartyId(ctx, authed(token, &partiesv1.GetParcelsByPartyIdRequest{
+			PartyId: tu.PartyID(3), First: &one,
+		}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(pp.Msg.Edges) != 1 || !pp.Msg.GetPageInfo().GetHasNextPage() {
+			t.Fatalf("party 3 parcels, first page = %v", pp.Msg)
+		}
+		next, err := parties.GetParcelsByPartyId(ctx, authed(token, &partiesv1.GetParcelsByPartyIdRequest{
+			PartyId: tu.PartyID(3), After: pp.Msg.GetPageInfo().EndCursor,
+		}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(next.Msg.Edges) != 2 || next.Msg.GetPageInfo().GetHasNextPage() {
+			t.Errorf("party 3 parcels after the first = %v, want the other 2", next.Msg)
+		}
+
+		addresses := addressesv1connect.NewAddressesServiceClient(httpClient, gatewayURL)
+		ar, err := addresses.GetAddressesById(ctx, authed(token, &addressesv1.GetAddressesByIdRequest{
+			AddressIds: []string{owner.GetMailingAddressId()},
+		}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if a := ar.Msg.GetAddresses()[tu.AddressID(3)]; a.GetCountry().GetCode() != "ZZ" || a.GetCoordinates() == nil {
+			t.Errorf("address 3 = %v", a)
+		}
+		ap, err := addresses.GetParcelsByAddressId(ctx, authed(token, &addressesv1.GetParcelsByAddressIdRequest{
+			AddressId: tu.AddressID(3),
+		}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(ap.Msg.Edges) != 1 || ap.Msg.Edges[0].GetNode().GetParcelId() != tu.ParcelID(3) {
+			t.Errorf("parcels at address 3 = %v", ap.Msg)
+		}
+
+		_, err = parties.GetParcelsByPartyId(ctx, authed(token, &partiesv1.GetParcelsByPartyIdRequest{PartyId: "not-a-uuid"}))
+		if code := connect.CodeOf(err); code != connect.CodeInvalidArgument {
+			t.Errorf("non-UUID party: got %v (%v), want InvalidArgument", code, err)
 		}
 	})
 

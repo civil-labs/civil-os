@@ -91,6 +91,72 @@ func (x *PageInfo) GetEndCursor() string {
 	return ""
 }
 
+// The decoded form of an edge cursor for lookups ordered by one public ID
+// (docs/address-party-read-api/spec.md). Internal to the reader: clients only
+// see its base64url encoding.
+type IdCursor struct {
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	Version uint32                 `protobuf:"varint,1,opt,name=version,proto3" json:"version,omitempty"`
+	// public_id of the last edge returned.
+	LastId string `protobuf:"bytes,2,opt,name=last_id,json=lastId,proto3" json:"last_id,omitempty"`
+	// SHA-256 of the canonical request filter, so a cursor can't be reused
+	// with a different filter.
+	FilterHash    []byte `protobuf:"bytes,3,opt,name=filter_hash,json=filterHash,proto3" json:"filter_hash,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *IdCursor) Reset() {
+	*x = IdCursor{}
+	mi := &file_civil_mesh_pagination_v1_pagination_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *IdCursor) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IdCursor) ProtoMessage() {}
+
+func (x *IdCursor) ProtoReflect() protoreflect.Message {
+	mi := &file_civil_mesh_pagination_v1_pagination_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IdCursor.ProtoReflect.Descriptor instead.
+func (*IdCursor) Descriptor() ([]byte, []int) {
+	return file_civil_mesh_pagination_v1_pagination_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *IdCursor) GetVersion() uint32 {
+	if x != nil {
+		return x.Version
+	}
+	return 0
+}
+
+func (x *IdCursor) GetLastId() string {
+	if x != nil {
+		return x.LastId
+	}
+	return ""
+}
+
+func (x *IdCursor) GetFilterHash() []byte {
+	if x != nil {
+		return x.FilterHash
+	}
+	return nil
+}
+
 var File_civil_mesh_pagination_v1_pagination_proto protoreflect.FileDescriptor
 
 const file_civil_mesh_pagination_v1_pagination_proto_rawDesc = "" +
@@ -103,7 +169,12 @@ const file_civil_mesh_pagination_v1_pagination_proto_rawDesc = "" +
 	"\n" +
 	"end_cursor\x18\x04 \x01(\tH\x01R\tendCursor\x88\x01\x01B\x0f\n" +
 	"\r_start_cursorB\r\n" +
-	"\v_end_cursorB\x88\x02\n" +
+	"\v_end_cursor\"^\n" +
+	"\bIdCursor\x12\x18\n" +
+	"\aversion\x18\x01 \x01(\rR\aversion\x12\x17\n" +
+	"\alast_id\x18\x02 \x01(\tR\x06lastId\x12\x1f\n" +
+	"\vfilter_hash\x18\x03 \x01(\fR\n" +
+	"filterHashB\x88\x02\n" +
 	"\x1ccom.civil.mesh.pagination.v1B\x0fPaginationProtoP\x01ZTgithub.com/civil-labs/civil-os/internal/gen/go/civil/mesh/pagination/v1;paginationv1\xa2\x02\x03CMP\xaa\x02\x18Civil.Mesh.Pagination.V1\xca\x02\x18Civil\\Mesh\\Pagination\\V1\xe2\x02$Civil\\Mesh\\Pagination\\V1\\GPBMetadata\xea\x02\x1bCivil::Mesh::Pagination::V1b\x06proto3"
 
 var (
@@ -118,9 +189,10 @@ func file_civil_mesh_pagination_v1_pagination_proto_rawDescGZIP() []byte {
 	return file_civil_mesh_pagination_v1_pagination_proto_rawDescData
 }
 
-var file_civil_mesh_pagination_v1_pagination_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_civil_mesh_pagination_v1_pagination_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_civil_mesh_pagination_v1_pagination_proto_goTypes = []any{
 	(*PageInfo)(nil), // 0: civil.mesh.pagination.v1.PageInfo
+	(*IdCursor)(nil), // 1: civil.mesh.pagination.v1.IdCursor
 }
 var file_civil_mesh_pagination_v1_pagination_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -142,7 +214,7 @@ func file_civil_mesh_pagination_v1_pagination_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_civil_mesh_pagination_v1_pagination_proto_rawDesc), len(file_civil_mesh_pagination_v1_pagination_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

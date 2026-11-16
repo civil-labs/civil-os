@@ -10,3 +10,15 @@ message PageInfo {
   optional string start_cursor = 3;
   optional string end_cursor = 4;
 }
+
+// The decoded form of an edge cursor for lookups ordered by one public ID
+// (docs/address-party-read-api/spec.md). Internal to the reader: clients only
+// see its base64url encoding.
+message IdCursor {
+  uint32 version = 1;
+  // public_id of the last edge returned.
+  string last_id = 2;
+  // SHA-256 of the canonical request filter, so a cursor can't be reused
+  // with a different filter.
+  bytes filter_hash = 3;
+}

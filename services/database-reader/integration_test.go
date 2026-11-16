@@ -17,6 +17,7 @@ import (
 	"google.golang.org/genproto/googleapis/type/interval"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/addresses/v1/addressesv1connect"
 	improvementsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/improvements/v1"
 	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/improvements/v1/improvementsv1connect"
 	landusesv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/landuses/v1"
@@ -25,6 +26,7 @@ import (
 	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/neighborhoods/v1/neighborhoodsv1connect"
 	parcelsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1"
 	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1/parcelsv1connect"
+	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parties/v1/partiesv1connect"
 	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/transfers/v1/transfersv1connect"
 	valuationsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/valuations/v1"
 	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/valuations/v1/valuationsv1connect"
@@ -46,6 +48,8 @@ type readerClients struct {
 	valuations    valuationsv1connect.ValuationReadServiceClient
 	neighborhoods neighborhoodsv1connect.NeighborhoodReadServiceClient
 	transfers     transfersv1connect.RealPropertyTransferReadServiceClient
+	addresses     addressesv1connect.AddressesReadServiceClient
+	parties       partiesv1connect.PartiesReadServiceClient
 }
 
 func startReader(t *testing.T) readerClients {
@@ -68,6 +72,8 @@ func startReaderOn(t *testing.T, pool *pgxpool.Pool) readerClients {
 		valuations:    valuationsv1connect.NewValuationReadServiceClient(c, srv.URL),
 		neighborhoods: neighborhoodsv1connect.NewNeighborhoodReadServiceClient(c, srv.URL),
 		transfers:     transfersv1connect.NewRealPropertyTransferReadServiceClient(c, srv.URL),
+		addresses:     addressesv1connect.NewAddressesReadServiceClient(c, srv.URL),
+		parties:       partiesv1connect.NewPartiesReadServiceClient(c, srv.URL),
 	}
 }
 

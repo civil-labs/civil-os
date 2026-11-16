@@ -14,7 +14,7 @@ import (
 	transfersv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/transfers/v1"
 )
 
-func TestTransferPageSize(t *testing.T) {
+func TestPageSize(t *testing.T) {
 	ptr := func(v int32) *int32 { return &v }
 	for _, c := range []struct {
 		first *int32
@@ -23,8 +23,8 @@ func TestTransferPageSize(t *testing.T) {
 		{nil, 25}, {ptr(1), 1}, {ptr(50), 50}, {ptr(100), 100},
 		{ptr(500), 100}, {ptr(0), 1}, {ptr(-3), 1},
 	} {
-		if got := transferPageSize(c.first); got != c.want {
-			t.Errorf("transferPageSize(%v) = %d, want %d", c.first, got, c.want)
+		if got := pageSize(c.first); got != c.want {
+			t.Errorf("pageSize(%v) = %d, want %d", c.first, got, c.want)
 		}
 	}
 }

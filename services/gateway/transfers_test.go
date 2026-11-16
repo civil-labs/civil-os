@@ -67,6 +67,13 @@ func TestTransferPageSizeDefault(t *testing.T) {
 		t.Errorf("feature lookup: unset first reached the mesh as %d, want 25", got)
 	}
 
+	if _, err := c.GetTransfersByPartyId(ctx, connect.NewRequest(&publictransfersv1.GetTransfersByPartyIdRequest{PartyIds: []string{testutil.PartyID(1)}})); err != nil {
+		t.Fatal(err)
+	}
+	if got := meshFirst(t, g); got != 25 {
+		t.Errorf("party lookup: unset first reached the mesh as %d, want 25", got)
+	}
+
 	for _, first := range []int32{1, 100} {
 		if _, err := c.GetTransfersByParcelId(ctx, connect.NewRequest(&publictransfersv1.GetTransfersByParcelIdRequest{ParcelIds: parcel, First: &first})); err != nil {
 			t.Fatalf("first = %d: %v", first, err)

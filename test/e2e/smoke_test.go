@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -297,6 +298,38 @@ func TestSmoke(t *testing.T) {
 		_, err = parties.GetParcelsByPartyId(ctx, authed(token, &partiesv1.GetParcelsByPartyIdRequest{PartyId: "not-a-uuid"}))
 		if code := connect.CodeOf(err); code != connect.CodeInvalidArgument {
 			t.Errorf("non-UUID party: got %v (%v), want InvalidArgument", code, err)
+		}
+	})
+
+	t.Run("parcel extents", func(t *testing.T) {
+		parcels := parcelsv1connect.NewParcelsServiceClient(httpClient, gatewayURL)
+		res, err := parcels.GetParcelExtentsWGS84ByParcelId(ctx, authed(token, &parcelsv1.GetParcelExtentsWGS84ByParcelIdRequest{
+			ParcelIds: []string{tu.ParcelID(1)},
+		}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		// Parcel 1 is the 0.0004-degree square at (-140, -40).
+		e := res.Msg.GetExtents()[tu.ParcelID(1)]
+		if e == nil || e.GetMinX() != -140 || e.GetMinY() != -40 || e.GetMaxX() <= e.GetMinX() || e.GetMaxY() <= e.GetMinY() {
+			t.Errorf("parcel 1 extent = %v", e)
+		}
+	})
+
+	t.Run("transfers by party", func(t *testing.T) {
+		transfers := transfersv1connect.NewRealPropertyTransfersServiceClient(httpClient, gatewayURL)
+		res, err := transfers.GetTransfersByPartyId(ctx, authed(token, &transfersv1.GetTransfersByPartyIdRequest{
+			PartyIds: []string{tu.PartyID(1)},
+		}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		var got []string
+		for _, e := range res.Msg.Edges {
+			got = append(got, e.GetNode().GetTransferId())
+		}
+		if want := []string{tu.TransferID(5), tu.TransferID(2)}; !slices.Equal(got, want) {
+			t.Errorf("party 1 transfers = %v, want %v", got, want)
 		}
 	})
 

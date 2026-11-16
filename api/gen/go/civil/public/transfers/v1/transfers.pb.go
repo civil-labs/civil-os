@@ -931,6 +931,131 @@ func (x *GetTransfersByFeatureIdResponse) GetPageInfo() *v11.PageInfo {
 	return nil
 }
 
+type GetTransfersByPartyIdRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// 1 to 100 unique party UUIDs.
+	PartyIds []string `protobuf:"bytes,1,rep,name=party_ids,json=partyIds,proto3" json:"party_ids,omitempty"`
+	// Only transfers in [start_time, end_time). Either bound may be omitted.
+	TimeRange *interval.Interval `protobuf:"bytes,2,opt,name=time_range,json=timeRange,proto3" json:"time_range,omitempty"`
+	// The page size, 1 to 100. Defaults to 25.
+	First *int32 `protobuf:"varint,3,opt,name=first,proto3,oneof" json:"first,omitempty"`
+	// Return the transfers after this cursor, from a previous page of the same
+	// request.
+	After         *string `protobuf:"bytes,4,opt,name=after,proto3,oneof" json:"after,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetTransfersByPartyIdRequest) Reset() {
+	*x = GetTransfersByPartyIdRequest{}
+	mi := &file_civil_public_transfers_v1_transfers_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetTransfersByPartyIdRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTransfersByPartyIdRequest) ProtoMessage() {}
+
+func (x *GetTransfersByPartyIdRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_civil_public_transfers_v1_transfers_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTransfersByPartyIdRequest.ProtoReflect.Descriptor instead.
+func (*GetTransfersByPartyIdRequest) Descriptor() ([]byte, []int) {
+	return file_civil_public_transfers_v1_transfers_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *GetTransfersByPartyIdRequest) GetPartyIds() []string {
+	if x != nil {
+		return x.PartyIds
+	}
+	return nil
+}
+
+func (x *GetTransfersByPartyIdRequest) GetTimeRange() *interval.Interval {
+	if x != nil {
+		return x.TimeRange
+	}
+	return nil
+}
+
+func (x *GetTransfersByPartyIdRequest) GetFirst() int32 {
+	if x != nil && x.First != nil {
+		return *x.First
+	}
+	return 0
+}
+
+func (x *GetTransfersByPartyIdRequest) GetAfter() string {
+	if x != nil && x.After != nil {
+		return *x.After
+	}
+	return ""
+}
+
+type GetTransfersByPartyIdResponse struct {
+	state         protoimpl.MessageState      `protogen:"open.v1"`
+	Edges         []*RealPropertyTransferEdge `protobuf:"bytes,1,rep,name=edges,proto3" json:"edges,omitempty"`
+	PageInfo      *v11.PageInfo               `protobuf:"bytes,2,opt,name=page_info,json=pageInfo,proto3" json:"page_info,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetTransfersByPartyIdResponse) Reset() {
+	*x = GetTransfersByPartyIdResponse{}
+	mi := &file_civil_public_transfers_v1_transfers_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetTransfersByPartyIdResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTransfersByPartyIdResponse) ProtoMessage() {}
+
+func (x *GetTransfersByPartyIdResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_civil_public_transfers_v1_transfers_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTransfersByPartyIdResponse.ProtoReflect.Descriptor instead.
+func (*GetTransfersByPartyIdResponse) Descriptor() ([]byte, []int) {
+	return file_civil_public_transfers_v1_transfers_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *GetTransfersByPartyIdResponse) GetEdges() []*RealPropertyTransferEdge {
+	if x != nil {
+		return x.Edges
+	}
+	return nil
+}
+
+func (x *GetTransfersByPartyIdResponse) GetPageInfo() *v11.PageInfo {
+	if x != nil {
+		return x.PageInfo
+	}
+	return nil
+}
+
 var File_civil_public_transfers_v1_transfers_proto protoreflect.FileDescriptor
 
 const file_civil_public_transfers_v1_transfers_proto_rawDesc = "" +
@@ -1016,11 +1141,25 @@ const file_civil_public_transfers_v1_transfers_proto_rawDesc = "" +
 	"\x06_after\"\xaf\x01\n" +
 	"\x1fGetTransfersByFeatureIdResponse\x12I\n" +
 	"\x05edges\x18\x01 \x03(\v23.civil.public.transfers.v1.RealPropertyTransferEdgeR\x05edges\x12A\n" +
-	"\tpage_info\x18\x02 \x01(\v2$.civil.public.pagination.v1.PageInfoR\bpageInfo2\xce\x03\n" +
+	"\tpage_info\x18\x02 \x01(\v2$.civil.public.pagination.v1.PageInfoR\bpageInfo\"\xfa\x02\n" +
+	"\x1cGetTransfersByPartyIdRequest\x120\n" +
+	"\tparty_ids\x18\x01 \x03(\tB\x13\xbaH\x10\x92\x01\r\b\x01\x10d\x18\x01\"\x05r\x03\xb0\x01\x01R\bpartyIds\x12\xc6\x01\n" +
+	"\n" +
+	"time_range\x18\x02 \x01(\v2\x15.google.type.IntervalB\x8f\x01\xbaH\x8b\x01\xba\x01\x87\x01\n" +
+	"\x10valid_time_range\x12\"start_time must be before end_time\x1aO!has(this.start_time) || !has(this.end_time) || this.start_time < this.end_timeR\ttimeRange\x12$\n" +
+	"\x05first\x18\x03 \x01(\x05B\t\xbaH\x06\x1a\x04\x18d(\x01H\x00R\x05first\x88\x01\x01\x12%\n" +
+	"\x05after\x18\x04 \x01(\tB\n" +
+	"\xbaH\ar\x05\x10\x01\x18\x80\x04H\x01R\x05after\x88\x01\x01B\b\n" +
+	"\x06_firstB\b\n" +
+	"\x06_after\"\xad\x01\n" +
+	"\x1dGetTransfersByPartyIdResponse\x12I\n" +
+	"\x05edges\x18\x01 \x03(\v23.civil.public.transfers.v1.RealPropertyTransferEdgeR\x05edges\x12A\n" +
+	"\tpage_info\x18\x02 \x01(\v2$.civil.public.pagination.v1.PageInfoR\bpageInfo2\xe0\x04\n" +
 	"\x1cRealPropertyTransfersService\x12\x80\x01\n" +
 	"\x10GetTransfersById\x122.civil.public.transfers.v1.GetTransfersByIdRequest\x1a3.civil.public.transfers.v1.GetTransfersByIdResponse\"\x03\x90\x02\x01\x12\x92\x01\n" +
 	"\x16GetTransfersByParcelId\x128.civil.public.transfers.v1.GetTransfersByParcelIdRequest\x1a9.civil.public.transfers.v1.GetTransfersByParcelIdResponse\"\x03\x90\x02\x01\x12\x95\x01\n" +
-	"\x17GetTransfersByFeatureId\x129.civil.public.transfers.v1.GetTransfersByFeatureIdRequest\x1a:.civil.public.transfers.v1.GetTransfersByFeatureIdResponse\"\x03\x90\x02\x01B\x89\x02\n" +
+	"\x17GetTransfersByFeatureId\x129.civil.public.transfers.v1.GetTransfersByFeatureIdRequest\x1a:.civil.public.transfers.v1.GetTransfersByFeatureIdResponse\"\x03\x90\x02\x01\x12\x8f\x01\n" +
+	"\x15GetTransfersByPartyId\x127.civil.public.transfers.v1.GetTransfersByPartyIdRequest\x1a8.civil.public.transfers.v1.GetTransfersByPartyIdResponse\"\x03\x90\x02\x01B\x89\x02\n" +
 	"\x1dcom.civil.public.transfers.v1B\x0eTransfersProtoP\x01ZOgithub.com/civil-labs/civil-os/api/gen/go/civil/public/transfers/v1;transfersv1\xa2\x02\x03CPT\xaa\x02\x19Civil.Public.Transfers.V1\xca\x02\x1aCivil\\Public_\\Transfers\\V1\xe2\x02&Civil\\Public_\\Transfers\\V1\\GPBMetadata\xea\x02\x1cCivil::Public::Transfers::V1b\x06proto3"
 
 var (
@@ -1035,7 +1174,7 @@ func file_civil_public_transfers_v1_transfers_proto_rawDescGZIP() []byte {
 	return file_civil_public_transfers_v1_transfers_proto_rawDescData
 }
 
-var file_civil_public_transfers_v1_transfers_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_civil_public_transfers_v1_transfers_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_civil_public_transfers_v1_transfers_proto_goTypes = []any{
 	(*RealPropertyTransfer)(nil),            // 0: civil.public.transfers.v1.RealPropertyTransfer
 	(*TransferredParcel)(nil),               // 1: civil.public.transfers.v1.TransferredParcel
@@ -1051,14 +1190,16 @@ var file_civil_public_transfers_v1_transfers_proto_goTypes = []any{
 	(*GetTransfersByParcelIdResponse)(nil),  // 11: civil.public.transfers.v1.GetTransfersByParcelIdResponse
 	(*GetTransfersByFeatureIdRequest)(nil),  // 12: civil.public.transfers.v1.GetTransfersByFeatureIdRequest
 	(*GetTransfersByFeatureIdResponse)(nil), // 13: civil.public.transfers.v1.GetTransfersByFeatureIdResponse
-	(*timestamppb.Timestamp)(nil),           // 14: google.protobuf.Timestamp
-	(*v1.Recording)(nil),                    // 15: civil.public.recordings.v1.Recording
-	(*interval.Interval)(nil),               // 16: google.type.Interval
-	(*v11.PageInfo)(nil),                    // 17: civil.public.pagination.v1.PageInfo
+	(*GetTransfersByPartyIdRequest)(nil),    // 14: civil.public.transfers.v1.GetTransfersByPartyIdRequest
+	(*GetTransfersByPartyIdResponse)(nil),   // 15: civil.public.transfers.v1.GetTransfersByPartyIdResponse
+	(*timestamppb.Timestamp)(nil),           // 16: google.protobuf.Timestamp
+	(*v1.Recording)(nil),                    // 17: civil.public.recordings.v1.Recording
+	(*interval.Interval)(nil),               // 18: google.type.Interval
+	(*v11.PageInfo)(nil),                    // 19: civil.public.pagination.v1.PageInfo
 }
 var file_civil_public_transfers_v1_transfers_proto_depIdxs = []int32{
-	14, // 0: civil.public.transfers.v1.RealPropertyTransfer.transfer_time:type_name -> google.protobuf.Timestamp
-	15, // 1: civil.public.transfers.v1.RealPropertyTransfer.recordings:type_name -> civil.public.recordings.v1.Recording
+	16, // 0: civil.public.transfers.v1.RealPropertyTransfer.transfer_time:type_name -> google.protobuf.Timestamp
+	17, // 1: civil.public.transfers.v1.RealPropertyTransfer.recordings:type_name -> civil.public.recordings.v1.Recording
 	1,  // 2: civil.public.transfers.v1.RealPropertyTransfer.parcels:type_name -> civil.public.transfers.v1.TransferredParcel
 	2,  // 3: civil.public.transfers.v1.RealPropertyTransfer.improvements:type_name -> civil.public.transfers.v1.TransferredImprovement
 	5,  // 4: civil.public.transfers.v1.RealPropertyTransfer.codes:type_name -> civil.public.transfers.v1.TransferCode
@@ -1070,23 +1211,28 @@ var file_civil_public_transfers_v1_transfers_proto_depIdxs = []int32{
 	6,  // 10: civil.public.transfers.v1.TransferCode.type:type_name -> civil.public.transfers.v1.TransferCodeType
 	0,  // 11: civil.public.transfers.v1.RealPropertyTransferEdge.node:type_name -> civil.public.transfers.v1.RealPropertyTransfer
 	0,  // 12: civil.public.transfers.v1.GetTransfersByIdResponse.transfers:type_name -> civil.public.transfers.v1.RealPropertyTransfer
-	16, // 13: civil.public.transfers.v1.GetTransfersByParcelIdRequest.time_range:type_name -> google.type.Interval
+	18, // 13: civil.public.transfers.v1.GetTransfersByParcelIdRequest.time_range:type_name -> google.type.Interval
 	7,  // 14: civil.public.transfers.v1.GetTransfersByParcelIdResponse.edges:type_name -> civil.public.transfers.v1.RealPropertyTransferEdge
-	17, // 15: civil.public.transfers.v1.GetTransfersByParcelIdResponse.page_info:type_name -> civil.public.pagination.v1.PageInfo
-	16, // 16: civil.public.transfers.v1.GetTransfersByFeatureIdRequest.time_range:type_name -> google.type.Interval
+	19, // 15: civil.public.transfers.v1.GetTransfersByParcelIdResponse.page_info:type_name -> civil.public.pagination.v1.PageInfo
+	18, // 16: civil.public.transfers.v1.GetTransfersByFeatureIdRequest.time_range:type_name -> google.type.Interval
 	7,  // 17: civil.public.transfers.v1.GetTransfersByFeatureIdResponse.edges:type_name -> civil.public.transfers.v1.RealPropertyTransferEdge
-	17, // 18: civil.public.transfers.v1.GetTransfersByFeatureIdResponse.page_info:type_name -> civil.public.pagination.v1.PageInfo
-	8,  // 19: civil.public.transfers.v1.RealPropertyTransfersService.GetTransfersById:input_type -> civil.public.transfers.v1.GetTransfersByIdRequest
-	10, // 20: civil.public.transfers.v1.RealPropertyTransfersService.GetTransfersByParcelId:input_type -> civil.public.transfers.v1.GetTransfersByParcelIdRequest
-	12, // 21: civil.public.transfers.v1.RealPropertyTransfersService.GetTransfersByFeatureId:input_type -> civil.public.transfers.v1.GetTransfersByFeatureIdRequest
-	9,  // 22: civil.public.transfers.v1.RealPropertyTransfersService.GetTransfersById:output_type -> civil.public.transfers.v1.GetTransfersByIdResponse
-	11, // 23: civil.public.transfers.v1.RealPropertyTransfersService.GetTransfersByParcelId:output_type -> civil.public.transfers.v1.GetTransfersByParcelIdResponse
-	13, // 24: civil.public.transfers.v1.RealPropertyTransfersService.GetTransfersByFeatureId:output_type -> civil.public.transfers.v1.GetTransfersByFeatureIdResponse
-	22, // [22:25] is the sub-list for method output_type
-	19, // [19:22] is the sub-list for method input_type
-	19, // [19:19] is the sub-list for extension type_name
-	19, // [19:19] is the sub-list for extension extendee
-	0,  // [0:19] is the sub-list for field type_name
+	19, // 18: civil.public.transfers.v1.GetTransfersByFeatureIdResponse.page_info:type_name -> civil.public.pagination.v1.PageInfo
+	18, // 19: civil.public.transfers.v1.GetTransfersByPartyIdRequest.time_range:type_name -> google.type.Interval
+	7,  // 20: civil.public.transfers.v1.GetTransfersByPartyIdResponse.edges:type_name -> civil.public.transfers.v1.RealPropertyTransferEdge
+	19, // 21: civil.public.transfers.v1.GetTransfersByPartyIdResponse.page_info:type_name -> civil.public.pagination.v1.PageInfo
+	8,  // 22: civil.public.transfers.v1.RealPropertyTransfersService.GetTransfersById:input_type -> civil.public.transfers.v1.GetTransfersByIdRequest
+	10, // 23: civil.public.transfers.v1.RealPropertyTransfersService.GetTransfersByParcelId:input_type -> civil.public.transfers.v1.GetTransfersByParcelIdRequest
+	12, // 24: civil.public.transfers.v1.RealPropertyTransfersService.GetTransfersByFeatureId:input_type -> civil.public.transfers.v1.GetTransfersByFeatureIdRequest
+	14, // 25: civil.public.transfers.v1.RealPropertyTransfersService.GetTransfersByPartyId:input_type -> civil.public.transfers.v1.GetTransfersByPartyIdRequest
+	9,  // 26: civil.public.transfers.v1.RealPropertyTransfersService.GetTransfersById:output_type -> civil.public.transfers.v1.GetTransfersByIdResponse
+	11, // 27: civil.public.transfers.v1.RealPropertyTransfersService.GetTransfersByParcelId:output_type -> civil.public.transfers.v1.GetTransfersByParcelIdResponse
+	13, // 28: civil.public.transfers.v1.RealPropertyTransfersService.GetTransfersByFeatureId:output_type -> civil.public.transfers.v1.GetTransfersByFeatureIdResponse
+	15, // 29: civil.public.transfers.v1.RealPropertyTransfersService.GetTransfersByPartyId:output_type -> civil.public.transfers.v1.GetTransfersByPartyIdResponse
+	26, // [26:30] is the sub-list for method output_type
+	22, // [22:26] is the sub-list for method input_type
+	22, // [22:22] is the sub-list for extension type_name
+	22, // [22:22] is the sub-list for extension extendee
+	0,  // [0:22] is the sub-list for field type_name
 }
 
 func init() { file_civil_public_transfers_v1_transfers_proto_init() }
@@ -1101,13 +1247,14 @@ func file_civil_public_transfers_v1_transfers_proto_init() {
 	file_civil_public_transfers_v1_transfers_proto_msgTypes[6].OneofWrappers = []any{}
 	file_civil_public_transfers_v1_transfers_proto_msgTypes[10].OneofWrappers = []any{}
 	file_civil_public_transfers_v1_transfers_proto_msgTypes[12].OneofWrappers = []any{}
+	file_civil_public_transfers_v1_transfers_proto_msgTypes[14].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_civil_public_transfers_v1_transfers_proto_rawDesc), len(file_civil_public_transfers_v1_transfers_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

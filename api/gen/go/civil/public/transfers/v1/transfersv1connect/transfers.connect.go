@@ -43,6 +43,9 @@ const (
 	// RealPropertyTransfersServiceGetTransfersByFeatureIdProcedure is the fully-qualified name of the
 	// RealPropertyTransfersService's GetTransfersByFeatureId RPC.
 	RealPropertyTransfersServiceGetTransfersByFeatureIdProcedure = "/civil.public.transfers.v1.RealPropertyTransfersService/GetTransfersByFeatureId"
+	// RealPropertyTransfersServiceGetTransfersByPartyIdProcedure is the fully-qualified name of the
+	// RealPropertyTransfersService's GetTransfersByPartyId RPC.
+	RealPropertyTransfersServiceGetTransfersByPartyIdProcedure = "/civil.public.transfers.v1.RealPropertyTransfersService/GetTransfersByPartyId"
 )
 
 // RealPropertyTransfersServiceClient is a client for the
@@ -55,6 +58,11 @@ type RealPropertyTransfersServiceClient interface {
 	// Returns a page of the transfers that involve the parcels with any of the
 	// map feature IDs.
 	GetTransfersByFeatureId(context.Context, *connect.Request[v1.GetTransfersByFeatureIdRequest]) (*connect.Response[v1.GetTransfersByFeatureIdResponse], error)
+	// Returns a page of the transfers where any of the parties is a grantor or
+	// grantee on a parcel or improvement entry that is returned. A voided
+	// party matches nothing. Each transfer is returned whole, with all its
+	// entries and parties.
+	GetTransfersByPartyId(context.Context, *connect.Request[v1.GetTransfersByPartyIdRequest]) (*connect.Response[v1.GetTransfersByPartyIdResponse], error)
 }
 
 // NewRealPropertyTransfersServiceClient constructs a client for the
@@ -90,6 +98,13 @@ func NewRealPropertyTransfersServiceClient(httpClient connect.HTTPClient, baseUR
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
+		getTransfersByPartyId: connect.NewClient[v1.GetTransfersByPartyIdRequest, v1.GetTransfersByPartyIdResponse](
+			httpClient,
+			baseURL+RealPropertyTransfersServiceGetTransfersByPartyIdProcedure,
+			connect.WithSchema(realPropertyTransfersServiceMethods.ByName("GetTransfersByPartyId")),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -98,6 +113,7 @@ type realPropertyTransfersServiceClient struct {
 	getTransfersById        *connect.Client[v1.GetTransfersByIdRequest, v1.GetTransfersByIdResponse]
 	getTransfersByParcelId  *connect.Client[v1.GetTransfersByParcelIdRequest, v1.GetTransfersByParcelIdResponse]
 	getTransfersByFeatureId *connect.Client[v1.GetTransfersByFeatureIdRequest, v1.GetTransfersByFeatureIdResponse]
+	getTransfersByPartyId   *connect.Client[v1.GetTransfersByPartyIdRequest, v1.GetTransfersByPartyIdResponse]
 }
 
 // GetTransfersById calls civil.public.transfers.v1.RealPropertyTransfersService.GetTransfersById.
@@ -117,6 +133,12 @@ func (c *realPropertyTransfersServiceClient) GetTransfersByFeatureId(ctx context
 	return c.getTransfersByFeatureId.CallUnary(ctx, req)
 }
 
+// GetTransfersByPartyId calls
+// civil.public.transfers.v1.RealPropertyTransfersService.GetTransfersByPartyId.
+func (c *realPropertyTransfersServiceClient) GetTransfersByPartyId(ctx context.Context, req *connect.Request[v1.GetTransfersByPartyIdRequest]) (*connect.Response[v1.GetTransfersByPartyIdResponse], error) {
+	return c.getTransfersByPartyId.CallUnary(ctx, req)
+}
+
 // RealPropertyTransfersServiceHandler is an implementation of the
 // civil.public.transfers.v1.RealPropertyTransfersService service.
 type RealPropertyTransfersServiceHandler interface {
@@ -127,6 +149,11 @@ type RealPropertyTransfersServiceHandler interface {
 	// Returns a page of the transfers that involve the parcels with any of the
 	// map feature IDs.
 	GetTransfersByFeatureId(context.Context, *connect.Request[v1.GetTransfersByFeatureIdRequest]) (*connect.Response[v1.GetTransfersByFeatureIdResponse], error)
+	// Returns a page of the transfers where any of the parties is a grantor or
+	// grantee on a parcel or improvement entry that is returned. A voided
+	// party matches nothing. Each transfer is returned whole, with all its
+	// entries and parties.
+	GetTransfersByPartyId(context.Context, *connect.Request[v1.GetTransfersByPartyIdRequest]) (*connect.Response[v1.GetTransfersByPartyIdResponse], error)
 }
 
 // NewRealPropertyTransfersServiceHandler builds an HTTP handler from the service implementation. It
@@ -157,6 +184,13 @@ func NewRealPropertyTransfersServiceHandler(svc RealPropertyTransfersServiceHand
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
+	realPropertyTransfersServiceGetTransfersByPartyIdHandler := connect.NewUnaryHandler(
+		RealPropertyTransfersServiceGetTransfersByPartyIdProcedure,
+		svc.GetTransfersByPartyId,
+		connect.WithSchema(realPropertyTransfersServiceMethods.ByName("GetTransfersByPartyId")),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/civil.public.transfers.v1.RealPropertyTransfersService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case RealPropertyTransfersServiceGetTransfersByIdProcedure:
@@ -165,6 +199,8 @@ func NewRealPropertyTransfersServiceHandler(svc RealPropertyTransfersServiceHand
 			realPropertyTransfersServiceGetTransfersByParcelIdHandler.ServeHTTP(w, r)
 		case RealPropertyTransfersServiceGetTransfersByFeatureIdProcedure:
 			realPropertyTransfersServiceGetTransfersByFeatureIdHandler.ServeHTTP(w, r)
+		case RealPropertyTransfersServiceGetTransfersByPartyIdProcedure:
+			realPropertyTransfersServiceGetTransfersByPartyIdHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -184,4 +220,8 @@ func (UnimplementedRealPropertyTransfersServiceHandler) GetTransfersByParcelId(c
 
 func (UnimplementedRealPropertyTransfersServiceHandler) GetTransfersByFeatureId(context.Context, *connect.Request[v1.GetTransfersByFeatureIdRequest]) (*connect.Response[v1.GetTransfersByFeatureIdResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.transfers.v1.RealPropertyTransfersService.GetTransfersByFeatureId is not implemented"))
+}
+
+func (UnimplementedRealPropertyTransfersServiceHandler) GetTransfersByPartyId(context.Context, *connect.Request[v1.GetTransfersByPartyIdRequest]) (*connect.Response[v1.GetTransfersByPartyIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.transfers.v1.RealPropertyTransfersService.GetTransfersByPartyId is not implemented"))
 }

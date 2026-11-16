@@ -61,6 +61,13 @@ service ParcelsService {
 
   rpc GetEstimatedParcelsExtentWGS84(GetEstimatedParcelsExtentWGS84Request) returns (GetEstimatedParcelsExtentWGS84Response) {}
 
+  // Returns the WGS84 bounding box of each parcel's geometry at legal_as_of,
+  // for zooming a map to it. Parcels that are unknown, voided, or have no
+  // geometry or record then are left out.
+  rpc GetParcelExtentsWGS84ByParcelId(GetParcelExtentsWGS84ByParcelIdRequest) returns (GetParcelExtentsWGS84ByParcelIdResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
   rpc GetLandAreaSqftByParcelId(GetLandAreaSqftByParcelIdRequest) returns (GetLandAreaSqftByParcelIdResponse) {}
 
   rpc GetFrontageFtByParcelId(GetFrontageFtByParcelIdRequest) returns (GetFrontageFtByParcelIdResponse) {}
@@ -756,6 +763,49 @@ message GetEstimatedParcelsExtentWGS84Response {
   double min_y = 2 [(gnostic.openapi.v3.property) = {description: "Minimum Latitude / South"}];
   double max_x = 3 [(gnostic.openapi.v3.property) = {description: "Maximum Longitude / East"}];
   double max_y = 4 [(gnostic.openapi.v3.property) = {description: "Maximum Latitude / North"}];
+}
+
+// The WGS84 bounding box of one parcel's geometry at legal_as_of.
+message ExtentWGS84 {
+  double min_x = 1 [(gnostic.openapi.v3.property) = {description: "Minimum Longitude / West"}];
+  double min_y = 2 [(gnostic.openapi.v3.property) = {description: "Minimum Latitude / South"}];
+  double max_x = 3 [(gnostic.openapi.v3.property) = {description: "Maximum Longitude / East"}];
+  double max_y = 4 [(gnostic.openapi.v3.property) = {description: "Maximum Latitude / North"}];
+}
+
+message GetParcelExtentsWGS84ByParcelIdRequest {
+  repeated string parcel_ids = 1 [
+    (buf.validate.field).repeated = {
+      // Enforce uniqueness at the API edge
+      unique: true
+
+      min_items: 1
+      max_items: 100
+
+      // Apply the uuid rule to the items in the array
+      items: {
+        string: {uuid: true}
+      }
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "A list of unique identifiers for the parcels."
+      example: {yaml: "['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']"}
+    }
+  ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The timestamp to read the parcels' geometry at. Defaults to now. A parcel with no geometry or record at that time is left out."}
+  ];
+}
+
+message GetParcelExtentsWGS84ByParcelIdResponse {
+  // Keyed by the UUID parcel ID. Parcels that aren't visible at legal_as_of
+  // (voided, or no geometry or record then) are absent.
+  map<string, ExtentWGS84> extents = 1;
 }
 
 // Get single attribute APIs

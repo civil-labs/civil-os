@@ -96,6 +96,28 @@ func (s *TransferServer) GetTransfersByFeatureId(
 	}), nil
 }
 
+func (s *TransferServer) GetTransfersByPartyId(
+	ctx context.Context,
+	req *connect.Request[publictransfersv1.GetTransfersByPartyIdRequest],
+) (*connect.Response[publictransfersv1.GetTransfersByPartyIdResponse], error) {
+	s.logger.Debug("received GetTransfersByPartyId request", slog.Int("ids", len(req.Msg.PartyIds)))
+
+	meshRes, err := s.dbReaderClient.GetTransfersByPartyId(ctx, connect.NewRequest(&meshtransfersv1.GetTransfersByPartyIdRequest{
+		PartyIds:  req.Msg.PartyIds,
+		TimeRange: req.Msg.TimeRange,
+		First:     pageSize(req.Msg.First),
+		After:     req.Msg.After,
+	}))
+	if err != nil {
+		s.logger.Error("upstream GetTransfersByPartyId request failed", slog.Any("error", err))
+		return nil, err // keep the mesh status code
+	}
+	return connect.NewResponse(&publictransfersv1.GetTransfersByPartyIdResponse{
+		Edges:    mapSlice(meshRes.Msg.Edges, mapTransferEdge),
+		PageInfo: mapPageInfo(meshRes.Msg.PageInfo),
+	}), nil
+}
+
 // mapSlice maps each non-nil element of in.
 func mapSlice[M, P any](in []*M, f func(*M) *P) []*P {
 	if in == nil {

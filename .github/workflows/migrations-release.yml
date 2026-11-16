@@ -1,34 +1,91 @@
 name: Migrations ConfigMap
 
 # On an app release tag, package database/migrations as a versioned
-# ConfigMap and attach it to the GitHub Release. Nothing is committed.
+# ConfigMap and publish it twice: as a GitHub Release asset, and as the OCI
+# artifact ghcr.io/civil-labs/civil-os/db-migrations:<tag>, which Argo CD can
+# use as a source directly. Nothing is committed.
 # No Atlas here (spec §6.4): kubectl only renders the manifest.
+#
+# Run it by hand (workflow_dispatch) to publish an existing tag again, or for
+# the first time (backfill).
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing app release tag to publish, e.g. v0.3.0
+        required: true
+        type: string
 
 permissions:
   contents: write # upload the release asset
+  packages: write # push the OCI artifact
 
 jobs:
   configmap:
     runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
+      ARTIFACT: ghcr.io/civil-labs/civil-os/db-migrations
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
-      - name: Render ConfigMap
+        with:
+          ref: ${{ env.TAG }}
+          fetch-depth: 0 # the size guard is read from the workflow's own commit
+      - name: Check the tag
         run: |
-          name="civil-os-db-migrations-$(echo "$GITHUB_REF_NAME" | tr '[:upper:]' '[:lower:]' | tr '._' '--')"
+          case "$TAG" in
+            v[0-9]*) ;;
+            *) echo "::error::$TAG is not an app release tag (vX.Y.Z)"; exit 1 ;;
+          esac
+      - name: Check the migrations fit in a ConfigMap
+        # The guard comes from the workflow's own commit, not the tag being
+        # published, so older tags are checked with the current rules.
+        run: |
+          git show "$GITHUB_SHA:scripts/check-migrations-size.sh" > "$RUNNER_TEMP/check-migrations-size.sh"
+          git show "$GITHUB_SHA:scripts/check-migrations-size_test.sh" > "$RUNNER_TEMP/check-migrations-size_test.sh"
+          sh "$RUNNER_TEMP/check-migrations-size_test.sh"
+          sh "$RUNNER_TEMP/check-migrations-size.sh" database/migrations
+      - name: Render ConfigMap
+        # Argo CD applies this ConfigMap with server-side apply, which skips the
+        # 256 KiB last-applied annotation that client-side apply would add.
+        # Other tools ignore the annotation.
+        run: |
+          name="civil-os-db-migrations-$(echo "$TAG" | tr '[:upper:]' '[:lower:]' | tr '._' '--')"
           echo "ConfigMap: $name"
           kubectl create configmap "$name" \
             --from-file=database/migrations \
-            --dry-run=client -o yaml > migrations-configmap.yaml
+            --dry-run=client -o yaml |
+            kubectl annotate --local -f - \
+              argocd.argoproj.io/sync-options=ServerSideApply=true \
+              -o yaml > migrations-configmap.yaml
       - name: Attach to the release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           # release-please creates the release with the tag; allow a moment for it.
-          for i in 1 2 3 4 5 6; do
-            gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 && break
+          for _ in 1 2 3 4 5 6; do
+            gh release view "$TAG" >/dev/null 2>&1 && break
             sleep 10
           done
-          gh release upload "$GITHUB_REF_NAME" migrations-configmap.yaml --clobber
+          gh release upload "$TAG" migrations-configmap.yaml --clobber
+      - uses: oras-project/setup-oras@5e2f2482b30b0cb3e14e67f89a80c88c659a7c63 # v2.0.3
+        with:
+          version: 1.3.6
+      - name: Push the OCI artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "$GH_TOKEN" | oras login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          # One gzip-tarball layer holding the directory manifests/ with only the
+          # ConfigMap in it. Argo CD sources it with `path: manifests`.
+          mkdir manifests
+          cp migrations-configmap.yaml manifests/
+          oras push "$ARTIFACT:$TAG" \
+            manifests:application/vnd.oci.image.layer.v1.tar+gzip
+      - name: Verify the pushed artifact
+        run: |
+          mkdir pulled
+          oras pull "$ARTIFACT:$TAG" -o pulled
+          diff -r manifests pulled/manifests

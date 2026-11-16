@@ -64,6 +64,9 @@ message Neighborhood {
   repeated string neighborhood_definition_ids = 3;   // new
 }
 
+// Unchanged: no fields. Every definition is returned.
+message GetNeighborhoodDefinitionsRequest {}
+
 message GetNeighborhoodDefinitionsResponse {
   // Keyed by the UUID neighborhood definition ID.
   map<string, NeighborhoodDefinition> neighborhoods = 1;   // type changed (#1)

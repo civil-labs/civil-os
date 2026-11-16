@@ -1,9 +1,13 @@
 name: Public API breaking changes
 
-# buf breaking on the public module against the last public-api release
-# (spec §4.3). A separate workflow so it re-runs, cheaply, when the PR title
-# is edited: marking a PR as breaking (`feat!:`) is what allows the break.
+# buf breaking on the public module against the PR's base: a PR fails only
+# for a break it introduces itself (docs/breaking-check-baseline/spec.md).
+# A separate workflow so it re-runs, cheaply, when the PR title is edited:
+# marking a PR as breaking (`feat!:`) is what allows the break.
 on:
+  # A merge queue would need a merge_group trigger, with the same HEAD^1
+  # baseline (a merge-group commit's first parent is the queue's base) and a
+  # way to read each queued PR's title. See the spec.
   pull_request:
     types: [opened, synchronize, reopened, edited]
 
@@ -29,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
-          fetch-depth: 0 # needs the public-api-v* tags
+          fetch-depth: 0 # the release-time check needs the public-api-v* tags
       # Skips buf breaking, at the job level, when no public API file changed
       # (docs/docs-only-ci/spec.md). The job still runs and reports, so the
       # check is safe to make required. If this step fails, the job fails.
@@ -57,21 +61,25 @@ jobs:
         uses: jdx/mise-action@6612f0ef07ed2a736cd1e00a94a065522dd41195 # v5.2.5
         with:
           install_args: buf
-      - name: buf breaking against the last public-api release
+      - name: buf breaking against the PR's base
         if: steps.scope.outputs.public != 'false'
         working-directory: api
         env:
           # Via env, never interpolated into the script: titles are untrusted.
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
-          tag=$(git describe --tags --abbrev=0 --match 'public-api-v*' 2>/dev/null || true)
-          if [ -z "$tag" ]; then
-            echo "::notice::No public-api release yet; skipping buf breaking"
-            exit 0
+          set -euo pipefail
+          # The checkout is refs/pull/N/merge, so HEAD^1 is the base tip it was
+          # built from. Not github.event.pull_request.base.sha, which can lag
+          # behind it and would blame this PR for breaks merged in between.
+          if ! base=$(git rev-parse --verify --quiet 'HEAD^1') \
+             || ! git rev-parse --verify --quiet 'HEAD^2' >/dev/null; then
+            echo "::error::HEAD is not a merge commit, so the PR's base can't be found."
+            exit 1
           fi
-          echo "Comparing against $tag"
+          echo "Comparing against the PR's base, $base"
           # The public module is the input; the mesh module may change freely.
-          if buf breaking proto/public --against "../.git#tag=${tag},subdir=api/proto/public"; then
+          if buf breaking proto/public --against "../.git#ref=${base},subdir=api/proto/public"; then
             exit 0
           fi
           # Squash merges keep only the title, so only a `type!:` / `type(scope)!:`

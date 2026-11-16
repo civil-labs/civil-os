@@ -98,19 +98,10 @@ func (s *APIServer) GetParcelsByPartyId(
 		if err != nil {
 			return nil, s.dbError("party parcels", err)
 		}
-		defer rows.Close()
-		var out []*partiesv1.PartyParcel
-		for rows.Next() {
-			pp := &partiesv1.PartyParcel{}
-			if err := rows.Scan(&pp.ParcelId, &pp.FeatureId, &pp.OwnershipShare); err != nil {
-				return nil, s.dbError("party parcels", err)
-			}
-			out = append(out, pp)
-		}
-		if err := rows.Err(); err != nil {
-			return nil, s.dbError("party parcels", err)
-		}
-		return out, nil
+		return collectRows(rows, func(r pgx.Rows) (*partiesv1.PartyParcel, error) {
+			n := &partiesv1.PartyParcel{}
+			return n, r.Scan(&n.ParcelId, &n.FeatureId, &n.OwnershipShare)
+		}, func(err error) error { return s.dbError("party parcels", err) })
 	}
 
 	nodes, cursors, pageInfo, err := pageByID("GetParcelsByPartyId", req.Msg.PartyId, req.Msg.LegalAsOf,

@@ -546,19 +546,21 @@ func (s *APIServer) fetchParcelsForComps(
 	var selectFields = []string{
 		"p.public_id::text",
 		"LEFT(aa.formatted_address, 1024) AS safe_address",
-		"a.public_id::text",
+		// Only an address with attributes now is readable.
+		"CASE WHEN aa.address_id IS NOT NULL THEN a.public_id::text END",
 		"pa.land_area_sq_m",
 		"pa.frontage_m",
 		"pa.depth_m",
 		"COALESCE(pg.feature_id, 0)",
 	}
 
-	// Baseline joins required for the default parcel attributes
+	// Baseline joins required for the default parcel attributes. Comparables
+	// have no legal_as_of, so every versioned row is resolved at NOW().
 	var joins = []string{
-		"LEFT JOIN parcel_attributes pa ON p.parcel_id = pa.parcel_id",
-		"LEFT JOIN addresses a ON pa.address_id = a.address_id",
-		"LEFT JOIN address_attributes aa ON a.address_id = aa.address_id",
-		"LEFT JOIN parcel_geometry pg ON p.parcel_id = pg.parcel_id",
+		"LEFT JOIN parcel_attributes pa ON p.parcel_id = pa.parcel_id AND pa.legal_valid_range @> NOW()",
+		"LEFT JOIN addresses a ON pa.address_id = a.address_id AND NOT a.is_voided",
+		"LEFT JOIN address_attributes aa ON a.address_id = aa.address_id AND aa.legal_valid_range @> NOW()",
+		"LEFT JOIN parcel_geometry pg ON p.parcel_id = pg.parcel_id AND pg.legal_valid_range @> NOW()",
 	}
 
 	// Variables where scanned column data is stored
@@ -622,6 +624,7 @@ func (s *APIServer) fetchParcelsForComps(
                             array_remove(array_agg(DISTINCT z.public_id::text), NULL) AS zoning_public_ids
                         FROM parcel_affordances pa
                         LEFT JOIN zoning z ON pa.zoning_id = z.zoning_id
+                        WHERE pa.legal_valid_range @> NOW()
                         GROUP BY parcel_id
                     ) aff ON p.parcel_id = aff.parcel_id`)
 				selectFields = append(selectFields, "aff.zoning_public_ids")
@@ -646,7 +649,8 @@ func (s *APIServer) fetchParcelsForComps(
                         FROM parcel_improvements pi
                         JOIN improvements imp ON pi.improvement_id = imp.improvement_id
                         LEFT JOIN improvement_attributes attr ON imp.improvement_id = attr.improvement_id
-                        WHERE NOT imp.is_voided
+                            AND attr.legal_valid_range @> NOW()
+                        WHERE NOT imp.is_voided AND pi.legal_valid_range @> NOW()
                         GROUP BY pi.parcel_id
                     ) imp_agg ON p.parcel_id = imp_agg.parcel_id`)
 				selectFields = append(selectFields,

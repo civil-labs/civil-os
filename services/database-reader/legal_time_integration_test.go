@@ -123,3 +123,87 @@ func TestParcelOwnersAtLegalTime(t *testing.T) {
 			d.GetPrimaryOwnerName(), d.PrimaryOwnerAddress)
 	}
 }
+
+// F3: comparables read current attributes, addresses, geometry, zoning and
+// improvements only. For parcels 5 and 9 the old rows only made the result
+// depend on row order; the history added below fails deterministically.
+func TestComparablesUseCurrentRows(t *testing.T) {
+	r := startReader(t)
+	ctx := context.Background()
+	sel := ids(tu.ParcelPrefix, tu.HistoricalAddress, tu.RedrawnParcel, tu.HistoricalParcel)
+	eq, err := r.parcels.GetEquityComparables(ctx, connect.NewRequest(&parcelsv1.GetEquityComparablesRequest{
+		SelectedParcelIds: sel,
+	}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(eq.Msg.Parcels) != 3 {
+		t.Fatalf("equity comparables = %v, want 3 parcels", sortedKeys(eq.Msg.Parcels))
+	}
+	if got := eq.Msg.Parcels[tu.ParcelID(tu.HistoricalAddress)].GetFormattedAddress(); got != "5 Fixture Way, Testville ZZ000" {
+		t.Errorf("parcel 5 address = %q, want the current one", got)
+	}
+	if got := eq.Msg.Parcels[tu.ParcelID(tu.RedrawnParcel)].GetFeatureId(); got != tu.ParcelFeatureID(tu.RedrawnParcel) {
+		t.Errorf("parcel 9 feature = %d, want the current %d, not %d", got, tu.ParcelFeatureID(tu.RedrawnParcel), tu.RedrawnParcelEarlierFeature)
+	}
+
+	// Improvement totals and zoning ignore rows that are no longer valid. The
+	// fixtures have no such history, so add some: improvement 5 was once
+	// 9999 m2, and parcel 5 was once zoned C-1 (zoning 2), both before 2020.
+	pool := tu.FixtureDatabase(t).Pool(t)
+	_, err = pool.Exec(ctx, `
+		INSERT INTO core.improvement_attributes (improvement_id, address_id, improvement_type_id, improvement_condition_id,
+		       improvement_quality_id, area_sq_m, bathrooms, bedrooms, year_built, effective_year_built, units, legal_valid_range, trace_id)
+		SELECT improvement_id, address_id, improvement_type_id, improvement_condition_id, improvement_quality_id,
+		       9999, bathrooms, bedrooms, year_built, effective_year_built, units,
+		       tstzrange('2015-01-01 00:00:00+00', '2020-01-01 00:00:00+00'), 'test'
+		FROM core.improvement_attributes ia JOIN core.improvements i USING (improvement_id)
+		WHERE i.public_id = $1`, tu.FixtureID(tu.ImprovementPrefix, 5))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = pool.Exec(ctx, `
+		INSERT INTO core.parcel_affordances (public_id, parcel_id, zoning_id, affordance_type_id, source, legal_valid_range, trace_id)
+		SELECT $1, pa.parcel_id, z.zoning_id, pa.affordance_type_id, 'test',
+		       tstzrange('2015-01-01 00:00:00+00', '2020-01-01 00:00:00+00'), 'test'
+		FROM core.parcel_affordances pa JOIN core.parcels p USING (parcel_id), core.zoning z
+		WHERE p.public_id = $2 AND z.public_id = $3`,
+		tu.FixtureID(tu.ParcelAffordancePrefix, 99), tu.ParcelID(5), tu.FixtureID(tu.ZoningPrefix, 2))
+	if err != nil {
+		t.Fatal(err)
+	}
+	hist, err := startReaderOn(t, pool).parcels.GetEquityComparables(ctx, connect.NewRequest(&parcelsv1.GetEquityComparablesRequest{
+		SelectedParcelIds: ids(tu.ParcelPrefix, 5),
+		Criteria: []*parcelsv1.ComparableCriteria{
+			{Attribute: parcelsv1.ParcelAttribute_PARCEL_ATTRIBUTE_IMPROVEMENT_AREA_SQ_FT},
+			{Attribute: parcelsv1.ParcelAttribute_PARCEL_ATTRIBUTE_ZONING_ID},
+		},
+	}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, a := range hist.Msg.Parcels[tu.ParcelID(5)].GetAttributes() {
+		switch a.GetAttribute() {
+		case parcelsv1.ParcelAttribute_PARCEL_ATTRIBUTE_IMPROVEMENT_AREA_SQ_FT:
+			if want := 145 * sqftPerSqm; !near(a.GetNumericalValue(), want) {
+				t.Errorf("parcel 5 improvement area = %v sq ft, want the current %v", a.GetNumericalValue(), want)
+			}
+		case parcelsv1.ParcelAttribute_PARCEL_ATTRIBUTE_ZONING_ID:
+			if want := tu.FixtureID(tu.ZoningPrefix, 1); a.GetCategoricalValue() != want {
+				t.Errorf("parcel 5 zoning = %q, want only the current %s", a.GetCategoricalValue(), want)
+			}
+		}
+	}
+
+	// A comparable whose address is voided has no address.
+	voidAddress(t, pool, 5)
+	eq, err = startReaderOn(t, pool).parcels.GetEquityComparables(ctx, connect.NewRequest(&parcelsv1.GetEquityComparablesRequest{
+		SelectedParcelIds: ids(tu.ParcelPrefix, 5),
+	}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p := eq.Msg.Parcels[tu.ParcelID(5)]; p == nil || p.GetAddressId() != "" || p.GetFormattedAddress() != "" {
+		t.Errorf("parcel 5 with a voided address = %v, want no address", p)
+	}
+}

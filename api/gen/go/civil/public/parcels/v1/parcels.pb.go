@@ -322,7 +322,6 @@ func (x *ParcelImprovementsSummary) GetTotalAssessedImprovementValue() string {
 type ParcelDetails struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
 	ParcelId            string                 `protobuf:"bytes,1,opt,name=parcel_id,json=parcelId,proto3" json:"parcel_id,omitempty"`
-	FeatureId           *int64                 `protobuf:"varint,2,opt,name=feature_id,json=featureId,proto3,oneof" json:"feature_id,omitempty"`
 	FormattedAddress    *string                `protobuf:"bytes,3,opt,name=formatted_address,json=formattedAddress,proto3,oneof" json:"formatted_address,omitempty"`
 	AddressId           *string                `protobuf:"bytes,4,opt,name=address_id,json=addressId,proto3,oneof" json:"address_id,omitempty"`
 	PrimaryOwnerName    *string                `protobuf:"bytes,5,opt,name=primary_owner_name,json=primaryOwnerName,proto3,oneof" json:"primary_owner_name,omitempty"`
@@ -376,13 +375,6 @@ func (x *ParcelDetails) GetParcelId() string {
 		return x.ParcelId
 	}
 	return ""
-}
-
-func (x *ParcelDetails) GetFeatureId() int64 {
-	if x != nil && x.FeatureId != nil {
-		return *x.FeatureId
-	}
-	return 0
 }
 
 func (x *ParcelDetails) GetFormattedAddress() string {
@@ -4493,37 +4485,34 @@ const file_civil_public_parcels_v1_parcels_proto_rawDesc = "" +
 	"\x1d_primary_effective_year_builtB\x17\n" +
 	"\x15_primary_condition_idB!\n" +
 	"\x1f_total_market_improvement_valueB#\n" +
-	"!_total_assessed_improvement_value\"\x85\x11\n" +
+	"!_total_assessed_improvement_value\"\xd2\x10\n" +
 	"\rParcelDetails\x12z\n" +
-	"\tparcel_id\x18\x01 \x01(\tB]\xbaGR:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x02%The unique identifier for the parcel.\xbaH\x05r\x03\xb0\x01\x01R\bparcelId\x12\"\n" +
-	"\n" +
-	"feature_id\x18\x02 \x01(\x03H\x00R\tfeatureId\x88\x01\x01\x12<\n" +
+	"\tparcel_id\x18\x01 \x01(\tB]\xbaGR:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x02%The unique identifier for the parcel.\xbaH\x05r\x03\xb0\x01\x01R\bparcelId\x12<\n" +
 	"\x11formatted_address\x18\x03 \x01(\tB\n" +
-	"\xbaH\ar\x05\x10\x00\x18\x80\x02H\x01R\x10formattedAddress\x88\x01\x01\x12\x8b\x01\n" +
+	"\xbaH\ar\x05\x10\x00\x18\x80\x02H\x00R\x10formattedAddress\x88\x01\x01\x12\x8b\x01\n" +
 	"\n" +
-	"address_id\x18\x04 \x01(\tBg\xbaG\\:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x02/The unique identifier for the parcel's address.\xbaH\x05r\x03\xb0\x01\x01H\x02R\taddressId\x88\x01\x01\x12=\n" +
+	"address_id\x18\x04 \x01(\tBg\xbaG\\:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x02/The unique identifier for the parcel's address.\xbaH\x05r\x03\xb0\x01\x01H\x01R\taddressId\x88\x01\x01\x12=\n" +
 	"\x12primary_owner_name\x18\x05 \x01(\tB\n" +
-	"\xbaH\ar\x05\x10\x00\x18\x80\x01H\x03R\x10primaryOwnerName\x88\x01\x01\x12C\n" +
+	"\xbaH\ar\x05\x10\x00\x18\x80\x01H\x02R\x10primaryOwnerName\x88\x01\x01\x12C\n" +
 	"\x15primary_owner_address\x18\x06 \x01(\tB\n" +
-	"\xbaH\ar\x05\x10\x00\x18\x80\x02H\x04R\x13primaryOwnerAddress\x88\x01\x01\x12\xcc\x01\n" +
+	"\xbaH\ar\x05\x10\x00\x18\x80\x02H\x03R\x13primaryOwnerAddress\x88\x01\x01\x12\xcc\x01\n" +
 	"\tparty_ids\x18\a \x03(\tB\xae\x01\xbaG\x99\x01:R\x12P['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']\x92\x02BA list of unique identifiers for the parties that own this parcel.\xbaH\x0e\x92\x01\v\x10\n" +
 	"\x18\x01\"\x05r\x03\xb0\x01\x01R\bpartyIds\x12\x8d\x01\n" +
-	"\vland_use_id\x18\b \x01(\tBh\xbaG]:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x020The unique identifier for the parcel's land use.\xbaH\x05r\x03\xb0\x01\x01H\x05R\tlandUseId\x88\x01\x01\x12\x94\x02\n" +
-	"\x0fneighborhood_id\x18\t \x01(\tB\xe5\x01\xbaG\xd9\x01:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x02\xab\x01The unique identifier for the parcel's neighborhood. Will only populate if a neighborhood definition ID is provided, and the parcel has a neighborhood for that definition.\xbaH\x05r\x03\xb0\x01\x01H\x06R\x0eneighborhoodId\x88\x01\x01\x12:\n" +
+	"\vland_use_id\x18\b \x01(\tBh\xbaG]:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x020The unique identifier for the parcel's land use.\xbaH\x05r\x03\xb0\x01\x01H\x04R\tlandUseId\x88\x01\x01\x12\x94\x02\n" +
+	"\x0fneighborhood_id\x18\t \x01(\tB\xe5\x01\xbaG\xd9\x01:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x02\xab\x01The unique identifier for the parcel's neighborhood. Will only populate if a neighborhood definition ID is provided, and the parcel has a neighborhood for that definition.\xbaH\x05r\x03\xb0\x01\x01H\x05R\x0eneighborhoodId\x88\x01\x01\x12:\n" +
 	"\x0fland_area_sq_ft\x18\n" +
-	" \x01(\x01B\x0e\xbaH\v\x12\t)\x00\x00\x00\x00\x00\x00\x00\x00H\aR\flandAreaSqFt\x88\x01\x01\x124\n" +
-	"\vfrontage_ft\x18\v \x01(\x01B\x0e\xbaH\v\x12\t)\x00\x00\x00\x00\x00\x00\x00\x00H\bR\n" +
+	" \x01(\x01B\x0e\xbaH\v\x12\t)\x00\x00\x00\x00\x00\x00\x00\x00H\x06R\flandAreaSqFt\x88\x01\x01\x124\n" +
+	"\vfrontage_ft\x18\v \x01(\x01B\x0e\xbaH\v\x12\t)\x00\x00\x00\x00\x00\x00\x00\x00H\aR\n" +
 	"frontageFt\x88\x01\x01\x12.\n" +
-	"\bdepth_ft\x18\f \x01(\x01B\x0e\xbaH\v\x12\t)\x00\x00\x00\x00\x00\x00\x00\x00H\tR\adepthFt\x88\x01\x01\x12\xcf\x01\n" +
+	"\bdepth_ft\x18\f \x01(\x01B\x0e\xbaH\v\x12\t)\x00\x00\x00\x00\x00\x00\x00\x00H\bR\adepthFt\x88\x01\x01\x12\xcf\x01\n" +
 	"\n" +
 	"zoning_ids\x18\r \x03(\tB\xaf\x01\xbaG\x9a\x01:R\x12P['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']\x92\x02CA list of unique identifiers for the zoning overlays on the parcel.\xbaH\x0e\x92\x01\v\x102\x18\x01\"\x05r\x03\xb0\x01\x01R\tzoningIds\x12\xb6\x01\n" +
-	"\x11market_land_value\x18\x0e \x01(\tB\x84\x01\xbaG\\\x92\x02YIs only returned if a valuation_id is provided which contains a valuation for this parcel\xbaH\"r 2\x1e^-?[0-9]{1,15}(\\.[0-9]{1,4})?$H\n" +
-	"R\x0fmarketLandValue\x88\x01\x01\x12\xba\x01\n" +
-	"\x13assessed_land_value\x18\x0f \x01(\tB\x84\x01\xbaG\\\x92\x02YIs only returned if a valuation_id is provided which contains a valuation for this parcel\xbaH\"r 2\x1e^-?[0-9]{1,15}(\\.[0-9]{1,4})?$H\vR\x11assessedLandValue\x88\x01\x01\x12-\n" +
+	"\x11market_land_value\x18\x0e \x01(\tB\x84\x01\xbaG\\\x92\x02YIs only returned if a valuation_id is provided which contains a valuation for this parcel\xbaH\"r 2\x1e^-?[0-9]{1,15}(\\.[0-9]{1,4})?$H\tR\x0fmarketLandValue\x88\x01\x01\x12\xba\x01\n" +
+	"\x13assessed_land_value\x18\x0f \x01(\tB\x84\x01\xbaG\\\x92\x02YIs only returned if a valuation_id is provided which contains a valuation for this parcel\xbaH\"r 2\x1e^-?[0-9]{1,15}(\\.[0-9]{1,4})?$H\n" +
+	"R\x11assessedLandValue\x88\x01\x01\x12-\n" +
 	"\n" +
-	"properties\x18\x10 \x01(\tB\b\xbaH\x05r\x03(\x80(H\fR\n" +
-	"properties\x88\x01\x01B\r\n" +
-	"\v_feature_idB\x14\n" +
+	"properties\x18\x10 \x01(\tB\b\xbaH\x05r\x03(\x80(H\vR\n" +
+	"properties\x88\x01\x01B\x14\n" +
 	"\x12_formatted_addressB\r\n" +
 	"\v_address_idB\x15\n" +
 	"\x13_primary_owner_nameB\x18\n" +

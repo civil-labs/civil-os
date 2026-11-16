@@ -319,6 +319,7 @@ func (x *ParcelImprovementsSummary) GetTotalAssessedImprovementValue() string {
 	return ""
 }
 
+// V2 scratch comment.
 type ParcelDetails struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
 	ParcelId            string                 `protobuf:"bytes,1,opt,name=parcel_id,json=parcelId,proto3" json:"parcel_id,omitempty"`

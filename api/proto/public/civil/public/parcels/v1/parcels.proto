@@ -224,6 +224,7 @@ message ParcelImprovementsSummary {
   ];
 }
 
+// V2 scratch comment.
 message ParcelDetails {
   string parcel_id = 1 [
     (buf.validate.field).string.uuid = true,

@@ -14,12 +14,14 @@ import (
 	"syscall"
 	"time"
 
+	publicaddressesv1connect "github.com/civil-labs/civil-os/api/gen/go/civil/public/addresses/v1/addressesv1connect"
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/dex/v1/dexv1connect"
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/improvements/v1/improvementsv1connect"
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/instance/v1/instancev1connect"
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/landuses/v1/landusesv1connect"
 	publicneighborhoodsv1connect "github.com/civil-labs/civil-os/api/gen/go/civil/public/neighborhoods/v1/neighborhoodsv1connect"
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/parcels/v1/parcelsv1connect"
+	publicpartiesv1connect "github.com/civil-labs/civil-os/api/gen/go/civil/public/parties/v1/partiesv1connect"
 	publictransfersv1connect "github.com/civil-labs/civil-os/api/gen/go/civil/public/transfers/v1/transfersv1connect"
 	publicvaluationsv1connect "github.com/civil-labs/civil-os/api/gen/go/civil/public/valuations/v1/valuationsv1connect"
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/zoning/v1/zoningv1connect"
@@ -27,10 +29,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
+	meshaddressesv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/addresses/v1/addressesv1connect"
 	meshimprovementsv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/improvements/v1/improvementsv1connect"
 	meshlandusesv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/landuses/v1/landusesv1connect"
 	meshneighborhoodsv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/neighborhoods/v1/neighborhoodsv1connect"
 	meshparcelsv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1/parcelsv1connect"
+	meshpartiesv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parties/v1/partiesv1connect"
 	meshtransfersv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/transfers/v1/transfersv1connect"
 	meshvaluationsv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/valuations/v1/valuationsv1connect"
 	meshzoningv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/zoning/v1/zoningv1connect"
@@ -312,6 +316,26 @@ func newHandler(config *Config, logger *slog.Logger) (http.Handler, error) {
 	)
 
 	mux.Handle(transfersPath, CORSMiddleware(auth(transfersHandler), logger))
+
+	addressesServer := &AddressServer{
+		dbReaderClient: meshaddressesv1connect.NewAddressesReadServiceClient(http.DefaultClient, dbReaderAddress),
+		logger:         logger,
+	}
+	addressesPath, addressesHandler := publicaddressesv1connect.NewAddressesServiceHandler(
+		addressesServer,
+		connect.WithInterceptors(validate.NewInterceptor()),
+	)
+	mux.Handle(addressesPath, CORSMiddleware(auth(addressesHandler), logger))
+
+	partiesServer := &PartyServer{
+		dbReaderClient: meshpartiesv1connect.NewPartiesReadServiceClient(http.DefaultClient, dbReaderAddress),
+		logger:         logger,
+	}
+	partiesPath, partiesHandler := publicpartiesv1connect.NewPartiesServiceHandler(
+		partiesServer,
+		connect.WithInterceptors(validate.NewInterceptor()),
+	)
+	mux.Handle(partiesPath, CORSMiddleware(auth(partiesHandler), logger))
 
 	// The Dex admin API is only served when a Dex gRPC endpoint is configured
 	// (jurisdictions without their own OIDC server run Dex as their IdP).

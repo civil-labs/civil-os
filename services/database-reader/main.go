@@ -21,6 +21,7 @@ import (
 	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/landuses/v1/landusesv1connect"
 	meshneighborhoodsv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/neighborhoods/v1/neighborhoodsv1connect"
 	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1/parcelsv1connect"
+	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parties/v1/partiesv1connect"
 	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/transfers/v1/transfersv1connect"
 	meshvaluationsv1connect "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/valuations/v1/valuationsv1connect"
 	"github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/zoning/v1/zoningv1connect"
@@ -146,6 +147,9 @@ func newHandler(pool *pgxpool.Pool, logger *slog.Logger) http.Handler {
 	path7, handler7 := transfersv1connect.NewRealPropertyTransferReadServiceHandler(srv)
 	mux.Handle(path7, handler7)
 
+	path8, handler8 := partiesv1connect.NewPartiesReadServiceHandler(srv)
+	mux.Handle(path8, handler8)
+
 	// Pass the fully qualified name of the service so the health check
 	// can report on this specific service, as well as the global server status.
 	checker := grpchealth.NewStaticChecker(
@@ -156,6 +160,7 @@ func newHandler(pool *pgxpool.Pool, logger *slog.Logger) http.Handler {
 		meshvaluationsv1connect.ValuationReadServiceName,
 		meshneighborhoodsv1connect.NeighborhoodReadServiceName,
 		transfersv1connect.RealPropertyTransferReadServiceName,
+		partiesv1connect.PartiesReadServiceName,
 	)
 
 	healthPath, healthHandler := grpchealth.NewHandler(checker)

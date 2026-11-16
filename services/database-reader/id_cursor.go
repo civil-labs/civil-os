@@ -3,9 +3,11 @@ package main
 import (
 	"bytes"
 	"encoding/base64"
+	"errors"
 	"time"
 
 	"connectrpc.com/connect"
+	"github.com/google/uuid"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -60,9 +62,65 @@ func decodeIDCursor(s string, filterHash []byte) (string, error) {
 	if err := proto.Unmarshal(b, &c); err != nil {
 		return "", invalid
 	}
-	if c.GetVersion() != idCursorVersion || c.GetLastId() == "" ||
-		!bytes.Equal(c.GetFilterHash(), filterHash) {
+	// last_id is cast to uuid in SQL, so a crafted cursor must not reach
+	// the database with anything else.
+	if c.GetVersion() != idCursorVersion || !bytes.Equal(c.GetFilterHash(), filterHash) {
+		return "", invalid
+	}
+	if _, err := uuid.Parse(c.GetLastId()); err != nil {
 		return "", invalid
 	}
 	return c.GetLastId(), nil
+}
+
+// pageByID reads one page of a lookup ordered by public ID, ascending. read
+// returns up to limit nodes whose public ID is after afterID (every node
+// when afterID is nil), in order; idOf gives a node's public ID. It returns
+// the nodes with their cursors.
+func pageByID[T any](
+	rpc, id string,
+	legalAsOf *timestamppb.Timestamp,
+	first *int32,
+	after *string,
+	read func(afterID *string, limit int) ([]T, error),
+	idOf func(T) string,
+) ([]T, []string, *paginationv1.PageInfo, error) {
+	pageInfo := &paginationv1.PageInfo{HasPreviousPage: after != nil}
+	if _, err := uuid.Parse(id); err != nil {
+		return nil, nil, nil, connect.NewError(connect.CodeInvalidArgument, errors.New("the ID must be a UUID"))
+	}
+
+	hash := idFilterHash(rpc, id, legalAsOf)
+	var afterID *string
+	if after != nil {
+		last, err := decodeIDCursor(*after, hash)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+		afterID = &last
+	}
+
+	size := pageSize(first)
+	nodes, err := read(afterID, size+1)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	if len(nodes) > size {
+		pageInfo.HasNextPage = true
+		nodes = nodes[:size]
+	}
+
+	cursors := make([]string, len(nodes))
+	for i, n := range nodes {
+		c, err := encodeIDCursor(idOf(n), hash)
+		if err != nil {
+			return nil, nil, nil, connect.NewError(connect.CodeInternal, errors.New("cursor encoding error"))
+		}
+		cursors[i] = c
+	}
+	if len(cursors) > 0 {
+		pageInfo.StartCursor = &cursors[0]
+		pageInfo.EndCursor = &cursors[len(cursors)-1]
+	}
+	return nodes, cursors, pageInfo, nil
 }

@@ -305,7 +305,9 @@ in `services/database-reader/addresses.go`:
 
 ## PR 3: extents and transfers by party (`feat/parcel-extents-transfers-by-party`)
 
-**3.1 Mesh protos** (`feat: mesh parcel extents and transfers by party`):
+**3.1 Mesh protos** (one commit with 3.2, `feat: serve parcel extents and transfers by party`,
+because a new RPC on an existing service doesn't build until the reader
+implements it):
 - On `ParcelReadService`: `GetParcelExtentsWGS84ByParcelId`, `ExtentWGS84` and
   the request and response.
 - On `RealPropertyTransferReadService`: `GetTransfersByPartyId` and its

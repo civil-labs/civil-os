@@ -2427,3 +2427,40 @@ func (s *APIServer) getPrimaryImprovementTypeIdByFeatureId(ctx context.Context, 
 	}
 	return values, nil
 }
+
+// GetParcelExtentsWGS84ByParcelId returns the bounding box of each visible
+// parcel's geometry at the legal time: not voided, with geometry and
+// attributes then (docs/address-party-read-api/spec.md, rule 3).
+func (s *APIServer) GetParcelExtentsWGS84ByParcelId(
+	ctx context.Context,
+	req *connect.Request[parcelsv1.GetParcelExtentsWGS84ByParcelIdRequest],
+) (*connect.Response[parcelsv1.GetParcelExtentsWGS84ByParcelIdResponse], error) {
+	s.logger.Debug("received GetParcelExtentsWGS84ByParcelId request", slog.Int("ids", len(req.Msg.ParcelIds)))
+
+	res := &parcelsv1.GetParcelExtentsWGS84ByParcelIdResponse{Extents: map[string]*parcelsv1.ExtentWGS84{}}
+	if len(req.Msg.ParcelIds) == 0 {
+		return connect.NewResponse(res), nil
+	}
+	rows, err := s.db.Query(ctx, `
+		SELECT p.public_id::text,
+		       ST_XMin(pg.geom_web), ST_YMin(pg.geom_web), ST_XMax(pg.geom_web), ST_YMax(pg.geom_web)
+		FROM core.parcels p`+visibleParcelJoinsSQL+`
+		WHERE NOT p.is_voided AND p.public_id = ANY($2::uuid[])`,
+		getTargetTime(req.Msg.LegalAsOf), req.Msg.ParcelIds)
+	if err != nil {
+		return nil, s.dbError("parcel extents", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var id string
+		e := &parcelsv1.ExtentWGS84{}
+		if err := rows.Scan(&id, &e.MinX, &e.MinY, &e.MaxX, &e.MaxY); err != nil {
+			return nil, s.dbError("parcel extents", err)
+		}
+		res.Extents[id] = e
+	}
+	if err := rows.Err(); err != nil {
+		return nil, s.dbError("parcel extents", err)
+	}
+	return connect.NewResponse(res), nil
+}

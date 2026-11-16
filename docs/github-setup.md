@@ -83,6 +83,9 @@ workflows.
 
 The first push from `images.yml` creates the packages
 `ghcr.io/civil-labs/civil-os/{gateway,database-reader,database-writer,tile-server}`.
+The first run of `migrations-release.yml` creates
+`ghcr.io/civil-labs/civil-os/db-migrations`, the migrations ConfigMap as an OCI
+artifact. Deployments pull it anonymously, so it must be public too.
 
 For each package, in **Organization → Packages → *package* → Package settings**:
 - [ ] Set **visibility** to public.
@@ -130,8 +133,12 @@ workflow passes it to npm when it's set.
 
 - [ ] The first release PRs propose `v0.2.0` for the app and
   `public-api-v0.1.0` for the public API.
-- [ ] The `v*` tag publishes `:vX.Y.Z` images and attaches
-  `migrations-configmap.yaml` to the release.
+- [ ] The `v*` tag publishes `:vX.Y.Z` images, attaches
+  `migrations-configmap.yaml` to the release, and pushes
+  `ghcr.io/civil-labs/civil-os/db-migrations:vX.Y.Z`.
+- [ ] For a release tagged before the OCI artifact existed, run **Actions →
+  Migrations ConfigMap → Run workflow** with that tag (for example `v0.3.0`).
+  The same run republishes a tag whose publish failed.
 - [ ] The `public-api-v*` tag publishes to npm and attaches `openapi.yaml`.
 - [ ] Clusters switch to the new image names and `CIVIL_OS_*` variables
   together, using the table in [architecture.md](architecture.md#configuration).

@@ -171,7 +171,7 @@ conventional commits on `main`:
 
 | Stream | Path | Tag | Publishes |
 |---|---|---|---|
-| App | everything | `vX.Y.Z` | the four images at `ghcr.io/civil-labs/civil-os/<service>:vX.Y.Z`, and `migrations-configmap.yaml` (ConfigMap `civil-os-db-migrations-vX-Y-Z`) on the GitHub Release |
+| App | everything | `vX.Y.Z` | the four images at `ghcr.io/civil-labs/civil-os/<service>:vX.Y.Z`, and the ConfigMap `civil-os-db-migrations-vX-Y-Z`, both as `migrations-configmap.yaml` on the GitHub Release and as the OCI artifact `ghcr.io/civil-labs/civil-os/db-migrations:vX.Y.Z` (a `manifests/` directory, for Argo CD's OCI sources) |
 | Public API | `api/proto/public` | `public-api-vX.Y.Z` | `@civil-labs/civil-os-api` on npm with provenance, and `openapi.yaml` on the GitHub Release |
 
 How versions move:

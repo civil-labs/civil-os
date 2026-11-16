@@ -13,6 +13,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	parcelsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1"
+	transfersv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/transfers/v1"
 	tu "github.com/civil-labs/civil-os/internal/testutil"
 )
 
@@ -205,5 +206,25 @@ func TestComparablesUseCurrentRows(t *testing.T) {
 	}
 	if p := eq.Msg.Parcels[tu.ParcelID(5)]; p == nil || p.GetAddressId() != "" || p.GetFormattedAddress() != "" {
 		t.Errorf("parcel 5 with a voided address = %v, want no address", p)
+	}
+}
+
+// F4: a transfer party whose mailing address is voided keeps its name but
+// has no mailing address.
+func TestTransferPartyVoidedMailingAddress(t *testing.T) {
+	pool := tu.FixtureDatabase(t).Pool(t)
+	voidAddress(t, pool, 9) // party 9's mailing address
+	tr := oneTransfer(t, startReaderOn(t, pool), 1)
+	var p9 *transfersv1.TransferParty
+	for _, p := range tr.GetParties() {
+		if p.GetPartyId() == partyID(9) {
+			p9 = p
+		}
+	}
+	if p9 == nil {
+		t.Fatal("transfer 1 lost party 9")
+	}
+	if p9.GetName() != "Fixture Owner 9" || p9.MailingAddress != nil {
+		t.Errorf("party 9 = %q at %v, want the name and no mailing address", p9.GetName(), p9.MailingAddress)
 	}
 }

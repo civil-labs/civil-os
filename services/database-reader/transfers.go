@@ -88,16 +88,17 @@ const (
 )
 
 // partyColumnsSQL and partyJoinsSQL load a share row's party, with its name
-// and mailing address as of the transfer. The attribute tables' exclusion
-// constraints allow at most one row per party (or address) and time, so the
-// joins can't duplicate a share.
+// and mailing address as of the transfer (unset when the address is voided).
+// The attribute tables' exclusion constraints allow at most one row per party
+// (or address) and time, so the joins can't duplicate a share.
 const (
 	partyColumnsSQL = `pt.public_id::text, pt.is_voided, x.is_grantor, x.transferred_share::text, pa.name, aa.formatted_address`
 	partyJoinsSQL   = `
 	JOIN core.real_property_transfers rpt ON rpt.real_property_transfer_id = x.real_property_transfer_id
 	JOIN core.parties pt ON pt.party_id = x.party_id
 	LEFT JOIN core.party_attributes pa ON pa.party_id = pt.party_id AND pa.legal_valid_range @> rpt.transfer_timestamp
-	LEFT JOIN core.address_attributes aa ON aa.address_id = pa.address_id AND aa.legal_valid_range @> rpt.transfer_timestamp`
+	LEFT JOIN core.addresses ma ON ma.address_id = pa.address_id AND NOT ma.is_voided
+	LEFT JOIN core.address_attributes aa ON aa.address_id = ma.address_id AND aa.legal_valid_range @> rpt.transfer_timestamp`
 )
 
 // Rows of voided parties are selected too (rule 3 drops them in Go), so an

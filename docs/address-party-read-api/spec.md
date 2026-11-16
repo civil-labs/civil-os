@@ -302,10 +302,10 @@ The indexes already exist: `idx_parcel_attributes_address_id`,
 `idx_improvement_attributes_address_id`, `idx_party_attributes_address_id`,
 `idx_parcel_parties_party_id`, the `public_id` unique indexes, and
 `idx_parcel_geometry_parcel_id`. The transfer party tables are indexed by
-transfer and by parcel, but not by party. Before planning, check with
-`EXPLAIN` on the fixtures whether `GetTransfersByPartyId` needs a party index.
-If it does, the migration is added in the plan, and the owner runs
-`mise run db:validate`.
+party too (`idx_rpt_party_parcels_party_id`,
+`idx_rpt_party_improvements_party_id`), so no migration is needed.
+*Corrected 2026-11-16, while planning:* this paragraph said those indexes
+were missing and asked for an `EXPLAIN` check.
 
 ## Fixtures
 

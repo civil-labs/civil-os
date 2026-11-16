@@ -344,7 +344,6 @@ func mapParcelWithImprovementSummary(meshParcels map[string]*meshparcelsv1.Parce
 			md := mp.ParcelDetails
 			publicDetails = &publicparcelsv1.ParcelDetails{
 				ParcelId:            md.ParcelId,
-				FeatureId:           md.FeatureId,
 				FormattedAddress:    md.FormattedAddress,
 				AddressId:           md.AddressId,
 				PrimaryOwnerName:    md.PrimaryOwnerName,

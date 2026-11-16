@@ -235,7 +235,6 @@ message ParcelDetails {
     }
   ];
 
-  optional int64 feature_id = 2;
 
   optional string formatted_address = 3 [(buf.validate.field).string = {
     min_len: 0

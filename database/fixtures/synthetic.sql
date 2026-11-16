@@ -15,10 +15,13 @@
 --   80000000 countries            81000000 administrative areas
 --   90000000 real property transfers
 --   91000000 transfer code types  92000000 transfer codes
---   a0000000 parcels (1..20; feature_id = 1000 + n)
+--   a0000000 parcels (1..21; feature_id = 1000 + n)
 --
 -- Shape of the data (tests rely on it):
---   * Parcels 1-19 are active; parcel 20 is voided.
+--   * Parcels 1-19 and 21 are active; parcel 20 is voided. Parcel 21 has no
+--     geometry, so parcel reads never return it (address 2, land use 1,
+--     owned by party 2 at 1.0; no improvement, affordance, neighborhood or
+--     valuation).
 --   * Parcel n: land use ((n-1) % 3) + 1, land area 400 + 10n m2,
 --     frontage 15 + 0.5n m, depth 25 + n m, properties {"fixture": true, "n": n}.
 --   * Parcel 1 also has a historical attributes row valid 2020-01-01..2024-01-01
@@ -30,6 +33,14 @@
 --   * Neighborhoods (legal definition 1): parcels 1-10 North, 11-20 South.
 --   * Valuation 1 (2025 roll): parcel market value 100000 + 5000n, assessed 90%.
 --   * Address 21 is attached to no parcel, for update tests.
+--   * History (docs/address-party-read-api/spec.md):
+--       party 8    'Fixture Owner 8 Formerly', mailing address 18, until 2023-01-01;
+--                  'Fixture Owner 8', address 8, from then
+--       address 5  '5 Old Fixture Way', no coordinates, until 2023-01-01
+--       parcel 9   west half of its square, feature 1109, until 2024-01-01;
+--                  full square, feature 1009, from then
+--   * Party 11 is voided (mailing address 11), but still has a parcel_parties
+--     row on parcel 4 at 0.5, so reads must hide it.
 --   * Real property transfers 1-7 (docs/real-property-transfers-api/spec.md):
 --       1  2021-03-01  parcel 5: party 9 -> 4; codes 1 and 3
 --       2  2022-06-15  parcel 2: party 1 -> 2 and 3 (0.5 each)
@@ -131,25 +142,48 @@ INSERT INTO core.address_attributes (address_id, country_id, administrative_area
 SELECT a.address_id, c.country_id, aa.administrative_area_id, 'Testville', 'ZZ000',
        fx.n || ' Fixture Way', fx.n || ' Fixture Way, Testville ZZ000',
        extensions.ST_SetSRID(extensions.ST_MakePoint(-140.0 + ((fx.n - 1) % 4) * 0.0004 + 0.0002, -40.0 + ((fx.n - 1) / 4) * 0.0004 + 0.0002), 4326),
-       tstzrange('2020-01-01 00:00:00+00', NULL), 'fixture'
+       CASE WHEN fx.n = 5 THEN tstzrange('2023-01-01 00:00:00+00', NULL)
+            ELSE tstzrange('2020-01-01 00:00:00+00', NULL) END,
+       'fixture'
 FROM fx
 JOIN core.addresses a ON a.public_id = pg_temp.fid('20000000', fx.n)
 CROSS JOIN core.countries c
 CROSS JOIN core.administrative_areas aa;
 
+-- Address 5's earlier version: another line and no coordinates.
+INSERT INTO core.address_attributes (address_id, country_id, administrative_area_id, locality, postal_code, address_line_1, formatted_address, coordinates, legal_valid_range, trace_id)
+SELECT a.address_id, c.country_id, aa.administrative_area_id, 'Testville', 'ZZ000',
+       '5 Old Fixture Way', '5 Old Fixture Way, Testville ZZ000', NULL,
+       tstzrange('2020-01-01 00:00:00+00', '2023-01-01 00:00:00+00'), 'fixture'
+FROM core.addresses a, core.countries c, core.administrative_areas aa
+WHERE a.public_id = pg_temp.fid('20000000', 5);
+
 INSERT INTO core.parties (public_id, trace_id)
-SELECT pg_temp.fid('30000000', k), 'fixture' FROM generate_series(1, 10) k;
+SELECT pg_temp.fid('30000000', k), 'fixture' FROM generate_series(1, 11) k;
+
+UPDATE core.parties SET is_voided = true, voided_at = '2025-06-01 00:00:00+00'
+WHERE public_id = pg_temp.fid('30000000', 11);
 
 INSERT INTO core.party_attributes (party_id, name, address_id, legal_valid_range, trace_id)
-SELECT p.party_id, 'Fixture Owner ' || k, a.address_id, tstzrange('2020-01-01 00:00:00+00', NULL), 'fixture'
-FROM generate_series(1, 10) k
+SELECT p.party_id, 'Fixture Owner ' || k, a.address_id,
+       CASE WHEN k = 8 THEN tstzrange('2023-01-01 00:00:00+00', NULL)
+            ELSE tstzrange('2020-01-01 00:00:00+00', NULL) END,
+       'fixture'
+FROM generate_series(1, 11) k
 JOIN core.parties p ON p.public_id = pg_temp.fid('30000000', k)
 JOIN core.addresses a ON a.public_id = pg_temp.fid('20000000', k);
+
+-- Party 8's earlier name and mailing address.
+INSERT INTO core.party_attributes (party_id, name, address_id, legal_valid_range, trace_id)
+SELECT p.party_id, 'Fixture Owner 8 Formerly', a.address_id,
+       tstzrange('2020-01-01 00:00:00+00', '2023-01-01 00:00:00+00'), 'fixture'
+FROM core.parties p, core.addresses a
+WHERE p.public_id = pg_temp.fid('30000000', 8) AND a.public_id = pg_temp.fid('20000000', 18);
 
 -- Parcels -------------------------------------------------------------------------
 
 INSERT INTO core.parcels (public_id, legacy_id, trace_id)
-SELECT pg_temp.fid('a0000000', n), 'FX-PARCEL-' || n, 'fixture' FROM fx WHERE n <= 20;
+SELECT pg_temp.fid('a0000000', n), 'FX-PARCEL-' || n, 'fixture' FROM fx WHERE n <= 21;
 
 UPDATE core.parcels SET is_voided = true, voided_at = '2025-06-01 00:00:00+00'
 WHERE public_id = pg_temp.fid('a0000000', 20);
@@ -160,8 +194,18 @@ SELECT p.parcel_id, 1000 + fx.n,
        extensions.ST_Multi(extensions.ST_MakeEnvelope(
          -140.0 + ((fx.n - 1) % 4) * 0.0004,       -40.0 + ((fx.n - 1) / 4) * 0.0004,
          -140.0 + ((fx.n - 1) % 4) * 0.0004 + 0.0004, -40.0 + ((fx.n - 1) / 4) * 0.0004 + 0.0004, 4326)),
-       tstzrange('2020-01-01 00:00:00+00', NULL), 'fixture'
-FROM fx JOIN core.parcels p ON p.public_id = pg_temp.fid('a0000000', fx.n);
+       CASE WHEN fx.n = 9 THEN tstzrange('2024-01-01 00:00:00+00', NULL)
+            ELSE tstzrange('2020-01-01 00:00:00+00', NULL) END,
+       'fixture'
+FROM fx JOIN core.parcels p ON p.public_id = pg_temp.fid('a0000000', fx.n)
+WHERE fx.n <= 20; -- parcel 21 has no geometry
+
+-- Parcel 9's earlier geometry: the west half of its square, as feature 1109.
+INSERT INTO geo.parcel_geometry (parcel_id, feature_id, geom_web, legal_valid_range, trace_id)
+SELECT p.parcel_id, 1109,
+       extensions.ST_Multi(extensions.ST_MakeEnvelope(-140.0, -39.9992, -139.9998, -39.9988, 4326)),
+       tstzrange('2020-01-01 00:00:00+00', '2024-01-01 00:00:00+00'), 'fixture'
+FROM core.parcels p WHERE p.public_id = pg_temp.fid('a0000000', 9);
 
 INSERT INTO core.parcel_attributes (parcel_id, address_id, land_use_id, land_area_sq_m, frontage_m, depth_m, properties, legal_valid_range, trace_id)
 SELECT p.parcel_id, a.address_id, lu.land_use_id,
@@ -173,7 +217,17 @@ SELECT p.parcel_id, a.address_id, lu.land_use_id,
 FROM fx
 JOIN core.parcels p ON p.public_id = pg_temp.fid('a0000000', fx.n)
 JOIN core.addresses a ON a.public_id = pg_temp.fid('20000000', fx.n)
-JOIN core.land_uses lu ON lu.public_id = pg_temp.fid('11000000', ((fx.n - 1) % 3) + 1);
+JOIN core.land_uses lu ON lu.public_id = pg_temp.fid('11000000', ((fx.n - 1) % 3) + 1)
+WHERE fx.n <= 20;
+
+-- Parcel 21: address 2, land use 1, no geometry.
+INSERT INTO core.parcel_attributes (parcel_id, address_id, land_use_id, land_area_sq_m, frontage_m, depth_m, properties, legal_valid_range, trace_id)
+SELECT p.parcel_id, a.address_id, lu.land_use_id, 610, 25.5, 46, '{"fixture": true, "n": 21}',
+       tstzrange('2020-01-01 00:00:00+00', NULL), 'fixture'
+FROM core.parcels p, core.addresses a, core.land_uses lu
+WHERE p.public_id = pg_temp.fid('a0000000', 21)
+  AND a.public_id = pg_temp.fid('20000000', 2)
+  AND lu.public_id = pg_temp.fid('11000000', 1);
 
 -- Historical attributes for parcel 1 (legal_as_of before 2024 sees 350 m2).
 INSERT INTO core.parcel_attributes (parcel_id, address_id, land_use_id, land_area_sq_m, frontage_m, depth_m, properties, legal_valid_range, trace_id)
@@ -188,7 +242,10 @@ WHERE p.public_id = pg_temp.fid('a0000000', 1)
 INSERT INTO core.parcel_parties (parcel_id, party_id, ownership_share, legal_valid_range, trace_id)
 SELECT p.parcel_id, pt.party_id, v.share, tstzrange('2020-01-01 00:00:00+00', NULL), 'fixture'
 FROM (SELECT n, ((n - 1) % 10) + 1 AS owner, CASE WHEN n = 2 THEN 0.5000 ELSE 1.0000 END AS share FROM fx WHERE n <= 20
-      UNION ALL SELECT 2, 3, 0.5000) v
+      UNION ALL SELECT 2, 3, 0.5000
+      UNION ALL SELECT 21, 2, 1.0000   -- parcel 21 (no geometry)
+      UNION ALL SELECT 4, 11, 0.5000   -- voided party 11
+     ) v
 JOIN core.parcels p ON p.public_id = pg_temp.fid('a0000000', v.n)
 JOIN core.parties pt ON pt.public_id = pg_temp.fid('30000000', v.owner);
 
@@ -200,20 +257,23 @@ FROM fx
 JOIN core.parcels p ON p.public_id = pg_temp.fid('a0000000', fx.n)
 JOIN core.zoning z ON z.public_id = pg_temp.fid('40000000', CASE WHEN fx.n <= 12 THEN 1 ELSE 2 END)
 JOIN core.zoning_attributes za ON za.zoning_id = z.zoning_id
-JOIN core.affordance_types t ON t.public_id = pg_temp.fid('41000000', 1);
+JOIN core.affordance_types t ON t.public_id = pg_temp.fid('41000000', 1)
+WHERE fx.n <= 20;
 
 INSERT INTO core.parcel_neighborhood_definitions (parcel_id, neighborhood_id, neighborhood_definition_id, is_legal, legal_valid_range, trace_id)
 SELECT p.parcel_id, nb.neighborhood_id, d.neighborhood_definition_id, true, tstzrange('2020-01-01 00:00:00+00', NULL), 'fixture'
 FROM fx
 JOIN core.parcels p ON p.public_id = pg_temp.fid('a0000000', fx.n)
 JOIN core.neighborhoods nb ON nb.public_id = pg_temp.fid('71000000', CASE WHEN fx.n <= 10 THEN 1 ELSE 2 END)
-CROSS JOIN core.neighborhood_definitions d;
+CROSS JOIN core.neighborhood_definitions d
+WHERE fx.n <= 20;
 
 INSERT INTO core.parcel_valuations (parcel_id, valuation_id, market_value, assessed_value, legal_valid_range, trace_id)
 SELECT p.parcel_id, v.valuation_id, 100000 + 5000 * fx.n, (100000 + 5000 * fx.n) * 0.9, tstzrange('2020-01-01 00:00:00+00', NULL), 'fixture'
 FROM fx
 JOIN core.parcels p ON p.public_id = pg_temp.fid('a0000000', fx.n)
-CROSS JOIN core.valuations v;
+CROSS JOIN core.valuations v
+WHERE fx.n <= 20;
 
 -- Improvements ----------------------------------------------------------------------
 -- Improvement k (1..15) sits on parcel k; improvement 16 is a secondary building on parcel 3;

@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package civil.mesh.parties.v1;
+
+import "civil/mesh/pagination/v1/pagination.proto";
+import "google/protobuf/timestamp.proto";
+
+// Reads parties. Served by the database reader; see
+// docs/address-party-read-api/spec.md for the contract.
+service PartiesReadService {
+  rpc GetPartiesById(GetPartiesByIdRequest) returns (GetPartiesByIdResponse) {}
+
+  rpc GetParcelsByPartyId(GetParcelsByPartyIdRequest) returns (GetParcelsByPartyIdResponse) {}
+}
+
+message Party {
+  string party_id = 1;
+  string name = 2;
+  optional string mailing_address_id = 3;
+  optional string mailing_address = 4;
+}
+
+message PartyParcel {
+  string parcel_id = 1;
+  optional int64 feature_id = 2;
+  string ownership_share = 3;
+}
+
+message PartyEdge {
+  string cursor = 1;
+  Party node = 2;
+}
+
+message PartyParcelEdge {
+  string cursor = 1;
+  PartyParcel node = 2;
+}
+
+message GetPartiesByIdRequest {
+  repeated string party_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
+}
+
+message GetPartiesByIdResponse {
+  map<string, Party> parties = 1;
+}
+
+message GetParcelsByPartyIdRequest {
+  string party_id = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
+  optional int32 first = 3;
+  optional string after = 4;
+}
+
+message GetParcelsByPartyIdResponse {
+  repeated PartyParcelEdge edges = 1;
+  civil.mesh.pagination.v1.PageInfo page_info = 2;
+}

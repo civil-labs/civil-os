@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package civil.mesh.addresses.v1;
+
+import "civil/mesh/pagination/v1/pagination.proto";
+import "civil/mesh/parties/v1/parties.proto";
+import "google/protobuf/timestamp.proto";
+import "google/type/latlng.proto";
+
+// Reads addresses and the records that reference them. Served by the
+// database reader; see docs/address-party-read-api/spec.md for the contract.
+service AddressesReadService {
+  rpc GetAddressesById(GetAddressesByIdRequest) returns (GetAddressesByIdResponse) {}
+
+  rpc GetParcelsByAddressId(GetParcelsByAddressIdRequest) returns (GetParcelsByAddressIdResponse) {}
+
+  rpc GetImprovementsByAddressId(GetImprovementsByAddressIdRequest) returns (GetImprovementsByAddressIdResponse) {}
+
+  rpc GetPartiesByAddressId(GetPartiesByAddressIdRequest) returns (GetPartiesByAddressIdResponse) {}
+}
+
+message Address {
+  string address_id = 1;
+  string formatted_address = 2;
+  optional string address_line_1 = 3;
+  optional string address_line_2 = 4;
+  optional string address_line_3 = 5;
+  optional string locality = 6;
+  optional string sublocality = 7;
+  optional string postal_code = 8;
+  optional AdministrativeArea administrative_area = 9;
+  optional Country country = 10;
+  optional google.type.LatLng coordinates = 11;
+}
+
+message Country {
+  string code = 1;
+  string name = 2;
+}
+
+message AdministrativeArea {
+  string code = 1;
+  string name = 2;
+}
+
+message AddressParcel {
+  string parcel_id = 1;
+  optional int64 feature_id = 2;
+}
+
+message AddressImprovement {
+  string improvement_id = 1;
+  repeated string parcel_ids = 2;
+}
+
+message AddressParcelEdge {
+  string cursor = 1;
+  AddressParcel node = 2;
+}
+
+message AddressImprovementEdge {
+  string cursor = 1;
+  AddressImprovement node = 2;
+}
+
+message GetAddressesByIdRequest {
+  repeated string address_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
+}
+
+message GetAddressesByIdResponse {
+  map<string, Address> addresses = 1;
+}
+
+message GetParcelsByAddressIdRequest {
+  string address_id = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
+  optional int32 first = 3;
+  optional string after = 4;
+}
+
+message GetParcelsByAddressIdResponse {
+  repeated AddressParcelEdge edges = 1;
+  civil.mesh.pagination.v1.PageInfo page_info = 2;
+}
+
+message GetImprovementsByAddressIdRequest {
+  string address_id = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
+  optional int32 first = 3;
+  optional string after = 4;
+}
+
+message GetImprovementsByAddressIdResponse {
+  repeated AddressImprovementEdge edges = 1;
+  civil.mesh.pagination.v1.PageInfo page_info = 2;
+}
+
+message GetPartiesByAddressIdRequest {
+  string address_id = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
+  optional int32 first = 3;
+  optional string after = 4;
+}
+
+message GetPartiesByAddressIdResponse {
+  repeated civil.mesh.parties.v1.PartyEdge edges = 1;
+  civil.mesh.pagination.v1.PageInfo page_info = 2;
+}

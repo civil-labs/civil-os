@@ -202,7 +202,7 @@ func (s *APIServer) pageTransfers(
 		afterKey = &key
 	}
 
-	size := transferPageSize(first)
+	size := pageSize(first)
 	transfers, keys, err := s.readTransfers(ctx, filter, ids, timeRange, afterKey, size+1)
 	if err != nil {
 		return nil, nil, err

@@ -2,9 +2,7 @@ package main
 
 import (
 	"bytes"
-	"crypto/sha256"
 	"encoding/base64"
-	"encoding/binary"
 	"errors"
 	"slices"
 	"strconv"
@@ -18,24 +16,8 @@ import (
 	transfersv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/transfers/v1"
 )
 
-// Page sizes for the paginated transfer reads. The public API enforces the
-// same limits with protovalidate; the reader clamps as a second line of
-// defence, since the mesh has no validation.
-const (
-	defaultTransferPageSize = 25
-	maxTransferPageSize     = 100
-)
-
 // transferCursorVersion is the only cursor format this reader accepts.
 const transferCursorVersion = 1
-
-// transferPageSize turns the request's optional first into a page size.
-func transferPageSize(first *int32) int {
-	if first == nil {
-		return defaultTransferPageSize
-	}
-	return min(max(int(*first), 1), maxTransferPageSize)
-}
 
 // transferKey is a transfer's position in the sort order
 // (transfer_time DESC, transfer_id DESC).
@@ -58,23 +40,15 @@ func transferFilterHash(rpc string, ids []string, timeRange *interval.Interval) 
 		}
 		return ts.AsTime().UTC().Format(time.RFC3339Nano)
 	}
-	// Every field is length-prefixed, so no choice of IDs can make two
-	// different filters hash the same input.
-	h := sha256.New()
-	write := func(s string) {
-		var n [8]byte
-		binary.BigEndian.PutUint64(n[:], uint64(len(s)))
-		h.Write(n[:])
-		h.Write([]byte(s))
-	}
-	write(rpc)
-	write(strconv.Itoa(len(sorted)))
+	h := newFilterHasher()
+	h.write(rpc)
+	h.write(strconv.Itoa(len(sorted)))
 	for _, id := range sorted {
-		write(id)
+		h.write(id)
 	}
-	write(bound(timeRange.GetStartTime()))
-	write(bound(timeRange.GetEndTime()))
-	return h.Sum(nil)
+	h.write(bound(timeRange.GetStartTime()))
+	h.write(bound(timeRange.GetEndTime()))
+	return h.sum()
 }
 
 // encodeTransferCursor returns the opaque cursor for a transfer.

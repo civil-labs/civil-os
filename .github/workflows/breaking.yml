@@ -57,7 +57,21 @@ jobs:
       - name: No public API change
         if: steps.scope.outputs.public == 'false'
         run: echo "::notice::No public API files changed; buf breaking skipped"
-      - if: steps.scope.outputs.public != 'false'
+      # Release-please PRs also get the release-time check, whatever the scope
+      # step says: a root-only release doesn't touch api/proto/public/, but a
+      # break merged under an ignored title (refactor:) must still be caught.
+      - name: Is this a release-please PR?
+        id: release
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          case "$HEAD_REF" in
+            release-please--*) release=true ;;
+            *) release=false ;;
+          esac
+          echo "release=$release" >> "$GITHUB_OUTPUT"
+          echo "Release-please PR: $release"
+      - if: steps.scope.outputs.public != 'false' || steps.release.outputs.release == 'true'
         uses: jdx/mise-action@6612f0ef07ed2a736cd1e00a94a065522dd41195 # v5.2.5
         with:
           install_args: buf
@@ -90,4 +104,28 @@ jobs:
             exit 0
           fi
           echo "::error::Breaking public API change. If intended, mark the PR title breaking, e.g. \`feat!: ...\` or \`feat(public-api)!: ...\`."
+          exit 1
+      - name: buf breaking against the last public-api release
+        if: steps.release.outputs.release == 'true'
+        working-directory: api
+        run: |
+          set -euo pipefail
+          sh ../scripts/is-breaking-bump_test.sh
+          tag=$(git describe --tags --abbrev=0 --match 'public-api-v*' 'HEAD^1' 2>/dev/null || true)
+          if [ -z "$tag" ]; then
+            echo "::notice::No public-api release yet; skipping the release-time check"
+            exit 0
+          fi
+          echo "Comparing against $tag"
+          if buf breaking proto/public --against "../.git#tag=${tag},subdir=api/proto/public"; then
+            exit 0
+          fi
+          old=${tag#public-api-v}
+          new=$(jq -r '.["api/proto/public"]' ../.release-please-manifest.json)
+          bump=$(sh ../scripts/is-breaking-bump.sh "$old" "$new")
+          if [ "$bump" = true ]; then
+            echo "::notice::Breaking changes since $tag, released as a breaking bump to $new."
+            exit 0
+          fi
+          echo "::error::buf breaking finds a breaking change since $tag, but this release is not a breaking version bump. A breaking change was merged without a breaking PR title. Add a commit to main with a \"Release-As: X.Y.Z\" footer, or a \"fix!:\" commit describing the break, and let release-please update this PR."
           exit 1

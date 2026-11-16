@@ -49,7 +49,9 @@ test reads, run `mise run check` yourself.
   `ci:`, `build:`, `refactor:` and `chore:`, with `!` for breaking changes.
   Only `feat`, `fix` and other user-facing types trigger a release.
 - **Mesh naming:** `<Entity>ReadService` is served by the reader and
-  `<Entity>WriteService` by the writer. The public API keeps its own names.
+  `<Entity>WriteService` by the writer. New services use the plural public
+  domain name (`AddressesReadService`, `PartiesReadService`); see
+  `docs/mesh-plural-service-names/intent.md`. The public API keeps its own names.
 - **Config:** env vars are `CIVIL_OS_<SERVICE>_<SETTING>`. Services refuse to
   start if a pre-rename `CIVIL_*` variable is set. Update the table in
   `docs/architecture.md` when you add one.

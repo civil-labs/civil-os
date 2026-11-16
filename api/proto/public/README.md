@@ -13,6 +13,8 @@ one port.
 | `civil.public.neighborhoods.v1` | `NeighborhoodService` | Neighborhood definitions and neighborhoods |
 | `civil.public.valuations.v1` | `ValuationService` | Valuations |
 | `civil.public.transfers.v1` | `RealPropertyTransfersService` | Real property transfers by transfer, parcel or map feature, with grantors, grantees, shares, codes and recordings. Paginated. |
+| `civil.public.addresses.v1` | `AddressesService` | Addresses, and the parcels, improvements and parties at an address. The lookups by address are paginated. |
+| `civil.public.parties.v1` | `PartiesService` | Parties (owners, grantors, grantees) and the parcels a party holds. Paginated. |
 | `civil.public.instance.v1` | `InstanceService` | Instance metadata and auth issuer (no token needed) |
 | `civil.public.dex.v1` | `DexService` | Dex OIDC client administration, when the instance runs Dex |
 
@@ -39,8 +41,8 @@ declared in the protos. For example, every parcel ID must be a UUID.
 
 APIs that can return many results are paginated with cursors, following the
 GraphQL [Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
-`RealPropertyTransfersService` is the first. New paginated RPCs follow the
-same pattern:
+`RealPropertyTransfersService` was the first, and the address and party
+lookups follow it. New paginated RPCs follow the same pattern:
 
 - **Request:** `optional int32 first` (the page size) and
   `optional string after` (a cursor from a previous page).

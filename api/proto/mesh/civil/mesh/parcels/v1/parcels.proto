@@ -25,6 +25,8 @@ service ParcelReadService {
 
   rpc GetEstimatedParcelsExtentWGS84(GetEstimatedParcelsExtentWGS84Request) returns (GetEstimatedParcelsExtentWGS84Response) {}
 
+  rpc GetParcelExtentsWGS84ByParcelId(GetParcelExtentsWGS84ByParcelIdRequest) returns (GetParcelExtentsWGS84ByParcelIdResponse) {}
+
   rpc GetLandAreaSqftByParcelId(GetLandAreaSqftByParcelIdRequest) returns (GetLandAreaSqftByParcelIdResponse) {}
 
   rpc GetFrontageFtByParcelId(GetFrontageFtByParcelIdRequest) returns (GetFrontageFtByParcelIdResponse) {}
@@ -346,6 +348,23 @@ message GetEstimatedParcelsExtentWGS84Response {
   double min_y = 2;
   double max_x = 3;
   double max_y = 4;
+}
+
+// The WGS84 bounding box of one parcel's geometry (geom_web) at legal_as_of.
+message ExtentWGS84 {
+  double min_x = 1;
+  double min_y = 2;
+  double max_x = 3;
+  double max_y = 4;
+}
+
+message GetParcelExtentsWGS84ByParcelIdRequest {
+  repeated string parcel_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
+}
+
+message GetParcelExtentsWGS84ByParcelIdResponse {
+  map<string, ExtentWGS84> extents = 1;
 }
 
 // Get single attribute APIs

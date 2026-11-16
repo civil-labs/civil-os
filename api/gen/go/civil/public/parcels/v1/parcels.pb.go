@@ -1959,6 +1959,173 @@ func (x *GetEstimatedParcelsExtentWGS84Response) GetMaxY() float64 {
 	return 0
 }
 
+// The WGS84 bounding box of one parcel's geometry at legal_as_of.
+type ExtentWGS84 struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MinX          float64                `protobuf:"fixed64,1,opt,name=min_x,json=minX,proto3" json:"min_x,omitempty"`
+	MinY          float64                `protobuf:"fixed64,2,opt,name=min_y,json=minY,proto3" json:"min_y,omitempty"`
+	MaxX          float64                `protobuf:"fixed64,3,opt,name=max_x,json=maxX,proto3" json:"max_x,omitempty"`
+	MaxY          float64                `protobuf:"fixed64,4,opt,name=max_y,json=maxY,proto3" json:"max_y,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ExtentWGS84) Reset() {
+	*x = ExtentWGS84{}
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExtentWGS84) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExtentWGS84) ProtoMessage() {}
+
+func (x *ExtentWGS84) ProtoReflect() protoreflect.Message {
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExtentWGS84.ProtoReflect.Descriptor instead.
+func (*ExtentWGS84) Descriptor() ([]byte, []int) {
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *ExtentWGS84) GetMinX() float64 {
+	if x != nil {
+		return x.MinX
+	}
+	return 0
+}
+
+func (x *ExtentWGS84) GetMinY() float64 {
+	if x != nil {
+		return x.MinY
+	}
+	return 0
+}
+
+func (x *ExtentWGS84) GetMaxX() float64 {
+	if x != nil {
+		return x.MaxX
+	}
+	return 0
+}
+
+func (x *ExtentWGS84) GetMaxY() float64 {
+	if x != nil {
+		return x.MaxY
+	}
+	return 0
+}
+
+type GetParcelExtentsWGS84ByParcelIdRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ParcelIds     []string               `protobuf:"bytes,1,rep,name=parcel_ids,json=parcelIds,proto3" json:"parcel_ids,omitempty"`
+	LegalAsOf     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=legal_as_of,json=legalAsOf,proto3,oneof" json:"legal_as_of,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetParcelExtentsWGS84ByParcelIdRequest) Reset() {
+	*x = GetParcelExtentsWGS84ByParcelIdRequest{}
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetParcelExtentsWGS84ByParcelIdRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetParcelExtentsWGS84ByParcelIdRequest) ProtoMessage() {}
+
+func (x *GetParcelExtentsWGS84ByParcelIdRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetParcelExtentsWGS84ByParcelIdRequest.ProtoReflect.Descriptor instead.
+func (*GetParcelExtentsWGS84ByParcelIdRequest) Descriptor() ([]byte, []int) {
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *GetParcelExtentsWGS84ByParcelIdRequest) GetParcelIds() []string {
+	if x != nil {
+		return x.ParcelIds
+	}
+	return nil
+}
+
+func (x *GetParcelExtentsWGS84ByParcelIdRequest) GetLegalAsOf() *timestamppb.Timestamp {
+	if x != nil {
+		return x.LegalAsOf
+	}
+	return nil
+}
+
+type GetParcelExtentsWGS84ByParcelIdResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Keyed by the UUID parcel ID. Parcels that aren't visible at legal_as_of
+	// (voided, or no geometry or record then) are absent.
+	Extents       map[string]*ExtentWGS84 `protobuf:"bytes,1,rep,name=extents,proto3" json:"extents,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetParcelExtentsWGS84ByParcelIdResponse) Reset() {
+	*x = GetParcelExtentsWGS84ByParcelIdResponse{}
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetParcelExtentsWGS84ByParcelIdResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetParcelExtentsWGS84ByParcelIdResponse) ProtoMessage() {}
+
+func (x *GetParcelExtentsWGS84ByParcelIdResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetParcelExtentsWGS84ByParcelIdResponse.ProtoReflect.Descriptor instead.
+func (*GetParcelExtentsWGS84ByParcelIdResponse) Descriptor() ([]byte, []int) {
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *GetParcelExtentsWGS84ByParcelIdResponse) GetExtents() map[string]*ExtentWGS84 {
+	if x != nil {
+		return x.Extents
+	}
+	return nil
+}
+
 // Parcel IDs
 type GetLandAreaSqftByParcelIdRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -1970,7 +2137,7 @@ type GetLandAreaSqftByParcelIdRequest struct {
 
 func (x *GetLandAreaSqftByParcelIdRequest) Reset() {
 	*x = GetLandAreaSqftByParcelIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[26]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1982,7 +2149,7 @@ func (x *GetLandAreaSqftByParcelIdRequest) String() string {
 func (*GetLandAreaSqftByParcelIdRequest) ProtoMessage() {}
 
 func (x *GetLandAreaSqftByParcelIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[26]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1995,7 +2162,7 @@ func (x *GetLandAreaSqftByParcelIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLandAreaSqftByParcelIdRequest.ProtoReflect.Descriptor instead.
 func (*GetLandAreaSqftByParcelIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{26}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *GetLandAreaSqftByParcelIdRequest) GetParcelIds() []string {
@@ -2021,7 +2188,7 @@ type GetLandAreaSqftByParcelIdResponse struct {
 
 func (x *GetLandAreaSqftByParcelIdResponse) Reset() {
 	*x = GetLandAreaSqftByParcelIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[27]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2033,7 +2200,7 @@ func (x *GetLandAreaSqftByParcelIdResponse) String() string {
 func (*GetLandAreaSqftByParcelIdResponse) ProtoMessage() {}
 
 func (x *GetLandAreaSqftByParcelIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[27]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2046,7 +2213,7 @@ func (x *GetLandAreaSqftByParcelIdResponse) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use GetLandAreaSqftByParcelIdResponse.ProtoReflect.Descriptor instead.
 func (*GetLandAreaSqftByParcelIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{27}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *GetLandAreaSqftByParcelIdResponse) GetValues() map[string]float64 {
@@ -2066,7 +2233,7 @@ type GetFrontageFtByParcelIdRequest struct {
 
 func (x *GetFrontageFtByParcelIdRequest) Reset() {
 	*x = GetFrontageFtByParcelIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[28]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2078,7 +2245,7 @@ func (x *GetFrontageFtByParcelIdRequest) String() string {
 func (*GetFrontageFtByParcelIdRequest) ProtoMessage() {}
 
 func (x *GetFrontageFtByParcelIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[28]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2091,7 +2258,7 @@ func (x *GetFrontageFtByParcelIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFrontageFtByParcelIdRequest.ProtoReflect.Descriptor instead.
 func (*GetFrontageFtByParcelIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{28}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *GetFrontageFtByParcelIdRequest) GetParcelIds() []string {
@@ -2117,7 +2284,7 @@ type GetFrontageFtByParcelIdResponse struct {
 
 func (x *GetFrontageFtByParcelIdResponse) Reset() {
 	*x = GetFrontageFtByParcelIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[29]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2129,7 +2296,7 @@ func (x *GetFrontageFtByParcelIdResponse) String() string {
 func (*GetFrontageFtByParcelIdResponse) ProtoMessage() {}
 
 func (x *GetFrontageFtByParcelIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[29]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2142,7 +2309,7 @@ func (x *GetFrontageFtByParcelIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFrontageFtByParcelIdResponse.ProtoReflect.Descriptor instead.
 func (*GetFrontageFtByParcelIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{29}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *GetFrontageFtByParcelIdResponse) GetValues() map[string]float64 {
@@ -2162,7 +2329,7 @@ type GetDepthFtByParcelIdRequest struct {
 
 func (x *GetDepthFtByParcelIdRequest) Reset() {
 	*x = GetDepthFtByParcelIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[30]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2174,7 +2341,7 @@ func (x *GetDepthFtByParcelIdRequest) String() string {
 func (*GetDepthFtByParcelIdRequest) ProtoMessage() {}
 
 func (x *GetDepthFtByParcelIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[30]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2187,7 +2354,7 @@ func (x *GetDepthFtByParcelIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDepthFtByParcelIdRequest.ProtoReflect.Descriptor instead.
 func (*GetDepthFtByParcelIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{30}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *GetDepthFtByParcelIdRequest) GetParcelIds() []string {
@@ -2213,7 +2380,7 @@ type GetDepthFtByParcelIdResponse struct {
 
 func (x *GetDepthFtByParcelIdResponse) Reset() {
 	*x = GetDepthFtByParcelIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[31]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2225,7 +2392,7 @@ func (x *GetDepthFtByParcelIdResponse) String() string {
 func (*GetDepthFtByParcelIdResponse) ProtoMessage() {}
 
 func (x *GetDepthFtByParcelIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[31]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2238,7 +2405,7 @@ func (x *GetDepthFtByParcelIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDepthFtByParcelIdResponse.ProtoReflect.Descriptor instead.
 func (*GetDepthFtByParcelIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{31}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *GetDepthFtByParcelIdResponse) GetValues() map[string]float64 {
@@ -2258,7 +2425,7 @@ type GetLandUseIdByParcelIdRequest struct {
 
 func (x *GetLandUseIdByParcelIdRequest) Reset() {
 	*x = GetLandUseIdByParcelIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[32]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2270,7 +2437,7 @@ func (x *GetLandUseIdByParcelIdRequest) String() string {
 func (*GetLandUseIdByParcelIdRequest) ProtoMessage() {}
 
 func (x *GetLandUseIdByParcelIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[32]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2283,7 +2450,7 @@ func (x *GetLandUseIdByParcelIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLandUseIdByParcelIdRequest.ProtoReflect.Descriptor instead.
 func (*GetLandUseIdByParcelIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{32}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *GetLandUseIdByParcelIdRequest) GetParcelIds() []string {
@@ -2309,7 +2476,7 @@ type GetLandUseIdByParcelIdResponse struct {
 
 func (x *GetLandUseIdByParcelIdResponse) Reset() {
 	*x = GetLandUseIdByParcelIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[33]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2321,7 +2488,7 @@ func (x *GetLandUseIdByParcelIdResponse) String() string {
 func (*GetLandUseIdByParcelIdResponse) ProtoMessage() {}
 
 func (x *GetLandUseIdByParcelIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[33]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2334,7 +2501,7 @@ func (x *GetLandUseIdByParcelIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLandUseIdByParcelIdResponse.ProtoReflect.Descriptor instead.
 func (*GetLandUseIdByParcelIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{33}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *GetLandUseIdByParcelIdResponse) GetValues() map[string]string {
@@ -2354,7 +2521,7 @@ type GetZoningIdByParcelIdRequest struct {
 
 func (x *GetZoningIdByParcelIdRequest) Reset() {
 	*x = GetZoningIdByParcelIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[34]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2366,7 +2533,7 @@ func (x *GetZoningIdByParcelIdRequest) String() string {
 func (*GetZoningIdByParcelIdRequest) ProtoMessage() {}
 
 func (x *GetZoningIdByParcelIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[34]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2379,7 +2546,7 @@ func (x *GetZoningIdByParcelIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetZoningIdByParcelIdRequest.ProtoReflect.Descriptor instead.
 func (*GetZoningIdByParcelIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{34}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *GetZoningIdByParcelIdRequest) GetParcelIds() []string {
@@ -2405,7 +2572,7 @@ type GetZoningIdByParcelIdResponse struct {
 
 func (x *GetZoningIdByParcelIdResponse) Reset() {
 	*x = GetZoningIdByParcelIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[35]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2417,7 +2584,7 @@ func (x *GetZoningIdByParcelIdResponse) String() string {
 func (*GetZoningIdByParcelIdResponse) ProtoMessage() {}
 
 func (x *GetZoningIdByParcelIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[35]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2430,7 +2597,7 @@ func (x *GetZoningIdByParcelIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetZoningIdByParcelIdResponse.ProtoReflect.Descriptor instead.
 func (*GetZoningIdByParcelIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{35}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *GetZoningIdByParcelIdResponse) GetValues() map[string]string {
@@ -2450,7 +2617,7 @@ type GetImprovementAreaSqftByParcelIdRequest struct {
 
 func (x *GetImprovementAreaSqftByParcelIdRequest) Reset() {
 	*x = GetImprovementAreaSqftByParcelIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[36]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2462,7 +2629,7 @@ func (x *GetImprovementAreaSqftByParcelIdRequest) String() string {
 func (*GetImprovementAreaSqftByParcelIdRequest) ProtoMessage() {}
 
 func (x *GetImprovementAreaSqftByParcelIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[36]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2475,7 +2642,7 @@ func (x *GetImprovementAreaSqftByParcelIdRequest) ProtoReflect() protoreflect.Me
 
 // Deprecated: Use GetImprovementAreaSqftByParcelIdRequest.ProtoReflect.Descriptor instead.
 func (*GetImprovementAreaSqftByParcelIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{36}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *GetImprovementAreaSqftByParcelIdRequest) GetParcelIds() []string {
@@ -2501,7 +2668,7 @@ type GetImprovementAreaSqftByParcelIdResponse struct {
 
 func (x *GetImprovementAreaSqftByParcelIdResponse) Reset() {
 	*x = GetImprovementAreaSqftByParcelIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[37]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2513,7 +2680,7 @@ func (x *GetImprovementAreaSqftByParcelIdResponse) String() string {
 func (*GetImprovementAreaSqftByParcelIdResponse) ProtoMessage() {}
 
 func (x *GetImprovementAreaSqftByParcelIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[37]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2526,7 +2693,7 @@ func (x *GetImprovementAreaSqftByParcelIdResponse) ProtoReflect() protoreflect.M
 
 // Deprecated: Use GetImprovementAreaSqftByParcelIdResponse.ProtoReflect.Descriptor instead.
 func (*GetImprovementAreaSqftByParcelIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{37}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *GetImprovementAreaSqftByParcelIdResponse) GetValues() map[string]float64 {
@@ -2546,7 +2713,7 @@ type GetBedroomsByParcelIdRequest struct {
 
 func (x *GetBedroomsByParcelIdRequest) Reset() {
 	*x = GetBedroomsByParcelIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[38]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2558,7 +2725,7 @@ func (x *GetBedroomsByParcelIdRequest) String() string {
 func (*GetBedroomsByParcelIdRequest) ProtoMessage() {}
 
 func (x *GetBedroomsByParcelIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[38]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2571,7 +2738,7 @@ func (x *GetBedroomsByParcelIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBedroomsByParcelIdRequest.ProtoReflect.Descriptor instead.
 func (*GetBedroomsByParcelIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{38}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *GetBedroomsByParcelIdRequest) GetParcelIds() []string {
@@ -2597,7 +2764,7 @@ type GetBedroomsByParcelIdResponse struct {
 
 func (x *GetBedroomsByParcelIdResponse) Reset() {
 	*x = GetBedroomsByParcelIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[39]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2609,7 +2776,7 @@ func (x *GetBedroomsByParcelIdResponse) String() string {
 func (*GetBedroomsByParcelIdResponse) ProtoMessage() {}
 
 func (x *GetBedroomsByParcelIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[39]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2622,7 +2789,7 @@ func (x *GetBedroomsByParcelIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBedroomsByParcelIdResponse.ProtoReflect.Descriptor instead.
 func (*GetBedroomsByParcelIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{39}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *GetBedroomsByParcelIdResponse) GetValues() map[string]int32 {
@@ -2642,7 +2809,7 @@ type GetBathroomsByParcelIdRequest struct {
 
 func (x *GetBathroomsByParcelIdRequest) Reset() {
 	*x = GetBathroomsByParcelIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[40]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2654,7 +2821,7 @@ func (x *GetBathroomsByParcelIdRequest) String() string {
 func (*GetBathroomsByParcelIdRequest) ProtoMessage() {}
 
 func (x *GetBathroomsByParcelIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[40]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2667,7 +2834,7 @@ func (x *GetBathroomsByParcelIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBathroomsByParcelIdRequest.ProtoReflect.Descriptor instead.
 func (*GetBathroomsByParcelIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{40}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *GetBathroomsByParcelIdRequest) GetParcelIds() []string {
@@ -2693,7 +2860,7 @@ type GetBathroomsByParcelIdResponse struct {
 
 func (x *GetBathroomsByParcelIdResponse) Reset() {
 	*x = GetBathroomsByParcelIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[41]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2705,7 +2872,7 @@ func (x *GetBathroomsByParcelIdResponse) String() string {
 func (*GetBathroomsByParcelIdResponse) ProtoMessage() {}
 
 func (x *GetBathroomsByParcelIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[41]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2718,7 +2885,7 @@ func (x *GetBathroomsByParcelIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBathroomsByParcelIdResponse.ProtoReflect.Descriptor instead.
 func (*GetBathroomsByParcelIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{41}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *GetBathroomsByParcelIdResponse) GetValues() map[string]int32 {
@@ -2738,7 +2905,7 @@ type GetUnitsByParcelIdRequest struct {
 
 func (x *GetUnitsByParcelIdRequest) Reset() {
 	*x = GetUnitsByParcelIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[42]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2750,7 +2917,7 @@ func (x *GetUnitsByParcelIdRequest) String() string {
 func (*GetUnitsByParcelIdRequest) ProtoMessage() {}
 
 func (x *GetUnitsByParcelIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[42]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2763,7 +2930,7 @@ func (x *GetUnitsByParcelIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUnitsByParcelIdRequest.ProtoReflect.Descriptor instead.
 func (*GetUnitsByParcelIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{42}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *GetUnitsByParcelIdRequest) GetParcelIds() []string {
@@ -2789,7 +2956,7 @@ type GetUnitsByParcelIdResponse struct {
 
 func (x *GetUnitsByParcelIdResponse) Reset() {
 	*x = GetUnitsByParcelIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[43]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2801,7 +2968,7 @@ func (x *GetUnitsByParcelIdResponse) String() string {
 func (*GetUnitsByParcelIdResponse) ProtoMessage() {}
 
 func (x *GetUnitsByParcelIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[43]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2814,7 +2981,7 @@ func (x *GetUnitsByParcelIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUnitsByParcelIdResponse.ProtoReflect.Descriptor instead.
 func (*GetUnitsByParcelIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{43}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *GetUnitsByParcelIdResponse) GetValues() map[string]int32 {
@@ -2834,7 +3001,7 @@ type GetPrimaryImprovementYearBuiltByParcelIdRequest struct {
 
 func (x *GetPrimaryImprovementYearBuiltByParcelIdRequest) Reset() {
 	*x = GetPrimaryImprovementYearBuiltByParcelIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[44]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2846,7 +3013,7 @@ func (x *GetPrimaryImprovementYearBuiltByParcelIdRequest) String() string {
 func (*GetPrimaryImprovementYearBuiltByParcelIdRequest) ProtoMessage() {}
 
 func (x *GetPrimaryImprovementYearBuiltByParcelIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[44]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2859,7 +3026,7 @@ func (x *GetPrimaryImprovementYearBuiltByParcelIdRequest) ProtoReflect() protore
 
 // Deprecated: Use GetPrimaryImprovementYearBuiltByParcelIdRequest.ProtoReflect.Descriptor instead.
 func (*GetPrimaryImprovementYearBuiltByParcelIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{44}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *GetPrimaryImprovementYearBuiltByParcelIdRequest) GetParcelIds() []string {
@@ -2885,7 +3052,7 @@ type GetPrimaryImprovementYearBuiltByParcelIdResponse struct {
 
 func (x *GetPrimaryImprovementYearBuiltByParcelIdResponse) Reset() {
 	*x = GetPrimaryImprovementYearBuiltByParcelIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[45]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2897,7 +3064,7 @@ func (x *GetPrimaryImprovementYearBuiltByParcelIdResponse) String() string {
 func (*GetPrimaryImprovementYearBuiltByParcelIdResponse) ProtoMessage() {}
 
 func (x *GetPrimaryImprovementYearBuiltByParcelIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[45]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2910,7 +3077,7 @@ func (x *GetPrimaryImprovementYearBuiltByParcelIdResponse) ProtoReflect() protor
 
 // Deprecated: Use GetPrimaryImprovementYearBuiltByParcelIdResponse.ProtoReflect.Descriptor instead.
 func (*GetPrimaryImprovementYearBuiltByParcelIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{45}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *GetPrimaryImprovementYearBuiltByParcelIdResponse) GetValues() map[string]int32 {
@@ -2930,7 +3097,7 @@ type GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest struct {
 
 func (x *GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest) Reset() {
 	*x = GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[46]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2942,7 +3109,7 @@ func (x *GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest) String() stri
 func (*GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest) ProtoMessage() {}
 
 func (x *GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[46]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2955,7 +3122,7 @@ func (x *GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest) ProtoReflect(
 
 // Deprecated: Use GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest.ProtoReflect.Descriptor instead.
 func (*GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{46}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{49}
 }
 
 func (x *GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest) GetParcelIds() []string {
@@ -2981,7 +3148,7 @@ type GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse struct {
 
 func (x *GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse) Reset() {
 	*x = GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[47]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2993,7 +3160,7 @@ func (x *GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse) String() str
 func (*GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse) ProtoMessage() {}
 
 func (x *GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[47]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3006,7 +3173,7 @@ func (x *GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse) ProtoReflect
 
 // Deprecated: Use GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse.ProtoReflect.Descriptor instead.
 func (*GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{47}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{50}
 }
 
 func (x *GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse) GetValues() map[string]int32 {
@@ -3026,7 +3193,7 @@ type GetPrimaryImprovementConditionIdByParcelIdRequest struct {
 
 func (x *GetPrimaryImprovementConditionIdByParcelIdRequest) Reset() {
 	*x = GetPrimaryImprovementConditionIdByParcelIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[48]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[51]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3038,7 +3205,7 @@ func (x *GetPrimaryImprovementConditionIdByParcelIdRequest) String() string {
 func (*GetPrimaryImprovementConditionIdByParcelIdRequest) ProtoMessage() {}
 
 func (x *GetPrimaryImprovementConditionIdByParcelIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[48]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[51]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3051,7 +3218,7 @@ func (x *GetPrimaryImprovementConditionIdByParcelIdRequest) ProtoReflect() proto
 
 // Deprecated: Use GetPrimaryImprovementConditionIdByParcelIdRequest.ProtoReflect.Descriptor instead.
 func (*GetPrimaryImprovementConditionIdByParcelIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{48}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{51}
 }
 
 func (x *GetPrimaryImprovementConditionIdByParcelIdRequest) GetParcelIds() []string {
@@ -3077,7 +3244,7 @@ type GetPrimaryImprovementConditionIdByParcelIdResponse struct {
 
 func (x *GetPrimaryImprovementConditionIdByParcelIdResponse) Reset() {
 	*x = GetPrimaryImprovementConditionIdByParcelIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[49]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[52]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3089,7 +3256,7 @@ func (x *GetPrimaryImprovementConditionIdByParcelIdResponse) String() string {
 func (*GetPrimaryImprovementConditionIdByParcelIdResponse) ProtoMessage() {}
 
 func (x *GetPrimaryImprovementConditionIdByParcelIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[49]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[52]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3102,7 +3269,7 @@ func (x *GetPrimaryImprovementConditionIdByParcelIdResponse) ProtoReflect() prot
 
 // Deprecated: Use GetPrimaryImprovementConditionIdByParcelIdResponse.ProtoReflect.Descriptor instead.
 func (*GetPrimaryImprovementConditionIdByParcelIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{49}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{52}
 }
 
 func (x *GetPrimaryImprovementConditionIdByParcelIdResponse) GetValues() map[string]string {
@@ -3122,7 +3289,7 @@ type GetPrimaryImprovementTypeIdByParcelIdRequest struct {
 
 func (x *GetPrimaryImprovementTypeIdByParcelIdRequest) Reset() {
 	*x = GetPrimaryImprovementTypeIdByParcelIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[50]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[53]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3134,7 +3301,7 @@ func (x *GetPrimaryImprovementTypeIdByParcelIdRequest) String() string {
 func (*GetPrimaryImprovementTypeIdByParcelIdRequest) ProtoMessage() {}
 
 func (x *GetPrimaryImprovementTypeIdByParcelIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[50]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[53]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3147,7 +3314,7 @@ func (x *GetPrimaryImprovementTypeIdByParcelIdRequest) ProtoReflect() protorefle
 
 // Deprecated: Use GetPrimaryImprovementTypeIdByParcelIdRequest.ProtoReflect.Descriptor instead.
 func (*GetPrimaryImprovementTypeIdByParcelIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{50}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{53}
 }
 
 func (x *GetPrimaryImprovementTypeIdByParcelIdRequest) GetParcelIds() []string {
@@ -3173,7 +3340,7 @@ type GetPrimaryImprovementTypeIdByParcelIdResponse struct {
 
 func (x *GetPrimaryImprovementTypeIdByParcelIdResponse) Reset() {
 	*x = GetPrimaryImprovementTypeIdByParcelIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[51]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[54]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3185,7 +3352,7 @@ func (x *GetPrimaryImprovementTypeIdByParcelIdResponse) String() string {
 func (*GetPrimaryImprovementTypeIdByParcelIdResponse) ProtoMessage() {}
 
 func (x *GetPrimaryImprovementTypeIdByParcelIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[51]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[54]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3198,7 +3365,7 @@ func (x *GetPrimaryImprovementTypeIdByParcelIdResponse) ProtoReflect() protorefl
 
 // Deprecated: Use GetPrimaryImprovementTypeIdByParcelIdResponse.ProtoReflect.Descriptor instead.
 func (*GetPrimaryImprovementTypeIdByParcelIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{51}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{54}
 }
 
 func (x *GetPrimaryImprovementTypeIdByParcelIdResponse) GetValues() map[string]string {
@@ -3219,7 +3386,7 @@ type GetLandAreaSqftByFeatureIdRequest struct {
 
 func (x *GetLandAreaSqftByFeatureIdRequest) Reset() {
 	*x = GetLandAreaSqftByFeatureIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[52]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[55]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3231,7 +3398,7 @@ func (x *GetLandAreaSqftByFeatureIdRequest) String() string {
 func (*GetLandAreaSqftByFeatureIdRequest) ProtoMessage() {}
 
 func (x *GetLandAreaSqftByFeatureIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[52]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[55]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3244,7 +3411,7 @@ func (x *GetLandAreaSqftByFeatureIdRequest) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use GetLandAreaSqftByFeatureIdRequest.ProtoReflect.Descriptor instead.
 func (*GetLandAreaSqftByFeatureIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{52}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{55}
 }
 
 func (x *GetLandAreaSqftByFeatureIdRequest) GetFeatureIds() []int64 {
@@ -3270,7 +3437,7 @@ type GetLandAreaSqftByFeatureIdResponse struct {
 
 func (x *GetLandAreaSqftByFeatureIdResponse) Reset() {
 	*x = GetLandAreaSqftByFeatureIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[53]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[56]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3282,7 +3449,7 @@ func (x *GetLandAreaSqftByFeatureIdResponse) String() string {
 func (*GetLandAreaSqftByFeatureIdResponse) ProtoMessage() {}
 
 func (x *GetLandAreaSqftByFeatureIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[53]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[56]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3295,7 +3462,7 @@ func (x *GetLandAreaSqftByFeatureIdResponse) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use GetLandAreaSqftByFeatureIdResponse.ProtoReflect.Descriptor instead.
 func (*GetLandAreaSqftByFeatureIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{53}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{56}
 }
 
 func (x *GetLandAreaSqftByFeatureIdResponse) GetValues() map[int64]float64 {
@@ -3315,7 +3482,7 @@ type GetFrontageFtByFeatureIdRequest struct {
 
 func (x *GetFrontageFtByFeatureIdRequest) Reset() {
 	*x = GetFrontageFtByFeatureIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[54]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[57]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3327,7 +3494,7 @@ func (x *GetFrontageFtByFeatureIdRequest) String() string {
 func (*GetFrontageFtByFeatureIdRequest) ProtoMessage() {}
 
 func (x *GetFrontageFtByFeatureIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[54]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[57]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3340,7 +3507,7 @@ func (x *GetFrontageFtByFeatureIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFrontageFtByFeatureIdRequest.ProtoReflect.Descriptor instead.
 func (*GetFrontageFtByFeatureIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{54}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{57}
 }
 
 func (x *GetFrontageFtByFeatureIdRequest) GetFeatureIds() []int64 {
@@ -3366,7 +3533,7 @@ type GetFrontageFtByFeatureIdResponse struct {
 
 func (x *GetFrontageFtByFeatureIdResponse) Reset() {
 	*x = GetFrontageFtByFeatureIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[55]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[58]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3378,7 +3545,7 @@ func (x *GetFrontageFtByFeatureIdResponse) String() string {
 func (*GetFrontageFtByFeatureIdResponse) ProtoMessage() {}
 
 func (x *GetFrontageFtByFeatureIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[55]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[58]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3391,7 +3558,7 @@ func (x *GetFrontageFtByFeatureIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFrontageFtByFeatureIdResponse.ProtoReflect.Descriptor instead.
 func (*GetFrontageFtByFeatureIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{55}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{58}
 }
 
 func (x *GetFrontageFtByFeatureIdResponse) GetValues() map[int64]float64 {
@@ -3411,7 +3578,7 @@ type GetDepthFtByFeatureIdRequest struct {
 
 func (x *GetDepthFtByFeatureIdRequest) Reset() {
 	*x = GetDepthFtByFeatureIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[56]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[59]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3423,7 +3590,7 @@ func (x *GetDepthFtByFeatureIdRequest) String() string {
 func (*GetDepthFtByFeatureIdRequest) ProtoMessage() {}
 
 func (x *GetDepthFtByFeatureIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[56]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[59]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3436,7 +3603,7 @@ func (x *GetDepthFtByFeatureIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDepthFtByFeatureIdRequest.ProtoReflect.Descriptor instead.
 func (*GetDepthFtByFeatureIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{56}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{59}
 }
 
 func (x *GetDepthFtByFeatureIdRequest) GetFeatureIds() []int64 {
@@ -3462,7 +3629,7 @@ type GetDepthFtByFeatureIdResponse struct {
 
 func (x *GetDepthFtByFeatureIdResponse) Reset() {
 	*x = GetDepthFtByFeatureIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[57]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[60]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3474,7 +3641,7 @@ func (x *GetDepthFtByFeatureIdResponse) String() string {
 func (*GetDepthFtByFeatureIdResponse) ProtoMessage() {}
 
 func (x *GetDepthFtByFeatureIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[57]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[60]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3487,7 +3654,7 @@ func (x *GetDepthFtByFeatureIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDepthFtByFeatureIdResponse.ProtoReflect.Descriptor instead.
 func (*GetDepthFtByFeatureIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{57}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{60}
 }
 
 func (x *GetDepthFtByFeatureIdResponse) GetValues() map[int64]float64 {
@@ -3507,7 +3674,7 @@ type GetLandUseIdByFeatureIdRequest struct {
 
 func (x *GetLandUseIdByFeatureIdRequest) Reset() {
 	*x = GetLandUseIdByFeatureIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[58]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[61]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3519,7 +3686,7 @@ func (x *GetLandUseIdByFeatureIdRequest) String() string {
 func (*GetLandUseIdByFeatureIdRequest) ProtoMessage() {}
 
 func (x *GetLandUseIdByFeatureIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[58]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[61]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3532,7 +3699,7 @@ func (x *GetLandUseIdByFeatureIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLandUseIdByFeatureIdRequest.ProtoReflect.Descriptor instead.
 func (*GetLandUseIdByFeatureIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{58}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{61}
 }
 
 func (x *GetLandUseIdByFeatureIdRequest) GetFeatureIds() []int64 {
@@ -3558,7 +3725,7 @@ type GetLandUseIdByFeatureIdResponse struct {
 
 func (x *GetLandUseIdByFeatureIdResponse) Reset() {
 	*x = GetLandUseIdByFeatureIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[59]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[62]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3570,7 +3737,7 @@ func (x *GetLandUseIdByFeatureIdResponse) String() string {
 func (*GetLandUseIdByFeatureIdResponse) ProtoMessage() {}
 
 func (x *GetLandUseIdByFeatureIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[59]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[62]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3583,7 +3750,7 @@ func (x *GetLandUseIdByFeatureIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLandUseIdByFeatureIdResponse.ProtoReflect.Descriptor instead.
 func (*GetLandUseIdByFeatureIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{59}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{62}
 }
 
 func (x *GetLandUseIdByFeatureIdResponse) GetValues() map[int64]string {
@@ -3603,7 +3770,7 @@ type GetZoningIdByFeatureIdRequest struct {
 
 func (x *GetZoningIdByFeatureIdRequest) Reset() {
 	*x = GetZoningIdByFeatureIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[60]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[63]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3615,7 +3782,7 @@ func (x *GetZoningIdByFeatureIdRequest) String() string {
 func (*GetZoningIdByFeatureIdRequest) ProtoMessage() {}
 
 func (x *GetZoningIdByFeatureIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[60]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[63]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3628,7 +3795,7 @@ func (x *GetZoningIdByFeatureIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetZoningIdByFeatureIdRequest.ProtoReflect.Descriptor instead.
 func (*GetZoningIdByFeatureIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{60}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{63}
 }
 
 func (x *GetZoningIdByFeatureIdRequest) GetFeatureIds() []int64 {
@@ -3654,7 +3821,7 @@ type GetZoningIdByFeatureIdResponse struct {
 
 func (x *GetZoningIdByFeatureIdResponse) Reset() {
 	*x = GetZoningIdByFeatureIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[61]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[64]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3666,7 +3833,7 @@ func (x *GetZoningIdByFeatureIdResponse) String() string {
 func (*GetZoningIdByFeatureIdResponse) ProtoMessage() {}
 
 func (x *GetZoningIdByFeatureIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[61]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[64]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3679,7 +3846,7 @@ func (x *GetZoningIdByFeatureIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetZoningIdByFeatureIdResponse.ProtoReflect.Descriptor instead.
 func (*GetZoningIdByFeatureIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{61}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{64}
 }
 
 func (x *GetZoningIdByFeatureIdResponse) GetValues() map[int64]string {
@@ -3699,7 +3866,7 @@ type GetImprovementAreaSqftByFeatureIdRequest struct {
 
 func (x *GetImprovementAreaSqftByFeatureIdRequest) Reset() {
 	*x = GetImprovementAreaSqftByFeatureIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[62]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[65]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3711,7 +3878,7 @@ func (x *GetImprovementAreaSqftByFeatureIdRequest) String() string {
 func (*GetImprovementAreaSqftByFeatureIdRequest) ProtoMessage() {}
 
 func (x *GetImprovementAreaSqftByFeatureIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[62]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[65]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3724,7 +3891,7 @@ func (x *GetImprovementAreaSqftByFeatureIdRequest) ProtoReflect() protoreflect.M
 
 // Deprecated: Use GetImprovementAreaSqftByFeatureIdRequest.ProtoReflect.Descriptor instead.
 func (*GetImprovementAreaSqftByFeatureIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{62}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{65}
 }
 
 func (x *GetImprovementAreaSqftByFeatureIdRequest) GetFeatureIds() []int64 {
@@ -3750,7 +3917,7 @@ type GetImprovementAreaSqftByFeatureIdResponse struct {
 
 func (x *GetImprovementAreaSqftByFeatureIdResponse) Reset() {
 	*x = GetImprovementAreaSqftByFeatureIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[63]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[66]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3762,7 +3929,7 @@ func (x *GetImprovementAreaSqftByFeatureIdResponse) String() string {
 func (*GetImprovementAreaSqftByFeatureIdResponse) ProtoMessage() {}
 
 func (x *GetImprovementAreaSqftByFeatureIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[63]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[66]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3775,7 +3942,7 @@ func (x *GetImprovementAreaSqftByFeatureIdResponse) ProtoReflect() protoreflect.
 
 // Deprecated: Use GetImprovementAreaSqftByFeatureIdResponse.ProtoReflect.Descriptor instead.
 func (*GetImprovementAreaSqftByFeatureIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{63}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{66}
 }
 
 func (x *GetImprovementAreaSqftByFeatureIdResponse) GetValues() map[int64]float64 {
@@ -3795,7 +3962,7 @@ type GetBedroomsByFeatureIdRequest struct {
 
 func (x *GetBedroomsByFeatureIdRequest) Reset() {
 	*x = GetBedroomsByFeatureIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[64]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[67]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3807,7 +3974,7 @@ func (x *GetBedroomsByFeatureIdRequest) String() string {
 func (*GetBedroomsByFeatureIdRequest) ProtoMessage() {}
 
 func (x *GetBedroomsByFeatureIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[64]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[67]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3820,7 +3987,7 @@ func (x *GetBedroomsByFeatureIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBedroomsByFeatureIdRequest.ProtoReflect.Descriptor instead.
 func (*GetBedroomsByFeatureIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{64}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{67}
 }
 
 func (x *GetBedroomsByFeatureIdRequest) GetFeatureIds() []int64 {
@@ -3846,7 +4013,7 @@ type GetBedroomsByFeatureIdResponse struct {
 
 func (x *GetBedroomsByFeatureIdResponse) Reset() {
 	*x = GetBedroomsByFeatureIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[65]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[68]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3858,7 +4025,7 @@ func (x *GetBedroomsByFeatureIdResponse) String() string {
 func (*GetBedroomsByFeatureIdResponse) ProtoMessage() {}
 
 func (x *GetBedroomsByFeatureIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[65]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[68]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3871,7 +4038,7 @@ func (x *GetBedroomsByFeatureIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBedroomsByFeatureIdResponse.ProtoReflect.Descriptor instead.
 func (*GetBedroomsByFeatureIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{65}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{68}
 }
 
 func (x *GetBedroomsByFeatureIdResponse) GetValues() map[int64]int32 {
@@ -3891,7 +4058,7 @@ type GetBathroomsByFeatureIdRequest struct {
 
 func (x *GetBathroomsByFeatureIdRequest) Reset() {
 	*x = GetBathroomsByFeatureIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[66]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[69]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3903,7 +4070,7 @@ func (x *GetBathroomsByFeatureIdRequest) String() string {
 func (*GetBathroomsByFeatureIdRequest) ProtoMessage() {}
 
 func (x *GetBathroomsByFeatureIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[66]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[69]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3916,7 +4083,7 @@ func (x *GetBathroomsByFeatureIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBathroomsByFeatureIdRequest.ProtoReflect.Descriptor instead.
 func (*GetBathroomsByFeatureIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{66}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{69}
 }
 
 func (x *GetBathroomsByFeatureIdRequest) GetFeatureIds() []int64 {
@@ -3942,7 +4109,7 @@ type GetBathroomsByFeatureIdResponse struct {
 
 func (x *GetBathroomsByFeatureIdResponse) Reset() {
 	*x = GetBathroomsByFeatureIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[67]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[70]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3954,7 +4121,7 @@ func (x *GetBathroomsByFeatureIdResponse) String() string {
 func (*GetBathroomsByFeatureIdResponse) ProtoMessage() {}
 
 func (x *GetBathroomsByFeatureIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[67]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[70]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3967,7 +4134,7 @@ func (x *GetBathroomsByFeatureIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBathroomsByFeatureIdResponse.ProtoReflect.Descriptor instead.
 func (*GetBathroomsByFeatureIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{67}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{70}
 }
 
 func (x *GetBathroomsByFeatureIdResponse) GetValues() map[int64]int32 {
@@ -3987,7 +4154,7 @@ type GetUnitsByFeatureIdRequest struct {
 
 func (x *GetUnitsByFeatureIdRequest) Reset() {
 	*x = GetUnitsByFeatureIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[68]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[71]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3999,7 +4166,7 @@ func (x *GetUnitsByFeatureIdRequest) String() string {
 func (*GetUnitsByFeatureIdRequest) ProtoMessage() {}
 
 func (x *GetUnitsByFeatureIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[68]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[71]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4012,7 +4179,7 @@ func (x *GetUnitsByFeatureIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUnitsByFeatureIdRequest.ProtoReflect.Descriptor instead.
 func (*GetUnitsByFeatureIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{68}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{71}
 }
 
 func (x *GetUnitsByFeatureIdRequest) GetFeatureIds() []int64 {
@@ -4038,7 +4205,7 @@ type GetUnitsByFeatureIdResponse struct {
 
 func (x *GetUnitsByFeatureIdResponse) Reset() {
 	*x = GetUnitsByFeatureIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[69]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[72]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4050,7 +4217,7 @@ func (x *GetUnitsByFeatureIdResponse) String() string {
 func (*GetUnitsByFeatureIdResponse) ProtoMessage() {}
 
 func (x *GetUnitsByFeatureIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[69]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[72]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4063,7 +4230,7 @@ func (x *GetUnitsByFeatureIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUnitsByFeatureIdResponse.ProtoReflect.Descriptor instead.
 func (*GetUnitsByFeatureIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{69}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{72}
 }
 
 func (x *GetUnitsByFeatureIdResponse) GetValues() map[int64]int32 {
@@ -4083,7 +4250,7 @@ type GetPrimaryImprovementYearBuiltByFeatureIdRequest struct {
 
 func (x *GetPrimaryImprovementYearBuiltByFeatureIdRequest) Reset() {
 	*x = GetPrimaryImprovementYearBuiltByFeatureIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[70]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[73]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4095,7 +4262,7 @@ func (x *GetPrimaryImprovementYearBuiltByFeatureIdRequest) String() string {
 func (*GetPrimaryImprovementYearBuiltByFeatureIdRequest) ProtoMessage() {}
 
 func (x *GetPrimaryImprovementYearBuiltByFeatureIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[70]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[73]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4108,7 +4275,7 @@ func (x *GetPrimaryImprovementYearBuiltByFeatureIdRequest) ProtoReflect() protor
 
 // Deprecated: Use GetPrimaryImprovementYearBuiltByFeatureIdRequest.ProtoReflect.Descriptor instead.
 func (*GetPrimaryImprovementYearBuiltByFeatureIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{70}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{73}
 }
 
 func (x *GetPrimaryImprovementYearBuiltByFeatureIdRequest) GetFeatureIds() []int64 {
@@ -4134,7 +4301,7 @@ type GetPrimaryImprovementYearBuiltByFeatureIdResponse struct {
 
 func (x *GetPrimaryImprovementYearBuiltByFeatureIdResponse) Reset() {
 	*x = GetPrimaryImprovementYearBuiltByFeatureIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[71]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[74]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4146,7 +4313,7 @@ func (x *GetPrimaryImprovementYearBuiltByFeatureIdResponse) String() string {
 func (*GetPrimaryImprovementYearBuiltByFeatureIdResponse) ProtoMessage() {}
 
 func (x *GetPrimaryImprovementYearBuiltByFeatureIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[71]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[74]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4159,7 +4326,7 @@ func (x *GetPrimaryImprovementYearBuiltByFeatureIdResponse) ProtoReflect() proto
 
 // Deprecated: Use GetPrimaryImprovementYearBuiltByFeatureIdResponse.ProtoReflect.Descriptor instead.
 func (*GetPrimaryImprovementYearBuiltByFeatureIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{71}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{74}
 }
 
 func (x *GetPrimaryImprovementYearBuiltByFeatureIdResponse) GetValues() map[int64]int32 {
@@ -4179,7 +4346,7 @@ type GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest struct {
 
 func (x *GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest) Reset() {
 	*x = GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[72]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[75]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4191,7 +4358,7 @@ func (x *GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest) String() str
 func (*GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest) ProtoMessage() {}
 
 func (x *GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[72]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[75]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4204,7 +4371,7 @@ func (x *GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest) ProtoReflect
 
 // Deprecated: Use GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest.ProtoReflect.Descriptor instead.
 func (*GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{72}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{75}
 }
 
 func (x *GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest) GetFeatureIds() []int64 {
@@ -4230,7 +4397,7 @@ type GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse struct {
 
 func (x *GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse) Reset() {
 	*x = GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[73]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[76]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4242,7 +4409,7 @@ func (x *GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse) String() st
 func (*GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse) ProtoMessage() {}
 
 func (x *GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[73]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[76]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4255,7 +4422,7 @@ func (x *GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse) ProtoReflec
 
 // Deprecated: Use GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse.ProtoReflect.Descriptor instead.
 func (*GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{73}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{76}
 }
 
 func (x *GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse) GetValues() map[int64]int32 {
@@ -4275,7 +4442,7 @@ type GetPrimaryImprovementConditionIdByFeatureIdRequest struct {
 
 func (x *GetPrimaryImprovementConditionIdByFeatureIdRequest) Reset() {
 	*x = GetPrimaryImprovementConditionIdByFeatureIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[74]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[77]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4287,7 +4454,7 @@ func (x *GetPrimaryImprovementConditionIdByFeatureIdRequest) String() string {
 func (*GetPrimaryImprovementConditionIdByFeatureIdRequest) ProtoMessage() {}
 
 func (x *GetPrimaryImprovementConditionIdByFeatureIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[74]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[77]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4300,7 +4467,7 @@ func (x *GetPrimaryImprovementConditionIdByFeatureIdRequest) ProtoReflect() prot
 
 // Deprecated: Use GetPrimaryImprovementConditionIdByFeatureIdRequest.ProtoReflect.Descriptor instead.
 func (*GetPrimaryImprovementConditionIdByFeatureIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{74}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{77}
 }
 
 func (x *GetPrimaryImprovementConditionIdByFeatureIdRequest) GetFeatureIds() []int64 {
@@ -4326,7 +4493,7 @@ type GetPrimaryImprovementConditionIdByFeatureIdResponse struct {
 
 func (x *GetPrimaryImprovementConditionIdByFeatureIdResponse) Reset() {
 	*x = GetPrimaryImprovementConditionIdByFeatureIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[75]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[78]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4338,7 +4505,7 @@ func (x *GetPrimaryImprovementConditionIdByFeatureIdResponse) String() string {
 func (*GetPrimaryImprovementConditionIdByFeatureIdResponse) ProtoMessage() {}
 
 func (x *GetPrimaryImprovementConditionIdByFeatureIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[75]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[78]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4351,7 +4518,7 @@ func (x *GetPrimaryImprovementConditionIdByFeatureIdResponse) ProtoReflect() pro
 
 // Deprecated: Use GetPrimaryImprovementConditionIdByFeatureIdResponse.ProtoReflect.Descriptor instead.
 func (*GetPrimaryImprovementConditionIdByFeatureIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{75}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{78}
 }
 
 func (x *GetPrimaryImprovementConditionIdByFeatureIdResponse) GetValues() map[int64]string {
@@ -4371,7 +4538,7 @@ type GetPrimaryImprovementTypeIdByFeatureIdRequest struct {
 
 func (x *GetPrimaryImprovementTypeIdByFeatureIdRequest) Reset() {
 	*x = GetPrimaryImprovementTypeIdByFeatureIdRequest{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[76]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[79]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4383,7 +4550,7 @@ func (x *GetPrimaryImprovementTypeIdByFeatureIdRequest) String() string {
 func (*GetPrimaryImprovementTypeIdByFeatureIdRequest) ProtoMessage() {}
 
 func (x *GetPrimaryImprovementTypeIdByFeatureIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[76]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[79]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4396,7 +4563,7 @@ func (x *GetPrimaryImprovementTypeIdByFeatureIdRequest) ProtoReflect() protorefl
 
 // Deprecated: Use GetPrimaryImprovementTypeIdByFeatureIdRequest.ProtoReflect.Descriptor instead.
 func (*GetPrimaryImprovementTypeIdByFeatureIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{76}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{79}
 }
 
 func (x *GetPrimaryImprovementTypeIdByFeatureIdRequest) GetFeatureIds() []int64 {
@@ -4422,7 +4589,7 @@ type GetPrimaryImprovementTypeIdByFeatureIdResponse struct {
 
 func (x *GetPrimaryImprovementTypeIdByFeatureIdResponse) Reset() {
 	*x = GetPrimaryImprovementTypeIdByFeatureIdResponse{}
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[77]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[80]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4434,7 +4601,7 @@ func (x *GetPrimaryImprovementTypeIdByFeatureIdResponse) String() string {
 func (*GetPrimaryImprovementTypeIdByFeatureIdResponse) ProtoMessage() {}
 
 func (x *GetPrimaryImprovementTypeIdByFeatureIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[77]
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[80]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4447,7 +4614,7 @@ func (x *GetPrimaryImprovementTypeIdByFeatureIdResponse) ProtoReflect() protoref
 
 // Deprecated: Use GetPrimaryImprovementTypeIdByFeatureIdResponse.ProtoReflect.Descriptor instead.
 func (*GetPrimaryImprovementTypeIdByFeatureIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{77}
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{80}
 }
 
 func (x *GetPrimaryImprovementTypeIdByFeatureIdResponse) GetValues() map[int64]string {
@@ -4724,7 +4891,22 @@ const file_civil_public_parcels_v1_parcels_proto_rawDesc = "" +
 	"\x05min_x\x18\x01 \x01(\x01B\x1e\xbaG\x1b\x92\x02\x18Minimum Longitude / WestR\x04minX\x123\n" +
 	"\x05min_y\x18\x02 \x01(\x01B\x1e\xbaG\x1b\x92\x02\x18Minimum Latitude / SouthR\x04minY\x123\n" +
 	"\x05max_x\x18\x03 \x01(\x01B\x1e\xbaG\x1b\x92\x02\x18Maximum Longitude / EastR\x04maxX\x123\n" +
-	"\x05max_y\x18\x04 \x01(\x01B\x1e\xbaG\x1b\x92\x02\x18Maximum Latitude / NorthR\x04maxY\"\x88\x04\n" +
+	"\x05max_y\x18\x04 \x01(\x01B\x1e\xbaG\x1b\x92\x02\x18Maximum Latitude / NorthR\x04maxY\"\xe1\x01\n" +
+	"\vExtentWGS84\x123\n" +
+	"\x05min_x\x18\x01 \x01(\x01B\x1e\xbaG\x1b\x92\x02\x18Minimum Longitude / WestR\x04minX\x123\n" +
+	"\x05min_y\x18\x02 \x01(\x01B\x1e\xbaG\x1b\x92\x02\x18Minimum Latitude / SouthR\x04minY\x123\n" +
+	"\x05max_x\x18\x03 \x01(\x01B\x1e\xbaG\x1b\x92\x02\x18Maximum Longitude / EastR\x04maxX\x123\n" +
+	"\x05max_y\x18\x04 \x01(\x01B\x1e\xbaG\x1b\x92\x02\x18Maximum Latitude / NorthR\x04maxY\"\xd3\x03\n" +
+	"&GetParcelExtentsWGS84ByParcelIdRequest\x12\xbb\x01\n" +
+	"\n" +
+	"parcel_ids\x18\x01 \x03(\tB\x9b\x01\xbaG\x84\x01:R\x12P['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']\x92\x02-A list of unique identifiers for the parcels.\xbaH\x10\x92\x01\r\b\x01\x10d\x18\x01\"\x05r\x03\xb0\x01\x01R\tparcelIds\x12\xda\x01\n" +
+	"\vlegal_as_of\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampB\x98\x01\xbaG\x81\x01\x92\x02~The timestamp to read the parcels' geometry at. Defaults to now. A parcel with no geometry or record at that time is left out.\xbaH\x10\xb2\x01\r*\v\b\x80\x92\xb8Ø\xfe\xff\xff\xff\x01H\x00R\tlegalAsOf\x88\x01\x01B\x0e\n" +
+	"\f_legal_as_of\"\xf4\x01\n" +
+	"'GetParcelExtentsWGS84ByParcelIdResponse\x12g\n" +
+	"\aextents\x18\x01 \x03(\v2M.civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse.ExtentsEntryR\aextents\x1a`\n" +
+	"\fExtentsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12:\n" +
+	"\x05value\x18\x02 \x01(\v2$.civil.public.parcels.v1.ExtentWGS84R\x05value:\x028\x01\"\x88\x04\n" +
 	" GetLandAreaSqftByParcelIdRequest\x12\xb5\x01\n" +
 	"\n" +
 	"parcel_ids\x18\x01 \x03(\tB\x95\x01\xbaG~:R\x12P['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']\x92\x02'A list of UUID identifiers for parcels.\xbaH\x11\x92\x01\x0e\b\x01\x10\xe8\a\x18\x01\"\x05r\x03\xb0\x01\x01R\tparcelIds\x12\x9b\x02\n" +
@@ -5013,7 +5195,7 @@ const file_civil_public_parcels_v1_parcels_proto_rawDesc = "" +
 	"\x12=\n" +
 	"9PARCEL_ATTRIBUTE_PRIMARY_IMPROVEMENT_EFFECTIVE_YEAR_BUILT\x10\v\x125\n" +
 	"1PARCEL_ATTRIBUTE_PRIMARY_IMPROVEMENT_CONDITION_ID\x10\f\x120\n" +
-	",PARCEL_ATTRIBUTE_PRIMARY_IMPROVEMENT_TYPE_ID\x10\r2\xe6,\n" +
+	",PARCEL_ATTRIBUTE_PRIMARY_IMPROVEMENT_TYPE_ID\x10\r2\x92.\n" +
 	"\x0eParcelsService\x12\xc7\x01\n" +
 	"*GetParcelsWithImprovementSummaryByParcelId\x12J.civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdRequest\x1aK.civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse\"\x00\x12\xca\x01\n" +
 	"+GetParcelsWithImprovementSummaryByFeatureId\x12K.civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdRequest\x1aL.civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse\"\x00\x12\xb5\x01\n" +
@@ -5022,7 +5204,8 @@ const file_civil_public_parcels_v1_parcels_proto_rawDesc = "" +
 	"\x14GetEquityComparables\x124.civil.public.parcels.v1.GetEquityComparablesRequest\x1a5.civil.public.parcels.v1.GetEquityComparablesResponse\"\x00\x12\x82\x01\n" +
 	"\x13GetSalesComparables\x123.civil.public.parcels.v1.GetSalesComparablesRequest\x1a4.civil.public.parcels.v1.GetSalesComparablesResponse\"\x00\x12\x8e\x01\n" +
 	"\x17GetParcelIdsByFeatureId\x127.civil.public.parcels.v1.GetParcelIdsByFeatureIdRequest\x1a8.civil.public.parcels.v1.GetParcelIdsByFeatureIdResponse\"\x00\x12\xa3\x01\n" +
-	"\x1eGetEstimatedParcelsExtentWGS84\x12>.civil.public.parcels.v1.GetEstimatedParcelsExtentWGS84Request\x1a?.civil.public.parcels.v1.GetEstimatedParcelsExtentWGS84Response\"\x00\x12\x94\x01\n" +
+	"\x1eGetEstimatedParcelsExtentWGS84\x12>.civil.public.parcels.v1.GetEstimatedParcelsExtentWGS84Request\x1a?.civil.public.parcels.v1.GetEstimatedParcelsExtentWGS84Response\"\x00\x12\xa9\x01\n" +
+	"\x1fGetParcelExtentsWGS84ByParcelId\x12?.civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdRequest\x1a@.civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse\"\x03\x90\x02\x01\x12\x94\x01\n" +
 	"\x19GetLandAreaSqftByParcelId\x129.civil.public.parcels.v1.GetLandAreaSqftByParcelIdRequest\x1a:.civil.public.parcels.v1.GetLandAreaSqftByParcelIdResponse\"\x00\x12\x8e\x01\n" +
 	"\x17GetFrontageFtByParcelId\x127.civil.public.parcels.v1.GetFrontageFtByParcelIdRequest\x1a8.civil.public.parcels.v1.GetFrontageFtByParcelIdResponse\"\x00\x12\x85\x01\n" +
 	"\x14GetDepthFtByParcelId\x124.civil.public.parcels.v1.GetDepthFtByParcelIdRequest\x1a5.civil.public.parcels.v1.GetDepthFtByParcelIdResponse\"\x00\x12\x8b\x01\n" +
@@ -5072,7 +5255,7 @@ func file_civil_public_parcels_v1_parcels_proto_rawDescGZIP() []byte {
 }
 
 var file_civil_public_parcels_v1_parcels_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_civil_public_parcels_v1_parcels_proto_msgTypes = make([]protoimpl.MessageInfo, 110)
+var file_civil_public_parcels_v1_parcels_proto_msgTypes = make([]protoimpl.MessageInfo, 114)
 var file_civil_public_parcels_v1_parcels_proto_goTypes = []any{
 	(ParcelAttribute)(0),                                               // 0: civil.public.parcels.v1.ParcelAttribute
 	(*ParcelAffordances)(nil),                                          // 1: civil.public.parcels.v1.ParcelAffordances
@@ -5101,249 +5284,258 @@ var file_civil_public_parcels_v1_parcels_proto_goTypes = []any{
 	(*GetParcelIdsByFeatureIdResponse)(nil),                            // 24: civil.public.parcels.v1.GetParcelIdsByFeatureIdResponse
 	(*GetEstimatedParcelsExtentWGS84Request)(nil),                      // 25: civil.public.parcels.v1.GetEstimatedParcelsExtentWGS84Request
 	(*GetEstimatedParcelsExtentWGS84Response)(nil),                     // 26: civil.public.parcels.v1.GetEstimatedParcelsExtentWGS84Response
-	(*GetLandAreaSqftByParcelIdRequest)(nil),                           // 27: civil.public.parcels.v1.GetLandAreaSqftByParcelIdRequest
-	(*GetLandAreaSqftByParcelIdResponse)(nil),                          // 28: civil.public.parcels.v1.GetLandAreaSqftByParcelIdResponse
-	(*GetFrontageFtByParcelIdRequest)(nil),                             // 29: civil.public.parcels.v1.GetFrontageFtByParcelIdRequest
-	(*GetFrontageFtByParcelIdResponse)(nil),                            // 30: civil.public.parcels.v1.GetFrontageFtByParcelIdResponse
-	(*GetDepthFtByParcelIdRequest)(nil),                                // 31: civil.public.parcels.v1.GetDepthFtByParcelIdRequest
-	(*GetDepthFtByParcelIdResponse)(nil),                               // 32: civil.public.parcels.v1.GetDepthFtByParcelIdResponse
-	(*GetLandUseIdByParcelIdRequest)(nil),                              // 33: civil.public.parcels.v1.GetLandUseIdByParcelIdRequest
-	(*GetLandUseIdByParcelIdResponse)(nil),                             // 34: civil.public.parcels.v1.GetLandUseIdByParcelIdResponse
-	(*GetZoningIdByParcelIdRequest)(nil),                               // 35: civil.public.parcels.v1.GetZoningIdByParcelIdRequest
-	(*GetZoningIdByParcelIdResponse)(nil),                              // 36: civil.public.parcels.v1.GetZoningIdByParcelIdResponse
-	(*GetImprovementAreaSqftByParcelIdRequest)(nil),                    // 37: civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdRequest
-	(*GetImprovementAreaSqftByParcelIdResponse)(nil),                   // 38: civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdResponse
-	(*GetBedroomsByParcelIdRequest)(nil),                               // 39: civil.public.parcels.v1.GetBedroomsByParcelIdRequest
-	(*GetBedroomsByParcelIdResponse)(nil),                              // 40: civil.public.parcels.v1.GetBedroomsByParcelIdResponse
-	(*GetBathroomsByParcelIdRequest)(nil),                              // 41: civil.public.parcels.v1.GetBathroomsByParcelIdRequest
-	(*GetBathroomsByParcelIdResponse)(nil),                             // 42: civil.public.parcels.v1.GetBathroomsByParcelIdResponse
-	(*GetUnitsByParcelIdRequest)(nil),                                  // 43: civil.public.parcels.v1.GetUnitsByParcelIdRequest
-	(*GetUnitsByParcelIdResponse)(nil),                                 // 44: civil.public.parcels.v1.GetUnitsByParcelIdResponse
-	(*GetPrimaryImprovementYearBuiltByParcelIdRequest)(nil),            // 45: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdRequest
-	(*GetPrimaryImprovementYearBuiltByParcelIdResponse)(nil),           // 46: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdResponse
-	(*GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest)(nil),   // 47: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest
-	(*GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse)(nil),  // 48: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse
-	(*GetPrimaryImprovementConditionIdByParcelIdRequest)(nil),          // 49: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdRequest
-	(*GetPrimaryImprovementConditionIdByParcelIdResponse)(nil),         // 50: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdResponse
-	(*GetPrimaryImprovementTypeIdByParcelIdRequest)(nil),               // 51: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdRequest
-	(*GetPrimaryImprovementTypeIdByParcelIdResponse)(nil),              // 52: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdResponse
-	(*GetLandAreaSqftByFeatureIdRequest)(nil),                          // 53: civil.public.parcels.v1.GetLandAreaSqftByFeatureIdRequest
-	(*GetLandAreaSqftByFeatureIdResponse)(nil),                         // 54: civil.public.parcels.v1.GetLandAreaSqftByFeatureIdResponse
-	(*GetFrontageFtByFeatureIdRequest)(nil),                            // 55: civil.public.parcels.v1.GetFrontageFtByFeatureIdRequest
-	(*GetFrontageFtByFeatureIdResponse)(nil),                           // 56: civil.public.parcels.v1.GetFrontageFtByFeatureIdResponse
-	(*GetDepthFtByFeatureIdRequest)(nil),                               // 57: civil.public.parcels.v1.GetDepthFtByFeatureIdRequest
-	(*GetDepthFtByFeatureIdResponse)(nil),                              // 58: civil.public.parcels.v1.GetDepthFtByFeatureIdResponse
-	(*GetLandUseIdByFeatureIdRequest)(nil),                             // 59: civil.public.parcels.v1.GetLandUseIdByFeatureIdRequest
-	(*GetLandUseIdByFeatureIdResponse)(nil),                            // 60: civil.public.parcels.v1.GetLandUseIdByFeatureIdResponse
-	(*GetZoningIdByFeatureIdRequest)(nil),                              // 61: civil.public.parcels.v1.GetZoningIdByFeatureIdRequest
-	(*GetZoningIdByFeatureIdResponse)(nil),                             // 62: civil.public.parcels.v1.GetZoningIdByFeatureIdResponse
-	(*GetImprovementAreaSqftByFeatureIdRequest)(nil),                   // 63: civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdRequest
-	(*GetImprovementAreaSqftByFeatureIdResponse)(nil),                  // 64: civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdResponse
-	(*GetBedroomsByFeatureIdRequest)(nil),                              // 65: civil.public.parcels.v1.GetBedroomsByFeatureIdRequest
-	(*GetBedroomsByFeatureIdResponse)(nil),                             // 66: civil.public.parcels.v1.GetBedroomsByFeatureIdResponse
-	(*GetBathroomsByFeatureIdRequest)(nil),                             // 67: civil.public.parcels.v1.GetBathroomsByFeatureIdRequest
-	(*GetBathroomsByFeatureIdResponse)(nil),                            // 68: civil.public.parcels.v1.GetBathroomsByFeatureIdResponse
-	(*GetUnitsByFeatureIdRequest)(nil),                                 // 69: civil.public.parcels.v1.GetUnitsByFeatureIdRequest
-	(*GetUnitsByFeatureIdResponse)(nil),                                // 70: civil.public.parcels.v1.GetUnitsByFeatureIdResponse
-	(*GetPrimaryImprovementYearBuiltByFeatureIdRequest)(nil),           // 71: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdRequest
-	(*GetPrimaryImprovementYearBuiltByFeatureIdResponse)(nil),          // 72: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse
-	(*GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest)(nil),  // 73: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest
-	(*GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse)(nil), // 74: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse
-	(*GetPrimaryImprovementConditionIdByFeatureIdRequest)(nil),         // 75: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdRequest
-	(*GetPrimaryImprovementConditionIdByFeatureIdResponse)(nil),        // 76: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse
-	(*GetPrimaryImprovementTypeIdByFeatureIdRequest)(nil),              // 77: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdRequest
-	(*GetPrimaryImprovementTypeIdByFeatureIdResponse)(nil),             // 78: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse
-	nil,                           // 79: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse.ParcelsEntry
-	nil,                           // 80: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse.ParcelsEntry
-	nil,                           // 81: civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdResponse.UniqueValuesEntry
-	nil,                           // 82: civil.public.parcels.v1.GetEquityComparablesResponse.ParcelsEntry
-	nil,                           // 83: civil.public.parcels.v1.GetSalesComparablesResponse.ParcelsEntry
-	nil,                           // 84: civil.public.parcels.v1.GetParcelIdsByFeatureIdResponse.ParcelIdsEntry
-	nil,                           // 85: civil.public.parcels.v1.GetLandAreaSqftByParcelIdResponse.ValuesEntry
-	nil,                           // 86: civil.public.parcels.v1.GetFrontageFtByParcelIdResponse.ValuesEntry
-	nil,                           // 87: civil.public.parcels.v1.GetDepthFtByParcelIdResponse.ValuesEntry
-	nil,                           // 88: civil.public.parcels.v1.GetLandUseIdByParcelIdResponse.ValuesEntry
-	nil,                           // 89: civil.public.parcels.v1.GetZoningIdByParcelIdResponse.ValuesEntry
-	nil,                           // 90: civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdResponse.ValuesEntry
-	nil,                           // 91: civil.public.parcels.v1.GetBedroomsByParcelIdResponse.ValuesEntry
-	nil,                           // 92: civil.public.parcels.v1.GetBathroomsByParcelIdResponse.ValuesEntry
-	nil,                           // 93: civil.public.parcels.v1.GetUnitsByParcelIdResponse.ValuesEntry
-	nil,                           // 94: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdResponse.ValuesEntry
-	nil,                           // 95: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse.ValuesEntry
-	nil,                           // 96: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdResponse.ValuesEntry
-	nil,                           // 97: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdResponse.ValuesEntry
-	nil,                           // 98: civil.public.parcels.v1.GetLandAreaSqftByFeatureIdResponse.ValuesEntry
-	nil,                           // 99: civil.public.parcels.v1.GetFrontageFtByFeatureIdResponse.ValuesEntry
-	nil,                           // 100: civil.public.parcels.v1.GetDepthFtByFeatureIdResponse.ValuesEntry
-	nil,                           // 101: civil.public.parcels.v1.GetLandUseIdByFeatureIdResponse.ValuesEntry
-	nil,                           // 102: civil.public.parcels.v1.GetZoningIdByFeatureIdResponse.ValuesEntry
-	nil,                           // 103: civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdResponse.ValuesEntry
-	nil,                           // 104: civil.public.parcels.v1.GetBedroomsByFeatureIdResponse.ValuesEntry
-	nil,                           // 105: civil.public.parcels.v1.GetBathroomsByFeatureIdResponse.ValuesEntry
-	nil,                           // 106: civil.public.parcels.v1.GetUnitsByFeatureIdResponse.ValuesEntry
-	nil,                           // 107: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse.ValuesEntry
-	nil,                           // 108: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse.ValuesEntry
-	nil,                           // 109: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse.ValuesEntry
-	nil,                           // 110: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse.ValuesEntry
-	(*timestamppb.Timestamp)(nil), // 111: google.protobuf.Timestamp
-	(*interval.Interval)(nil),     // 112: google.type.Interval
+	(*ExtentWGS84)(nil),                                                // 27: civil.public.parcels.v1.ExtentWGS84
+	(*GetParcelExtentsWGS84ByParcelIdRequest)(nil),                     // 28: civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdRequest
+	(*GetParcelExtentsWGS84ByParcelIdResponse)(nil),                    // 29: civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse
+	(*GetLandAreaSqftByParcelIdRequest)(nil),                           // 30: civil.public.parcels.v1.GetLandAreaSqftByParcelIdRequest
+	(*GetLandAreaSqftByParcelIdResponse)(nil),                          // 31: civil.public.parcels.v1.GetLandAreaSqftByParcelIdResponse
+	(*GetFrontageFtByParcelIdRequest)(nil),                             // 32: civil.public.parcels.v1.GetFrontageFtByParcelIdRequest
+	(*GetFrontageFtByParcelIdResponse)(nil),                            // 33: civil.public.parcels.v1.GetFrontageFtByParcelIdResponse
+	(*GetDepthFtByParcelIdRequest)(nil),                                // 34: civil.public.parcels.v1.GetDepthFtByParcelIdRequest
+	(*GetDepthFtByParcelIdResponse)(nil),                               // 35: civil.public.parcels.v1.GetDepthFtByParcelIdResponse
+	(*GetLandUseIdByParcelIdRequest)(nil),                              // 36: civil.public.parcels.v1.GetLandUseIdByParcelIdRequest
+	(*GetLandUseIdByParcelIdResponse)(nil),                             // 37: civil.public.parcels.v1.GetLandUseIdByParcelIdResponse
+	(*GetZoningIdByParcelIdRequest)(nil),                               // 38: civil.public.parcels.v1.GetZoningIdByParcelIdRequest
+	(*GetZoningIdByParcelIdResponse)(nil),                              // 39: civil.public.parcels.v1.GetZoningIdByParcelIdResponse
+	(*GetImprovementAreaSqftByParcelIdRequest)(nil),                    // 40: civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdRequest
+	(*GetImprovementAreaSqftByParcelIdResponse)(nil),                   // 41: civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdResponse
+	(*GetBedroomsByParcelIdRequest)(nil),                               // 42: civil.public.parcels.v1.GetBedroomsByParcelIdRequest
+	(*GetBedroomsByParcelIdResponse)(nil),                              // 43: civil.public.parcels.v1.GetBedroomsByParcelIdResponse
+	(*GetBathroomsByParcelIdRequest)(nil),                              // 44: civil.public.parcels.v1.GetBathroomsByParcelIdRequest
+	(*GetBathroomsByParcelIdResponse)(nil),                             // 45: civil.public.parcels.v1.GetBathroomsByParcelIdResponse
+	(*GetUnitsByParcelIdRequest)(nil),                                  // 46: civil.public.parcels.v1.GetUnitsByParcelIdRequest
+	(*GetUnitsByParcelIdResponse)(nil),                                 // 47: civil.public.parcels.v1.GetUnitsByParcelIdResponse
+	(*GetPrimaryImprovementYearBuiltByParcelIdRequest)(nil),            // 48: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdRequest
+	(*GetPrimaryImprovementYearBuiltByParcelIdResponse)(nil),           // 49: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdResponse
+	(*GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest)(nil),   // 50: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest
+	(*GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse)(nil),  // 51: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse
+	(*GetPrimaryImprovementConditionIdByParcelIdRequest)(nil),          // 52: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdRequest
+	(*GetPrimaryImprovementConditionIdByParcelIdResponse)(nil),         // 53: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdResponse
+	(*GetPrimaryImprovementTypeIdByParcelIdRequest)(nil),               // 54: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdRequest
+	(*GetPrimaryImprovementTypeIdByParcelIdResponse)(nil),              // 55: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdResponse
+	(*GetLandAreaSqftByFeatureIdRequest)(nil),                          // 56: civil.public.parcels.v1.GetLandAreaSqftByFeatureIdRequest
+	(*GetLandAreaSqftByFeatureIdResponse)(nil),                         // 57: civil.public.parcels.v1.GetLandAreaSqftByFeatureIdResponse
+	(*GetFrontageFtByFeatureIdRequest)(nil),                            // 58: civil.public.parcels.v1.GetFrontageFtByFeatureIdRequest
+	(*GetFrontageFtByFeatureIdResponse)(nil),                           // 59: civil.public.parcels.v1.GetFrontageFtByFeatureIdResponse
+	(*GetDepthFtByFeatureIdRequest)(nil),                               // 60: civil.public.parcels.v1.GetDepthFtByFeatureIdRequest
+	(*GetDepthFtByFeatureIdResponse)(nil),                              // 61: civil.public.parcels.v1.GetDepthFtByFeatureIdResponse
+	(*GetLandUseIdByFeatureIdRequest)(nil),                             // 62: civil.public.parcels.v1.GetLandUseIdByFeatureIdRequest
+	(*GetLandUseIdByFeatureIdResponse)(nil),                            // 63: civil.public.parcels.v1.GetLandUseIdByFeatureIdResponse
+	(*GetZoningIdByFeatureIdRequest)(nil),                              // 64: civil.public.parcels.v1.GetZoningIdByFeatureIdRequest
+	(*GetZoningIdByFeatureIdResponse)(nil),                             // 65: civil.public.parcels.v1.GetZoningIdByFeatureIdResponse
+	(*GetImprovementAreaSqftByFeatureIdRequest)(nil),                   // 66: civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdRequest
+	(*GetImprovementAreaSqftByFeatureIdResponse)(nil),                  // 67: civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdResponse
+	(*GetBedroomsByFeatureIdRequest)(nil),                              // 68: civil.public.parcels.v1.GetBedroomsByFeatureIdRequest
+	(*GetBedroomsByFeatureIdResponse)(nil),                             // 69: civil.public.parcels.v1.GetBedroomsByFeatureIdResponse
+	(*GetBathroomsByFeatureIdRequest)(nil),                             // 70: civil.public.parcels.v1.GetBathroomsByFeatureIdRequest
+	(*GetBathroomsByFeatureIdResponse)(nil),                            // 71: civil.public.parcels.v1.GetBathroomsByFeatureIdResponse
+	(*GetUnitsByFeatureIdRequest)(nil),                                 // 72: civil.public.parcels.v1.GetUnitsByFeatureIdRequest
+	(*GetUnitsByFeatureIdResponse)(nil),                                // 73: civil.public.parcels.v1.GetUnitsByFeatureIdResponse
+	(*GetPrimaryImprovementYearBuiltByFeatureIdRequest)(nil),           // 74: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdRequest
+	(*GetPrimaryImprovementYearBuiltByFeatureIdResponse)(nil),          // 75: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse
+	(*GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest)(nil),  // 76: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest
+	(*GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse)(nil), // 77: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse
+	(*GetPrimaryImprovementConditionIdByFeatureIdRequest)(nil),         // 78: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdRequest
+	(*GetPrimaryImprovementConditionIdByFeatureIdResponse)(nil),        // 79: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse
+	(*GetPrimaryImprovementTypeIdByFeatureIdRequest)(nil),              // 80: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdRequest
+	(*GetPrimaryImprovementTypeIdByFeatureIdResponse)(nil),             // 81: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse
+	nil,                           // 82: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse.ParcelsEntry
+	nil,                           // 83: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse.ParcelsEntry
+	nil,                           // 84: civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdResponse.UniqueValuesEntry
+	nil,                           // 85: civil.public.parcels.v1.GetEquityComparablesResponse.ParcelsEntry
+	nil,                           // 86: civil.public.parcels.v1.GetSalesComparablesResponse.ParcelsEntry
+	nil,                           // 87: civil.public.parcels.v1.GetParcelIdsByFeatureIdResponse.ParcelIdsEntry
+	nil,                           // 88: civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse.ExtentsEntry
+	nil,                           // 89: civil.public.parcels.v1.GetLandAreaSqftByParcelIdResponse.ValuesEntry
+	nil,                           // 90: civil.public.parcels.v1.GetFrontageFtByParcelIdResponse.ValuesEntry
+	nil,                           // 91: civil.public.parcels.v1.GetDepthFtByParcelIdResponse.ValuesEntry
+	nil,                           // 92: civil.public.parcels.v1.GetLandUseIdByParcelIdResponse.ValuesEntry
+	nil,                           // 93: civil.public.parcels.v1.GetZoningIdByParcelIdResponse.ValuesEntry
+	nil,                           // 94: civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdResponse.ValuesEntry
+	nil,                           // 95: civil.public.parcels.v1.GetBedroomsByParcelIdResponse.ValuesEntry
+	nil,                           // 96: civil.public.parcels.v1.GetBathroomsByParcelIdResponse.ValuesEntry
+	nil,                           // 97: civil.public.parcels.v1.GetUnitsByParcelIdResponse.ValuesEntry
+	nil,                           // 98: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdResponse.ValuesEntry
+	nil,                           // 99: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse.ValuesEntry
+	nil,                           // 100: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdResponse.ValuesEntry
+	nil,                           // 101: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdResponse.ValuesEntry
+	nil,                           // 102: civil.public.parcels.v1.GetLandAreaSqftByFeatureIdResponse.ValuesEntry
+	nil,                           // 103: civil.public.parcels.v1.GetFrontageFtByFeatureIdResponse.ValuesEntry
+	nil,                           // 104: civil.public.parcels.v1.GetDepthFtByFeatureIdResponse.ValuesEntry
+	nil,                           // 105: civil.public.parcels.v1.GetLandUseIdByFeatureIdResponse.ValuesEntry
+	nil,                           // 106: civil.public.parcels.v1.GetZoningIdByFeatureIdResponse.ValuesEntry
+	nil,                           // 107: civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdResponse.ValuesEntry
+	nil,                           // 108: civil.public.parcels.v1.GetBedroomsByFeatureIdResponse.ValuesEntry
+	nil,                           // 109: civil.public.parcels.v1.GetBathroomsByFeatureIdResponse.ValuesEntry
+	nil,                           // 110: civil.public.parcels.v1.GetUnitsByFeatureIdResponse.ValuesEntry
+	nil,                           // 111: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse.ValuesEntry
+	nil,                           // 112: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse.ValuesEntry
+	nil,                           // 113: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse.ValuesEntry
+	nil,                           // 114: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse.ValuesEntry
+	(*timestamppb.Timestamp)(nil), // 115: google.protobuf.Timestamp
+	(*interval.Interval)(nil),     // 116: google.type.Interval
 }
 var file_civil_public_parcels_v1_parcels_proto_depIdxs = []int32{
 	3,   // 0: civil.public.parcels.v1.ParcelWithImprovementSummary.parcel_details:type_name -> civil.public.parcels.v1.ParcelDetails
 	2,   // 1: civil.public.parcels.v1.ParcelWithImprovementSummary.improvement_summary:type_name -> civil.public.parcels.v1.ParcelImprovementsSummary
-	111, // 2: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	79,  // 3: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse.parcels:type_name -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse.ParcelsEntry
-	111, // 4: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	80,  // 5: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse.parcels:type_name -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse.ParcelsEntry
+	115, // 2: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	82,  // 3: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse.parcels:type_name -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse.ParcelsEntry
+	115, // 4: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	83,  // 5: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse.parcels:type_name -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse.ParcelsEntry
 	0,   // 6: civil.public.parcels.v1.GetNumericalParcelAttributeStatsByIdRequest.attribute:type_name -> civil.public.parcels.v1.ParcelAttribute
-	111, // 7: civil.public.parcels.v1.GetNumericalParcelAttributeStatsByIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	111, // 8: civil.public.parcels.v1.GetNumericalParcelAttributeStatsByIdRequest.system_as_of:type_name -> google.protobuf.Timestamp
+	115, // 7: civil.public.parcels.v1.GetNumericalParcelAttributeStatsByIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	115, // 8: civil.public.parcels.v1.GetNumericalParcelAttributeStatsByIdRequest.system_as_of:type_name -> google.protobuf.Timestamp
 	0,   // 9: civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdRequest.attribute:type_name -> civil.public.parcels.v1.ParcelAttribute
-	111, // 10: civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	111, // 11: civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdRequest.system_as_of:type_name -> google.protobuf.Timestamp
-	81,  // 12: civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdResponse.unique_values:type_name -> civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdResponse.UniqueValuesEntry
+	115, // 10: civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	115, // 11: civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdRequest.system_as_of:type_name -> google.protobuf.Timestamp
+	84,  // 12: civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdResponse.unique_values:type_name -> civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdResponse.UniqueValuesEntry
 	0,   // 13: civil.public.parcels.v1.ComparableCriteria.attribute:type_name -> civil.public.parcels.v1.ParcelAttribute
 	0,   // 14: civil.public.parcels.v1.ComparableAttribute.attribute:type_name -> civil.public.parcels.v1.ParcelAttribute
 	16,  // 15: civil.public.parcels.v1.EquityComparableParcel.attributes:type_name -> civil.public.parcels.v1.ComparableAttribute
-	111, // 16: civil.public.parcels.v1.SaleComparableParcel.sale_time:type_name -> google.protobuf.Timestamp
+	115, // 16: civil.public.parcels.v1.SaleComparableParcel.sale_time:type_name -> google.protobuf.Timestamp
 	16,  // 17: civil.public.parcels.v1.SaleComparableParcel.attributes:type_name -> civil.public.parcels.v1.ComparableAttribute
 	15,  // 18: civil.public.parcels.v1.GetEquityComparablesRequest.criteria:type_name -> civil.public.parcels.v1.ComparableCriteria
-	82,  // 19: civil.public.parcels.v1.GetEquityComparablesResponse.parcels:type_name -> civil.public.parcels.v1.GetEquityComparablesResponse.ParcelsEntry
+	85,  // 19: civil.public.parcels.v1.GetEquityComparablesResponse.parcels:type_name -> civil.public.parcels.v1.GetEquityComparablesResponse.ParcelsEntry
 	15,  // 20: civil.public.parcels.v1.GetSalesComparablesRequest.criteria:type_name -> civil.public.parcels.v1.ComparableCriteria
-	112, // 21: civil.public.parcels.v1.GetSalesComparablesRequest.time_range:type_name -> google.type.Interval
-	83,  // 22: civil.public.parcels.v1.GetSalesComparablesResponse.parcels:type_name -> civil.public.parcels.v1.GetSalesComparablesResponse.ParcelsEntry
-	84,  // 23: civil.public.parcels.v1.GetParcelIdsByFeatureIdResponse.parcel_ids:type_name -> civil.public.parcels.v1.GetParcelIdsByFeatureIdResponse.ParcelIdsEntry
-	111, // 24: civil.public.parcels.v1.GetLandAreaSqftByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	85,  // 25: civil.public.parcels.v1.GetLandAreaSqftByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetLandAreaSqftByParcelIdResponse.ValuesEntry
-	111, // 26: civil.public.parcels.v1.GetFrontageFtByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	86,  // 27: civil.public.parcels.v1.GetFrontageFtByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetFrontageFtByParcelIdResponse.ValuesEntry
-	111, // 28: civil.public.parcels.v1.GetDepthFtByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	87,  // 29: civil.public.parcels.v1.GetDepthFtByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetDepthFtByParcelIdResponse.ValuesEntry
-	111, // 30: civil.public.parcels.v1.GetLandUseIdByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	88,  // 31: civil.public.parcels.v1.GetLandUseIdByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetLandUseIdByParcelIdResponse.ValuesEntry
-	111, // 32: civil.public.parcels.v1.GetZoningIdByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	89,  // 33: civil.public.parcels.v1.GetZoningIdByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetZoningIdByParcelIdResponse.ValuesEntry
-	111, // 34: civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	90,  // 35: civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdResponse.ValuesEntry
-	111, // 36: civil.public.parcels.v1.GetBedroomsByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	91,  // 37: civil.public.parcels.v1.GetBedroomsByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetBedroomsByParcelIdResponse.ValuesEntry
-	111, // 38: civil.public.parcels.v1.GetBathroomsByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	92,  // 39: civil.public.parcels.v1.GetBathroomsByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetBathroomsByParcelIdResponse.ValuesEntry
-	111, // 40: civil.public.parcels.v1.GetUnitsByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	93,  // 41: civil.public.parcels.v1.GetUnitsByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetUnitsByParcelIdResponse.ValuesEntry
-	111, // 42: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	94,  // 43: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdResponse.ValuesEntry
-	111, // 44: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	95,  // 45: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse.ValuesEntry
-	111, // 46: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	96,  // 47: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdResponse.ValuesEntry
-	111, // 48: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	97,  // 49: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdResponse.ValuesEntry
-	111, // 50: civil.public.parcels.v1.GetLandAreaSqftByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	98,  // 51: civil.public.parcels.v1.GetLandAreaSqftByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetLandAreaSqftByFeatureIdResponse.ValuesEntry
-	111, // 52: civil.public.parcels.v1.GetFrontageFtByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	99,  // 53: civil.public.parcels.v1.GetFrontageFtByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetFrontageFtByFeatureIdResponse.ValuesEntry
-	111, // 54: civil.public.parcels.v1.GetDepthFtByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	100, // 55: civil.public.parcels.v1.GetDepthFtByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetDepthFtByFeatureIdResponse.ValuesEntry
-	111, // 56: civil.public.parcels.v1.GetLandUseIdByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	101, // 57: civil.public.parcels.v1.GetLandUseIdByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetLandUseIdByFeatureIdResponse.ValuesEntry
-	111, // 58: civil.public.parcels.v1.GetZoningIdByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	102, // 59: civil.public.parcels.v1.GetZoningIdByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetZoningIdByFeatureIdResponse.ValuesEntry
-	111, // 60: civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	103, // 61: civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdResponse.ValuesEntry
-	111, // 62: civil.public.parcels.v1.GetBedroomsByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	104, // 63: civil.public.parcels.v1.GetBedroomsByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetBedroomsByFeatureIdResponse.ValuesEntry
-	111, // 64: civil.public.parcels.v1.GetBathroomsByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	105, // 65: civil.public.parcels.v1.GetBathroomsByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetBathroomsByFeatureIdResponse.ValuesEntry
-	111, // 66: civil.public.parcels.v1.GetUnitsByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	106, // 67: civil.public.parcels.v1.GetUnitsByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetUnitsByFeatureIdResponse.ValuesEntry
-	111, // 68: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	107, // 69: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse.ValuesEntry
-	111, // 70: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	108, // 71: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse.ValuesEntry
-	111, // 72: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	109, // 73: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse.ValuesEntry
-	111, // 74: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	110, // 75: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse.ValuesEntry
-	4,   // 76: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse.ParcelsEntry.value:type_name -> civil.public.parcels.v1.ParcelWithImprovementSummary
-	4,   // 77: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse.ParcelsEntry.value:type_name -> civil.public.parcels.v1.ParcelWithImprovementSummary
-	17,  // 78: civil.public.parcels.v1.GetEquityComparablesResponse.ParcelsEntry.value:type_name -> civil.public.parcels.v1.EquityComparableParcel
-	18,  // 79: civil.public.parcels.v1.GetSalesComparablesResponse.ParcelsEntry.value:type_name -> civil.public.parcels.v1.SaleComparableParcel
-	5,   // 80: civil.public.parcels.v1.ParcelsService.GetParcelsWithImprovementSummaryByParcelId:input_type -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdRequest
-	7,   // 81: civil.public.parcels.v1.ParcelsService.GetParcelsWithImprovementSummaryByFeatureId:input_type -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdRequest
-	11,  // 82: civil.public.parcels.v1.ParcelsService.GetNumericalParcelAttributeStatsById:input_type -> civil.public.parcels.v1.GetNumericalParcelAttributeStatsByIdRequest
-	13,  // 83: civil.public.parcels.v1.ParcelsService.GetCategoricalParcelAttributeStatsById:input_type -> civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdRequest
-	19,  // 84: civil.public.parcels.v1.ParcelsService.GetEquityComparables:input_type -> civil.public.parcels.v1.GetEquityComparablesRequest
-	21,  // 85: civil.public.parcels.v1.ParcelsService.GetSalesComparables:input_type -> civil.public.parcels.v1.GetSalesComparablesRequest
-	23,  // 86: civil.public.parcels.v1.ParcelsService.GetParcelIdsByFeatureId:input_type -> civil.public.parcels.v1.GetParcelIdsByFeatureIdRequest
-	25,  // 87: civil.public.parcels.v1.ParcelsService.GetEstimatedParcelsExtentWGS84:input_type -> civil.public.parcels.v1.GetEstimatedParcelsExtentWGS84Request
-	27,  // 88: civil.public.parcels.v1.ParcelsService.GetLandAreaSqftByParcelId:input_type -> civil.public.parcels.v1.GetLandAreaSqftByParcelIdRequest
-	29,  // 89: civil.public.parcels.v1.ParcelsService.GetFrontageFtByParcelId:input_type -> civil.public.parcels.v1.GetFrontageFtByParcelIdRequest
-	31,  // 90: civil.public.parcels.v1.ParcelsService.GetDepthFtByParcelId:input_type -> civil.public.parcels.v1.GetDepthFtByParcelIdRequest
-	33,  // 91: civil.public.parcels.v1.ParcelsService.GetLandUseIdByParcelId:input_type -> civil.public.parcels.v1.GetLandUseIdByParcelIdRequest
-	35,  // 92: civil.public.parcels.v1.ParcelsService.GetZoningIdByParcelId:input_type -> civil.public.parcels.v1.GetZoningIdByParcelIdRequest
-	37,  // 93: civil.public.parcels.v1.ParcelsService.GetImprovementAreaSqftByParcelId:input_type -> civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdRequest
-	39,  // 94: civil.public.parcels.v1.ParcelsService.GetBedroomsByParcelId:input_type -> civil.public.parcels.v1.GetBedroomsByParcelIdRequest
-	41,  // 95: civil.public.parcels.v1.ParcelsService.GetBathroomsByParcelId:input_type -> civil.public.parcels.v1.GetBathroomsByParcelIdRequest
-	43,  // 96: civil.public.parcels.v1.ParcelsService.GetUnitsByParcelId:input_type -> civil.public.parcels.v1.GetUnitsByParcelIdRequest
-	45,  // 97: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementYearBuiltByParcelId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdRequest
-	47,  // 98: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementEffectiveYearBuiltByParcelId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest
-	49,  // 99: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementConditionIdByParcelId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdRequest
-	51,  // 100: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByParcelId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdRequest
-	53,  // 101: civil.public.parcels.v1.ParcelsService.GetLandAreaSqftByFeatureId:input_type -> civil.public.parcels.v1.GetLandAreaSqftByFeatureIdRequest
-	55,  // 102: civil.public.parcels.v1.ParcelsService.GetFrontageFtByFeatureId:input_type -> civil.public.parcels.v1.GetFrontageFtByFeatureIdRequest
-	57,  // 103: civil.public.parcels.v1.ParcelsService.GetDepthFtByFeatureId:input_type -> civil.public.parcels.v1.GetDepthFtByFeatureIdRequest
-	59,  // 104: civil.public.parcels.v1.ParcelsService.GetLandUseIdByFeatureId:input_type -> civil.public.parcels.v1.GetLandUseIdByFeatureIdRequest
-	61,  // 105: civil.public.parcels.v1.ParcelsService.GetZoningIdByFeatureId:input_type -> civil.public.parcels.v1.GetZoningIdByFeatureIdRequest
-	63,  // 106: civil.public.parcels.v1.ParcelsService.GetImprovementAreaSqftByFeatureId:input_type -> civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdRequest
-	65,  // 107: civil.public.parcels.v1.ParcelsService.GetBedroomsByFeatureId:input_type -> civil.public.parcels.v1.GetBedroomsByFeatureIdRequest
-	67,  // 108: civil.public.parcels.v1.ParcelsService.GetBathroomsByFeatureId:input_type -> civil.public.parcels.v1.GetBathroomsByFeatureIdRequest
-	69,  // 109: civil.public.parcels.v1.ParcelsService.GetUnitsByFeatureId:input_type -> civil.public.parcels.v1.GetUnitsByFeatureIdRequest
-	71,  // 110: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementYearBuiltByFeatureId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdRequest
-	73,  // 111: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementEffectiveYearBuiltByFeatureId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest
-	75,  // 112: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementConditionIdByFeatureId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdRequest
-	77,  // 113: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByFeatureId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdRequest
-	9,   // 114: civil.public.parcels.v1.ParcelsService.UpdateParcel:input_type -> civil.public.parcels.v1.UpdateParcelRequest
-	6,   // 115: civil.public.parcels.v1.ParcelsService.GetParcelsWithImprovementSummaryByParcelId:output_type -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse
-	8,   // 116: civil.public.parcels.v1.ParcelsService.GetParcelsWithImprovementSummaryByFeatureId:output_type -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse
-	12,  // 117: civil.public.parcels.v1.ParcelsService.GetNumericalParcelAttributeStatsById:output_type -> civil.public.parcels.v1.GetNumericalParcelAttributeStatsByIdResponse
-	14,  // 118: civil.public.parcels.v1.ParcelsService.GetCategoricalParcelAttributeStatsById:output_type -> civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdResponse
-	20,  // 119: civil.public.parcels.v1.ParcelsService.GetEquityComparables:output_type -> civil.public.parcels.v1.GetEquityComparablesResponse
-	22,  // 120: civil.public.parcels.v1.ParcelsService.GetSalesComparables:output_type -> civil.public.parcels.v1.GetSalesComparablesResponse
-	24,  // 121: civil.public.parcels.v1.ParcelsService.GetParcelIdsByFeatureId:output_type -> civil.public.parcels.v1.GetParcelIdsByFeatureIdResponse
-	26,  // 122: civil.public.parcels.v1.ParcelsService.GetEstimatedParcelsExtentWGS84:output_type -> civil.public.parcels.v1.GetEstimatedParcelsExtentWGS84Response
-	28,  // 123: civil.public.parcels.v1.ParcelsService.GetLandAreaSqftByParcelId:output_type -> civil.public.parcels.v1.GetLandAreaSqftByParcelIdResponse
-	30,  // 124: civil.public.parcels.v1.ParcelsService.GetFrontageFtByParcelId:output_type -> civil.public.parcels.v1.GetFrontageFtByParcelIdResponse
-	32,  // 125: civil.public.parcels.v1.ParcelsService.GetDepthFtByParcelId:output_type -> civil.public.parcels.v1.GetDepthFtByParcelIdResponse
-	34,  // 126: civil.public.parcels.v1.ParcelsService.GetLandUseIdByParcelId:output_type -> civil.public.parcels.v1.GetLandUseIdByParcelIdResponse
-	36,  // 127: civil.public.parcels.v1.ParcelsService.GetZoningIdByParcelId:output_type -> civil.public.parcels.v1.GetZoningIdByParcelIdResponse
-	38,  // 128: civil.public.parcels.v1.ParcelsService.GetImprovementAreaSqftByParcelId:output_type -> civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdResponse
-	40,  // 129: civil.public.parcels.v1.ParcelsService.GetBedroomsByParcelId:output_type -> civil.public.parcels.v1.GetBedroomsByParcelIdResponse
-	42,  // 130: civil.public.parcels.v1.ParcelsService.GetBathroomsByParcelId:output_type -> civil.public.parcels.v1.GetBathroomsByParcelIdResponse
-	44,  // 131: civil.public.parcels.v1.ParcelsService.GetUnitsByParcelId:output_type -> civil.public.parcels.v1.GetUnitsByParcelIdResponse
-	46,  // 132: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementYearBuiltByParcelId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdResponse
-	48,  // 133: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementEffectiveYearBuiltByParcelId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse
-	50,  // 134: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementConditionIdByParcelId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdResponse
-	52,  // 135: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByParcelId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdResponse
-	54,  // 136: civil.public.parcels.v1.ParcelsService.GetLandAreaSqftByFeatureId:output_type -> civil.public.parcels.v1.GetLandAreaSqftByFeatureIdResponse
-	56,  // 137: civil.public.parcels.v1.ParcelsService.GetFrontageFtByFeatureId:output_type -> civil.public.parcels.v1.GetFrontageFtByFeatureIdResponse
-	58,  // 138: civil.public.parcels.v1.ParcelsService.GetDepthFtByFeatureId:output_type -> civil.public.parcels.v1.GetDepthFtByFeatureIdResponse
-	60,  // 139: civil.public.parcels.v1.ParcelsService.GetLandUseIdByFeatureId:output_type -> civil.public.parcels.v1.GetLandUseIdByFeatureIdResponse
-	62,  // 140: civil.public.parcels.v1.ParcelsService.GetZoningIdByFeatureId:output_type -> civil.public.parcels.v1.GetZoningIdByFeatureIdResponse
-	64,  // 141: civil.public.parcels.v1.ParcelsService.GetImprovementAreaSqftByFeatureId:output_type -> civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdResponse
-	66,  // 142: civil.public.parcels.v1.ParcelsService.GetBedroomsByFeatureId:output_type -> civil.public.parcels.v1.GetBedroomsByFeatureIdResponse
-	68,  // 143: civil.public.parcels.v1.ParcelsService.GetBathroomsByFeatureId:output_type -> civil.public.parcels.v1.GetBathroomsByFeatureIdResponse
-	70,  // 144: civil.public.parcels.v1.ParcelsService.GetUnitsByFeatureId:output_type -> civil.public.parcels.v1.GetUnitsByFeatureIdResponse
-	72,  // 145: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementYearBuiltByFeatureId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse
-	74,  // 146: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementEffectiveYearBuiltByFeatureId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse
-	76,  // 147: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementConditionIdByFeatureId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse
-	78,  // 148: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByFeatureId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse
-	10,  // 149: civil.public.parcels.v1.ParcelsService.UpdateParcel:output_type -> civil.public.parcels.v1.UpdateParcelResponse
-	115, // [115:150] is the sub-list for method output_type
-	80,  // [80:115] is the sub-list for method input_type
-	80,  // [80:80] is the sub-list for extension type_name
-	80,  // [80:80] is the sub-list for extension extendee
-	0,   // [0:80] is the sub-list for field type_name
+	116, // 21: civil.public.parcels.v1.GetSalesComparablesRequest.time_range:type_name -> google.type.Interval
+	86,  // 22: civil.public.parcels.v1.GetSalesComparablesResponse.parcels:type_name -> civil.public.parcels.v1.GetSalesComparablesResponse.ParcelsEntry
+	87,  // 23: civil.public.parcels.v1.GetParcelIdsByFeatureIdResponse.parcel_ids:type_name -> civil.public.parcels.v1.GetParcelIdsByFeatureIdResponse.ParcelIdsEntry
+	115, // 24: civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	88,  // 25: civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse.extents:type_name -> civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse.ExtentsEntry
+	115, // 26: civil.public.parcels.v1.GetLandAreaSqftByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	89,  // 27: civil.public.parcels.v1.GetLandAreaSqftByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetLandAreaSqftByParcelIdResponse.ValuesEntry
+	115, // 28: civil.public.parcels.v1.GetFrontageFtByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	90,  // 29: civil.public.parcels.v1.GetFrontageFtByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetFrontageFtByParcelIdResponse.ValuesEntry
+	115, // 30: civil.public.parcels.v1.GetDepthFtByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	91,  // 31: civil.public.parcels.v1.GetDepthFtByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetDepthFtByParcelIdResponse.ValuesEntry
+	115, // 32: civil.public.parcels.v1.GetLandUseIdByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	92,  // 33: civil.public.parcels.v1.GetLandUseIdByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetLandUseIdByParcelIdResponse.ValuesEntry
+	115, // 34: civil.public.parcels.v1.GetZoningIdByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	93,  // 35: civil.public.parcels.v1.GetZoningIdByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetZoningIdByParcelIdResponse.ValuesEntry
+	115, // 36: civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	94,  // 37: civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdResponse.ValuesEntry
+	115, // 38: civil.public.parcels.v1.GetBedroomsByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	95,  // 39: civil.public.parcels.v1.GetBedroomsByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetBedroomsByParcelIdResponse.ValuesEntry
+	115, // 40: civil.public.parcels.v1.GetBathroomsByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	96,  // 41: civil.public.parcels.v1.GetBathroomsByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetBathroomsByParcelIdResponse.ValuesEntry
+	115, // 42: civil.public.parcels.v1.GetUnitsByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	97,  // 43: civil.public.parcels.v1.GetUnitsByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetUnitsByParcelIdResponse.ValuesEntry
+	115, // 44: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	98,  // 45: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdResponse.ValuesEntry
+	115, // 46: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	99,  // 47: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse.ValuesEntry
+	115, // 48: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	100, // 49: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdResponse.ValuesEntry
+	115, // 50: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	101, // 51: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdResponse.ValuesEntry
+	115, // 52: civil.public.parcels.v1.GetLandAreaSqftByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	102, // 53: civil.public.parcels.v1.GetLandAreaSqftByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetLandAreaSqftByFeatureIdResponse.ValuesEntry
+	115, // 54: civil.public.parcels.v1.GetFrontageFtByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	103, // 55: civil.public.parcels.v1.GetFrontageFtByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetFrontageFtByFeatureIdResponse.ValuesEntry
+	115, // 56: civil.public.parcels.v1.GetDepthFtByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	104, // 57: civil.public.parcels.v1.GetDepthFtByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetDepthFtByFeatureIdResponse.ValuesEntry
+	115, // 58: civil.public.parcels.v1.GetLandUseIdByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	105, // 59: civil.public.parcels.v1.GetLandUseIdByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetLandUseIdByFeatureIdResponse.ValuesEntry
+	115, // 60: civil.public.parcels.v1.GetZoningIdByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	106, // 61: civil.public.parcels.v1.GetZoningIdByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetZoningIdByFeatureIdResponse.ValuesEntry
+	115, // 62: civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	107, // 63: civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdResponse.ValuesEntry
+	115, // 64: civil.public.parcels.v1.GetBedroomsByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	108, // 65: civil.public.parcels.v1.GetBedroomsByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetBedroomsByFeatureIdResponse.ValuesEntry
+	115, // 66: civil.public.parcels.v1.GetBathroomsByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	109, // 67: civil.public.parcels.v1.GetBathroomsByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetBathroomsByFeatureIdResponse.ValuesEntry
+	115, // 68: civil.public.parcels.v1.GetUnitsByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	110, // 69: civil.public.parcels.v1.GetUnitsByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetUnitsByFeatureIdResponse.ValuesEntry
+	115, // 70: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	111, // 71: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse.ValuesEntry
+	115, // 72: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	112, // 73: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse.ValuesEntry
+	115, // 74: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	113, // 75: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse.ValuesEntry
+	115, // 76: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	114, // 77: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse.ValuesEntry
+	4,   // 78: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse.ParcelsEntry.value:type_name -> civil.public.parcels.v1.ParcelWithImprovementSummary
+	4,   // 79: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse.ParcelsEntry.value:type_name -> civil.public.parcels.v1.ParcelWithImprovementSummary
+	17,  // 80: civil.public.parcels.v1.GetEquityComparablesResponse.ParcelsEntry.value:type_name -> civil.public.parcels.v1.EquityComparableParcel
+	18,  // 81: civil.public.parcels.v1.GetSalesComparablesResponse.ParcelsEntry.value:type_name -> civil.public.parcels.v1.SaleComparableParcel
+	27,  // 82: civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse.ExtentsEntry.value:type_name -> civil.public.parcels.v1.ExtentWGS84
+	5,   // 83: civil.public.parcels.v1.ParcelsService.GetParcelsWithImprovementSummaryByParcelId:input_type -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdRequest
+	7,   // 84: civil.public.parcels.v1.ParcelsService.GetParcelsWithImprovementSummaryByFeatureId:input_type -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdRequest
+	11,  // 85: civil.public.parcels.v1.ParcelsService.GetNumericalParcelAttributeStatsById:input_type -> civil.public.parcels.v1.GetNumericalParcelAttributeStatsByIdRequest
+	13,  // 86: civil.public.parcels.v1.ParcelsService.GetCategoricalParcelAttributeStatsById:input_type -> civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdRequest
+	19,  // 87: civil.public.parcels.v1.ParcelsService.GetEquityComparables:input_type -> civil.public.parcels.v1.GetEquityComparablesRequest
+	21,  // 88: civil.public.parcels.v1.ParcelsService.GetSalesComparables:input_type -> civil.public.parcels.v1.GetSalesComparablesRequest
+	23,  // 89: civil.public.parcels.v1.ParcelsService.GetParcelIdsByFeatureId:input_type -> civil.public.parcels.v1.GetParcelIdsByFeatureIdRequest
+	25,  // 90: civil.public.parcels.v1.ParcelsService.GetEstimatedParcelsExtentWGS84:input_type -> civil.public.parcels.v1.GetEstimatedParcelsExtentWGS84Request
+	28,  // 91: civil.public.parcels.v1.ParcelsService.GetParcelExtentsWGS84ByParcelId:input_type -> civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdRequest
+	30,  // 92: civil.public.parcels.v1.ParcelsService.GetLandAreaSqftByParcelId:input_type -> civil.public.parcels.v1.GetLandAreaSqftByParcelIdRequest
+	32,  // 93: civil.public.parcels.v1.ParcelsService.GetFrontageFtByParcelId:input_type -> civil.public.parcels.v1.GetFrontageFtByParcelIdRequest
+	34,  // 94: civil.public.parcels.v1.ParcelsService.GetDepthFtByParcelId:input_type -> civil.public.parcels.v1.GetDepthFtByParcelIdRequest
+	36,  // 95: civil.public.parcels.v1.ParcelsService.GetLandUseIdByParcelId:input_type -> civil.public.parcels.v1.GetLandUseIdByParcelIdRequest
+	38,  // 96: civil.public.parcels.v1.ParcelsService.GetZoningIdByParcelId:input_type -> civil.public.parcels.v1.GetZoningIdByParcelIdRequest
+	40,  // 97: civil.public.parcels.v1.ParcelsService.GetImprovementAreaSqftByParcelId:input_type -> civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdRequest
+	42,  // 98: civil.public.parcels.v1.ParcelsService.GetBedroomsByParcelId:input_type -> civil.public.parcels.v1.GetBedroomsByParcelIdRequest
+	44,  // 99: civil.public.parcels.v1.ParcelsService.GetBathroomsByParcelId:input_type -> civil.public.parcels.v1.GetBathroomsByParcelIdRequest
+	46,  // 100: civil.public.parcels.v1.ParcelsService.GetUnitsByParcelId:input_type -> civil.public.parcels.v1.GetUnitsByParcelIdRequest
+	48,  // 101: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementYearBuiltByParcelId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdRequest
+	50,  // 102: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementEffectiveYearBuiltByParcelId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest
+	52,  // 103: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementConditionIdByParcelId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdRequest
+	54,  // 104: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByParcelId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdRequest
+	56,  // 105: civil.public.parcels.v1.ParcelsService.GetLandAreaSqftByFeatureId:input_type -> civil.public.parcels.v1.GetLandAreaSqftByFeatureIdRequest
+	58,  // 106: civil.public.parcels.v1.ParcelsService.GetFrontageFtByFeatureId:input_type -> civil.public.parcels.v1.GetFrontageFtByFeatureIdRequest
+	60,  // 107: civil.public.parcels.v1.ParcelsService.GetDepthFtByFeatureId:input_type -> civil.public.parcels.v1.GetDepthFtByFeatureIdRequest
+	62,  // 108: civil.public.parcels.v1.ParcelsService.GetLandUseIdByFeatureId:input_type -> civil.public.parcels.v1.GetLandUseIdByFeatureIdRequest
+	64,  // 109: civil.public.parcels.v1.ParcelsService.GetZoningIdByFeatureId:input_type -> civil.public.parcels.v1.GetZoningIdByFeatureIdRequest
+	66,  // 110: civil.public.parcels.v1.ParcelsService.GetImprovementAreaSqftByFeatureId:input_type -> civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdRequest
+	68,  // 111: civil.public.parcels.v1.ParcelsService.GetBedroomsByFeatureId:input_type -> civil.public.parcels.v1.GetBedroomsByFeatureIdRequest
+	70,  // 112: civil.public.parcels.v1.ParcelsService.GetBathroomsByFeatureId:input_type -> civil.public.parcels.v1.GetBathroomsByFeatureIdRequest
+	72,  // 113: civil.public.parcels.v1.ParcelsService.GetUnitsByFeatureId:input_type -> civil.public.parcels.v1.GetUnitsByFeatureIdRequest
+	74,  // 114: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementYearBuiltByFeatureId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdRequest
+	76,  // 115: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementEffectiveYearBuiltByFeatureId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest
+	78,  // 116: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementConditionIdByFeatureId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdRequest
+	80,  // 117: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByFeatureId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdRequest
+	9,   // 118: civil.public.parcels.v1.ParcelsService.UpdateParcel:input_type -> civil.public.parcels.v1.UpdateParcelRequest
+	6,   // 119: civil.public.parcels.v1.ParcelsService.GetParcelsWithImprovementSummaryByParcelId:output_type -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse
+	8,   // 120: civil.public.parcels.v1.ParcelsService.GetParcelsWithImprovementSummaryByFeatureId:output_type -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse
+	12,  // 121: civil.public.parcels.v1.ParcelsService.GetNumericalParcelAttributeStatsById:output_type -> civil.public.parcels.v1.GetNumericalParcelAttributeStatsByIdResponse
+	14,  // 122: civil.public.parcels.v1.ParcelsService.GetCategoricalParcelAttributeStatsById:output_type -> civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdResponse
+	20,  // 123: civil.public.parcels.v1.ParcelsService.GetEquityComparables:output_type -> civil.public.parcels.v1.GetEquityComparablesResponse
+	22,  // 124: civil.public.parcels.v1.ParcelsService.GetSalesComparables:output_type -> civil.public.parcels.v1.GetSalesComparablesResponse
+	24,  // 125: civil.public.parcels.v1.ParcelsService.GetParcelIdsByFeatureId:output_type -> civil.public.parcels.v1.GetParcelIdsByFeatureIdResponse
+	26,  // 126: civil.public.parcels.v1.ParcelsService.GetEstimatedParcelsExtentWGS84:output_type -> civil.public.parcels.v1.GetEstimatedParcelsExtentWGS84Response
+	29,  // 127: civil.public.parcels.v1.ParcelsService.GetParcelExtentsWGS84ByParcelId:output_type -> civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse
+	31,  // 128: civil.public.parcels.v1.ParcelsService.GetLandAreaSqftByParcelId:output_type -> civil.public.parcels.v1.GetLandAreaSqftByParcelIdResponse
+	33,  // 129: civil.public.parcels.v1.ParcelsService.GetFrontageFtByParcelId:output_type -> civil.public.parcels.v1.GetFrontageFtByParcelIdResponse
+	35,  // 130: civil.public.parcels.v1.ParcelsService.GetDepthFtByParcelId:output_type -> civil.public.parcels.v1.GetDepthFtByParcelIdResponse
+	37,  // 131: civil.public.parcels.v1.ParcelsService.GetLandUseIdByParcelId:output_type -> civil.public.parcels.v1.GetLandUseIdByParcelIdResponse
+	39,  // 132: civil.public.parcels.v1.ParcelsService.GetZoningIdByParcelId:output_type -> civil.public.parcels.v1.GetZoningIdByParcelIdResponse
+	41,  // 133: civil.public.parcels.v1.ParcelsService.GetImprovementAreaSqftByParcelId:output_type -> civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdResponse
+	43,  // 134: civil.public.parcels.v1.ParcelsService.GetBedroomsByParcelId:output_type -> civil.public.parcels.v1.GetBedroomsByParcelIdResponse
+	45,  // 135: civil.public.parcels.v1.ParcelsService.GetBathroomsByParcelId:output_type -> civil.public.parcels.v1.GetBathroomsByParcelIdResponse
+	47,  // 136: civil.public.parcels.v1.ParcelsService.GetUnitsByParcelId:output_type -> civil.public.parcels.v1.GetUnitsByParcelIdResponse
+	49,  // 137: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementYearBuiltByParcelId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdResponse
+	51,  // 138: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementEffectiveYearBuiltByParcelId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse
+	53,  // 139: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementConditionIdByParcelId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdResponse
+	55,  // 140: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByParcelId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdResponse
+	57,  // 141: civil.public.parcels.v1.ParcelsService.GetLandAreaSqftByFeatureId:output_type -> civil.public.parcels.v1.GetLandAreaSqftByFeatureIdResponse
+	59,  // 142: civil.public.parcels.v1.ParcelsService.GetFrontageFtByFeatureId:output_type -> civil.public.parcels.v1.GetFrontageFtByFeatureIdResponse
+	61,  // 143: civil.public.parcels.v1.ParcelsService.GetDepthFtByFeatureId:output_type -> civil.public.parcels.v1.GetDepthFtByFeatureIdResponse
+	63,  // 144: civil.public.parcels.v1.ParcelsService.GetLandUseIdByFeatureId:output_type -> civil.public.parcels.v1.GetLandUseIdByFeatureIdResponse
+	65,  // 145: civil.public.parcels.v1.ParcelsService.GetZoningIdByFeatureId:output_type -> civil.public.parcels.v1.GetZoningIdByFeatureIdResponse
+	67,  // 146: civil.public.parcels.v1.ParcelsService.GetImprovementAreaSqftByFeatureId:output_type -> civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdResponse
+	69,  // 147: civil.public.parcels.v1.ParcelsService.GetBedroomsByFeatureId:output_type -> civil.public.parcels.v1.GetBedroomsByFeatureIdResponse
+	71,  // 148: civil.public.parcels.v1.ParcelsService.GetBathroomsByFeatureId:output_type -> civil.public.parcels.v1.GetBathroomsByFeatureIdResponse
+	73,  // 149: civil.public.parcels.v1.ParcelsService.GetUnitsByFeatureId:output_type -> civil.public.parcels.v1.GetUnitsByFeatureIdResponse
+	75,  // 150: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementYearBuiltByFeatureId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse
+	77,  // 151: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementEffectiveYearBuiltByFeatureId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse
+	79,  // 152: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementConditionIdByFeatureId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse
+	81,  // 153: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByFeatureId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse
+	10,  // 154: civil.public.parcels.v1.ParcelsService.UpdateParcel:output_type -> civil.public.parcels.v1.UpdateParcelResponse
+	119, // [119:155] is the sub-list for method output_type
+	83,  // [83:119] is the sub-list for method input_type
+	83,  // [83:83] is the sub-list for extension type_name
+	83,  // [83:83] is the sub-list for extension extendee
+	0,   // [0:83] is the sub-list for field type_name
 }
 
 func init() { file_civil_public_parcels_v1_parcels_proto_init() }
@@ -5361,39 +5553,40 @@ func file_civil_public_parcels_v1_parcels_proto_init() {
 	file_civil_public_parcels_v1_parcels_proto_msgTypes[12].OneofWrappers = []any{}
 	file_civil_public_parcels_v1_parcels_proto_msgTypes[14].OneofWrappers = []any{}
 	file_civil_public_parcels_v1_parcels_proto_msgTypes[15].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[26].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[28].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[30].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[32].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[34].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[36].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[38].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[40].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[42].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[44].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[46].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[48].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[50].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[52].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[54].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[56].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[58].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[60].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[62].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[64].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[66].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[68].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[70].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[72].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[74].OneofWrappers = []any{}
-	file_civil_public_parcels_v1_parcels_proto_msgTypes[76].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[27].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[29].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[31].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[33].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[35].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[37].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[39].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[41].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[43].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[45].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[47].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[49].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[51].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[53].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[55].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[57].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[59].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[61].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[63].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[65].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[67].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[69].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[71].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[73].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[75].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[77].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[79].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_civil_public_parcels_v1_parcels_proto_rawDesc), len(file_civil_public_parcels_v1_parcels_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   110,
+			NumMessages:   114,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

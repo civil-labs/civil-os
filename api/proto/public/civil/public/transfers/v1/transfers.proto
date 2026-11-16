@@ -30,6 +30,14 @@ service RealPropertyTransfersService {
   rpc GetTransfersByFeatureId(GetTransfersByFeatureIdRequest) returns (GetTransfersByFeatureIdResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+
+  // Returns a page of the transfers where any of the parties is a grantor or
+  // grantee on a parcel or improvement entry that is returned. A voided
+  // party matches nothing. Each transfer is returned whole, with all its
+  // entries and parties.
+  rpc GetTransfersByPartyId(GetTransfersByPartyIdRequest) returns (GetTransfersByPartyIdResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 // One real property transfer.
@@ -217,6 +225,43 @@ message GetTransfersByFeatureIdRequest {
 }
 
 message GetTransfersByFeatureIdResponse {
+  repeated RealPropertyTransferEdge edges = 1;
+  civil.public.pagination.v1.PageInfo page_info = 2;
+}
+
+message GetTransfersByPartyIdRequest {
+  // 1 to 100 unique party UUIDs.
+  repeated string party_ids = 1 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 100
+    unique: true
+    items: {
+      string: {uuid: true}
+    }
+  }];
+
+  // Only transfers in [start_time, end_time). Either bound may be omitted.
+  google.type.Interval time_range = 2 [(buf.validate.field).cel = {
+    id: "valid_time_range"
+    message: "start_time must be before end_time"
+    expression: "!has(this.start_time) || !has(this.end_time) || this.start_time < this.end_time"
+  }];
+
+  // The page size, 1 to 100. Defaults to 25.
+  optional int32 first = 3 [(buf.validate.field).int32 = {
+    gte: 1
+    lte: 100
+  }];
+
+  // Return the transfers after this cursor, from a previous page of the same
+  // request.
+  optional string after = 4 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 512
+  }];
+}
+
+message GetTransfersByPartyIdResponse {
   repeated RealPropertyTransferEdge edges = 1;
   civil.public.pagination.v1.PageInfo page_info = 2;
 }

@@ -87,6 +87,25 @@ const (
 	)`
 )
 
+// transfersByPartyFilter matches a transfer where a requested, non-voided
+// party is a grantor or grantee on a visible parcel or improvement entry
+// (docs/address-party-read-api/spec.md, rule 6).
+var transfersByPartyFilter = `EXISTS (
+		SELECT 1
+		FROM core.real_property_transfer_party_parcels f
+		JOIN core.parties fpt ON fpt.party_id = f.party_id
+		JOIN core.parcels fp ON fp.parcel_id = f.parcel_id
+		WHERE f.real_property_transfer_id = rpt.real_property_transfer_id
+		  AND NOT fpt.is_voided AND NOT fp.is_voided AND fpt.public_id = ANY($1::uuid[])
+	) OR EXISTS (
+		SELECT 1
+		FROM core.real_property_transfer_party_improvements f
+		JOIN core.parties fpt ON fpt.party_id = f.party_id
+		WHERE f.real_property_transfer_id = rpt.real_property_transfer_id
+		  AND NOT fpt.is_voided AND fpt.public_id = ANY($1::uuid[])
+		  AND ` + fmt.Sprintf(visibleImprovementSQL, "f.improvement_id") + `
+	)`
+
 // partyColumnsSQL and partyJoinsSQL load a share row's party, with its name
 // and mailing address as of the transfer (unset when the address is voided).
 // The attribute tables' exclusion constraints allow at most one row per party
@@ -173,6 +192,20 @@ func (s *APIServer) GetTransfersByFeatureId(
 		return nil, err
 	}
 	return connect.NewResponse(&transfersv1.GetTransfersByFeatureIdResponse{Edges: edges, PageInfo: pageInfo}), nil
+}
+
+func (s *APIServer) GetTransfersByPartyId(
+	ctx context.Context,
+	req *connect.Request[transfersv1.GetTransfersByPartyIdRequest],
+) (*connect.Response[transfersv1.GetTransfersByPartyIdResponse], error) {
+	s.logger.Debug("received GetTransfersByPartyId request", slog.Int("ids", len(req.Msg.PartyIds)))
+
+	edges, pageInfo, err := s.pageTransfers(ctx, "GetTransfersByPartyId", transfersByPartyFilter,
+		req.Msg.PartyIds, req.Msg.PartyIds, req.Msg.TimeRange, req.Msg.First, req.Msg.After)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&transfersv1.GetTransfersByPartyIdResponse{Edges: edges, PageInfo: pageInfo}), nil
 }
 
 // pageTransfers reads one page of a paginated transfer lookup. ids is the

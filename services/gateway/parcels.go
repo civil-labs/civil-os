@@ -329,6 +329,31 @@ func (s *ParcelServer) GetEstimatedParcelsExtentWGS84(
 	return connect.NewResponse(publicRes), nil
 }
 
+func (s *ParcelServer) GetParcelExtentsWGS84ByParcelId(
+	ctx context.Context,
+	req *connect.Request[publicparcelsv1.GetParcelExtentsWGS84ByParcelIdRequest],
+) (*connect.Response[publicparcelsv1.GetParcelExtentsWGS84ByParcelIdResponse], error) {
+	s.logger.Debug("received GetParcelExtentsWGS84ByParcelId request", slog.Int("ids", len(req.Msg.ParcelIds)))
+
+	meshRes, err := s.dbReaderClient.GetParcelExtentsWGS84ByParcelId(ctx, connect.NewRequest(&meshparcelsv1.GetParcelExtentsWGS84ByParcelIdRequest{
+		ParcelIds: req.Msg.ParcelIds,
+		LegalAsOf: req.Msg.LegalAsOf,
+	}))
+	if err != nil {
+		s.logger.Error("upstream GetParcelExtentsWGS84ByParcelId request failed", slog.Any("error", err))
+		return nil, err // keep the mesh status code
+	}
+	extents := make(map[string]*publicparcelsv1.ExtentWGS84, len(meshRes.Msg.Extents))
+	for id, e := range meshRes.Msg.Extents {
+		extents[id] = mapExtent(e)
+	}
+	return connect.NewResponse(&publicparcelsv1.GetParcelExtentsWGS84ByParcelIdResponse{Extents: extents}), nil
+}
+
+func mapExtent(m *meshparcelsv1.ExtentWGS84) *publicparcelsv1.ExtentWGS84 {
+	return &publicparcelsv1.ExtentWGS84{MinX: m.GetMinX(), MinY: m.GetMinY(), MaxX: m.GetMaxX(), MaxY: m.GetMaxY()}
+}
+
 func mapParcelWithImprovementSummary(meshParcels map[string]*meshparcelsv1.ParcelWithImprovementSummary) map[string]*publicparcelsv1.ParcelWithImprovementSummary {
 	if meshParcels == nil {
 		return nil

@@ -57,6 +57,9 @@ const (
 	// ParcelsServiceGetEstimatedParcelsExtentWGS84Procedure is the fully-qualified name of the
 	// ParcelsService's GetEstimatedParcelsExtentWGS84 RPC.
 	ParcelsServiceGetEstimatedParcelsExtentWGS84Procedure = "/civil.public.parcels.v1.ParcelsService/GetEstimatedParcelsExtentWGS84"
+	// ParcelsServiceGetParcelExtentsWGS84ByParcelIdProcedure is the fully-qualified name of the
+	// ParcelsService's GetParcelExtentsWGS84ByParcelId RPC.
+	ParcelsServiceGetParcelExtentsWGS84ByParcelIdProcedure = "/civil.public.parcels.v1.ParcelsService/GetParcelExtentsWGS84ByParcelId"
 	// ParcelsServiceGetLandAreaSqftByParcelIdProcedure is the fully-qualified name of the
 	// ParcelsService's GetLandAreaSqftByParcelId RPC.
 	ParcelsServiceGetLandAreaSqftByParcelIdProcedure = "/civil.public.parcels.v1.ParcelsService/GetLandAreaSqftByParcelId"
@@ -152,6 +155,10 @@ type ParcelsServiceClient interface {
 	GetSalesComparables(context.Context, *connect.Request[v1.GetSalesComparablesRequest]) (*connect.Response[v1.GetSalesComparablesResponse], error)
 	GetParcelIdsByFeatureId(context.Context, *connect.Request[v1.GetParcelIdsByFeatureIdRequest]) (*connect.Response[v1.GetParcelIdsByFeatureIdResponse], error)
 	GetEstimatedParcelsExtentWGS84(context.Context, *connect.Request[v1.GetEstimatedParcelsExtentWGS84Request]) (*connect.Response[v1.GetEstimatedParcelsExtentWGS84Response], error)
+	// Returns the WGS84 bounding box of each parcel's geometry at legal_as_of,
+	// for zooming a map to it. Parcels that are unknown, voided, or have no
+	// geometry or record then are left out.
+	GetParcelExtentsWGS84ByParcelId(context.Context, *connect.Request[v1.GetParcelExtentsWGS84ByParcelIdRequest]) (*connect.Response[v1.GetParcelExtentsWGS84ByParcelIdResponse], error)
 	GetLandAreaSqftByParcelId(context.Context, *connect.Request[v1.GetLandAreaSqftByParcelIdRequest]) (*connect.Response[v1.GetLandAreaSqftByParcelIdResponse], error)
 	GetFrontageFtByParcelId(context.Context, *connect.Request[v1.GetFrontageFtByParcelIdRequest]) (*connect.Response[v1.GetFrontageFtByParcelIdResponse], error)
 	GetDepthFtByParcelId(context.Context, *connect.Request[v1.GetDepthFtByParcelIdRequest]) (*connect.Response[v1.GetDepthFtByParcelIdResponse], error)
@@ -238,6 +245,13 @@ func NewParcelsServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			httpClient,
 			baseURL+ParcelsServiceGetEstimatedParcelsExtentWGS84Procedure,
 			connect.WithSchema(parcelsServiceMethods.ByName("GetEstimatedParcelsExtentWGS84")),
+			connect.WithClientOptions(opts...),
+		),
+		getParcelExtentsWGS84ByParcelId: connect.NewClient[v1.GetParcelExtentsWGS84ByParcelIdRequest, v1.GetParcelExtentsWGS84ByParcelIdResponse](
+			httpClient,
+			baseURL+ParcelsServiceGetParcelExtentsWGS84ByParcelIdProcedure,
+			connect.WithSchema(parcelsServiceMethods.ByName("GetParcelExtentsWGS84ByParcelId")),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		getLandAreaSqftByParcelId: connect.NewClient[v1.GetLandAreaSqftByParcelIdRequest, v1.GetLandAreaSqftByParcelIdResponse](
@@ -415,6 +429,7 @@ type parcelsServiceClient struct {
 	getSalesComparables                                *connect.Client[v1.GetSalesComparablesRequest, v1.GetSalesComparablesResponse]
 	getParcelIdsByFeatureId                            *connect.Client[v1.GetParcelIdsByFeatureIdRequest, v1.GetParcelIdsByFeatureIdResponse]
 	getEstimatedParcelsExtentWGS84                     *connect.Client[v1.GetEstimatedParcelsExtentWGS84Request, v1.GetEstimatedParcelsExtentWGS84Response]
+	getParcelExtentsWGS84ByParcelId                    *connect.Client[v1.GetParcelExtentsWGS84ByParcelIdRequest, v1.GetParcelExtentsWGS84ByParcelIdResponse]
 	getLandAreaSqftByParcelId                          *connect.Client[v1.GetLandAreaSqftByParcelIdRequest, v1.GetLandAreaSqftByParcelIdResponse]
 	getFrontageFtByParcelId                            *connect.Client[v1.GetFrontageFtByParcelIdRequest, v1.GetFrontageFtByParcelIdResponse]
 	getDepthFtByParcelId                               *connect.Client[v1.GetDepthFtByParcelIdRequest, v1.GetDepthFtByParcelIdResponse]
@@ -487,6 +502,12 @@ func (c *parcelsServiceClient) GetParcelIdsByFeatureId(ctx context.Context, req 
 // civil.public.parcels.v1.ParcelsService.GetEstimatedParcelsExtentWGS84.
 func (c *parcelsServiceClient) GetEstimatedParcelsExtentWGS84(ctx context.Context, req *connect.Request[v1.GetEstimatedParcelsExtentWGS84Request]) (*connect.Response[v1.GetEstimatedParcelsExtentWGS84Response], error) {
 	return c.getEstimatedParcelsExtentWGS84.CallUnary(ctx, req)
+}
+
+// GetParcelExtentsWGS84ByParcelId calls
+// civil.public.parcels.v1.ParcelsService.GetParcelExtentsWGS84ByParcelId.
+func (c *parcelsServiceClient) GetParcelExtentsWGS84ByParcelId(ctx context.Context, req *connect.Request[v1.GetParcelExtentsWGS84ByParcelIdRequest]) (*connect.Response[v1.GetParcelExtentsWGS84ByParcelIdResponse], error) {
+	return c.getParcelExtentsWGS84ByParcelId.CallUnary(ctx, req)
 }
 
 // GetLandAreaSqftByParcelId calls civil.public.parcels.v1.ParcelsService.GetLandAreaSqftByParcelId.
@@ -647,6 +668,10 @@ type ParcelsServiceHandler interface {
 	GetSalesComparables(context.Context, *connect.Request[v1.GetSalesComparablesRequest]) (*connect.Response[v1.GetSalesComparablesResponse], error)
 	GetParcelIdsByFeatureId(context.Context, *connect.Request[v1.GetParcelIdsByFeatureIdRequest]) (*connect.Response[v1.GetParcelIdsByFeatureIdResponse], error)
 	GetEstimatedParcelsExtentWGS84(context.Context, *connect.Request[v1.GetEstimatedParcelsExtentWGS84Request]) (*connect.Response[v1.GetEstimatedParcelsExtentWGS84Response], error)
+	// Returns the WGS84 bounding box of each parcel's geometry at legal_as_of,
+	// for zooming a map to it. Parcels that are unknown, voided, or have no
+	// geometry or record then are left out.
+	GetParcelExtentsWGS84ByParcelId(context.Context, *connect.Request[v1.GetParcelExtentsWGS84ByParcelIdRequest]) (*connect.Response[v1.GetParcelExtentsWGS84ByParcelIdResponse], error)
 	GetLandAreaSqftByParcelId(context.Context, *connect.Request[v1.GetLandAreaSqftByParcelIdRequest]) (*connect.Response[v1.GetLandAreaSqftByParcelIdResponse], error)
 	GetFrontageFtByParcelId(context.Context, *connect.Request[v1.GetFrontageFtByParcelIdRequest]) (*connect.Response[v1.GetFrontageFtByParcelIdResponse], error)
 	GetDepthFtByParcelId(context.Context, *connect.Request[v1.GetDepthFtByParcelIdRequest]) (*connect.Response[v1.GetDepthFtByParcelIdResponse], error)
@@ -729,6 +754,13 @@ func NewParcelsServiceHandler(svc ParcelsServiceHandler, opts ...connect.Handler
 		ParcelsServiceGetEstimatedParcelsExtentWGS84Procedure,
 		svc.GetEstimatedParcelsExtentWGS84,
 		connect.WithSchema(parcelsServiceMethods.ByName("GetEstimatedParcelsExtentWGS84")),
+		connect.WithHandlerOptions(opts...),
+	)
+	parcelsServiceGetParcelExtentsWGS84ByParcelIdHandler := connect.NewUnaryHandler(
+		ParcelsServiceGetParcelExtentsWGS84ByParcelIdProcedure,
+		svc.GetParcelExtentsWGS84ByParcelId,
+		connect.WithSchema(parcelsServiceMethods.ByName("GetParcelExtentsWGS84ByParcelId")),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	parcelsServiceGetLandAreaSqftByParcelIdHandler := connect.NewUnaryHandler(
@@ -911,6 +943,8 @@ func NewParcelsServiceHandler(svc ParcelsServiceHandler, opts ...connect.Handler
 			parcelsServiceGetParcelIdsByFeatureIdHandler.ServeHTTP(w, r)
 		case ParcelsServiceGetEstimatedParcelsExtentWGS84Procedure:
 			parcelsServiceGetEstimatedParcelsExtentWGS84Handler.ServeHTTP(w, r)
+		case ParcelsServiceGetParcelExtentsWGS84ByParcelIdProcedure:
+			parcelsServiceGetParcelExtentsWGS84ByParcelIdHandler.ServeHTTP(w, r)
 		case ParcelsServiceGetLandAreaSqftByParcelIdProcedure:
 			parcelsServiceGetLandAreaSqftByParcelIdHandler.ServeHTTP(w, r)
 		case ParcelsServiceGetFrontageFtByParcelIdProcedure:
@@ -1004,6 +1038,10 @@ func (UnimplementedParcelsServiceHandler) GetParcelIdsByFeatureId(context.Contex
 
 func (UnimplementedParcelsServiceHandler) GetEstimatedParcelsExtentWGS84(context.Context, *connect.Request[v1.GetEstimatedParcelsExtentWGS84Request]) (*connect.Response[v1.GetEstimatedParcelsExtentWGS84Response], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.parcels.v1.ParcelsService.GetEstimatedParcelsExtentWGS84 is not implemented"))
+}
+
+func (UnimplementedParcelsServiceHandler) GetParcelExtentsWGS84ByParcelId(context.Context, *connect.Request[v1.GetParcelExtentsWGS84ByParcelIdRequest]) (*connect.Response[v1.GetParcelExtentsWGS84ByParcelIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.parcels.v1.ParcelsService.GetParcelExtentsWGS84ByParcelId is not implemented"))
 }
 
 func (UnimplementedParcelsServiceHandler) GetLandAreaSqftByParcelId(context.Context, *connect.Request[v1.GetLandAreaSqftByParcelIdRequest]) (*connect.Response[v1.GetLandAreaSqftByParcelIdResponse], error) {

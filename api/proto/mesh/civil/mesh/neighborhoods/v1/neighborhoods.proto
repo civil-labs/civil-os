@@ -17,16 +17,24 @@ message NeighborhoodDefinition {
 message Neighborhood {
   string id = 1;
   string name = 2;
+  // The definitions that assign at least one non-voided parcel to this
+  // neighborhood, at any time, ordered by ID.
+  repeated string neighborhood_definition_ids = 3;
 }
 
 message GetNeighborhoodDefinitionsRequest {}
 
 message GetNeighborhoodDefinitionsResponse {
-  map<string, Neighborhood> neighborhoods = 1;
+  // Keyed by definition ID.
+  map<string, NeighborhoodDefinition> neighborhoods = 1;
 }
 
-message GetNeighborhoodsRequest {}
+message GetNeighborhoodsRequest {
+  // Only the neighborhoods this definition uses. Every neighborhood when unset.
+  optional string neighborhood_definition_id = 1;
+}
 
 message GetNeighborhoodsResponse {
+  // Keyed by neighborhood ID.
   map<string, Neighborhood> neighborhoods = 1;
 }

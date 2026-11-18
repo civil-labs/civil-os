@@ -28,19 +28,20 @@ func (s *NeighborhoodServer) GetNeighborhoodDefinitions(
 		return nil, err // keep the mesh status code
 	}
 
-	publicNeighborhoods := make(map[string]*publicneighborhoodsv1.Neighborhood, len(meshRes.Msg.Neighborhoods))
+	publicDefinitions := make(map[string]*publicneighborhoodsv1.NeighborhoodDefinition, len(meshRes.Msg.Neighborhoods))
 	for k, v := range meshRes.Msg.Neighborhoods {
 		if v == nil {
 			continue
 		}
-		publicNeighborhoods[k] = &publicneighborhoodsv1.Neighborhood{
-			Id:   v.Id,
-			Name: v.Name,
+		publicDefinitions[k] = &publicneighborhoodsv1.NeighborhoodDefinition{
+			Id:      v.Id,
+			Name:    v.Name,
+			IsLegal: v.IsLegal,
 		}
 	}
 
 	return connect.NewResponse(&publicneighborhoodsv1.GetNeighborhoodDefinitionsResponse{
-		Neighborhoods: publicNeighborhoods,
+		Neighborhoods: publicDefinitions,
 	}), nil
 }
 
@@ -50,7 +51,9 @@ func (s *NeighborhoodServer) GetNeighborhoods(
 ) (*connect.Response[publicneighborhoodsv1.GetNeighborhoodsResponse], error) {
 	s.logger.Debug("received GetNeighborhoods request")
 
-	meshReq := connect.NewRequest(&meshneighborhoodsv1.GetNeighborhoodsRequest{})
+	meshReq := connect.NewRequest(&meshneighborhoodsv1.GetNeighborhoodsRequest{
+		NeighborhoodDefinitionId: req.Msg.NeighborhoodDefinitionId,
+	})
 	meshRes, err := s.dbReaderClient.GetNeighborhoods(ctx, meshReq)
 	if err != nil {
 		s.logger.Error("upstream GetNeighborhoods request failed", slog.Any("error", err))
@@ -63,8 +66,9 @@ func (s *NeighborhoodServer) GetNeighborhoods(
 			continue
 		}
 		publicNeighborhoods[k] = &publicneighborhoodsv1.Neighborhood{
-			Id:   v.Id,
-			Name: v.Name,
+			Id:                        v.Id,
+			Name:                      v.Name,
+			NeighborhoodDefinitionIds: v.NeighborhoodDefinitionIds,
 		}
 	}
 

@@ -159,7 +159,7 @@ func TestReferenceData(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(nd.Msg.Neighborhoods) != 2 || nd.Msg.Neighborhoods[tu.FixtureID(tu.NeighborhoodDefPrefix, 1)].GetName() != "Fixture districts" {
+	if len(nd.Msg.Neighborhoods) != 2 || nd.Msg.Neighborhoods[tu.FixtureID(tu.NeighborhoodDefPrefix, 1)].GetName() != "Fixture districts" || !nd.Msg.Neighborhoods[tu.FixtureID(tu.NeighborhoodDefPrefix, 1)].GetIsLegal() {
 		t.Errorf("neighborhood definitions = %v", nd.Msg.Neighborhoods)
 	}
 

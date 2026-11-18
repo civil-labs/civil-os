@@ -305,7 +305,7 @@ message ParcelDetails {
 
     // Gnostic annotation for example
     (gnostic.openapi.v3.property) = {
-      description: "The unique identifier for the parcel's neighborhood. Will only populate if a neighborhood definition ID is provided, and the parcel has a neighborhood for that definition."
+      description: "The parcel's neighborhood under the requested neighborhood_definition_id, at legal_as_of for a legal definition. Unset when no definition is requested, or the parcel has no neighborhood under it then."
       example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
     }
   ];
@@ -404,7 +404,7 @@ message GetParcelsWithImprovementSummaryByParcelIdRequest {
 
     // Gnostic annotation for example
     (gnostic.openapi.v3.property) = {
-      description: "The unique identifier of a neighborhood definition."
+      description: "A neighborhood definition ID from NeighborhoodService.GetNeighborhoodDefinitions. Without one, neighborhood_id is unset."
       example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
     }
   ];
@@ -440,7 +440,7 @@ message GetParcelsWithImprovementSummaryByFeatureIdRequest {
 
     // Gnostic annotation for example
     (gnostic.openapi.v3.property) = {
-      description: "The unique identifier of a neighborhood definition."
+      description: "A neighborhood definition ID from NeighborhoodService.GetNeighborhoodDefinitions. Without one, neighborhood_id is unset."
       example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
     }
   ];

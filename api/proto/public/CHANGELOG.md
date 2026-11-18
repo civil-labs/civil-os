@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.3.0](https://github.com/civil-labs/civil-os/compare/public-api-v0.2.0...public-api-v0.3.0) (2026-11-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* return neighborhood definitions and their neighborhoods ([#52](https://github.com/civil-labs/civil-os/issues/52))
+
+### Features
+
+* parcel extents and transfers by party ([#49](https://github.com/civil-labs/civil-os/issues/49)) ([716979f](https://github.com/civil-labs/civil-os/commit/716979fef39aee9ea3f0e3eacff9f686c4edffca))
+* public addresses and parties read API ([#48](https://github.com/civil-labs/civil-os/issues/48)) ([45b030c](https://github.com/civil-labs/civil-os/commit/45b030c7d581d557ef90dddbf19da51ff1f1d0cf))
+
+
+### Bug Fixes
+
+* return neighborhood definitions and their neighborhoods ([#52](https://github.com/civil-labs/civil-os/issues/52)) ([373807e](https://github.com/civil-labs/civil-os/commit/373807e76a593137d0ee96c9839c69c84369b988))
+
 ## [0.2.0](https://github.com/civil-labs/civil-os/compare/public-api-v0.1.0...public-api-v0.2.0) (2026-11-15)
 
 

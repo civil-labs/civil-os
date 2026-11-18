@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.4.0](https://github.com/civil-labs/civil-os/compare/v0.3.0...v0.4.0) (2026-11-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* return neighborhood definitions and their neighborhoods ([#52](https://github.com/civil-labs/civil-os/issues/52))
+
+### Features
+
+* parcel extents and transfers by party ([#49](https://github.com/civil-labs/civil-os/issues/49)) ([716979f](https://github.com/civil-labs/civil-os/commit/716979fef39aee9ea3f0e3eacff9f686c4edffca))
+* public addresses and parties read API ([#48](https://github.com/civil-labs/civil-os/issues/48)) ([45b030c](https://github.com/civil-labs/civil-os/commit/45b030c7d581d557ef90dddbf19da51ff1f1d0cf))
+
+
+### Bug Fixes
+
+* resolve addresses and owners at the legal time and hide voided records ([#46](https://github.com/civil-labs/civil-os/issues/46)) ([042d9ff](https://github.com/civil-labs/civil-os/commit/042d9fff883cc971073b4d053b6903a929a31add))
+* return neighborhood definitions and their neighborhoods ([#52](https://github.com/civil-labs/civil-os/issues/52)) ([373807e](https://github.com/civil-labs/civil-os/commit/373807e76a593137d0ee96c9839c69c84369b988))
+
 ## [0.3.0](https://github.com/civil-labs/civil-os/compare/v0.2.2...v0.3.0) (2026-11-15)
 
 

@@ -73,3 +73,6 @@ test reads, run `mise run check` yourself.
   start with `/`.
 - protobuf-es output needs `import_extension=js` for Node ESM. It's already set
   in `api/buf.gen.public.yaml`.
+- Adding a bind mount to `compose.yaml` without `z`, or dropping it as
+  unexplained. SELinux hosts need it (`docs/compose-selinux-relabel/spec.md`).
+  Never use it on a path outside the repo.

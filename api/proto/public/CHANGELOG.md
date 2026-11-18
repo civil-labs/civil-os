@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.4.0](https://github.com/civil-labs/civil-os/compare/public-api-v0.3.0...public-api-v0.4.0) (2026-11-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename the neighborhood definitions map to neighborhood_definitions ([#53](https://github.com/civil-labs/civil-os/issues/53))
+
+### Bug Fixes
+
+* rename the neighborhood definitions map to neighborhood_definitions ([#53](https://github.com/civil-labs/civil-os/issues/53)) ([ad51c3b](https://github.com/civil-labs/civil-os/commit/ad51c3b2adbbb6fdb742e11ff16cffd5a54c64cb))
+
 ## [0.3.0](https://github.com/civil-labs/civil-os/compare/public-api-v0.2.0...public-api-v0.3.0) (2026-11-18)
 
 

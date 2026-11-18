@@ -16,6 +16,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"maps"
 	"math"
 	"net/http"
 	"net/url"
@@ -33,6 +34,8 @@ import (
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/dex/v1/dexv1connect"
 	instancev1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/instance/v1"
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/instance/v1/instancev1connect"
+	neighborhoodsv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/neighborhoods/v1"
+	"github.com/civil-labs/civil-os/api/gen/go/civil/public/neighborhoods/v1/neighborhoodsv1connect"
 	parcelsv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/parcels/v1"
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/parcels/v1/parcelsv1connect"
 	partiesv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/parties/v1"
@@ -330,6 +333,42 @@ func TestSmoke(t *testing.T) {
 		}
 		if want := []string{tu.TransferID(5), tu.TransferID(2)}; !slices.Equal(got, want) {
 			t.Errorf("party 1 transfers = %v, want %v", got, want)
+		}
+	})
+
+	t.Run("neighborhoods", func(t *testing.T) {
+		// Over Connect GET: the RPCs are NO_SIDE_EFFECTS.
+		nbhds := neighborhoodsv1connect.NewNeighborhoodServiceClient(httpClient, gatewayURL, connect.WithHTTPGet())
+		defs, err := nbhds.GetNeighborhoodDefinitions(ctx, authed(token, &neighborhoodsv1.GetNeighborhoodDefinitionsRequest{}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if d := defs.Msg.Neighborhoods[tu.NeighborhoodDefinitionID(tu.LegalNeighborhoodDefinition)]; !d.GetIsLegal() {
+			t.Errorf("legal definition = %v, want is_legal", d)
+		}
+
+		nonLegal := tu.NeighborhoodDefinitionID(tu.NonLegalNeighborhoodDefinition)
+		res, err := nbhds.GetNeighborhoods(ctx, authed(token, &neighborhoodsv1.GetNeighborhoodsRequest{
+			NeighborhoodDefinitionId: &nonLegal,
+		}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		got := slices.Sorted(maps.Keys(res.Msg.Neighborhoods))
+		want := []string{tu.NeighborhoodID(tu.NorthNeighborhood), tu.NeighborhoodID(tu.MarketAreaNeighborhood)}
+		slices.Sort(want)
+		if !slices.Equal(got, want) {
+			t.Errorf("neighborhoods for the non-legal definition = %v, want %v", got, want)
+		}
+
+		p, err := parcels.GetParcelsWithImprovementSummaryByParcelId(ctx, authed(token, &parcelsv1.GetParcelsWithImprovementSummaryByParcelIdRequest{
+			ParcelIds: []string{tu.ParcelID(3)}, NeighborhoodDefinitionId: &nonLegal,
+		}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got := p.Msg.Parcels[tu.ParcelID(3)].GetParcelDetails().GetNeighborhoodId(); got != tu.NeighborhoodID(tu.MarketAreaNeighborhood) {
+			t.Errorf("parcel 3 neighborhood under the non-legal definition = %q", got)
 		}
 	})
 

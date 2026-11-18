@@ -4,12 +4,14 @@ package main
 
 import (
 	"context"
+	"reflect"
 	"testing"
 	"time"
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	neighborhoodsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/neighborhoods/v1"
 	parcelsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1"
 	tu "github.com/civil-labs/civil-os/internal/testutil"
 )
@@ -87,5 +89,87 @@ func TestParcelNeighborhood(t *testing.T) {
 				t.Errorf("neighborhood = %q by parcel ID, %q by feature ID, want %q", byID, byFeature, want)
 			}
 		})
+	}
+}
+
+func TestNeighborhoodDefinitions(t *testing.T) {
+	r := startReader(t)
+	res, err := r.neighborhoods.GetNeighborhoodDefinitions(context.Background(), connect.NewRequest(&neighborhoodsv1.GetNeighborhoodDefinitionsRequest{}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := map[string][2]any{}
+	for id, d := range res.Msg.Neighborhoods {
+		if d.GetId() != id {
+			t.Errorf("definition keyed %s has ID %s", id, d.GetId())
+		}
+		got[id] = [2]any{d.GetName(), d.GetIsLegal()}
+	}
+	want := map[string][2]any{
+		tu.NeighborhoodDefinitionID(tu.LegalNeighborhoodDefinition):    {"Fixture districts", true},
+		tu.NeighborhoodDefinitionID(tu.NonLegalNeighborhoodDefinition): {"Fixture market areas", false},
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("definitions = %v, want %v", got, want)
+	}
+}
+
+func TestNeighborhoodsByDefinition(t *testing.T) {
+	r := startReader(t)
+	legal := tu.NeighborhoodDefinitionID(tu.LegalNeighborhoodDefinition)
+	nonLegal := tu.NeighborhoodDefinitionID(tu.NonLegalNeighborhoodDefinition)
+	str := func(s string) *string { return &s }
+
+	// Every neighborhood lists all the definitions that use it, whatever the
+	// filter; definition IDs sort with the legal one first.
+	all := map[string][]string{
+		tu.NeighborhoodID(tu.NorthNeighborhood):      {legal, nonLegal},
+		tu.NeighborhoodID(tu.SouthNeighborhood):      {legal},
+		tu.NeighborhoodID(tu.MarketAreaNeighborhood): {nonLegal},
+		tu.NeighborhoodID(tu.UnusedNeighborhood):     {},
+	}
+	only := func(ns ...int) map[string][]string {
+		out := map[string][]string{}
+		for _, n := range ns {
+			out[tu.NeighborhoodID(n)] = all[tu.NeighborhoodID(n)]
+		}
+		return out
+	}
+
+	for _, tc := range []struct {
+		name   string
+		filter *string
+		want   map[string][]string
+	}{
+		{"no filter", nil, all},
+		{"legal definition", &legal, only(tu.NorthNeighborhood, tu.SouthNeighborhood)},
+		{"non-legal definition", &nonLegal, only(tu.NorthNeighborhood, tu.MarketAreaNeighborhood)},
+		{"unknown definition", str(tu.MissingID), map[string][]string{}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			res, err := r.neighborhoods.GetNeighborhoods(context.Background(), connect.NewRequest(&neighborhoodsv1.GetNeighborhoodsRequest{
+				NeighborhoodDefinitionId: tc.filter,
+			}))
+			if err != nil {
+				t.Fatal(err)
+			}
+			got := map[string][]string{}
+			for id, n := range res.Msg.Neighborhoods {
+				if n.GetId() != id || n.GetName() == "" {
+					t.Errorf("neighborhood keyed %s = %v", id, n)
+				}
+				got[id] = append([]string{}, n.GetNeighborhoodDefinitionIds()...)
+			}
+			if !reflect.DeepEqual(got, tc.want) {
+				t.Errorf("neighborhoods = %v, want %v", got, tc.want)
+			}
+		})
+	}
+
+	_, err := r.neighborhoods.GetNeighborhoods(context.Background(), connect.NewRequest(&neighborhoodsv1.GetNeighborhoodsRequest{
+		NeighborhoodDefinitionId: str("definition-1"),
+	}))
+	if code := connect.CodeOf(err); code != connect.CodeInvalidArgument {
+		t.Errorf("non-UUID definition: got %v (%v), want InvalidArgument", code, err)
 	}
 }

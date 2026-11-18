@@ -526,3 +526,51 @@ func TestComparablesRequireUUIDs(t *testing.T) {
 		})
 	}
 }
+
+// methodRecorder records the HTTP method of every request it sends.
+type methodRecorder struct {
+	mu      sync.Mutex
+	methods []string
+}
+
+func (m *methodRecorder) RoundTrip(r *http.Request) (*http.Response, error) {
+	m.mu.Lock()
+	m.methods = append(m.methods, r.Method)
+	m.mu.Unlock()
+	return http.DefaultTransport.RoundTrip(r)
+}
+
+// TestNeighborhoodRPCsOverGET calls each NeighborhoodService RPC with Connect
+// GET. The handler only accepts GET for NO_SIDE_EFFECTS procedures, so a
+// call that reaches the mesh proves the idempotency level reaches it.
+func TestNeighborhoodRPCsOverGET(t *testing.T) {
+	g := startGateway(t, nil)
+	for _, md := range methods(t, publicneighborhoodsv1connect.NeighborhoodServiceName) {
+		t.Run(string(md.Name()), func(t *testing.T) {
+			rec := &methodRecorder{}
+			procedure := fmt.Sprintf("/%s/%s", md.Parent().FullName(), md.Name())
+			client := connect.NewClient[dynamicpb.Message, dynamicpb.Message](&http.Client{Transport: rec}, g.url+procedure,
+				connect.WithHTTPGet(),
+				connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+				connect.WithResponseInitializer(func(_ connect.Spec, msg any) error {
+					*msg.(*dynamicpb.Message) = *dynamicpb.NewMessage(md.Output())
+					return nil
+				}))
+			req := dynamicpb.NewMessage(md.Input())
+			fillValid(req, 3)
+			r := connect.NewRequest(req)
+			r.Header().Set("Authorization", "Bearer "+g.token)
+
+			g.mesh.reset(0)
+			if _, err := client.CallUnary(context.Background(), r); err != nil {
+				t.Fatalf("GET call: %v", err)
+			}
+			if calls := g.mesh.reset(0); len(calls) != 1 {
+				t.Errorf("expected one mesh call, got %d", len(calls))
+			}
+			if len(rec.methods) != 1 || rec.methods[0] != http.MethodGet {
+				t.Errorf("sent %v, want one GET", rec.methods)
+			}
+		})
+	}
+}

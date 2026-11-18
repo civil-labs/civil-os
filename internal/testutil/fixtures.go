@@ -74,6 +74,20 @@ const (
 	MissingGranteeTransfer = 7 // parcel 8 with a grantor and no grantee
 )
 
+// Neighborhoods; see the header of database/fixtures/synthetic.sql and
+// docs/neighborhoods-api-fixes/spec.md.
+const (
+	LegalNeighborhoodDefinition    = 1  // 'Fixture districts'
+	NonLegalNeighborhoodDefinition = 2  // 'Fixture market areas'
+	NorthNeighborhood              = 1  // used by definitions 1 and 2
+	SouthNeighborhood              = 2  // used by definition 1 only
+	MarketAreaNeighborhood         = 3  // used by definition 2 only
+	UnusedNeighborhood             = 4  // no assignments
+	NeighborhoodHistoryParcel      = 10 // definition 1: South until HistoryChange, North from then
+	DatedNonLegalParcel            = 6  // definition 2: neighborhood 3 until HistoryChange, none from then
+	SharedNeighborhoodParcel       = 7  // definition 2: North, null range
+)
+
 // FixtureID returns the public ID of row n with the given prefix.
 func FixtureID(prefix string, n int) string {
 	return fmt.Sprintf("%s-0000-4000-8000-%012d", prefix, n)
@@ -87,6 +101,12 @@ func PartyID(n int) string { return FixtureID(PartyPrefix, n) }
 
 // AddressID returns the public ID of fixture address n.
 func AddressID(n int) string { return FixtureID(AddressPrefix, n) }
+
+// NeighborhoodDefinitionID returns the public ID of fixture neighborhood definition n.
+func NeighborhoodDefinitionID(n int) string { return FixtureID(NeighborhoodDefPrefix, n) }
+
+// NeighborhoodID returns the public ID of fixture neighborhood n.
+func NeighborhoodID(n int) string { return FixtureID(NeighborhoodPrefix, n) }
 
 // ParcelID returns the public ID of fixture parcel n.
 func ParcelID(n int) string { return FixtureID(ParcelPrefix, n) }

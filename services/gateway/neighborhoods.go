@@ -41,7 +41,7 @@ func (s *NeighborhoodServer) GetNeighborhoodDefinitions(
 	}
 
 	return connect.NewResponse(&publicneighborhoodsv1.GetNeighborhoodDefinitionsResponse{
-		Neighborhoods: publicDefinitions,
+		NeighborhoodDefinitions: publicDefinitions,
 	}), nil
 }
 

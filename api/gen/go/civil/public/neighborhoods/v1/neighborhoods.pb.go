@@ -186,10 +186,10 @@ func (*GetNeighborhoodDefinitionsRequest) Descriptor() ([]byte, []int) {
 }
 
 type GetNeighborhoodDefinitionsResponse struct {
-	state         protoimpl.MessageState             `protogen:"open.v1"`
-	Neighborhoods map[string]*NeighborhoodDefinition `protobuf:"bytes,1,rep,name=neighborhoods,proto3" json:"neighborhoods,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                    protoimpl.MessageState             `protogen:"open.v1"`
+	NeighborhoodsDefinitions map[string]*NeighborhoodDefinition `protobuf:"bytes,1,rep,name=neighborhoods_definitions,json=neighborhoodsDefinitions,proto3" json:"neighborhoods_definitions,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
 }
 
 func (x *GetNeighborhoodDefinitionsResponse) Reset() {
@@ -222,9 +222,9 @@ func (*GetNeighborhoodDefinitionsResponse) Descriptor() ([]byte, []int) {
 	return file_civil_public_neighborhoods_v1_neighborhoods_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *GetNeighborhoodDefinitionsResponse) GetNeighborhoods() map[string]*NeighborhoodDefinition {
+func (x *GetNeighborhoodDefinitionsResponse) GetNeighborhoodsDefinitions() map[string]*NeighborhoodDefinition {
 	if x != nil {
-		return x.Neighborhoods
+		return x.NeighborhoodsDefinitions
 	}
 	return nil
 }
@@ -332,10 +332,10 @@ const file_civil_public_neighborhoods_v1_neighborhoods_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tBc\xbaGX:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x02+The unique identifier for the neighborhood.\xbaH\x05r\x03\xb0\x01\x01R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\xe4\x01\n" +
 	"\x1bneighborhood_definition_ids\x18\x03 \x03(\tB\xa3\x01\xbaG\x9f\x01\x92\x02\x9b\x01The definitions that assign at least one (non-voided) parcel to this neighborhood, at any time, ordered by ID. Empty for a neighborhood no definition uses.R\x19neighborhoodDefinitionIds\"#\n" +
-	"!GetNeighborhoodDefinitionsRequest\"\xee\x02\n" +
-	"\"GetNeighborhoodDefinitionsResponse\x12\xce\x01\n" +
-	"\rneighborhoods\x18\x01 \x03(\v2T.civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsEntryBR\xbaGO\x92\x02LMap of neighborhood definitions keyed by the UUID neighborhood definition IDR\rneighborhoods\x1aw\n" +
-	"\x12NeighborhoodsEntry\x12\x10\n" +
+	"!GetNeighborhoodDefinitionsRequest\"\x9c\x03\n" +
+	"\"GetNeighborhoodDefinitionsResponse\x12\xf0\x01\n" +
+	"\x19neighborhoods_definitions\x18\x01 \x03(\v2_.civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsDefinitionsEntryBR\xbaGO\x92\x02LMap of neighborhood definitions keyed by the UUID neighborhood definition IDR\x18neighborhoodsDefinitions\x1a\x82\x01\n" +
+	"\x1dNeighborhoodsDefinitionsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12K\n" +
 	"\x05value\x18\x02 \x01(\v25.civil.public.neighborhoods.v1.NeighborhoodDefinitionR\x05value:\x028\x01\"\xa7\x02\n" +
 	"\x17GetNeighborhoodsRequest\x12\xec\x01\n" +
@@ -371,13 +371,13 @@ var file_civil_public_neighborhoods_v1_neighborhoods_proto_goTypes = []any{
 	(*GetNeighborhoodDefinitionsResponse)(nil), // 3: civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse
 	(*GetNeighborhoodsRequest)(nil),            // 4: civil.public.neighborhoods.v1.GetNeighborhoodsRequest
 	(*GetNeighborhoodsResponse)(nil),           // 5: civil.public.neighborhoods.v1.GetNeighborhoodsResponse
-	nil,                                        // 6: civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsEntry
+	nil,                                        // 6: civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsDefinitionsEntry
 	nil,                                        // 7: civil.public.neighborhoods.v1.GetNeighborhoodsResponse.NeighborhoodsEntry
 }
 var file_civil_public_neighborhoods_v1_neighborhoods_proto_depIdxs = []int32{
-	6, // 0: civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.neighborhoods:type_name -> civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsEntry
+	6, // 0: civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.neighborhoods_definitions:type_name -> civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsDefinitionsEntry
 	7, // 1: civil.public.neighborhoods.v1.GetNeighborhoodsResponse.neighborhoods:type_name -> civil.public.neighborhoods.v1.GetNeighborhoodsResponse.NeighborhoodsEntry
-	0, // 2: civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsEntry.value:type_name -> civil.public.neighborhoods.v1.NeighborhoodDefinition
+	0, // 2: civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsDefinitionsEntry.value:type_name -> civil.public.neighborhoods.v1.NeighborhoodDefinition
 	1, // 3: civil.public.neighborhoods.v1.GetNeighborhoodsResponse.NeighborhoodsEntry.value:type_name -> civil.public.neighborhoods.v1.Neighborhood
 	2, // 4: civil.public.neighborhoods.v1.NeighborhoodService.GetNeighborhoodDefinitions:input_type -> civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsRequest
 	4, // 5: civil.public.neighborhoods.v1.NeighborhoodService.GetNeighborhoods:input_type -> civil.public.neighborhoods.v1.GetNeighborhoodsRequest

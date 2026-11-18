@@ -239,7 +239,7 @@ func (s *APIServer) getParcelsWithImprovementSummary(
 		LEFT JOIN core.parcel_neighborhood_definitions pnd 
 			ON p.parcel_id = pnd.parcel_id 
 			AND pnd.neighborhood_definition_id = nd.neighborhood_definition_id
-			AND pnd.legal_valid_range @> $1::timestamptz
+			AND (pnd.legal_valid_range @> $1::timestamptz OR pnd.legal_valid_range IS NULL)
 		LEFT JOIN core.neighborhoods n 
 			ON pnd.neighborhood_id = n.neighborhood_id
 

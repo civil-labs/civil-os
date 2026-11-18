@@ -57,7 +57,7 @@ message Neighborhood {
 message GetNeighborhoodDefinitionsRequest {}
 
 message GetNeighborhoodDefinitionsResponse {
-  map<string, NeighborhoodDefinition> neighborhoods = 1 [(gnostic.openapi.v3.property) = {description: "Map of neighborhood definitions keyed by the UUID neighborhood definition ID"}];
+  map<string, NeighborhoodDefinition> neighborhood_definitions = 1 [(gnostic.openapi.v3.property) = {description: "Map of neighborhood definitions keyed by the UUID neighborhood definition ID"}];
 }
 
 message GetNeighborhoodsRequest {

@@ -182,9 +182,9 @@ func (*GetNeighborhoodDefinitionsRequest) Descriptor() ([]byte, []int) {
 type GetNeighborhoodDefinitionsResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Keyed by definition ID.
-	Neighborhoods map[string]*NeighborhoodDefinition `protobuf:"bytes,1,rep,name=neighborhoods,proto3" json:"neighborhoods,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	NeighborhoodDefinitions map[string]*NeighborhoodDefinition `protobuf:"bytes,1,rep,name=neighborhood_definitions,json=neighborhoodDefinitions,proto3" json:"neighborhood_definitions,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *GetNeighborhoodDefinitionsResponse) Reset() {
@@ -217,9 +217,9 @@ func (*GetNeighborhoodDefinitionsResponse) Descriptor() ([]byte, []int) {
 	return file_civil_mesh_neighborhoods_v1_neighborhoods_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *GetNeighborhoodDefinitionsResponse) GetNeighborhoods() map[string]*NeighborhoodDefinition {
+func (x *GetNeighborhoodDefinitionsResponse) GetNeighborhoodDefinitions() map[string]*NeighborhoodDefinition {
 	if x != nil {
-		return x.Neighborhoods
+		return x.NeighborhoodDefinitions
 	}
 	return nil
 }
@@ -327,10 +327,10 @@ const file_civil_mesh_neighborhoods_v1_neighborhoods_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12>\n" +
 	"\x1bneighborhood_definition_ids\x18\x03 \x03(\tR\x19neighborhoodDefinitionIds\"#\n" +
-	"!GetNeighborhoodDefinitionsRequest\"\x95\x02\n" +
-	"\"GetNeighborhoodDefinitionsResponse\x12x\n" +
-	"\rneighborhoods\x18\x01 \x03(\v2R.civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsEntryR\rneighborhoods\x1au\n" +
-	"\x12NeighborhoodsEntry\x12\x10\n" +
+	"!GetNeighborhoodDefinitionsRequest\"\xbf\x02\n" +
+	"\"GetNeighborhoodDefinitionsResponse\x12\x97\x01\n" +
+	"\x18neighborhood_definitions\x18\x01 \x03(\v2\\.civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodDefinitionsEntryR\x17neighborhoodDefinitions\x1a\x7f\n" +
+	"\x1cNeighborhoodDefinitionsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12I\n" +
 	"\x05value\x18\x02 \x01(\v23.civil.mesh.neighborhoods.v1.NeighborhoodDefinitionR\x05value:\x028\x01\"{\n" +
 	"\x17GetNeighborhoodsRequest\x12A\n" +
@@ -366,13 +366,13 @@ var file_civil_mesh_neighborhoods_v1_neighborhoods_proto_goTypes = []any{
 	(*GetNeighborhoodDefinitionsResponse)(nil), // 3: civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse
 	(*GetNeighborhoodsRequest)(nil),            // 4: civil.mesh.neighborhoods.v1.GetNeighborhoodsRequest
 	(*GetNeighborhoodsResponse)(nil),           // 5: civil.mesh.neighborhoods.v1.GetNeighborhoodsResponse
-	nil,                                        // 6: civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsEntry
+	nil,                                        // 6: civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodDefinitionsEntry
 	nil,                                        // 7: civil.mesh.neighborhoods.v1.GetNeighborhoodsResponse.NeighborhoodsEntry
 }
 var file_civil_mesh_neighborhoods_v1_neighborhoods_proto_depIdxs = []int32{
-	6, // 0: civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.neighborhoods:type_name -> civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsEntry
+	6, // 0: civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.neighborhood_definitions:type_name -> civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodDefinitionsEntry
 	7, // 1: civil.mesh.neighborhoods.v1.GetNeighborhoodsResponse.neighborhoods:type_name -> civil.mesh.neighborhoods.v1.GetNeighborhoodsResponse.NeighborhoodsEntry
-	0, // 2: civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsEntry.value:type_name -> civil.mesh.neighborhoods.v1.NeighborhoodDefinition
+	0, // 2: civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodDefinitionsEntry.value:type_name -> civil.mesh.neighborhoods.v1.NeighborhoodDefinition
 	1, // 3: civil.mesh.neighborhoods.v1.GetNeighborhoodsResponse.NeighborhoodsEntry.value:type_name -> civil.mesh.neighborhoods.v1.Neighborhood
 	2, // 4: civil.mesh.neighborhoods.v1.NeighborhoodReadService.GetNeighborhoodDefinitions:input_type -> civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsRequest
 	4, // 5: civil.mesh.neighborhoods.v1.NeighborhoodReadService.GetNeighborhoods:input_type -> civil.mesh.neighborhoods.v1.GetNeighborhoodsRequest

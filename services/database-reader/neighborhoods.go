@@ -56,7 +56,7 @@ func (s *APIServer) GetNeighborhoodDefinitions(
 	}
 
 	return connect.NewResponse(&meshneighborhoodsv1.GetNeighborhoodDefinitionsResponse{
-		Neighborhoods: defsMap,
+		NeighborhoodDefinitions: defsMap,
 	}), nil
 }
 

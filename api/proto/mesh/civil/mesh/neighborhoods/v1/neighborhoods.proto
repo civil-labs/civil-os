@@ -26,7 +26,7 @@ message GetNeighborhoodDefinitionsRequest {}
 
 message GetNeighborhoodDefinitionsResponse {
   // Keyed by definition ID.
-  map<string, NeighborhoodDefinition> neighborhoods = 1;
+  map<string, NeighborhoodDefinition> neighborhood_definitions = 1;
 }
 
 message GetNeighborhoodsRequest {

@@ -99,7 +99,7 @@ func TestNeighborhoodDefinitions(t *testing.T) {
 		t.Fatal(err)
 	}
 	got := map[string][2]any{}
-	for id, d := range res.Msg.Neighborhoods {
+	for id, d := range res.Msg.NeighborhoodDefinitions {
 		if d.GetId() != id {
 			t.Errorf("definition keyed %s has ID %s", id, d.GetId())
 		}

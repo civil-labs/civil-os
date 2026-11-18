@@ -28,8 +28,8 @@ func (s *NeighborhoodServer) GetNeighborhoodDefinitions(
 		return nil, err // keep the mesh status code
 	}
 
-	publicDefinitions := make(map[string]*publicneighborhoodsv1.NeighborhoodDefinition, len(meshRes.Msg.Neighborhoods))
-	for k, v := range meshRes.Msg.Neighborhoods {
+	publicDefinitions := make(map[string]*publicneighborhoodsv1.NeighborhoodDefinition, len(meshRes.Msg.NeighborhoodDefinitions))
+	for k, v := range meshRes.Msg.NeighborhoodDefinitions {
 		if v == nil {
 			continue
 		}

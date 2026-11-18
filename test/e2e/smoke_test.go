@@ -343,7 +343,7 @@ func TestSmoke(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if d := defs.Msg.Neighborhoods[tu.NeighborhoodDefinitionID(tu.LegalNeighborhoodDefinition)]; !d.GetIsLegal() {
+		if d := defs.Msg.NeighborhoodDefinitions[tu.NeighborhoodDefinitionID(tu.LegalNeighborhoodDefinition)]; !d.GetIsLegal() {
 			t.Errorf("legal definition = %v, want is_legal", d)
 		}
 

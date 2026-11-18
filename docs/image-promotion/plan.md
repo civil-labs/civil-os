@@ -120,6 +120,9 @@ directory and logs every `create`. With `PROMOTE_INTERVAL=0` and a short
 
 **4. Docs** (`docs: releases promote the main images`)
 
+*Amended during implementation:* `README.md`'s release paragraph is updated
+too. It repeated the "every merge to `main`" sentence.
+
 - **`docs/architecture.md`:**
   - the App row of the release table: `:vX.Y.Z` is the `main` image of the
     tagged commit, promoted, with the same digest;

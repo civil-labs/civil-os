@@ -125,8 +125,9 @@ independent release streams from `main`:
 | App | `vX.Y.Z` | `ghcr.io/civil-labs/civil-os/{gateway,database-reader,database-writer,tile-server}:vX.Y.Z`, plus a database-migrations ConfigMap on the GitHub Release |
 | Public API | `public-api-vX.Y.Z` | `@civil-labs/civil-os-api` on npm, plus `openapi.yaml` on the GitHub Release |
 
-Every merge to `main` also publishes `:sha-<short>` images. There is no
-`latest` tag.
+Every merge to `main` builds and publishes `:sha-<short>` images. A release
+doesn't rebuild them: `:vX.Y.Z` is the `main` image of the tagged commit, with
+the same digest. There is no `latest` tag.
 
 ## License
 

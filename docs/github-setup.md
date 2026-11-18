@@ -133,7 +133,8 @@ workflow passes it to npm when it's set.
 
 - [ ] The first release PRs propose `v0.2.0` for the app and
   `public-api-v0.1.0` for the public API.
-- [ ] The `v*` tag publishes `:vX.Y.Z` images, attaches
+- [ ] The `v*` tag promotes the `main` images of the tagged commit to
+  `:vX.Y.Z` (see [§7](#7-release-images-missing) if it fails), attaches
   `migrations-configmap.yaml` to the release, and pushes
   `ghcr.io/civil-labs/civil-os/db-migrations:vX.Y.Z`.
 - [ ] For a release tagged before the OCI artifact existed, run **Actions →
@@ -145,3 +146,27 @@ workflow passes it to npm when it's set.
   That rollout happens outside this repository.
 - [ ] Once clusters run civil-os images, archive the pre-monorepo repositories
   (the old service, schema and API repos), each with a README pointing here.
+
+## 7. Release images missing
+
+A `v*` tag doesn't build images: the Images run's `promote` jobs add the tag to
+the `:sha-<short>` images that the `main` run built for the same commit
+([`image-promotion/spec.md`](image-promotion/spec.md)). A `promote` job fails
+when that image never appears, usually because the `main` Images run failed,
+or when `:vX.Y.Z` already points at a different image (it never moves a
+published tag).
+
+To recover:
+1. Re-run the failed `main` Images run for the tagged commit, and wait for it.
+2. On the tag's Images run, choose **Re-run failed jobs**.
+
+As a last resort, promote one service by hand, then check both tags have the
+same digest:
+
+```sh
+docker buildx imagetools create \
+  --tag ghcr.io/civil-labs/civil-os/<service>:vX.Y.Z \
+  ghcr.io/civil-labs/civil-os/<service>:sha-<short>
+docker buildx imagetools inspect ghcr.io/civil-labs/civil-os/<service>:vX.Y.Z --format '{{.Manifest.Digest}}'
+docker buildx imagetools inspect ghcr.io/civil-labs/civil-os/<service>:sha-<short> --format '{{.Manifest.Digest}}'
+```

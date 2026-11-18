@@ -30,7 +30,14 @@
 --     also has a secondary improvement (improvement 16). Voided parcel 20 has
 --     primary improvement 17, so improvement reads must hide it too.
 --   * Zoning: parcels 1-12 are R-1, 13-20 are C-1.
---   * Neighborhoods (legal definition 1): parcels 1-10 North, 11-20 South.
+--   * Neighborhoods (docs/neighborhoods-api-fixes/spec.md):
+--       definition 1 'Fixture districts' (legal): parcels 1-10 North (1) and
+--         11-20 South (2) from 2020-01-01, except parcel 10: South until
+--         2023-01-01, North from then
+--       definition 2 'Fixture market areas' (not legal): parcels 1-5 ->
+--         'Fixture Market Area' (3), null range; parcel 6 -> 3 for
+--         2020-01-01..2023-01-01; parcel 7 -> North (1), null range
+--       neighborhood 4 'Unused Fixture' has no assignments
 --   * Valuation 1 (2025 roll): parcel market value 100000 + 5000n, assessed 90%.
 --   * Address 21 is attached to no parcel, for update tests.
 --   * History (docs/address-party-read-api/spec.md):
@@ -126,12 +133,15 @@ JOIN core.zoning z ON z.public_id = pg_temp.fid('40000000', v.k);
 INSERT INTO core.valuations (public_id, legacy_id, valuation_date, trace_id)
 VALUES (pg_temp.fid('60000000', 1), 'FX-2025', '2025-01-01 00:00:00+00', 'fixture');
 
-INSERT INTO core.neighborhood_definitions (public_id, name, is_legal, trace_id)
-VALUES (pg_temp.fid('70000000', 1), 'Fixture districts', true, 'fixture');
+INSERT INTO core.neighborhood_definitions (public_id, name, is_legal, trace_id) VALUES
+  (pg_temp.fid('70000000', 1), 'Fixture districts', true, 'fixture'),
+  (pg_temp.fid('70000000', 2), 'Fixture market areas', false, 'fixture');
 
 INSERT INTO core.neighborhoods (public_id, name, trace_id) VALUES
   (pg_temp.fid('71000000', 1), 'North Fixture', 'fixture'),
-  (pg_temp.fid('71000000', 2), 'South Fixture', 'fixture');
+  (pg_temp.fid('71000000', 2), 'South Fixture', 'fixture'),
+  (pg_temp.fid('71000000', 3), 'Fixture Market Area', 'fixture'),
+  (pg_temp.fid('71000000', 4), 'Unused Fixture', 'fixture');
 
 -- Addresses and parties ----------------------------------------------------------
 
@@ -260,13 +270,36 @@ JOIN core.zoning_attributes za ON za.zoning_id = z.zoning_id
 JOIN core.affordance_types t ON t.public_id = pg_temp.fid('41000000', 1)
 WHERE fx.n <= 20;
 
+-- Legal definition 1. Parcel 10's North row starts 2023-01-01; before that it was South.
 INSERT INTO core.parcel_neighborhood_definitions (parcel_id, neighborhood_id, neighborhood_definition_id, is_legal, legal_valid_range, trace_id)
-SELECT p.parcel_id, nb.neighborhood_id, d.neighborhood_definition_id, true, tstzrange('2020-01-01 00:00:00+00', NULL), 'fixture'
+SELECT p.parcel_id, nb.neighborhood_id, d.neighborhood_definition_id, true,
+       CASE WHEN fx.n = 10 THEN tstzrange('2023-01-01 00:00:00+00', NULL)
+            ELSE tstzrange('2020-01-01 00:00:00+00', NULL) END,
+       'fixture'
 FROM fx
 JOIN core.parcels p ON p.public_id = pg_temp.fid('a0000000', fx.n)
 JOIN core.neighborhoods nb ON nb.public_id = pg_temp.fid('71000000', CASE WHEN fx.n <= 10 THEN 1 ELSE 2 END)
-CROSS JOIN core.neighborhood_definitions d
+JOIN core.neighborhood_definitions d ON d.public_id = pg_temp.fid('70000000', 1)
 WHERE fx.n <= 20;
+
+INSERT INTO core.parcel_neighborhood_definitions (parcel_id, neighborhood_id, neighborhood_definition_id, is_legal, legal_valid_range, trace_id)
+SELECT p.parcel_id, nb.neighborhood_id, d.neighborhood_definition_id, true,
+       tstzrange('2020-01-01 00:00:00+00', '2023-01-01 00:00:00+00'), 'fixture'
+FROM core.parcels p
+JOIN core.neighborhoods nb ON nb.public_id = pg_temp.fid('71000000', 2)
+JOIN core.neighborhood_definitions d ON d.public_id = pg_temp.fid('70000000', 1)
+WHERE p.public_id = pg_temp.fid('a0000000', 10);
+
+-- Non-legal definition 2: parcels 1-5 and 7 with a null range, parcel 6 dated.
+INSERT INTO core.parcel_neighborhood_definitions (parcel_id, neighborhood_id, neighborhood_definition_id, is_legal, legal_valid_range, trace_id)
+SELECT p.parcel_id, nb.neighborhood_id, d.neighborhood_definition_id, false,
+       CASE WHEN fx.n = 6 THEN tstzrange('2020-01-01 00:00:00+00', '2023-01-01 00:00:00+00') END,
+       'fixture'
+FROM fx
+JOIN core.parcels p ON p.public_id = pg_temp.fid('a0000000', fx.n)
+JOIN core.neighborhoods nb ON nb.public_id = pg_temp.fid('71000000', CASE WHEN fx.n = 7 THEN 1 ELSE 3 END)
+JOIN core.neighborhood_definitions d ON d.public_id = pg_temp.fid('70000000', 2)
+WHERE fx.n <= 7;
 
 INSERT INTO core.parcel_valuations (parcel_id, valuation_id, market_value, assessed_value, legal_valid_range, trace_id)
 SELECT p.parcel_id, v.valuation_id, 100000 + 5000 * fx.n, (100000 + 5000 * fx.n) * 0.9, tstzrange('2020-01-01 00:00:00+00', NULL), 'fixture'

@@ -10,7 +10,7 @@ one port.
 | `civil.public.improvements.v1` | `ImprovementsService` | Improvement types and conditions |
 | `civil.public.landuses.v1` | `LandUsesService` | Land uses and land-use types |
 | `civil.public.zoning.v1` | `ZoningService` | Zoning designations |
-| `civil.public.neighborhoods.v1` | `NeighborhoodService` | Neighborhood definitions and neighborhoods |
+| `civil.public.neighborhoods.v1` | `NeighborhoodService` | Neighborhood definitions (with `is_legal`), and neighborhoods with the definitions that use them, optionally filtered by definition. Both RPCs accept Connect GET. |
 | `civil.public.valuations.v1` | `ValuationService` | Valuations |
 | `civil.public.transfers.v1` | `RealPropertyTransfersService` | Real property transfers by transfer, parcel, map feature or party, with grantors, grantees, shares, codes and recordings. Paginated. |
 | `civil.public.addresses.v1` | `AddressesService` | Addresses, and the parcels, improvements and parties at an address. The lookups by address are paginated. |
@@ -61,6 +61,33 @@ lookups follow it. New paginated RPCs follow the same pattern:
 - **Consistency:** pages are keyset-based, so results added or removed between
   requests don't shift later pages, but there's no snapshot either.
 - Only forward pagination (`first` / `after`) is supported for now.
+
+## Neighborhoods
+
+Parcels are grouped into neighborhoods under one or more *neighborhood
+definitions*. An instance can have several definitions, and none, one or
+several of them can be legal. A parcel has at most one neighborhood per
+definition at a time.
+
+1. **Pick a definition.** `NeighborhoodService.GetNeighborhoodDefinitions`
+   returns every definition, keyed by ID, with its `name` and `is_legal`.
+   A legal definition's assignments are dated, so a parcel's neighborhood
+   under it depends on the legal time. A non-legal one's usually aren't.
+2. **List its neighborhoods.** `GetNeighborhoods` with
+   `neighborhood_definition_id` returns the neighborhoods that definition
+   uses. Without it, you get every neighborhood. Either way, each neighborhood
+   lists all the definitions that use it in `neighborhood_definition_ids`. A
+   definition "uses" a neighborhood when it has ever assigned a parcel to it,
+   so a neighborhood with no parcels yet belongs to no definition.
+3. **Read a parcel's neighborhood.** Pass the same `neighborhood_definition_id`
+   on `ParcelsService.GetParcelsWithImprovementSummaryByParcelId` (or
+   `...ByFeatureId`). For a legal definition, also set `legal_as_of`, which
+   defaults to now. `ParcelDetails.neighborhood_id` is unset when no
+   definition is requested, or the parcel has no neighborhood under it then.
+   There is no default definition.
+
+Both `NeighborhoodService` RPCs have no side effects, so they can be called
+with Connect GET and cached.
 
 ## Vector tiles
 

@@ -4660,7 +4660,7 @@ const file_civil_public_parcels_v1_parcels_proto_rawDesc = "" +
 	"\x1d_primary_effective_year_builtB\x17\n" +
 	"\x15_primary_condition_idB!\n" +
 	"\x1f_total_market_improvement_valueB#\n" +
-	"!_total_assessed_improvement_value\"\x85\x11\n" +
+	"!_total_assessed_improvement_value\"\xa2\x11\n" +
 	"\rParcelDetails\x12z\n" +
 	"\tparcel_id\x18\x01 \x01(\tB]\xbaGR:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x02%The unique identifier for the parcel.\xbaH\x05r\x03\xb0\x01\x01R\bparcelId\x12\"\n" +
 	"\n" +
@@ -4675,8 +4675,8 @@ const file_civil_public_parcels_v1_parcels_proto_rawDesc = "" +
 	"\xbaH\ar\x05\x10\x00\x18\x80\x02H\x04R\x13primaryOwnerAddress\x88\x01\x01\x12\xcc\x01\n" +
 	"\tparty_ids\x18\a \x03(\tB\xae\x01\xbaG\x99\x01:R\x12P['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']\x92\x02BA list of unique identifiers for the parties that own this parcel.\xbaH\x0e\x92\x01\v\x10\n" +
 	"\x18\x01\"\x05r\x03\xb0\x01\x01R\bpartyIds\x12\x8d\x01\n" +
-	"\vland_use_id\x18\b \x01(\tBh\xbaG]:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x020The unique identifier for the parcel's land use.\xbaH\x05r\x03\xb0\x01\x01H\x05R\tlandUseId\x88\x01\x01\x12\x94\x02\n" +
-	"\x0fneighborhood_id\x18\t \x01(\tB\xe5\x01\xbaG\xd9\x01:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x02\xab\x01The unique identifier for the parcel's neighborhood. Will only populate if a neighborhood definition ID is provided, and the parcel has a neighborhood for that definition.\xbaH\x05r\x03\xb0\x01\x01H\x06R\x0eneighborhoodId\x88\x01\x01\x12:\n" +
+	"\vland_use_id\x18\b \x01(\tBh\xbaG]:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x020The unique identifier for the parcel's land use.\xbaH\x05r\x03\xb0\x01\x01H\x05R\tlandUseId\x88\x01\x01\x12\xb1\x02\n" +
+	"\x0fneighborhood_id\x18\t \x01(\tB\x82\x02\xbaG\xf6\x01:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x02\xc8\x01The parcel's neighborhood under the requested neighborhood_definition_id, at legal_as_of for a legal definition. Unset when no definition is requested, or the parcel has no neighborhood under it then.\xbaH\x05r\x03\xb0\x01\x01H\x06R\x0eneighborhoodId\x88\x01\x01\x12:\n" +
 	"\x0fland_area_sq_ft\x18\n" +
 	" \x01(\x01B\x0e\xbaH\v\x12\t)\x00\x00\x00\x00\x00\x00\x00\x00H\aR\flandAreaSqFt\x88\x01\x01\x124\n" +
 	"\vfrontage_ft\x18\v \x01(\x01B\x0e\xbaH\v\x12\t)\x00\x00\x00\x00\x00\x00\x00\x00H\bR\n" +
@@ -4705,13 +4705,13 @@ const file_civil_public_parcels_v1_parcels_proto_rawDesc = "" +
 	"\v_properties\"\xd2\x01\n" +
 	"\x1cParcelWithImprovementSummary\x12M\n" +
 	"\x0eparcel_details\x18\x01 \x01(\v2&.civil.public.parcels.v1.ParcelDetailsR\rparcelDetails\x12c\n" +
-	"\x13improvement_summary\x18\x02 \x01(\v22.civil.public.parcels.v1.ParcelImprovementsSummaryR\x12improvementSummary\"\xdc\x06\n" +
+	"\x13improvement_summary\x18\x02 \x01(\v22.civil.public.parcels.v1.ParcelImprovementsSummaryR\x12improvementSummary\"\xa3\a\n" +
 	"1GetParcelsWithImprovementSummaryByParcelIdRequest\x12\xbb\x01\n" +
 	"\n" +
 	"parcel_ids\x18\x01 \x03(\tB\x9b\x01\xbaG\x84\x01:R\x12P['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']\x92\x02-A list of unique identifiers for the parcels.\xbaH\x10\x92\x01\r\b\x01\x10d\x18\x01\"\x05r\x03\xb0\x01\x01R\tparcelIds\x12\xef\x01\n" +
 	"\vlegal_as_of\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampB\xad\x01\xbaG\x96\x01\x92\x02\x92\x01The timestamp to retrieve the parcel data for. Defaults to now. If a parcel does not have data for that time, no data for that parcel is returned.\xbaH\x10\xb2\x01\r*\v\b\x80\x92\xb8Ø\xfe\xff\xff\xff\x01H\x00R\tlegalAsOf\x88\x01\x01\x12\x85\x01\n" +
-	"\fvaluation_id\x18\x03 \x01(\tB]\xbaGR:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x02%The unique identifier of a valuation.\xbaH\x05r\x03\xb0\x01\x01H\x01R\vvaluationId\x88\x01\x01\x12\xae\x01\n" +
-	"\x1aneighborhood_definition_id\x18\x04 \x01(\tBk\xbaG`:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x023The unique identifier of a neighborhood definition.\xbaH\x05r\x03\xb0\x01\x01H\x02R\x18neighborhoodDefinitionId\x88\x01\x01B\x0e\n" +
+	"\fvaluation_id\x18\x03 \x01(\tB]\xbaGR:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x02%The unique identifier of a valuation.\xbaH\x05r\x03\xb0\x01\x01H\x01R\vvaluationId\x88\x01\x01\x12\xf5\x01\n" +
+	"\x1aneighborhood_definition_id\x18\x04 \x01(\tB\xb1\x01\xbaG\xa5\x01:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x02xA neighborhood definition ID from NeighborhoodService.GetNeighborhoodDefinitions. Without one, neighborhood_id is unset.\xbaH\x05r\x03\xb0\x01\x01H\x02R\x18neighborhoodDefinitionId\x88\x01\x01B\x0e\n" +
 	"\f_legal_as_ofB\x0f\n" +
 	"\r_valuation_idB\x1d\n" +
 	"\x1b_neighborhood_definition_id\"\xdb\x02\n" +
@@ -4719,13 +4719,13 @@ const file_civil_public_parcels_v1_parcels_proto_rawDesc = "" +
 	"\aparcels\x18\x01 \x03(\v2X.civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse.ParcelsEntryB=\xbaG:\x92\x027A dictionary of parcels, keyed by their UUID parcel ID.R\aparcels\x1aq\n" +
 	"\fParcelsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12K\n" +
-	"\x05value\x18\x02 \x01(\v25.civil.public.parcels.v1.ParcelWithImprovementSummaryR\x05value:\x028\x01\"\xc0\x05\n" +
+	"\x05value\x18\x02 \x01(\v25.civil.public.parcels.v1.ParcelWithImprovementSummaryR\x05value:\x028\x01\"\x87\x06\n" +
 	"2GetParcelsWithImprovementSummaryByFeatureIdRequest\x12\x1f\n" +
 	"\vfeature_ids\x18\x01 \x03(\x03R\n" +
 	"featureIds\x12\xef\x01\n" +
 	"\vlegal_as_of\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampB\xad\x01\xbaG\x96\x01\x92\x02\x92\x01The timestamp to retrieve the parcel data for. Defaults to now. If a parcel does not have data for that time, no data for that parcel is returned.\xbaH\x10\xb2\x01\r*\v\b\x80\x92\xb8Ø\xfe\xff\xff\xff\x01H\x00R\tlegalAsOf\x88\x01\x01\x12\x85\x01\n" +
-	"\fvaluation_id\x18\x03 \x01(\tB]\xbaGR:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x02%The unique identifier of a valuation.\xbaH\x05r\x03\xb0\x01\x01H\x01R\vvaluationId\x88\x01\x01\x12\xae\x01\n" +
-	"\x1aneighborhood_definition_id\x18\x04 \x01(\tBk\xbaG`:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x023The unique identifier of a neighborhood definition.\xbaH\x05r\x03\xb0\x01\x01H\x02R\x18neighborhoodDefinitionId\x88\x01\x01B\x0e\n" +
+	"\fvaluation_id\x18\x03 \x01(\tB]\xbaGR:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x02%The unique identifier of a valuation.\xbaH\x05r\x03\xb0\x01\x01H\x01R\vvaluationId\x88\x01\x01\x12\xf5\x01\n" +
+	"\x1aneighborhood_definition_id\x18\x04 \x01(\tB\xb1\x01\xbaG\xa5\x01:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x02xA neighborhood definition ID from NeighborhoodService.GetNeighborhoodDefinitions. Without one, neighborhood_id is unset.\xbaH\x05r\x03\xb0\x01\x01H\x02R\x18neighborhoodDefinitionId\x88\x01\x01B\x0e\n" +
 	"\f_legal_as_ofB\x0f\n" +
 	"\r_valuation_idB\x1d\n" +
 	"\x1b_neighborhood_definition_id\"\xe1\x02\n" +

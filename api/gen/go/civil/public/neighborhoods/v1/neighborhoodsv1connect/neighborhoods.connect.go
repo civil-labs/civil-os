@@ -44,7 +44,10 @@ const (
 // NeighborhoodServiceClient is a client for the civil.public.neighborhoods.v1.NeighborhoodService
 // service.
 type NeighborhoodServiceClient interface {
+	// Returns every neighborhood definition.
 	GetNeighborhoodDefinitions(context.Context, *connect.Request[v1.GetNeighborhoodDefinitionsRequest]) (*connect.Response[v1.GetNeighborhoodDefinitionsResponse], error)
+	// Returns the neighborhoods, each with the definitions that use it, or
+	// only those one definition uses.
 	GetNeighborhoods(context.Context, *connect.Request[v1.GetNeighborhoodsRequest]) (*connect.Response[v1.GetNeighborhoodsResponse], error)
 }
 
@@ -64,12 +67,14 @@ func NewNeighborhoodServiceClient(httpClient connect.HTTPClient, baseURL string,
 			httpClient,
 			baseURL+NeighborhoodServiceGetNeighborhoodDefinitionsProcedure,
 			connect.WithSchema(neighborhoodServiceMethods.ByName("GetNeighborhoodDefinitions")),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		getNeighborhoods: connect.NewClient[v1.GetNeighborhoodsRequest, v1.GetNeighborhoodsResponse](
 			httpClient,
 			baseURL+NeighborhoodServiceGetNeighborhoodsProcedure,
 			connect.WithSchema(neighborhoodServiceMethods.ByName("GetNeighborhoods")),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -95,7 +100,10 @@ func (c *neighborhoodServiceClient) GetNeighborhoods(ctx context.Context, req *c
 // NeighborhoodServiceHandler is an implementation of the
 // civil.public.neighborhoods.v1.NeighborhoodService service.
 type NeighborhoodServiceHandler interface {
+	// Returns every neighborhood definition.
 	GetNeighborhoodDefinitions(context.Context, *connect.Request[v1.GetNeighborhoodDefinitionsRequest]) (*connect.Response[v1.GetNeighborhoodDefinitionsResponse], error)
+	// Returns the neighborhoods, each with the definitions that use it, or
+	// only those one definition uses.
 	GetNeighborhoods(context.Context, *connect.Request[v1.GetNeighborhoodsRequest]) (*connect.Response[v1.GetNeighborhoodsResponse], error)
 }
 
@@ -110,12 +118,14 @@ func NewNeighborhoodServiceHandler(svc NeighborhoodServiceHandler, opts ...conne
 		NeighborhoodServiceGetNeighborhoodDefinitionsProcedure,
 		svc.GetNeighborhoodDefinitions,
 		connect.WithSchema(neighborhoodServiceMethods.ByName("GetNeighborhoodDefinitions")),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	neighborhoodServiceGetNeighborhoodsHandler := connect.NewUnaryHandler(
 		NeighborhoodServiceGetNeighborhoodsProcedure,
 		svc.GetNeighborhoods,
 		connect.WithSchema(neighborhoodServiceMethods.ByName("GetNeighborhoods")),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/civil.public.neighborhoods.v1.NeighborhoodService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

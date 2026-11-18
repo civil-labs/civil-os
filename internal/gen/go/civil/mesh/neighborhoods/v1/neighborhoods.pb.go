@@ -82,11 +82,14 @@ func (x *NeighborhoodDefinition) GetIsLegal() bool {
 }
 
 type Neighborhood struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name  string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// The definitions that assign at least one non-voided parcel to this
+	// neighborhood, at any time, ordered by ID.
+	NeighborhoodDefinitionIds []string `protobuf:"bytes,3,rep,name=neighborhood_definition_ids,json=neighborhoodDefinitionIds,proto3" json:"neighborhood_definition_ids,omitempty"`
+	unknownFields             protoimpl.UnknownFields
+	sizeCache                 protoimpl.SizeCache
 }
 
 func (x *Neighborhood) Reset() {
@@ -133,6 +136,13 @@ func (x *Neighborhood) GetName() string {
 	return ""
 }
 
+func (x *Neighborhood) GetNeighborhoodDefinitionIds() []string {
+	if x != nil {
+		return x.NeighborhoodDefinitionIds
+	}
+	return nil
+}
+
 type GetNeighborhoodDefinitionsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -170,8 +180,9 @@ func (*GetNeighborhoodDefinitionsRequest) Descriptor() ([]byte, []int) {
 }
 
 type GetNeighborhoodDefinitionsResponse struct {
-	state         protoimpl.MessageState   `protogen:"open.v1"`
-	Neighborhoods map[string]*Neighborhood `protobuf:"bytes,1,rep,name=neighborhoods,proto3" json:"neighborhoods,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Keyed by definition ID.
+	Neighborhoods map[string]*NeighborhoodDefinition `protobuf:"bytes,1,rep,name=neighborhoods,proto3" json:"neighborhoods,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -206,7 +217,7 @@ func (*GetNeighborhoodDefinitionsResponse) Descriptor() ([]byte, []int) {
 	return file_civil_mesh_neighborhoods_v1_neighborhoods_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *GetNeighborhoodDefinitionsResponse) GetNeighborhoods() map[string]*Neighborhood {
+func (x *GetNeighborhoodDefinitionsResponse) GetNeighborhoods() map[string]*NeighborhoodDefinition {
 	if x != nil {
 		return x.Neighborhoods
 	}
@@ -214,9 +225,11 @@ func (x *GetNeighborhoodDefinitionsResponse) GetNeighborhoods() map[string]*Neig
 }
 
 type GetNeighborhoodsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Only the neighborhoods this definition uses. Every neighborhood when unset.
+	NeighborhoodDefinitionId *string `protobuf:"bytes,1,opt,name=neighborhood_definition_id,json=neighborhoodDefinitionId,proto3,oneof" json:"neighborhood_definition_id,omitempty"`
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
 }
 
 func (x *GetNeighborhoodsRequest) Reset() {
@@ -249,8 +262,16 @@ func (*GetNeighborhoodsRequest) Descriptor() ([]byte, []int) {
 	return file_civil_mesh_neighborhoods_v1_neighborhoods_proto_rawDescGZIP(), []int{4}
 }
 
+func (x *GetNeighborhoodsRequest) GetNeighborhoodDefinitionId() string {
+	if x != nil && x.NeighborhoodDefinitionId != nil {
+		return *x.NeighborhoodDefinitionId
+	}
+	return ""
+}
+
 type GetNeighborhoodsResponse struct {
-	state         protoimpl.MessageState   `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Keyed by neighborhood ID.
 	Neighborhoods map[string]*Neighborhood `protobuf:"bytes,1,rep,name=neighborhoods,proto3" json:"neighborhoods,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -301,17 +322,20 @@ const file_civil_mesh_neighborhoods_v1_neighborhoods_proto_rawDesc = "" +
 	"\x16NeighborhoodDefinition\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x19\n" +
-	"\bis_legal\x18\x03 \x01(\bR\aisLegal\"2\n" +
+	"\bis_legal\x18\x03 \x01(\bR\aisLegal\"r\n" +
 	"\fNeighborhood\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\"#\n" +
-	"!GetNeighborhoodDefinitionsRequest\"\x8b\x02\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12>\n" +
+	"\x1bneighborhood_definition_ids\x18\x03 \x03(\tR\x19neighborhoodDefinitionIds\"#\n" +
+	"!GetNeighborhoodDefinitionsRequest\"\x95\x02\n" +
 	"\"GetNeighborhoodDefinitionsResponse\x12x\n" +
-	"\rneighborhoods\x18\x01 \x03(\v2R.civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsEntryR\rneighborhoods\x1ak\n" +
+	"\rneighborhoods\x18\x01 \x03(\v2R.civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsEntryR\rneighborhoods\x1au\n" +
 	"\x12NeighborhoodsEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12?\n" +
-	"\x05value\x18\x02 \x01(\v2).civil.mesh.neighborhoods.v1.NeighborhoodR\x05value:\x028\x01\"\x19\n" +
-	"\x17GetNeighborhoodsRequest\"\xf7\x01\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12I\n" +
+	"\x05value\x18\x02 \x01(\v23.civil.mesh.neighborhoods.v1.NeighborhoodDefinitionR\x05value:\x028\x01\"{\n" +
+	"\x17GetNeighborhoodsRequest\x12A\n" +
+	"\x1aneighborhood_definition_id\x18\x01 \x01(\tH\x00R\x18neighborhoodDefinitionId\x88\x01\x01B\x1d\n" +
+	"\x1b_neighborhood_definition_id\"\xf7\x01\n" +
 	"\x18GetNeighborhoodsResponse\x12n\n" +
 	"\rneighborhoods\x18\x01 \x03(\v2H.civil.mesh.neighborhoods.v1.GetNeighborhoodsResponse.NeighborhoodsEntryR\rneighborhoods\x1ak\n" +
 	"\x12NeighborhoodsEntry\x12\x10\n" +
@@ -348,7 +372,7 @@ var file_civil_mesh_neighborhoods_v1_neighborhoods_proto_goTypes = []any{
 var file_civil_mesh_neighborhoods_v1_neighborhoods_proto_depIdxs = []int32{
 	6, // 0: civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.neighborhoods:type_name -> civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsEntry
 	7, // 1: civil.mesh.neighborhoods.v1.GetNeighborhoodsResponse.neighborhoods:type_name -> civil.mesh.neighborhoods.v1.GetNeighborhoodsResponse.NeighborhoodsEntry
-	1, // 2: civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsEntry.value:type_name -> civil.mesh.neighborhoods.v1.Neighborhood
+	0, // 2: civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsEntry.value:type_name -> civil.mesh.neighborhoods.v1.NeighborhoodDefinition
 	1, // 3: civil.mesh.neighborhoods.v1.GetNeighborhoodsResponse.NeighborhoodsEntry.value:type_name -> civil.mesh.neighborhoods.v1.Neighborhood
 	2, // 4: civil.mesh.neighborhoods.v1.NeighborhoodReadService.GetNeighborhoodDefinitions:input_type -> civil.mesh.neighborhoods.v1.GetNeighborhoodDefinitionsRequest
 	4, // 5: civil.mesh.neighborhoods.v1.NeighborhoodReadService.GetNeighborhoods:input_type -> civil.mesh.neighborhoods.v1.GetNeighborhoodsRequest
@@ -366,6 +390,7 @@ func file_civil_mesh_neighborhoods_v1_neighborhoods_proto_init() {
 	if File_civil_mesh_neighborhoods_v1_neighborhoods_proto != nil {
 		return
 	}
+	file_civil_mesh_neighborhoods_v1_neighborhoods_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

@@ -24,10 +24,12 @@ const (
 )
 
 type NeighborhoodDefinition struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	IsLegal       bool                   `protobuf:"varint,3,opt,name=is_legal,json=isLegal,proto3" json:"is_legal,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name  string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Whether the definition has legal meaning. A legal definition's
+	// assignments are dated, so a parcel's neighborhood depends on legal_as_of.
+	IsLegal       bool `protobuf:"varint,3,opt,name=is_legal,json=isLegal,proto3" json:"is_legal,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -84,11 +86,15 @@ func (x *NeighborhoodDefinition) GetIsLegal() bool {
 }
 
 type Neighborhood struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name  string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// The definitions that assign at least one (non-voided) parcel to this
+	// neighborhood, at any time, ordered by ID. Empty for a neighborhood no
+	// definition uses.
+	NeighborhoodDefinitionIds []string `protobuf:"bytes,3,rep,name=neighborhood_definition_ids,json=neighborhoodDefinitionIds,proto3" json:"neighborhood_definition_ids,omitempty"`
+	unknownFields             protoimpl.UnknownFields
+	sizeCache                 protoimpl.SizeCache
 }
 
 func (x *Neighborhood) Reset() {
@@ -135,6 +141,14 @@ func (x *Neighborhood) GetName() string {
 	return ""
 }
 
+func (x *Neighborhood) GetNeighborhoodDefinitionIds() []string {
+	if x != nil {
+		return x.NeighborhoodDefinitionIds
+	}
+	return nil
+}
+
+// No fields. Every definition is returned.
 type GetNeighborhoodDefinitionsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -172,8 +186,8 @@ func (*GetNeighborhoodDefinitionsRequest) Descriptor() ([]byte, []int) {
 }
 
 type GetNeighborhoodDefinitionsResponse struct {
-	state         protoimpl.MessageState   `protogen:"open.v1"`
-	Neighborhoods map[string]*Neighborhood `protobuf:"bytes,1,rep,name=neighborhoods,proto3" json:"neighborhoods,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	state         protoimpl.MessageState             `protogen:"open.v1"`
+	Neighborhoods map[string]*NeighborhoodDefinition `protobuf:"bytes,1,rep,name=neighborhoods,proto3" json:"neighborhoods,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -208,7 +222,7 @@ func (*GetNeighborhoodDefinitionsResponse) Descriptor() ([]byte, []int) {
 	return file_civil_public_neighborhoods_v1_neighborhoods_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *GetNeighborhoodDefinitionsResponse) GetNeighborhoods() map[string]*Neighborhood {
+func (x *GetNeighborhoodDefinitionsResponse) GetNeighborhoods() map[string]*NeighborhoodDefinition {
 	if x != nil {
 		return x.Neighborhoods
 	}
@@ -216,9 +230,12 @@ func (x *GetNeighborhoodDefinitionsResponse) GetNeighborhoods() map[string]*Neig
 }
 
 type GetNeighborhoodsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Only the neighborhoods this definition uses. Every neighborhood when
+	// unset. An unknown ID returns an empty map.
+	NeighborhoodDefinitionId *string `protobuf:"bytes,1,opt,name=neighborhood_definition_id,json=neighborhoodDefinitionId,proto3,oneof" json:"neighborhood_definition_id,omitempty"`
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
 }
 
 func (x *GetNeighborhoodsRequest) Reset() {
@@ -249,6 +266,13 @@ func (x *GetNeighborhoodsRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use GetNeighborhoodsRequest.ProtoReflect.Descriptor instead.
 func (*GetNeighborhoodsRequest) Descriptor() ([]byte, []int) {
 	return file_civil_public_neighborhoods_v1_neighborhoods_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *GetNeighborhoodsRequest) GetNeighborhoodDefinitionId() string {
+	if x != nil && x.NeighborhoodDefinitionId != nil {
+		return *x.NeighborhoodDefinitionId
+	}
+	return ""
 }
 
 type GetNeighborhoodsResponse struct {
@@ -299,29 +323,32 @@ var File_civil_public_neighborhoods_v1_neighborhoods_proto protoreflect.FileDesc
 
 const file_civil_public_neighborhoods_v1_neighborhoods_proto_rawDesc = "" +
 	"\n" +
-	"1civil/public/neighborhoods/v1/neighborhoods.proto\x12\x1dcivil.public.neighborhoods.v1\x1a\x1bbuf/validate/validate.proto\x1a$gnostic/openapi/v3/annotations.proto\"\xc7\x01\n" +
+	"1civil/public/neighborhoods/v1/neighborhoods.proto\x12\x1dcivil.public.neighborhoods.v1\x1a\x1bbuf/validate/validate.proto\x1a$gnostic/openapi/v3/annotations.proto\"\xdb\x02\n" +
 	"\x16NeighborhoodDefinition\x12~\n" +
 	"\x02id\x18\x01 \x01(\tBn\xbaGc:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x026The unique identifier for the neighborhood definition.\xbaH\x05r\x03\xb0\x01\x01R\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x19\n" +
-	"\bis_legal\x18\x03 \x01(\bR\aisLegal\"\x97\x01\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\xac\x01\n" +
+	"\bis_legal\x18\x03 \x01(\bB\x90\x01\xbaG\x8c\x01\x92\x02\x88\x01Whether the definition has legal meaning. A legal definition's assignments are dated, so a parcel's neighborhood depends on legal_as_of.R\aisLegal\"\xfe\x02\n" +
 	"\fNeighborhood\x12s\n" +
 	"\x02id\x18\x01 \x01(\tBc\xbaGX:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x02+The unique identifier for the neighborhood.\xbaH\x05r\x03\xb0\x01\x01R\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\"#\n" +
-	"!GetNeighborhoodDefinitionsRequest\"\xce\x02\n" +
-	"\"GetNeighborhoodDefinitionsResponse\x12\xb8\x01\n" +
-	"\rneighborhoods\x18\x01 \x03(\v2T.civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsEntryB<\xbaG9\x92\x026Map of neighborhoods keyed by the UUID neighborhood IDR\rneighborhoods\x1am\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\xe4\x01\n" +
+	"\x1bneighborhood_definition_ids\x18\x03 \x03(\tB\xa3\x01\xbaG\x9f\x01\x92\x02\x9b\x01The definitions that assign at least one (non-voided) parcel to this neighborhood, at any time, ordered by ID. Empty for a neighborhood no definition uses.R\x19neighborhoodDefinitionIds\"#\n" +
+	"!GetNeighborhoodDefinitionsRequest\"\xee\x02\n" +
+	"\"GetNeighborhoodDefinitionsResponse\x12\xce\x01\n" +
+	"\rneighborhoods\x18\x01 \x03(\v2T.civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsEntryBR\xbaGO\x92\x02LMap of neighborhood definitions keyed by the UUID neighborhood definition IDR\rneighborhoods\x1aw\n" +
+	"\x12NeighborhoodsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12K\n" +
+	"\x05value\x18\x02 \x01(\v25.civil.public.neighborhoods.v1.NeighborhoodDefinitionR\x05value:\x028\x01\"\xa7\x02\n" +
+	"\x17GetNeighborhoodsRequest\x12\xec\x01\n" +
+	"\x1aneighborhood_definition_id\x18\x01 \x01(\tB\xa8\x01\xbaG\x9c\x01:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x02oOnly the neighborhoods this definition uses. Every neighborhood when unset. An unknown ID returns an empty map.\xbaH\x05r\x03\xb0\x01\x01H\x00R\x18neighborhoodDefinitionId\x88\x01\x01B\x1d\n" +
+	"\x1b_neighborhood_definition_id\"\xba\x02\n" +
+	"\x18GetNeighborhoodsResponse\x12\xae\x01\n" +
+	"\rneighborhoods\x18\x01 \x03(\v2J.civil.public.neighborhoods.v1.GetNeighborhoodsResponse.NeighborhoodsEntryB<\xbaG9\x92\x026Map of neighborhoods keyed by the UUID neighborhood IDR\rneighborhoods\x1am\n" +
 	"\x12NeighborhoodsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12A\n" +
-	"\x05value\x18\x02 \x01(\v2+.civil.public.neighborhoods.v1.NeighborhoodR\x05value:\x028\x01\"\x19\n" +
-	"\x17GetNeighborhoodsRequest\"\xc5\x02\n" +
-	"\x18GetNeighborhoodsResponse\x12\xb9\x01\n" +
-	"\rneighborhoods\x18\x01 \x03(\v2J.civil.public.neighborhoods.v1.GetNeighborhoodsResponse.NeighborhoodsEntryBG\xbaGD\x92\x02AMap of neighborhoods keyed by the UUID neighborhood definition IDR\rneighborhoods\x1am\n" +
-	"\x12NeighborhoodsEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12A\n" +
-	"\x05value\x18\x02 \x01(\v2+.civil.public.neighborhoods.v1.NeighborhoodR\x05value:\x028\x012\xc3\x02\n" +
-	"\x13NeighborhoodService\x12\xa3\x01\n" +
-	"\x1aGetNeighborhoodDefinitions\x12@.civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsRequest\x1aA.civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse\"\x00\x12\x85\x01\n" +
-	"\x10GetNeighborhoods\x126.civil.public.neighborhoods.v1.GetNeighborhoodsRequest\x1a7.civil.public.neighborhoods.v1.GetNeighborhoodsResponse\"\x00B\xa9\x02\n" +
+	"\x05value\x18\x02 \x01(\v2+.civil.public.neighborhoods.v1.NeighborhoodR\x05value:\x028\x012\xc9\x02\n" +
+	"\x13NeighborhoodService\x12\xa6\x01\n" +
+	"\x1aGetNeighborhoodDefinitions\x12@.civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsRequest\x1aA.civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse\"\x03\x90\x02\x01\x12\x88\x01\n" +
+	"\x10GetNeighborhoods\x126.civil.public.neighborhoods.v1.GetNeighborhoodsRequest\x1a7.civil.public.neighborhoods.v1.GetNeighborhoodsResponse\"\x03\x90\x02\x01B\xa9\x02\n" +
 	"!com.civil.public.neighborhoods.v1B\x12NeighborhoodsProtoP\x01ZWgithub.com/civil-labs/civil-os/api/gen/go/civil/public/neighborhoods/v1;neighborhoodsv1\xa2\x02\x03CPN\xaa\x02\x1dCivil.Public.Neighborhoods.V1\xca\x02\x1eCivil\\Public_\\Neighborhoods\\V1\xe2\x02*Civil\\Public_\\Neighborhoods\\V1\\GPBMetadata\xea\x02 Civil::Public::Neighborhoods::V1b\x06proto3"
 
 var (
@@ -350,7 +377,7 @@ var file_civil_public_neighborhoods_v1_neighborhoods_proto_goTypes = []any{
 var file_civil_public_neighborhoods_v1_neighborhoods_proto_depIdxs = []int32{
 	6, // 0: civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.neighborhoods:type_name -> civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsEntry
 	7, // 1: civil.public.neighborhoods.v1.GetNeighborhoodsResponse.neighborhoods:type_name -> civil.public.neighborhoods.v1.GetNeighborhoodsResponse.NeighborhoodsEntry
-	1, // 2: civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsEntry.value:type_name -> civil.public.neighborhoods.v1.Neighborhood
+	0, // 2: civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodsEntry.value:type_name -> civil.public.neighborhoods.v1.NeighborhoodDefinition
 	1, // 3: civil.public.neighborhoods.v1.GetNeighborhoodsResponse.NeighborhoodsEntry.value:type_name -> civil.public.neighborhoods.v1.Neighborhood
 	2, // 4: civil.public.neighborhoods.v1.NeighborhoodService.GetNeighborhoodDefinitions:input_type -> civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsRequest
 	4, // 5: civil.public.neighborhoods.v1.NeighborhoodService.GetNeighborhoods:input_type -> civil.public.neighborhoods.v1.GetNeighborhoodsRequest
@@ -368,6 +395,7 @@ func file_civil_public_neighborhoods_v1_neighborhoods_proto_init() {
 	if File_civil_public_neighborhoods_v1_neighborhoods_proto != nil {
 		return
 	}
+	file_civil_public_neighborhoods_v1_neighborhoods_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

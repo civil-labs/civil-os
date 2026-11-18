@@ -6,9 +6,16 @@ import "buf/validate/validate.proto";
 import "gnostic/openapi/v3/annotations.proto";
 
 service NeighborhoodService {
-  rpc GetNeighborhoodDefinitions(GetNeighborhoodDefinitionsRequest) returns (GetNeighborhoodDefinitionsResponse) {}
+  // Returns every neighborhood definition.
+  rpc GetNeighborhoodDefinitions(GetNeighborhoodDefinitionsRequest) returns (GetNeighborhoodDefinitionsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
-  rpc GetNeighborhoods(GetNeighborhoodsRequest) returns (GetNeighborhoodsResponse) {}
+  // Returns the neighborhoods, each with the definitions that use it, or
+  // only those one definition uses.
+  rpc GetNeighborhoods(GetNeighborhoodsRequest) returns (GetNeighborhoodsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 message NeighborhoodDefinition {
@@ -23,7 +30,9 @@ message NeighborhoodDefinition {
 
   string name = 2;
 
-  bool is_legal = 3;
+  // Whether the definition has legal meaning. A legal definition's
+  // assignments are dated, so a parcel's neighborhood depends on legal_as_of.
+  bool is_legal = 3 [(gnostic.openapi.v3.property) = {description: "Whether the definition has legal meaning. A legal definition's assignments are dated, so a parcel's neighborhood depends on legal_as_of."}];
 }
 
 message Neighborhood {
@@ -37,16 +46,33 @@ message Neighborhood {
   ];
 
   string name = 2;
+
+  // The definitions that assign at least one (non-voided) parcel to this
+  // neighborhood, at any time, ordered by ID. Empty for a neighborhood no
+  // definition uses.
+  repeated string neighborhood_definition_ids = 3 [(gnostic.openapi.v3.property) = {description: "The definitions that assign at least one (non-voided) parcel to this neighborhood, at any time, ordered by ID. Empty for a neighborhood no definition uses."}];
 }
 
+// No fields. Every definition is returned.
 message GetNeighborhoodDefinitionsRequest {}
 
 message GetNeighborhoodDefinitionsResponse {
-  map<string, Neighborhood> neighborhoods = 1 [(gnostic.openapi.v3.property) = {description: "Map of neighborhoods keyed by the UUID neighborhood ID"}];
+  map<string, NeighborhoodDefinition> neighborhoods = 1 [(gnostic.openapi.v3.property) = {description: "Map of neighborhood definitions keyed by the UUID neighborhood definition ID"}];
 }
 
-message GetNeighborhoodsRequest {}
+message GetNeighborhoodsRequest {
+  // Only the neighborhoods this definition uses. Every neighborhood when
+  // unset. An unknown ID returns an empty map.
+  optional string neighborhood_definition_id = 1 [
+    (buf.validate.field).string.uuid = true,
+
+    (gnostic.openapi.v3.property) = {
+      description: "Only the neighborhoods this definition uses. Every neighborhood when unset. An unknown ID returns an empty map."
+      example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+    }
+  ];
+}
 
 message GetNeighborhoodsResponse {
-  map<string, Neighborhood> neighborhoods = 1 [(gnostic.openapi.v3.property) = {description: "Map of neighborhoods keyed by the UUID neighborhood definition ID"}];
+  map<string, Neighborhood> neighborhoods = 1 [(gnostic.openapi.v3.property) = {description: "Map of neighborhoods keyed by the UUID neighborhood ID"}];
 }

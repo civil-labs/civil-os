@@ -34,6 +34,8 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Test the classification scripts
         run: sh scripts/changed-code_test.sh
+      - name: Test the image promotion script
+        run: sh scripts/promote-image_test.sh
       - name: Classify the changed files
         id: classify
         env:

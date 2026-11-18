@@ -174,7 +174,7 @@ conventional commits on `main`:
 
 | Stream | Path | Tag | Publishes |
 |---|---|---|---|
-| App | everything | `vX.Y.Z` | the four images at `ghcr.io/civil-labs/civil-os/<service>:vX.Y.Z`, and the ConfigMap `civil-os-db-migrations-vX-Y-Z`, both as `migrations-configmap.yaml` on the GitHub Release and as the OCI artifact `ghcr.io/civil-labs/civil-os/db-migrations:vX.Y.Z` (a `manifests/` directory, for Argo CD's OCI sources) |
+| App | everything | `vX.Y.Z` | the four images at `ghcr.io/civil-labs/civil-os/<service>:vX.Y.Z`, promoted from the `main` build of the tagged commit (same digest as its `:sha-<short>`, nothing rebuilt), and the ConfigMap `civil-os-db-migrations-vX-Y-Z`, both as `migrations-configmap.yaml` on the GitHub Release and as the OCI artifact `ghcr.io/civil-labs/civil-os/db-migrations:vX.Y.Z` (a `manifests/` directory, for Argo CD's OCI sources) |
 | Public API | `api/proto/public` | `public-api-vX.Y.Z` | `@civil-labs/civil-os-api` on npm with provenance, and `openapi.yaml` on the GitHub Release |
 
 How versions move:
@@ -183,8 +183,15 @@ How versions move:
   it releases both streams.
 - **Before 1.0,** a breaking change bumps the minor version and a `feat` bumps
   the patch.
-- **Every merge to `main`** also pushes `:sha-<short>` images. No `latest` tag
-  is published.
+- **Every merge to `main`** builds and pushes `:sha-<short>` images, the only
+  image builds. No `latest` tag is published.
+- **A release promotes, not rebuilds.** The `vX.Y.Z` tag is added to the
+  `main` image of the tagged commit, so the release is the tested image and
+  its build provenance applies (`gh attestation verify
+  oci://ghcr.io/civil-labs/civil-os/<service>:vX.Y.Z --repo civil-labs/civil-os`).
+  Its `org.opencontainers.image.version` label reads `sha-<short>`; the
+  release version is the tag, and `org.opencontainers.image.revision` has the
+  full commit ([`image-promotion/spec.md`](image-promotion/spec.md)).
 
 Cluster rollout (Helm values, applying migrations) happens outside this
 repository.

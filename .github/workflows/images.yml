@@ -1,6 +1,8 @@
 name: Images
 
-# main pushes :sha-<short>; an app release tag vX.Y.Z pushes :vX.Y.Z.
+# main builds and pushes :sha-<short>. An app release tag vX.Y.Z adds that tag
+# to the main image for the same commit, without rebuilding
+# (docs/image-promotion/spec.md).
 on:
   push:
     branches: [main]
@@ -14,8 +16,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  image:
-    name: ${{ matrix.service }}
+  build:
+    name: build ${{ matrix.service }}
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -28,6 +31,8 @@ jobs:
         service: [gateway, database-reader, database-writer, tile-server]
     env:
       IMAGE: ghcr.io/civil-labs/civil-os/${{ matrix.service }}
+      # promote computes the same sha-<7> tag; pinned so they can't drift.
+      DOCKER_METADATA_SHORT_SHA_LENGTH: "7"
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
@@ -40,12 +45,10 @@ jobs:
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: ${{ env.IMAGE }}
-          # Never publish :latest (spec F9). metadata-action adds it to semver
-          # tags by default (latest=auto).
+          # Never publish :latest (spec F9).
           flavor: latest=false
           tags: |
-            type=sha,prefix=sha-,enable=${{ github.ref == 'refs/heads/main' }}
-            type=semver,pattern=v{{version}}
+            type=sha,prefix=sha-
       - id: push
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
@@ -62,3 +65,39 @@ jobs:
           subject-name: ${{ env.IMAGE }}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
+
+  promote:
+    name: promote ${{ matrix.service }}
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    # The script waits up to 20 min for the main build of the tagged commit.
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [gateway, database-reader, database-writer, tile-server]
+    env:
+      IMAGE: ghcr.io/civil-labs/civil-os/${{ matrix.service }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Test the promotion script
+        run: sh scripts/promote-image_test.sh
+      - name: Promote sha-<short> to the release tag
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          {
+            echo "| Image | Tag | Digest |"
+            echo "|---|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+          sh scripts/promote-image.sh "$IMAGE" "$COMMIT_SHA" "$RELEASE_TAG" >> "$GITHUB_STEP_SUMMARY"

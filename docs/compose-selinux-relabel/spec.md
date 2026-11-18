@@ -73,8 +73,10 @@ No other file under `services/`, `dev/` or `database/` changes.
   `dev/migrate.sh` after a pull, can take its directory's label again. The
   next `up` relabels it, because `z` applies on every container start.
 - **On hosts without SELinux** (Ubuntu CI, Docker Engine with SELinux off, and
-  Docker Desktop on macOS and Windows), `z` is ignored. Docker Desktop is the
-  one case not checked by CI. See the plan's risks.
+  Docker Desktop on macOS and Windows), `z` is ignored. Docker Desktop is
+  expected to ignore it too, but that's unverified: CI doesn't cover it, and
+  no Mac is available to test on. It's accepted as a known risk. See the
+  plan's risks.
 - **Filesystems without SELinux labels** (NFS, some FUSE mounts): the relabel
   can fail and stop the container. This affects only a checkout on such a
   filesystem under an SELinux runtime, which already fails today.

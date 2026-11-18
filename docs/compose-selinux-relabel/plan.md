@@ -70,7 +70,7 @@ config may change: compare it with `main`'s output.
 
 | Risk | Mitigation |
 |---|---|
-| Docker Desktop on macOS or Windows rejects `z`, instead of ignoring it. | Not covered by CI. Ask the owner, or another developer on a Mac, to run `docker compose up --wait` on the branch before merging. If it's rejected, stop and go back to the spec. A per-platform override file is the fallback. |
+| Docker Desktop on macOS or Windows rejects `z`, instead of ignoring it. | Accepted for now, unverified: no Mac is available to test on, and CI doesn't cover Docker Desktop. The PR description says so. If a Docker Desktop user later reports that `up` fails, revisit the spec. A per-platform override file is the fallback. |
 | Someone adds `z` to a broad path later and relabels a home directory. | The `compose.yaml` comment and the `CLAUDE.md` entry both restrict it to paths inside the repo. Review catches the rest. |
 | A checkout on NFS or FUSE fails to relabel and stops the stack under podman. | It already fails there today. The README sentence names the requirement. |
 | Relabeling leaves the checkout's files as `container_file_t`, and that surprises someone. | It's documented in the spec. `restorecon -R <path>` restores the default label. |

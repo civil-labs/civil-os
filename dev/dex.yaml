@@ -3,6 +3,7 @@
 #
 #   user:          dev@example.com / civil-os-dev-password
 #   client:        civil-os-dev / civil-os-dev-secret
+#   browser app:   record-keeper-dev (public, PKCE, no secret)
 #   password grant: see README.md ("Quickstart")
 #
 # The issuer is the host-facing URL so tokens work from the host and a
@@ -15,6 +16,10 @@ storage:
 
 web:
   http: 0.0.0.0:5556
+  # Browser apps on the Vite dev server call the token endpoint with fetch,
+  # so Dex must answer their CORS requests.
+  allowedOrigins:
+    - http://localhost:3000
 
 # Dex admin API, used by the gateway's DexService (CIVIL_OS_GATEWAY_DEX_GRPC_ADDRESS).
 grpc:
@@ -32,6 +37,13 @@ staticClients:
   - id: civil-os-dev
     name: civil-os local development
     secret: civil-os-dev-secret
+    redirectURIs:
+      - http://localhost:3000/callback
+  # OpenCAMA Record Keeper's dev server. A browser can't keep a secret, so it's
+  # a public client that exchanges its code with PKCE alone.
+  - id: record-keeper-dev
+    name: OpenCAMA Record Keeper (local development)
+    public: true
     redirectURIs:
       - http://localhost:3000/callback
 

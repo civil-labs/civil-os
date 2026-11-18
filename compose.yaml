@@ -128,7 +128,7 @@ services:
       # Tokens carry the host-facing issuer; keys are fetched over the compose network.
       CIVIL_OS_GATEWAY_AUTH_SERVER: http://localhost:5556/dex
       CIVIL_OS_GATEWAY_IDP_HOST: dex:5556/dex
-      CIVIL_OS_GATEWAY_ALLOWED_CLIENT_IDS: '["civil-os-dev"]'
+      CIVIL_OS_GATEWAY_ALLOWED_CLIENT_IDS: '["civil-os-dev", "record-keeper-dev"]'
       CIVIL_OS_GATEWAY_READER_HOST: database-reader:50051
       CIVIL_OS_GATEWAY_WRITER_HOST: database-writer:50052
       CIVIL_OS_GATEWAY_TILE_SERVER_HOST: tile-server:3000

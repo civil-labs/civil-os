@@ -18,6 +18,9 @@ whole stack runs locally with Docker Compose on synthetic data.
 ## Quickstart
 
 You need [Docker](https://docs.docker.com/get-docker/) with Compose v2.
+The stack also runs under podman on SELinux hosts such as Fedora: the bind
+mounts carry `z` for that, so the checkout must be on a filesystem with
+SELinux labels (not NFS).
 
 ```sh
 git clone https://github.com/civil-labs/civil-os.git

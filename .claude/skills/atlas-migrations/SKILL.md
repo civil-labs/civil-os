@@ -54,8 +54,8 @@ Include:
   no other block in the file uses yet, and the fallback if Atlas rejects it.
 - **The operational effects**, such as table locks, long index builds,
   rewrites or data backfills.
-- **Whether it needs two passes** (see "Objects that depend on a new
-  function" below), and if so, which half goes first.
+- **Whether something depends on a new function** (see "Objects that depend
+  on a new function" below), and the `depends_on` you added for it.
 
 Ask them to review it and say whether to go ahead. If they ask for changes,
 make them in the HCL and present it again. Don't move to step 3 until they
@@ -112,17 +112,33 @@ generated the migration and ran `db:validate`, with its output.
 
 ## Objects that depend on a new function
 
-Atlas doesn't parse SQL strings in the HCL. It can't see that an index `expr`
-calls a function, and in a single diff it creates table changes **before** new
-functions. So a new function and an index that calls it, generated together,
-come out in the wrong order. `db:diff` succeeds, then `db:validate` fails on
-replay with `function core.<name>(...) does not exist`. Atlas documents
-`depends_on` only for `view` and `materialized` blocks, so the HCL can't fix
-the order. A column `default` (`sql("...")`) or a `check` that calls a new
-function is probably affected the same way. That hasn't been seen here yet,
-so check the order when one comes up.
+Atlas doesn't parse SQL strings in the HCL. It can't see that an index `expr`,
+a column `default` (`sql("...")`) or a `check` calls a function, and in a
+single diff it creates table changes **before** new functions. Generated
+together, a new function and an index that calls it come out in the wrong
+order. `db:diff` succeeds, then `db:validate` fails on replay with
+`function core.<name>(...) does not exist`. That happened in #64.
 
-Use two passes, each one a separate migration:
+**First, declare the dependency on the table.** Atlas supports a table-level
+`depends_on` for this, though the HCL reference doesn't show it on tables.
+The maintainer describes it in
+[ariga/atlas#2572](https://github.com/ariga/atlas/issues/2572), and
+`atlas schema inspect` writes it itself:
+
+```hcl
+table "address_attributes" {
+  ...
+  depends_on = [function.search_normalize]
+}
+```
+
+Put a short comment on it saying which index, default or check needs the
+function. Don't add it when the function reads the same table, because that's
+a cycle. In step 2, tell the developer that `depends_on` hasn't been tried in
+this repo yet. Then compare the order in the generated SQL in step 4.
+
+**If the order is still wrong, use two passes**, each one a separate
+migration:
 
 1. Add the function, plus anything else that doesn't call it, and leave the
    dependent index, default or check out of the HCL. The developer runs
@@ -130,9 +146,10 @@ Use two passes, each one a separate migration:
 2. Add the dependent object to the HCL. The developer runs `db:diff` again,
    then `db:validate` once over both migrations.
 
-Both migrations go in the same PR. Say in step 2 that the change needs two
-passes, so the developer isn't surprised by it. This doesn't apply when the
-function already exists in an earlier migration.
-`docs/parcel-search/plan.md` (step 1.2) has a worked example: `pg_trgm`,
-`core.search_normalize` and the trigram index on `address_attributes`.
+Both migrations go in the same PR.
 
+None of this applies when the function already exists in an earlier
+migration. `docs/parcel-search/plan.md` (step 1.2) has the two-pass example
+from #64: `pg_trgm`, `core.search_normalize` and the trigram index on
+`address_attributes`. Once `depends_on` has worked here, replace "hasn't been
+tried in this repo yet" with the PR that showed it.

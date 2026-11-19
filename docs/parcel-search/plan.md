@@ -114,7 +114,9 @@ can't see the function call inside the index's `expr` string, and it plans
 table changes before new functions. In one pass, it put `CREATE INDEX` before
 `CREATE FUNCTION`, and `db:validate` failed with
 `function core.search_normalize(text) does not exist`. Atlas documents
-`depends_on` only for views and materialized views. So:
+`depends_on` only for views and materialized views. After PR 1 merged, we
+found that a table-level `depends_on = [function.search_normalize]` would
+probably have fixed the order too (ariga/atlas#2572). So:
 1. The HCL without the index gives `CREATE EXTENSION`, then `CREATE FUNCTION`.
 2. The index added back gives `CREATE INDEX` alone, in a later migration.
 
@@ -123,8 +125,8 @@ table changes before new functions. In one pass, it put `CREATE INDEX` before
 - There's no `CONCURRENTLY` (see the decisions table).
 - There's nothing unrelated: Atlas can pick up drift.
 
-Any later schema change that makes an index or a table depend on a new
-function needs the same two passes.
+For later changes like this, the `atlas-migrations` skill says to try
+`depends_on` first.
 
 `scripts/check-migrations-size.sh database/migrations` stays well under its
 768 KiB warning.

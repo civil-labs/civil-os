@@ -135,8 +135,12 @@ Order: `tier ASC, word_similarity(q, t) DESC, parcel public_id ASC`.
 so the order is total and stable.
 
 **The threshold** is pg_trgm's `word_similarity_threshold`, set with
-`SET LOCAL` in the reader's transaction. It starts at the default, 0.6, and the
-plan tunes it against the fixtures. It's a reader constant, not an env var:
+`SET LOCAL` in the reader's transaction. It's the default, 0.6, which the plan
+checked against the fixtures (owner, 2026-11-19). A two-letter swap such as
+`fixtrue way` scores 0.5 and isn't found. Lowering the threshold to 0.5 would
+find it, but then `old way` matches every fixture address. Dropped, doubled or
+swapped-neighbour typos such as `fxture way` (0.73) and `fixture wya` (0.75)
+are found. It's a reader constant, not an env var:
 changing it changes results, and that should be a reviewed code change.
 
 ## Visibility rules
@@ -259,9 +263,9 @@ parcel `n`, cover what the intent asks for once owner names are dropped:
 |---|---|
 | Partial match and ranking across tiers | `2 fixture`: parcel 2 at tier 0, then parcel 12 at tier 2 (`12 fixture way` contains it). Voided parcel 20 never appears. |
 | Case and punctuation | `2, FIXTURE-way` returns the same order |
-| Typo tolerance | `fixtrue way` returns parcels at tier 3 only |
+| Typo tolerance | `fxture way` returns parcels at tier 3 only |
 | Every parcel at one tier | `fixture way`: every visible parcel at tier 1 |
-| History | address 5's old line, `5 Old Fixture Way`, until 2023-01-01 |
+| History | address 5's old line, `5 Old Fixture Way`, until 2023-01-01. Now, `5 Old Fixture` matches address 5's current line only as a tier 3 hit (0.71). |
 | Address shared with an invisible parcel | address 2 is also on parcel 21, which has no geometry |
 | Voided parcel | parcel 20 and its address 20 |
 
@@ -275,8 +279,8 @@ change.
 |---|---|
 | Gateway handler tests | An empty query and a 201-character query are rejected without calling the mesh. So are `first` of 0 and 101, and a `legal_as_of` before year 0. An unset `first` reaches the mesh as 25, and cursors pass through unchanged. A fully populated `ParcelSearchHit` round-trips through the mapping. |
 | Normalisation | An integration test calls `core.search_normalize` on case, punctuation, runs of spaces, leading and trailing junk, and digits. A query of `--` or `a.b` fails with `InvalidArgument`. |
-| Reader integration: matching | `2 fixture` returns parcel 2 then parcel 12 as its first two hits. Parcel 2's hit carries address 2 and `2 Fixture Way, Testville ZZ000`. `2, FIXTURE-way` returns the same hits in the same order. `fixtrue way` returns hits. `fixture way` returns all 19 visible parcels with a geometry, in `parcel_id` order within the tier, unless similarity separates them. |
-| Reader integration: visibility | No hit is ever parcel 20 or 21. `5 Old Fixture` returns nothing now, and parcel 5 at 2022. An address voided in the test no longer matches, and its parcel disappears from results. |
+| Reader integration: matching | `2 fixture` returns parcel 2 then parcel 12 as its first two hits. Parcel 2's hit carries address 2 and `2 Fixture Way, Testville ZZ000`. `2, FIXTURE-way` returns the same hits in the same order. `fxture way` returns hits, all at tier 3. `fixture way` returns all 19 visible parcels with a geometry, in `parcel_id` order within the tier, unless similarity separates them. |
+| Reader integration: visibility | No hit is ever parcel 20 or 21. `5 Old Fixture` never returns the old line now: no hit carries `5 Old Fixture Way`, and parcel 5 can appear only at tier 3 with its current address. At 2022, parcel 5 is the first hit and carries the old line. An address voided in the test no longer matches, and its parcel disappears from results. |
 | Reader integration: pagination | `fixture way` with `first = 5` walks every visible parcel exactly once through `end_cursor`, in the same order as a single `first = 100` page. A page's `start_cursor` passed as `after` returns that page minus its first hit. An empty page has neither cursor. A cursor reused with another query, or with a query that normalises differently, fails with `InvalidArgument`, but one reused with `12, FIXTURE-way` after `12 fixture way` works. When `legal_as_of` is unset, an address reworded between pages (in the test) doesn't change page 2, because of the snapshot. A malformed or unknown-version cursor fails, and `first = 500` sent directly to the reader is clamped to 100. |
 | Reader unit tests: forged cursors | Cursors built in the test with a correctly recomputed filter hash fail with `InvalidArgument` when:<ul><li>`tier` is 4;</li><li>`similarity` is NaN, +Inf, −0.1 or 1.1;</li><li>`last_parcel_id` isn't a UUID;</li><li>`as_of` is unset, or before year 0;</li><li>`as_of` differs from a `legal_as_of` set on the request.</li></ul>A forged cursor with valid values is accepted, and it returns the hits after that position. |
 | Reader integration: cap | With the cap lowered through a test-only reader option to 10, `fixture way` returns exactly 10 hits across pages, and the last page has `has_next_page = false`. |

@@ -216,7 +216,7 @@ unit tests in `search_cursor_test.go`:
      removing spaces), return
      `InvalidArgument("query must contain at least 3 letters or digits")`;
    - `set_config` the threshold (`searchSimilarityThreshold`, a constant,
-     `"0.6"` until step 2.5 says otherwise).
+     `"0.6"`, confirmed in step 2.5).
 2. **Resolve `t`:** `legal_as_of` if set, otherwise the truncated now (see the
    decisions table). Decode `after` if present.
 3. **Query** (sketch; `$q` is the normalised query, already free of `%`, `_`
@@ -274,12 +274,13 @@ assertion helper isn't needed. Compare parcel IDs in order.
   - `2 fixture` begins with parcels 2 and 12, and parcel 2's hit carries
     `AddressID(2)` and `2 Fixture Way, Testville ZZ000`;
   - `2, FIXTURE-way` returns the same IDs in the same order;
-  - `fixtrue way` returns at least one hit;
+  - `fxture way` returns hits, all at tier 3 (step 2.5);
   - `fixture way` returns parcels 1–19 in ID order.
 - **Visibility:**
   - parcels 20 and 21 never appear, whatever the query;
-  - `5 Old Fixture` is empty now and returns parcel 5 at
-    `testutil.HistoryChange - 1 day`;
+  - `5 Old Fixture` now returns no hit carrying `5 Old Fixture Way`, and
+    parcel 5 at most at tier 3 with its current line (step 2.5). At
+    `testutil.HistoryChange - 1 day`, parcel 5 is first with the old line;
   - an address voided in the test (`startReaderOn` with a committed update)
     drops its parcel.
 - **Pagination:**
@@ -309,6 +310,27 @@ Before the public proto, a throwaway query over the fixtures lists
 If 0.6 doesn't give the spec's results, the constant changes, and this plan
 and the spec's "Matching and ranking" are updated in this commit. The owner
 is told, because the spec names 0.6.
+
+**Done on 2026-11-19, on the compose fixtures.** Best `word_similarity`
+against any current address, and the number of addresses (of 21) at or
+above each threshold:
+
+| Query | Best | ≥ 0.6 | ≥ 0.5 |
+|---|---|---|---|
+| `fixtrue way` | 0.500 | 0 | 21 |
+| `fxture way` | 0.727 | 21 | 21 |
+| `fixture wya` | 0.750 | 21 | 21 |
+| `old way` | 0.500 | 0 | 21 |
+| `maple way` | 0.400 | 0 | 0 |
+| `5 Old Fixture` | 0.714 | 1 | 21 |
+| `2 fixture` | 1.000 | 21 | 21 |
+
+The owner kept 0.6 (2026-11-19). The spec's typo example became
+`fxture way`, because the `fixtrue` swap breaks four of the word's eight
+trigrams. Its history example was reworded: `5 Old Fixture` matches address
+5's current line at tier 3, so it can't return nothing now, but it never
+returns the old line. Both changes are in the spec's "Matching and ranking",
+"Fixtures" and "Tests". `maple way` is the empty-page query in the tests.
 
 **2.6 Public protos** (`feat: SearchParcelsAddresses in the public API`):
 - In `api/proto/public/civil/public/parcels/v1/parcels.proto`, the RPC with the

@@ -75,7 +75,7 @@ In `database/schema/schema.pg.hcl`:
   ```hcl
   function "search_normalize" {
     schema     = schema.core
-    lang       = SQL
+    lang       = "sql"
     arg "input" { type = text }
     return     = text
     volatility = IMMUTABLE
@@ -85,7 +85,7 @@ In `database/schema/schema.pg.hcl`:
   }
   ```
 
-  The exact attribute spelling (`lang = SQL` and the `as` form) follows what
+  The exact attribute spelling (`lang = "sql"` and the `as` form) follows what
   `get_parcel_tiles` uses and what `atlas schema inspect` emits. If Atlas
   can't express a function-level `SET search_path`, use the qualified names
   above (see the decisions table).
@@ -108,11 +108,23 @@ In `database/schema/schema.pg.hcl`:
 
 **1.2 Migration** (owner: `mise run db:diff`, then `mise run db:validate`)
 
-The owner generates the migration on the branch and commits it with
-`atlas.sum`. The agent then reviews the SQL:
-- It's `CREATE EXTENSION`, then the function, then the index, in that order.
-- It has no `CONCURRENTLY` (see the decisions table).
-- It contains nothing unrelated: Atlas can pick up drift.
+The owner generates the migrations on the branch, and they are committed with
+`atlas.sum`. There are **two migrations, generated in two passes**. Atlas
+can't see the function call inside the index's `expr` string, and it plans
+table changes before new functions. In one pass, it put `CREATE INDEX` before
+`CREATE FUNCTION`, and `db:validate` failed with
+`function core.search_normalize(text) does not exist`. Atlas documents
+`depends_on` only for views and materialized views. So:
+1. The HCL without the index gives `CREATE EXTENSION`, then `CREATE FUNCTION`.
+2. The index added back gives `CREATE INDEX` alone, in a later migration.
+
+`db:validate` then runs once over both. The agent reviews the SQL:
+- The statements are in that order across the two files.
+- There's no `CONCURRENTLY` (see the decisions table).
+- There's nothing unrelated: Atlas can pick up drift.
+
+Any later schema change that makes an index or a table depend on a new
+function needs the same two passes.
 
 `scripts/check-migrations-size.sh database/migrations` stays well under its
 768 KiB warning.

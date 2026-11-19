@@ -35,6 +35,13 @@ extension "pgcrypto" {
   version = "1.4"
 }
 
+// Trigram matching for address search (docs/parcel-search/spec.md).
+extension "pg_trgm" {
+  schema = schema.extensions
+
+  version = "1.6"
+}
+
 ##############################
 ### System Settings
 ##############################
@@ -3383,6 +3390,19 @@ table "address_attributes" {
     columns = [column.address_id]
   }
 
+  // Address search: trigram index on the normalised address, used by both the
+  // word-similarity (<%) and substring (LIKE) conditions
+  // (docs/parcel-search/spec.md). It needs core.search_normalize, which Atlas
+  // can't see inside expr and would create after the index, so the function
+  // has its own earlier migration (docs/parcel-search/plan.md, step 1.2).
+  index "idx_address_attributes_formatted_address_trgm" {
+    type = GIN
+    on {
+      expr = "core.search_normalize(formatted_address)"
+      ops  = sql("extensions.gin_trgm_ops")
+    }
+  }
+
   foreign_key "fk_country_id" {
     columns     = [column.country_id]
     ref_columns = [table.countries.column.country_id]
@@ -5395,6 +5415,28 @@ table "improvement_types" {
     unique  = true
     columns = [column.name]
   }
+}
+
+##############################
+### Search Functions
+##############################
+
+// Normalises text for address search: runs of anything but letters and digits
+// become one space, then trim and lowercase. The reader calls it on the query
+// and the trigram index calls it on formatted_address, so both see the same
+// string (docs/parcel-search/spec.md). Names are schema-qualified instead of
+// setting search_path, so the function can't be redirected.
+function "search_normalize" {
+  schema = schema.core
+  lang   = "sql"
+  arg "input" {
+    type = text
+  }
+  return     = text
+  volatility = IMMUTABLE
+  strict     = true
+  parallel   = SAFE
+  as         = "SELECT pg_catalog.lower(pg_catalog.btrim(pg_catalog.regexp_replace(input, '[^[:alnum:]]+', ' ', 'g')))"
 }
 
 ##############################

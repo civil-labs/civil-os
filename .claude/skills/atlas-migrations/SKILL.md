@@ -115,12 +115,12 @@ generated the migration and ran `db:validate`, with its output.
 Atlas doesn't parse SQL strings in the HCL. It can't see that an index `expr`
 calls a function, and in a single diff it creates table changes **before** new
 functions. So a new function and an index that calls it, generated together,
-come out in the wrong order. A column `default` (`sql("...")`) or a `check`
-that calls a new function is probably affected the same way. That hasn't
-been seen here yet, so check the order when one comes up. `db:diff`
-succeeds, then `db:validate` fails on replay with
-`function core.<name>(...) does not exist`. Atlas documents `depends_on` only
-for `view` and `materialized` blocks, so the HCL can't fix the order.
+come out in the wrong order. `db:diff` succeeds, then `db:validate` fails on
+replay with `function core.<name>(...) does not exist`. Atlas documents
+`depends_on` only for `view` and `materialized` blocks, so the HCL can't fix
+the order. A column `default` (`sql("...")`) or a `check` that calls a new
+function is probably affected the same way. That hasn't been seen here yet,
+so check the order when one comes up.
 
 Use two passes, each one a separate migration:
 

@@ -52,10 +52,11 @@ In **Settings → Secrets and variables → Actions → Repository secrets**:
 
 | Secret | Used by | Value |
 |---|---|---|
-| `RELEASE_PLEASE_APP_ID` | `release-please.yml` | The App ID of the GitHub App in step 3 |
-| `RELEASE_PLEASE_PRIVATE_KEY` | `release-please.yml` | A private key (`.pem` contents) generated for that App |
 | `CUSTOMER_DENYLIST` | `ci.yml` | Newline-separated terms that must never appear in the repo: jurisdiction names, deployment codes, hostnames. Matched case-insensitively as fixed strings. CI prints only file names, never the matching terms. |
 | `BUF_TOKEN` *(optional)* | `ci.yml`, `public-api-release.yml` | A buf.build token, if remote-plugin rate limits become a problem |
+
+The release-please App's credentials are set once for the organization, not
+here (step 3).
 
 Workflows triggered from forks don't receive secrets. The denylist check skips
 with a warning in that case, and those PRs need a maintainer's review.
@@ -76,8 +77,14 @@ workflows.
   | Issues | Read and write (for release labels) |
   | Metadata | Read (set automatically) |
 
-- [ ] Install it on the `civil-os` repository only.
-- [ ] Save its App ID and a private key as the secrets in step 2.
+- [ ] Install it on `civil-os` and the other repositories that release with it
+  (`opencama-record-keeper`).
+- [ ] In **Organization → Settings → Secrets and variables → Actions**, save
+  its App ID as the **variable** `RELEASE_PLEASE_APP_ID` and a private key
+  (`.pem` contents) as the **secret** `RELEASE_PLEASE_PRIVATE_KEY`, both
+  available to the repositories that release with it. `release-please.yml`
+  reads them as `vars.RELEASE_PLEASE_APP_ID` and
+  `secrets.RELEASE_PLEASE_PRIVATE_KEY`.
 
 ## 4. GitHub Container Registry
 

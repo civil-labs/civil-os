@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package civil.mesh.pagination.v1;
 
+import "google/protobuf/timestamp.proto";
+
 // Relay-style page info (https://relay.dev/graphql/connections.htm), the mesh
 // copy of civil.public.pagination.v1.PageInfo. Cursors are opaque.
 message PageInfo {
@@ -21,4 +23,21 @@ message IdCursor {
   // SHA-256 of the canonical request filter, so a cursor can't be reused
   // with a different filter.
   bytes filter_hash = 3;
+}
+
+// The decoded form of a SearchParcelsAddresses cursor
+// (docs/parcel-search/spec.md, Pagination): a position in the ranked hits.
+// Internal to the reader: clients only see its base64url encoding.
+message SearchCursor {
+  uint32 version = 1;
+  // Rank of the hit: 0 prefix, 1 word prefix, 2 substring, 3 similar.
+  uint32 tier = 2;
+  // word_similarity of the hit, as the database's real.
+  float similarity = 3;
+  // public_id of the hit's parcel.
+  string last_parcel_id = 4;
+  // SHA-256 of the RPC, the normalised query and legal_as_of.
+  bytes filter_hash = 5;
+  // The legal time every page resolves at, fixed by the first page.
+  google.protobuf.Timestamp as_of = 6;
 }

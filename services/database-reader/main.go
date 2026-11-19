@@ -31,6 +31,18 @@ import (
 type APIServer struct {
 	db     *pgxpool.Pool
 	logger *slog.Logger
+	// searchCap is the most hits SearchParcelsAddresses returns across
+	// all pages.
+	searchCap int
+}
+
+// handlerOption changes the server newHandler builds. Only tests use one.
+type handlerOption func(*APIServer)
+
+// withSearchCap lowers the search hit cap, so a test can reach it with the
+// fixtures.
+func withSearchCap(n int) handlerOption {
+	return func(s *APIServer) { s.searchCap = n }
 }
 
 func main() {
@@ -120,10 +132,14 @@ func run(ctx context.Context, config *Config, logger *slog.Logger) error {
 }
 
 // newHandler builds the service's Connect handlers and gRPC health check.
-func newHandler(pool *pgxpool.Pool, logger *slog.Logger) http.Handler {
+func newHandler(pool *pgxpool.Pool, logger *slog.Logger, opts ...handlerOption) http.Handler {
 	srv := &APIServer{
-		db:     pool,
-		logger: logger,
+		db:        pool,
+		logger:    logger,
+		searchCap: defaultSearchCap,
+	}
+	for _, opt := range opts {
+		opt(srv)
 	}
 	mux := http.NewServeMux()
 

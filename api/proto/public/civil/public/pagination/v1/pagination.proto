@@ -17,9 +17,9 @@ message PageInfo {
   // Whether results precede this page. True exactly when the request set
   // `after`.
   bool has_previous_page = 2;
-  // The cursor of the first edge. Unset when the page is empty.
+  // The cursor of the first result. Unset when the page is empty.
   optional string start_cursor = 3;
-  // The cursor of the last edge: pass it as `after` to read the next page.
+  // The cursor of the last result: pass it as `after` to read the next page.
   // Unset when the page is empty.
   optional string end_cursor = 4;
 }

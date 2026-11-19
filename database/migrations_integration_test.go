@@ -4,6 +4,7 @@ package database_test
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/jackc/pgx/v5"
@@ -33,12 +34,94 @@ func TestMigrationsApplyToEmptyDatabase(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for _, fn := range []string{"core.get_parcel_tiles", "core.get_primary_improvements"} {
+	for _, fn := range []string{"core.get_parcel_tiles", "core.get_primary_improvements", "core.search_normalize"} {
 		var ok bool
 		if err := conn.QueryRow(ctx, "SELECT to_regproc($1) IS NOT NULL", fn).Scan(&ok); err != nil || !ok {
 			t.Errorf("function %s missing after migrations (err=%v)", fn, err)
 		}
 	}
+
+	// Address search (docs/parcel-search/spec.md): pg_trgm lives in the
+	// extensions schema, and the trigram index is GIN over the normalised
+	// address.
+	var trgmSchema string
+	if err := conn.QueryRow(ctx, `SELECT n.nspname FROM pg_extension e
+		JOIN pg_namespace n ON n.oid = e.extnamespace WHERE e.extname = 'pg_trgm'`).Scan(&trgmSchema); err != nil {
+		t.Errorf("pg_trgm not installed: %v", err)
+	} else if trgmSchema != "extensions" {
+		t.Errorf("pg_trgm is in schema %q, want extensions", trgmSchema)
+	}
+
+	var indexdef string
+	if err := conn.QueryRow(ctx, `SELECT indexdef FROM pg_indexes
+		WHERE schemaname = 'core' AND tablename = 'address_attributes'
+		  AND indexname = 'idx_address_attributes_formatted_address_trgm'`).Scan(&indexdef); err != nil {
+		t.Errorf("address search index missing: %v", err)
+	} else {
+		for _, want := range []string{"USING gin", "search_normalize(formatted_address)", "gin_trgm_ops"} {
+			if !strings.Contains(indexdef, want) {
+				t.Errorf("address search index %q does not contain %q", indexdef, want)
+			}
+		}
+	}
+}
+
+// TestSearchNormalize checks core.search_normalize, which the address search
+// applies to both the query and the indexed address.
+func TestSearchNormalize(t *testing.T) {
+	ctx := context.Background()
+	pool := testutil.FixtureDatabase(t).Pool(t)
+
+	for _, tc := range []struct {
+		in, want *string
+	}{
+		{ptr("12 Fixture Way"), ptr("12 fixture way")},
+		{ptr("12, FIXTURE-way"), ptr("12 fixture way")},
+		{ptr("  --12   Fixture__Way!! "), ptr("12 fixture way")},
+		{ptr("#4B"), ptr("4b")},
+		{ptr("--"), ptr("")},
+		{nil, nil}, // STRICT: NULL in, NULL out
+	} {
+		var got *string
+		if err := pool.QueryRow(ctx, "SELECT core.search_normalize($1::text)", tc.in).Scan(&got); err != nil {
+			t.Fatalf("search_normalize(%v): %v", show(tc.in), err)
+		}
+		if show(got) != show(tc.want) {
+			t.Errorf("search_normalize(%s) = %s, want %s", show(tc.in), show(got), show(tc.want))
+		}
+	}
+
+	// The fixtures are too small for the planner to choose the index on its
+	// own, so seqscans are disabled for this one transaction.
+	tx, err := pool.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback(ctx)
+	if _, err := tx.Exec(ctx, "SET LOCAL enable_seqscan = off"); err != nil {
+		t.Fatal(err)
+	}
+	rows, err := tx.Query(ctx, `EXPLAIN SELECT address_id FROM core.address_attributes
+		WHERE core.search_normalize(formatted_address) LIKE '%fixture%'`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	plan, err := pgx.CollectRows(rows, pgx.RowTo[string])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if joined := strings.Join(plan, "\n"); !strings.Contains(joined, "idx_address_attributes_formatted_address_trgm") {
+		t.Errorf("LIKE on the normalised address does not use the trigram index:\n%s", joined)
+	}
+}
+
+func ptr(s string) *string { return &s }
+
+func show(s *string) string {
+	if s == nil {
+		return "NULL"
+	}
+	return "\"" + *s + "\""
 }
 
 // TestFixturesLoad checks the synthetic dataset loads and has the shape that

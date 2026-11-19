@@ -1,4 +1,16 @@
 {
+  "permissions": {
+    "deny": [
+      "Bash(atlas *)",
+      "Bash(mise run db:diff*)",
+      "Bash(mise run db:validate*)",
+      "Bash(mise db:diff*)",
+      "Bash(mise db:validate*)",
+      "Bash(docker run *arigaio/atlas*)",
+      "Bash(podman run *arigaio/atlas*)",
+      "Edit(**/database/migrations/**)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {

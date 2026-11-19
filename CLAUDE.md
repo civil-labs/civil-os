@@ -14,7 +14,8 @@ mise run up                # build + start the compose stack on synthetic data
 mise run test:e2e          # starts/rebuilds the stack, then runs the smoke tests
 TOKEN=$(mise run token)    # bearer token for the local test user
 mise run down              # stop the stack and delete its database
-mise run db:validate       # Atlas, local only: run (or ask the owner to) after any migration change
+mise run db:diff           # Atlas, local only: the owner runs it, never an agent (see below)
+mise run db:validate       # Atlas, local only: the owner runs it, never an agent (see below)
 ```
 
 CI also runs these, so run them before you push:
@@ -57,6 +58,11 @@ test reads, run `mise run check` yourself.
   `docs/architecture.md` when you add one.
 - **Never push to `main`.** Work on a branch and open a PR. The owner merges.
 - **No Atlas in CI or compose.** It's licensed for local use only.
+- **Agents never run Atlas**, even when it's logged in. Agents never run
+  `db:diff`, `db:validate` or any `atlas` command, and never write files in
+  `database/migrations`. Change the HCL, let the owner review it, and ask
+  them to run the commands. Follow the `atlas-migrations` skill
+  (`.claude/skills/atlas-migrations/SKILL.md`).
 - **Don't touch the deployment repos** (Helm chart, gitops, jurisdiction repos)
   from here.
 

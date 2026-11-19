@@ -6,7 +6,7 @@ one port.
 
 | Package | Service | What it serves |
 |---|---|---|
-| `civil.public.parcels.v1` | `ParcelsService` | Parcel details, attribute lookups by parcel or map feature, parcel extents (bounding boxes), stats, comparables, `UpdateParcel` |
+| `civil.public.parcels.v1` | `ParcelsService` | Parcel details, attribute lookups by parcel or map feature, parcel extents (bounding boxes), stats, comparables, address search (`SearchParcelsAddresses`, paginated), `UpdateParcel` |
 | `civil.public.improvements.v1` | `ImprovementsService` | Improvement types and conditions |
 | `civil.public.landuses.v1` | `LandUsesService` | Land uses and land-use types |
 | `civil.public.zoning.v1` | `ZoningService` | Zoning designations |
@@ -39,28 +39,49 @@ declared in the protos. For example, every parcel ID must be a UUID.
 
 ## Pagination
 
-APIs that can return many results are paginated with cursors, following the
-GraphQL [Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
-`RealPropertyTransfersService` was the first, and the address and party
-lookups follow it. New paginated RPCs follow the same pattern:
+APIs that can return many results are paginated with cursors.
+`RealPropertyTransfersService` was the first, followed by the address and party
+lookups and `ParcelsService.SearchParcelsAddresses`. They share these rules:
 
 - **Request:** `optional int32 first` (the page size) and
   `optional string after` (a cursor from a previous page).
-- **Response:** `repeated <Thing>Edge edges`, each with a `cursor` and the
-  `node`, and a `civil.public.pagination.v1.PageInfo page_info`.
+- **Response:** the results and a `civil.public.pagination.v1.PageInfo
+  page_info`. New paginated RPCs, starting with `SearchParcelsAddresses`,
+  return `repeated <Thing> <things>` with no edges. The older RPCs still
+  return `repeated <Thing>Edge edges`, each with a `cursor` and the `node`,
+  until [`pagination-without-edges`](../../../docs/pagination-without-edges/intent.md)
+  removes them. Either way, `page_info.end_cursor` is all you need to page.
 - **Page size:** `first` is 1 to 100, and defaults to 25 when unset. A larger
   value is rejected with `InvalidArgument`, not reduced. The limits are part of
   the contract and the same on every instance.
 - **Reading every page:** repeat the request with
   `after = page_info.end_cursor` while `page_info.has_next_page` is true. Use
-  `has_next_page`, not the number of edges, to detect the end.
+  `has_next_page`, not the number of results, to detect the end.
 - **Cursors are opaque.** Don't parse or build them. A cursor is only valid
-  with the same filter (IDs and time range) as the request it came from;
-  otherwise the request fails with `InvalidArgument`. `first` may change
-  between pages.
+  with the same filter (IDs, time range, or search query) as the request it
+  came from; otherwise the request fails with `InvalidArgument`. `first` may
+  change between pages.
 - **Consistency:** pages are keyset-based, so results added or removed between
-  requests don't shift later pages, but there's no snapshot either.
+  requests don't shift later pages. The lookups have no snapshot: each page
+  reads "now" again. **Search pages share a snapshot:** when `legal_as_of` is
+  unset, the first page fixes "now", and later pages resolve at that time, so
+  ranks don't move between pages.
+- **Search has a cap.** `SearchParcelsAddresses` returns at most 1,000 hits
+  across all pages. After that, `has_next_page` is false: refine the query.
 - Only forward pagination (`first` / `after`) is supported for now.
+
+## Searching parcels by address
+
+`ParcelsService.SearchParcelsAddresses` takes free text (`query`, 1 to 200
+characters, with at least 3 letters or digits) and returns visible parcels
+whose address at `legal_as_of` matches, best first. Case and punctuation are
+ignored, so `12, FIXTURE-way` finds the same parcels as `12 Fixture Way`.
+Hits are ranked: addresses starting with the query, then those with a word
+starting with it, then those containing it, then similar ones (typos). Each
+hit has the `parcel_id`, its `feature_id`, the `address_id` that matched and
+its `formatted_address`. Load details with
+`GetParcelsWithImprovementSummaryByParcelId`. Owner names, parcel numbers,
+abbreviations (`St` and `Street`) and accents aren't matched yet.
 
 ## Neighborhoods
 

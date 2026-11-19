@@ -350,7 +350,8 @@ returns the old line. Both changes are in the spec's "Matching and ranking",
 - `mise run generate`, and commit `api/gen/go`. Check that the SDK index
   exports the new messages, and that `openapi.yaml` has the path.
 
-**2.7 Gateway** (`feat: serve SearchParcelsAddresses from the gateway`):
+**2.7 Gateway** (in 2.6's commit, because the gateway doesn't build until it
+implements a new public RPC, as with 2.1 and 2.3):
 - `ParcelServer.SearchParcelsAddresses` in `services/gateway/parcels.go`:
   - `first = 25` when unset, as the address/party RPCs do;
   - map the request and the hits one-to-one, with `PageInfo` copied;

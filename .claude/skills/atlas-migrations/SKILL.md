@@ -54,6 +54,8 @@ Include:
   no other block in the file uses yet, and the fallback if Atlas rejects it.
 - **The operational effects**, such as table locks, long index builds,
   rewrites or data backfills.
+- **Whether it needs two passes** (see "Objects that depend on a new
+  function" below), and if so, which half goes first.
 
 Ask them to review it and say whether to go ahead. If they ask for changes,
 make them in the HCL and present it again. Don't move to step 3 until they
@@ -90,8 +92,15 @@ When they've run both commands:
 - Run `scripts/check-migrations-size.sh database/migrations`.
 
 Report what you found. If the migration is wrong, change the HCL, ask the
-developer to delete the generated file and restore `atlas.sum`
-(`git checkout -- database/migrations/atlas.sum`), and go back to step 2.
+developer to delete the generated file and restore `atlas.sum`, and go back to
+step 2. Give the cleanup as two separate commands, so a file that's already
+gone doesn't stop `atlas.sum` from being restored (with `&&`, a failed `rm`
+skips the `checkout`):
+
+```
+! rm -f database/migrations/<timestamp>.sql
+! git checkout -- database/migrations/atlas.sum
+```
 
 ### 5. Test, then commit
 
@@ -100,3 +109,30 @@ every migration to an empty PostGIS container, and `mise run down && mise run
 up`, which applies it through `dev/migrate.sh`. Commit the HCL and the
 generated files together, and say in the commit or PR that the developer
 generated the migration and ran `db:validate`, with its output.
+
+## Objects that depend on a new function
+
+Atlas doesn't parse SQL strings in the HCL. It can't see that an index `expr`
+calls a function, and in a single diff it creates table changes **before** new
+functions. So a new function and an index that calls it, generated together,
+come out in the wrong order. `db:diff` succeeds, then `db:validate` fails on
+replay with `function core.<name>(...) does not exist`. Atlas documents
+`depends_on` only for `view` and `materialized` blocks, so the HCL can't fix
+the order. A column `default` (`sql("...")`) or a `check` that calls a new
+function is probably affected the same way. That hasn't been seen here yet,
+so check the order when one comes up.
+
+Use two passes, each one a separate migration:
+
+1. Add the function, plus anything else that doesn't call it, and leave the
+   dependent index, default or check out of the HCL. The developer runs
+   `db:diff`.
+2. Add the dependent object to the HCL. The developer runs `db:diff` again,
+   then `db:validate` once over both migrations.
+
+Both migrations go in the same PR. Say in step 2 that the change needs two
+passes, so the developer isn't surprised by it. This doesn't apply when the
+function already exists in an earlier migration.
+`docs/parcel-search/plan.md` (step 1.2) has a worked example: `pg_trgm`,
+`core.search_normalize` and the trigram index on `address_attributes`.
+

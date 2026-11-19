@@ -69,6 +69,8 @@ reader a read-only role. The roles themselves are created outside this repo.
 
 The schema is authored in `database/schema/schema.pg.hcl`. Versioned SQL
 migrations in `database/migrations/` are generated from it.
+The database needs the `postgis`, `btree_gist`, `pgcrypto` and `pg_trgm`
+extensions, all in the `extensions` schema.
 
 - **Stable identity.** Entities (`core.parcels`, `core.improvements`, …) carry an
   internal key and a `public_id` UUID. Only the UUID appears in the API.

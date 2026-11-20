@@ -49,6 +49,9 @@ var errSearchQueryTooShort = errors.New("query must contain at least 3 letters o
 // and attributes at t; the address is the one those attributes name, isn't
 // voided, and has attributes at t. Both trigram conditions are on the
 // indexed expression, so the GIN index drives the candidate scan.
+//
+// The outer query orders by ranked.parcel_id, the uuid, as the keyset
+// compares it. Its text output is aliased so ORDER BY can't pick it up.
 const searchSQL = `
 WITH cand AS (
 	SELECT p.public_id AS parcel_id, pg.feature_id,
@@ -73,11 +76,11 @@ WITH cand AS (
 	ORDER BY tier, sim DESC, parcel_id
 	LIMIT $5
 )
-SELECT parcel_id::text, feature_id, address_id::text, formatted_address, tier, sim
+SELECT ranked.parcel_id::text AS parcel_public_id, feature_id, address_id::text, formatted_address, tier, sim
 FROM ranked
 WHERE $6::int IS NULL
-   OR (tier, -sim, parcel_id) > ($6::int, -($7::real), $8::uuid)
-ORDER BY tier, sim DESC, parcel_id
+   OR (tier, -sim, ranked.parcel_id) > ($6::int, -($7::real), $8::uuid)
+ORDER BY tier, sim DESC, ranked.parcel_id
 LIMIT $4`
 
 // escapeLike escapes LIKE's wildcards and its escape character.

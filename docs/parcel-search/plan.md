@@ -379,8 +379,9 @@ implements a new public RPC, as with 2.1 and 2.3):
 **2.9 Performance check** (`test: latency check for address search`):
 - **`dev/perf/search-dataset.sql`** loads 500,000 extra parcels into a database
   that already has the fixtures:
-  - one `INSERT ... SELECT` per table from `generate_series`, so it takes
-    seconds;
+  - one `INSERT ... SELECT` per table from `generate_series`. That took
+    1m44s to 2m06s on the owner's laptop, not seconds: the inserts maintain
+    the tables' GiST exclusion constraints and indexes;
   - each parcel gets a 30 m square on a grid (offset from the fixture grid),
     an attributes row with land use 1, and its own address;
   - addresses are `<house number> <street> <suffix>, <locality> ZZ<5 digits>`,
@@ -393,15 +394,18 @@ implements a new public RPC, as with 2.1 and 2.3):
   - Start a fixture database and load the dataset. Before that, drop the
     trigram index, load, and time `CREATE INDEX` separately, so PR 2 can
     report the build time.
+  - Print `EXPLAIN (ANALYZE, BUFFERS)` for one query of each kind first, so
+    a slow kind can't hide the plans.
   - Start the reader in-process, warm up with 20 queries, then run each of
     the spec's five query kinds 200 times (fixed seeds), timing the mesh call.
+    `PERF_SEARCH_RUNS=<n>` changes the 200, for a quick run.
   - Print p50, p95 and p99 per kind and overall, the machine (`runtime`, CPU
     model from `/proc/cpuinfo`) and the row counts.
   - Fail if overall p95 > 200 ms or p99 > 500 ms.
-  - Also print `EXPLAIN (ANALYZE, BUFFERS)` for one query of each kind, to
-    show that the trigram index is used.
+  - Fail if any plan doesn't use the trigram index.
 - **`mise.toml`:** `[tasks."perf:search"]` runs
-  `go test -tags perf -run TestSearchLatency -v -timeout 30m ./services/database-reader`.
+  `go test -tags perf -run TestSearchLatency -v -count=1 -timeout 90m ./services/database-reader`.
+  At 30 m, a 200-run pass timed out on the laptop in the broad kind.
 - `mise run check` doesn't run it (build tag), and CI doesn't either. `go vet
   -tags perf ./...` goes in this step's checks, so the file can't rot
   unnoticed.
@@ -409,12 +413,77 @@ implements a new public RPC, as with 2.1 and 2.3):
   numbers and the plans to the owner, who decides between changing the query
   and amending the spec.
 
+**Status on 2026-11-20: handed off to finish the performance check on the
+owner's desktop.** Everything in PR 2 is written and committed on
+`feat/search-parcels-addresses`. Every check below passes except
+`perf:search`, which hasn't been run to completion yet. See "Handoff:
+performance check" below.
+
 **Checks:**
 - `mise run check`, and `buf format --diff --exit-code` in `api/`.
 - Generated-code freshness.
 - `buf breaking` passes without `!`.
 - `mise run test:integration` and `mise run test:e2e`.
 - `mise run perf:search`, with its output in the PR description.
+
+### Handoff: performance check
+
+The owner ran the laptop numbers below on a 13th-gen Core i3-1315U (8 threads,
+16 GB) with testcontainers' Postgres defaults (`shared_buffers` 128 MB,
+`work_mem` 4 MB). The owner doesn't treat the laptop's absolute latencies as
+meaningful. The desktop run is the measurement. The *shape* of the results is
+the useful part.
+
+200-run pass (timed out during the broad kind, at the old 30 m timeout):
+
+| Kind | p50 | p95 | p99 |
+|---|---|---|---|
+| house-number prefix | 108 ms | 152 ms | 172 ms |
+| street fragment | 238 ms | 451 ms | 525 ms |
+| full address | 182 ms | 209 ms | 247 ms |
+| one-typo street | 277 ms | 1.73 s | 2.73 s |
+| broad (cap) | did not finish | | |
+
+A 1-run pass (`PERF_SEARCH_RUNS=1`) finished: broad (`Row`) took 6.7 s, and
+its `EXPLAIN ANALYZE` 7.9 s. The trigram index build took 5.1 to 5.2 s.
+
+What the broad plan shows:
+- **The index is used, and it's cheap:** the `BitmapOr` of the `%>` and
+  `LIKE` index scans takes about 30 ms.
+- **The recheck takes about 1.35 s** for about 83,000 candidates, a sixth of
+  the dataset. `core.search_normalize` (a regex) runs in the recheck, the
+  filter, the tier `CASE` and `word_similarity`, for every candidate.
+- **The visibility joins take about 6.5 s.** `addresses`,
+  `parcel_attributes`, `parcel_geometry` and `parcels` are index-probed once
+  per candidate (82,965 loops each), before the 1,000 cap applies, with
+  281,627 blocks read from disk. 128 MB of `shared_buffers` doesn't hold the
+  working set.
+
+Next steps for whoever picks this up:
+1. On the desktop, run `mise run perf:search` (200 runs per kind, up to
+   90 m). If the broad kind is still very slow, start with
+   `PERF_SEARCH_RUNS=20`. Record the machine line, every kind's percentiles,
+   the index build time and the five plans.
+2. If the budget is met, put the output in PR 2's description and finish
+   "Final verification".
+3. If it isn't, **don't change the query or the spec on your own.** Report
+   the numbers and plans to the owner, with options. Candidates the laptop
+   plan suggests, none tried yet:
+   - **Rank and cap before the visibility joins.** Sort the matching
+     `address_attributes` rows by `(tier, sim)` first, then join for
+     visibility, so the joins stop after about 1,000 visible hits instead of
+     running for every candidate. That keeps the spec's semantics if the
+     visibility filter is applied before the cap is counted (for example, a
+     `LATERAL` or nested loop under the `LIMIT`). Check the plan.
+   - **Compute the normalised text once per row**, in a column or a
+     materialised CTE, instead of the planner inlining
+     `core.search_normalize` four or more times. A stored generated column is
+     a schema change (Atlas, owner), so it needs the owner's agreement.
+   - **Postgres settings**, if the desktop numbers come mostly from disk reads
+     (`shared_buffers`, `effective_cache_size`). That's a deployment
+     concern. Note it, and don't tune the test container to pass.
+   - **Amend the budget, or the broad-query expectation,** in the spec. That's
+     the owner's call.
 
 ## Final verification (before reporting the feature done)
 

@@ -16,7 +16,7 @@ work and how the PRs are split go in `plan.md`.
 | Question | Decision |
 |---|---|
 | Scope of results | **Parcels only.** One RPC, `ParcelsService.SearchParcelsAddresses`, returning parcels with the address that matched. A search across record types would need a `oneof` result, ranking across kinds and a cursor over mixed kinds. If the records app needs one, it can be a later RPC, and adding it won't break this one. |
-| Matching | **Trigram matching with a prefix boost** (`pg_trgm`), on a normalised form of the text (see [Matching and ranking](#matching-and-ranking)). Hits are ranked in four tiers: prefix, word prefix, substring, then similar (typo-tolerant). Within a tier they're ordered by trigram word similarity, and ties go to `parcel_id`. Pagination uses a keyset cursor over `(tier, similarity, parcel_id)`, with `legal_as_of` fixed by the first page. |
+| Matching | **Trigram matching with a prefix boost** (`pg_trgm`), on a normalised form of the text (see [Matching and ranking](#matching-and-ranking)). Hits are ranked in four tiers: prefix, word prefix, substring, then similar (typo-tolerant). Within a tier they're ordered by trigram word similarity, then by address, then by `parcel_id` (owner, 2026-11-20; see [Ordering within a rank](#ordering-within-a-rank)). Pagination uses a keyset cursor over `(tier, similarity, address, parcel_id)`, with `legal_as_of` fixed by the first page. |
 | Other keys (`legacy_id`) | **Deferred.** The public API doesn't expose `legacy_id` today, and the intent says search adds no new kind of data. Making jurisdiction parcel numbers public, and then searchable, is a decision of its own: [`../parcel-number-search/intent.md`](../parcel-number-search/intent.md), written in this spec's PR. |
 | Address normalisation | **Proposed: punctuation and case only.** Text is lower-cased, every run of characters other than letters and digits becomes one space, and the result is trimmed. Abbreviations (`St` / `Street`), unit designators and accents aren't normalised. Trigram similarity covers some of that, and the rest is listed in [Known limits](#known-limits). Expanding abbreviations is locale-specific and belongs in a follow-up, driven by what records-app users actually type. |
 | Extension availability | **`pg_trgm` is available in every deployment's PostGIS image** (owner, 2026-11-18), so there's no fallback. It's a contrib module in `postgis/postgis:18-3.6`, which compose and testcontainers use. It's declared in the Atlas schema in the `extensions` schema, next to `postgis`, `btree_gist` and `pgcrypto`. |
@@ -28,7 +28,7 @@ work and how the PRs are split go in `plan.md`.
 |---|---|
 | Owner names | **Not searched** (owner, 2026-11-18). This narrows the intent's outcome 2, which listed current owners' names, and its fixture items for an owner with several parcels and a voided party. Search matches only the parcel's current `formatted_address`. Owner-name search makes it much easier to list everything one person owns, and a mixed result list ranks two fields that can't be compared. Clients can still go from a party to their parcels with `PartiesService.GetParcelsByPartyId`. Adding owner names later is a new intent. Adding a field to the hit then doesn't break anything. |
 | Where the RPC lives | **On `ParcelsService`**, because it returns parcels. Adding an RPC doesn't break anything. On the mesh it's `ParcelReadService.SearchParcelsAddresses`, which keeps that service's current name, as `GetParcelExtentsWGS84ByParcelId` did ([`../mesh-plural-service-names/intent.md`](../mesh-plural-service-names/intent.md)). |
-| One hit per parcel | A parcel has one address at `t`, so it appears at most once. Several parcels sharing an address each appear, ordered by `parcel_id` within the same rank. |
+| One hit per parcel | A parcel has one address at `t`, so it appears at most once. Several parcels sharing an address each appear, next to each other and ordered by `parcel_id`. |
 | Minimum query | **Proposed: at least 3 characters after normalisation**, and at most 200 characters before it. Shorter queries can't use the trigram index selectively, and in a jurisdiction they would match most rows. The gateway checks the raw length (1..200). The reader checks the normalised length, because only it normalises, and returns `InvalidArgument` (`query must contain at least 3 letters or digits`). |
 | Result cap | **Proposed: 1,000 hits per query.** Ranking can't stream: every candidate has to be scored before the first page can be cut. The cap bounds that work for broad queries such as `fixture way`. `has_next_page` is false after the 1,000th hit. The cap is documented on the RPC, because a client paging past it is told to refine the query. |
 | No edges | **Results are `repeated ParcelSearchHit hits`, with no edge wrapper and no cursor on each hit** (owner, 2026-11-18). Paging only needs `page_info.end_cursor`. Every civil-os cursor is a keyset position, not a reference to a row, so a client that edits its cached list can still continue from `end_cursor`. The only thing a cursor on each result adds is resuming from the middle of a page, which nothing needs. The edge shape came from the Relay connection spec, but Relay-style client libraries (Relay, Apollo, urql) are GraphQL tools and can't read Connect responses. Connect clients, such as `@connectrpc/connect-query`'s infinite queries, read the next cursor from `page_info`. This is the first paginated RPC without edges. [`../pagination-without-edges/intent.md`](../pagination-without-edges/intent.md), written in this spec's PR, removes edges from the existing paginated RPCs. |
@@ -130,9 +130,26 @@ the GIN trigram index below.
 | 2 | `t LIKE '%' || q || '%'` | `12 fixture way testville zz000` |
 | 3 | `q <% t` only | `3 fixture way …` (similar, not containing) |
 
-Order: `tier ASC, word_similarity(q, t) DESC, parcel public_id ASC`.
-`word_similarity` returns `real`, which is deterministic for the same inputs,
-so the order is total and stable.
+Order: `tier ASC, word_similarity(q, t) DESC, address ASC, parcel public_id
+ASC`. `word_similarity` returns `real`, which is deterministic for the same
+inputs, so the order is total and stable.
+
+### Ordering within a rank
+
+"Address" means the address's internal key (`address_attributes.address_id`),
+not its `public_id` (owner, 2026-11-20). The first draft broke ties on the
+parcel `public_id` alone. On the performance dataset, a broad query such as
+`row` puts about 83,000 candidates in one `(tier, similarity)` group, and the
+parcel `public_id` only exists after the visibility joins. So every candidate
+was joined before the cap could apply: about 2.75 s of a 3.6 s query. Every key up
+to the address is on `address_attributes`, so the reader sorts candidates
+before any join and probes visibility only until the cap is filled. The
+parcel `public_id` only orders parcels that share an address.
+
+The internal key never leaves the reader. The cursor carries the address's
+`public_id`, and the keyset looks up its internal key. Clients only see "best
+first", as before: neither the public API nor its README describes the
+tie-break.
 
 **The threshold** is pg_trgm's `word_similarity_threshold`, set with
 `SET LOCAL` in the reader's transaction. It's the default, 0.6, which the plan
@@ -176,6 +193,7 @@ message SearchCursor {
   string last_parcel_id = 4;
   bytes filter_hash = 5;
   google.protobuf.Timestamp as_of = 6;      // the t every page resolves at
+  string last_address_id = 7;               // public_id of the last hit's address
 }
 ```
 
@@ -189,9 +207,12 @@ message SearchCursor {
   `legal_as_of` (set or unset, and its value). Queries that normalise the same
   (`12 Fixture Way` and `12, fixture-way`) share cursors. A cursor from
   another RPC or another query fails.
-- **The keyset condition** is `(tier, -similarity, public_id) > ($tier,
-  -$similarity, $last_parcel_id)`, with `$similarity` compared as `real`, and
-  `LIMIT first + 1`. The 1,000-hit cap is applied before the keyset, inside
+- **The keyset condition** is `(tier, -similarity, address, public_id) >
+  ($tier, -$similarity, <address of $last_address_id>, $last_parcel_id)`,
+  with `$similarity` compared as `real`, and `LIMIT first + 1`. If no address
+  has `$last_address_id`, the lookup is null and the page is empty.
+  Addresses are voided, not deleted, so only a forged cursor gets there, and
+  an empty page tells it nothing. The 1,000-hit cap is applied before the keyset, inside
   the ranked candidate set, so each page sees the same capped list.
 - **Decoding treats the cursor as untrusted input.** The filter hash is a
   plain SHA-256 of public inputs, as in the existing cursors. It catches a
@@ -200,7 +221,7 @@ message SearchCursor {
   - `version` is 1, and `filter_hash` matches the request;
   - `tier` is 0–3;
   - `similarity` is finite (not NaN or infinite) and within [0, 1];
-  - `last_parcel_id` is a UUID;
+  - `last_parcel_id` and `last_address_id` are UUIDs;
   - `as_of` is set and passes the same check as `legal_as_of` (after year 0).
     When the request sets `legal_as_of`, `as_of` must equal it.
 
@@ -236,11 +257,13 @@ The reader's unqualified names rely on the database `search_path`
 One query in `services/database-reader/parcel_search.go`:
 
 1. **Candidates:** `address_attributes` at `t`, filtered on the trigram
-   condition first so the GIN index drives it. They're joined to non-voided
-   addresses, and through `parcel_attributes.address_id` at `t` to visible
-   parcels (rules 1 and 2).
-2. **Rank** each candidate (tier and similarity).
-3. **Cap:** order by rank and `LIMIT 1000`.
+   condition so the GIN index drives it.
+2. **Rank** each candidate (tier and similarity), computing the normalised
+   text once per row, and sort by `(tier, similarity, address)`. No join yet.
+3. **Visibility and cap:** a `LATERAL` probe joins each candidate, in rank
+   order, to its non-voided address and, through
+   `parcel_attributes.address_id` at `t`, to visible parcels (rules 1 and 2).
+   `LIMIT 1000` stops the probes once the cap is filled.
 4. **Page:** apply the keyset condition and `LIMIT first + 1`, then join each
    page row's `feature_id`.
 
@@ -279,10 +302,11 @@ change.
 |---|---|
 | Gateway handler tests | An empty query and a 201-character query are rejected without calling the mesh. So are `first` of 0 and 101, and a `legal_as_of` before year 0. An unset `first` reaches the mesh as 25, and cursors pass through unchanged. A fully populated `ParcelSearchHit` round-trips through the mapping. |
 | Normalisation | An integration test calls `core.search_normalize` on case, punctuation, runs of spaces, leading and trailing junk, and digits. A query of `--` or `a.b` fails with `InvalidArgument`. |
-| Reader integration: matching | `2 fixture` returns parcel 2 then parcel 12 as its first two hits. Parcel 2's hit carries address 2 and `2 Fixture Way, Testville ZZ000`. `2, FIXTURE-way` returns the same hits in the same order. `fxture way` returns hits, all at tier 3. `fixture way` returns all 19 visible parcels with a geometry, in `parcel_id` order within the tier, unless similarity separates them. |
+| Reader integration: matching | `2 fixture` returns parcel 2 then parcel 12 as its first two hits. Parcel 2's hit carries address 2 and `2 Fixture Way, Testville ZZ000`. `2, FIXTURE-way` returns the same hits in the same order. `fxture way` returns hits, all at tier 3. `fixture way` returns all 19 visible parcels with a geometry, in address order within the tier (the same as `parcel_id` order in the fixtures), unless similarity separates them. |
+| Reader integration: shared address | In a copy of the fixtures where parcel 21 is given a geometry, `2 fixture way` returns parcels 2 then 21 first, both carrying address 2, and a `first = 1` walk returns the same hits. |
 | Reader integration: visibility | No hit is ever parcel 20 or 21. `5 Old Fixture` never returns the old line now: no hit carries `5 Old Fixture Way`, and parcel 5 can appear only at tier 3 with its current address. At 2022, parcel 5 is the first hit and carries the old line. An address voided in the test no longer matches, and its parcel disappears from results. |
 | Reader integration: pagination | `fixture way` with `first = 5` walks every visible parcel exactly once through `end_cursor`, in the same order as a single `first = 100` page. A page's `start_cursor` passed as `after` returns that page minus its first hit. An empty page has neither cursor. A cursor reused with another query, or with a query that normalises differently, fails with `InvalidArgument`, but one reused with `12, FIXTURE-way` after `12 fixture way` works. When `legal_as_of` is unset, an address reworded between pages (in the test) doesn't change page 2, because of the snapshot. A malformed or unknown-version cursor fails, and `first = 500` sent directly to the reader is clamped to 100. |
-| Reader unit tests: forged cursors | Cursors built in the test with a correctly recomputed filter hash fail with `InvalidArgument` when:<ul><li>`tier` is 4;</li><li>`similarity` is NaN, +Inf, −0.1 or 1.1;</li><li>`last_parcel_id` isn't a UUID;</li><li>`as_of` is unset, or before year 0;</li><li>`as_of` differs from a `legal_as_of` set on the request.</li></ul>A forged cursor with valid values is accepted, and it returns the hits after that position. |
+| Reader unit tests: forged cursors | Cursors built in the test with a correctly recomputed filter hash fail with `InvalidArgument` when:<ul><li>`tier` is 4;</li><li>`similarity` is NaN, +Inf, −0.1 or 1.1;</li><li>`last_parcel_id` or `last_address_id` isn't a UUID;</li><li>`as_of` is unset, or before year 0;</li><li>`as_of` differs from a `legal_as_of` set on the request.</li></ul>A forged cursor with valid values is accepted, and it returns the hits after that position. |
 | Reader integration: cap | With the cap lowered through a test-only reader option to 10, `fixture way` returns exactly 10 hits across pages, and the last page has `has_next_page = false`. |
 | Migration test | The existing migration suite applies the new migration. A test checks that `pg_trgm` is installed in `extensions` and that the index exists. |
 | e2e (`test/e2e`) | One smoke search through the gateway with a bearer token: `3 Fixture Way` returns parcel 3 first. |

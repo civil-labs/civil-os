@@ -36,51 +36,71 @@ var errSearchQueryTooShort = errors.New("query must contain at least 3 letters o
 
 // searchSQL ranks every visible parcel whose current address matches the
 // normalised query $2, caps the ranked list at $5 hits, and returns the page
-// after the keyset position ($6, $7, $8), or the first page when $6 is null.
+// after the keyset position ($6, $7, $8, $9), or the first page when $6 is
+// null.
 //
 //	$1 the legal time t
 //	$2 the normalised query
 //	$3 the normalised query, escaped for LIKE
 //	$4 the page size plus one
 //	$5 the cap
-//	$6 $7 $8 the cursor's tier, similarity and parcel public_id
+//	$6 $7 the cursor's tier and similarity
+//	$8 $9 the cursor's parcel and address public_ids
 //
 // Visibility (spec, rules 1 and 2): the parcel isn't voided and has geometry
 // and attributes at t; the address is the one those attributes name, isn't
 // voided, and has attributes at t. Both trigram conditions are on the
 // indexed expression, so the GIN index drives the candidate scan.
 //
+// Order: tier, similarity DESC, the address's internal key, then the parcel
+// public_id. Everything up to the address key comes from
+// address_attributes alone, so m sorts the candidates before any join, and
+// the LATERAL visibility probe runs only until the cap is filled (spec,
+// "Ordering within a rank"). The parcel public_id only orders parcels that share
+// an address.
+//
+// The unnest computes the normalised text once per candidate for the tier
+// and the similarity. A plain alias would be inlined and run the regex once
+// per use, and OFFSET 0 would stop the parallel scan.
+//
+// The keyset resolves the cursor's address public_id to its internal key.
 // The outer query orders by ranked.parcel_id, the uuid, as the keyset
 // compares it. Its text output is aliased so ORDER BY can't pick it up.
 const searchSQL = `
-WITH cand AS (
-	SELECT p.public_id AS parcel_id, pg.feature_id,
-	       a.public_id AS address_id, aa.formatted_address,
-	       core.search_normalize(aa.formatted_address) AS t
-	FROM core.address_attributes aa
-	JOIN core.addresses a ON a.address_id = aa.address_id AND NOT a.is_voided
-	JOIN core.parcel_attributes pva ON pva.address_id = a.address_id AND pva.legal_valid_range @> $1::timestamptz
-	JOIN core.parcels p ON p.parcel_id = pva.parcel_id AND NOT p.is_voided
-	JOIN geo.parcel_geometry pg ON pg.parcel_id = p.parcel_id AND pg.legal_valid_range @> $1::timestamptz
-	WHERE aa.legal_valid_range @> $1::timestamptz
-	  AND ($2::text <% core.search_normalize(aa.formatted_address)
-	       OR core.search_normalize(aa.formatted_address) LIKE '%' || $3::text || '%')
-), ranked AS (
-	SELECT parcel_id, feature_id, address_id, formatted_address,
-	       CASE WHEN t LIKE $3::text || '%'               THEN 0
-	            WHEN ' ' || t LIKE '% ' || $3::text || '%' THEN 1
-	            WHEN t LIKE '%' || $3::text || '%'         THEN 2
-	            ELSE 3 END AS tier,
-	       word_similarity($2::text, t) AS sim
-	FROM cand
-	ORDER BY tier, sim DESC, parcel_id
+WITH ranked AS (
+	SELECT v.parcel_id, v.feature_id, v.address_public_id,
+	       m.address_id, m.formatted_address, m.tier, m.sim
+	FROM (
+		SELECT aa.address_id, aa.formatted_address,
+		       CASE WHEN n.t LIKE $3::text || '%'               THEN 0
+		            WHEN ' ' || n.t LIKE '% ' || $3::text || '%' THEN 1
+		            WHEN n.t LIKE '%' || $3::text || '%'         THEN 2
+		            ELSE 3 END AS tier,
+		       word_similarity($2::text, n.t) AS sim
+		FROM core.address_attributes aa
+		CROSS JOIN LATERAL unnest(ARRAY[core.search_normalize(aa.formatted_address)]) AS n(t)
+		WHERE aa.legal_valid_range @> $1::timestamptz
+		  AND ($2::text <% core.search_normalize(aa.formatted_address)
+		       OR core.search_normalize(aa.formatted_address) LIKE '%' || $3::text || '%')
+		ORDER BY tier, sim DESC, aa.address_id
+	) m
+	CROSS JOIN LATERAL (
+		SELECT p.public_id AS parcel_id, pg.feature_id, a.public_id AS address_public_id
+		FROM core.addresses a
+		JOIN core.parcel_attributes pva ON pva.address_id = a.address_id AND pva.legal_valid_range @> $1::timestamptz
+		JOIN core.parcels p ON p.parcel_id = pva.parcel_id AND NOT p.is_voided
+		JOIN geo.parcel_geometry pg ON pg.parcel_id = p.parcel_id AND pg.legal_valid_range @> $1::timestamptz
+		WHERE a.address_id = m.address_id AND NOT a.is_voided
+	) v
+	ORDER BY m.tier, m.sim DESC, m.address_id, v.parcel_id
 	LIMIT $5
 )
-SELECT ranked.parcel_id::text AS parcel_public_id, feature_id, address_id::text, formatted_address, tier, sim
+SELECT ranked.parcel_id::text AS parcel_public_id, feature_id, address_public_id::text, formatted_address, tier, sim
 FROM ranked
 WHERE $6::int IS NULL
-   OR (tier, -sim, ranked.parcel_id) > ($6::int, -($7::real), $8::uuid)
-ORDER BY tier, sim DESC, ranked.parcel_id
+   OR (tier, -sim, ranked.address_id, ranked.parcel_id)
+      > ($6::int, -($7::real), (SELECT x.address_id FROM core.addresses x WHERE x.public_id = $9::uuid), $8::uuid)
+ORDER BY tier, sim DESC, ranked.address_id, ranked.parcel_id
 LIMIT $4`
 
 // escapeLike escapes LIKE's wildcards and its escape character.
@@ -147,12 +167,12 @@ func (s *APIServer) SearchParcelsAddresses(
 
 	var afterTier *int
 	var afterSim *float32
-	var afterParcel *string
+	var afterParcel, afterAddress *string
 	if after != nil {
-		afterTier, afterSim, afterParcel = &after.tier, &after.similarity, &after.parcelID
+		afterTier, afterSim, afterParcel, afterAddress = &after.tier, &after.similarity, &after.parcelID, &after.addressID
 	}
 	size := pageSize(msg.First)
-	rows, err := tx.Query(ctx, searchSQL, at, q, escapeLike(q), size+1, s.searchCap, afterTier, afterSim, afterParcel)
+	rows, err := tx.Query(ctx, searchSQL, at, q, escapeLike(q), size+1, s.searchCap, afterTier, afterSim, afterParcel, afterAddress)
 	if err != nil {
 		return nil, s.dbError("parcel search", err)
 	}
@@ -163,7 +183,7 @@ func (s *APIServer) SearchParcelsAddresses(
 	hits, err := collectRows(rows, func(r pgx.Rows) (hit, error) {
 		h := hit{ParcelSearchHit: &parcelsv1.ParcelSearchHit{}, key: searchKey{asOf: at}}
 		err := r.Scan(&h.ParcelId, &h.FeatureId, &h.AddressId, &h.FormattedAddress, &h.key.tier, &h.key.similarity)
-		h.key.parcelID = h.ParcelId
+		h.key.parcelID, h.key.addressID = h.ParcelId, h.AddressId
 		return h, err
 	}, func(err error) error { return s.dbError("parcel search", err) })
 	if err != nil {

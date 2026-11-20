@@ -241,7 +241,7 @@ func explain(t *testing.T, pool *pgxpool.Pool, kind, query string) {
 		t.Fatal(err)
 	}
 	rows, err := tx.Query(ctx, "EXPLAIN (ANALYZE, BUFFERS) "+searchSQL,
-		time.Now().UTC().Truncate(time.Microsecond), q, escapeLike(q), defaultPageSize+1, defaultSearchCap, nil, nil, nil)
+		time.Now().UTC().Truncate(time.Microsecond), q, escapeLike(q), defaultPageSize+1, defaultSearchCap, nil, nil, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

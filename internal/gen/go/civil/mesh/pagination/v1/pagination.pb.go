@@ -173,7 +173,10 @@ type SearchCursor struct {
 	// SHA-256 of the RPC, the normalised query and legal_as_of.
 	FilterHash []byte `protobuf:"bytes,5,opt,name=filter_hash,json=filterHash,proto3" json:"filter_hash,omitempty"`
 	// The legal time every page resolves at, fixed by the first page.
-	AsOf          *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=as_of,json=asOf,proto3" json:"as_of,omitempty"`
+	AsOf *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=as_of,json=asOf,proto3" json:"as_of,omitempty"`
+	// public_id of the hit's address. It orders hits within a rank, before
+	// last_parcel_id.
+	LastAddressId string `protobuf:"bytes,7,opt,name=last_address_id,json=lastAddressId,proto3" json:"last_address_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -250,6 +253,13 @@ func (x *SearchCursor) GetAsOf() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *SearchCursor) GetLastAddressId() string {
+	if x != nil {
+		return x.LastAddressId
+	}
+	return ""
+}
+
 var File_civil_mesh_pagination_v1_pagination_proto protoreflect.FileDescriptor
 
 const file_civil_mesh_pagination_v1_pagination_proto_rawDesc = "" +
@@ -267,7 +277,7 @@ const file_civil_mesh_pagination_v1_pagination_proto_rawDesc = "" +
 	"\aversion\x18\x01 \x01(\rR\aversion\x12\x17\n" +
 	"\alast_id\x18\x02 \x01(\tR\x06lastId\x12\x1f\n" +
 	"\vfilter_hash\x18\x03 \x01(\fR\n" +
-	"filterHash\"\xd4\x01\n" +
+	"filterHash\"\xfc\x01\n" +
 	"\fSearchCursor\x12\x18\n" +
 	"\aversion\x18\x01 \x01(\rR\aversion\x12\x12\n" +
 	"\x04tier\x18\x02 \x01(\rR\x04tier\x12\x1e\n" +
@@ -277,7 +287,8 @@ const file_civil_mesh_pagination_v1_pagination_proto_rawDesc = "" +
 	"\x0elast_parcel_id\x18\x04 \x01(\tR\flastParcelId\x12\x1f\n" +
 	"\vfilter_hash\x18\x05 \x01(\fR\n" +
 	"filterHash\x12/\n" +
-	"\x05as_of\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\x04asOfB\x88\x02\n" +
+	"\x05as_of\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\x04asOf\x12&\n" +
+	"\x0flast_address_id\x18\a \x01(\tR\rlastAddressIdB\x88\x02\n" +
 	"\x1ccom.civil.mesh.pagination.v1B\x0fPaginationProtoP\x01ZTgithub.com/civil-labs/civil-os/internal/gen/go/civil/mesh/pagination/v1;paginationv1\xa2\x02\x03CMP\xaa\x02\x18Civil.Mesh.Pagination.V1\xca\x02\x18Civil\\Mesh\\Pagination\\V1\xe2\x02$Civil\\Mesh\\Pagination\\V1\\GPBMetadata\xea\x02\x1bCivil::Mesh::Pagination::V1b\x06proto3"
 
 var (

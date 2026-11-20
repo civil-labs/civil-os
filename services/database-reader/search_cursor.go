@@ -30,12 +30,14 @@ const maxSearchTier = 3
 // stands in for legal_as_of, so it gets the same bound.
 const minLegalTimeSeconds = -62135596800
 
-// searchKey is a hit's position in the ranked order
-// (tier ASC, similarity DESC, parcel public_id ASC), plus the legal time the
-// walk resolves at.
+// searchKey is a hit's position in the ranked order (tier ASC, similarity
+// DESC, address, parcel public_id ASC), plus the legal time the walk resolves
+// at. The address orders by its internal key, which the reader resolves from
+// addressID, so the internal key never leaves the database.
 type searchKey struct {
 	tier       int
 	similarity float32
+	addressID  string
 	parcelID   string
 	asOf       time.Time
 }
@@ -59,12 +61,13 @@ func searchFilterHash(normalizedQuery string, legalAsOf *timestamppb.Timestamp) 
 // encodeSearchCursor returns the opaque cursor for a hit.
 func encodeSearchCursor(key searchKey, filterHash []byte) (string, error) {
 	b, err := proto.Marshal(&paginationv1.SearchCursor{
-		Version:      searchCursorVersion,
-		Tier:         uint32(key.tier),
-		Similarity:   key.similarity,
-		LastParcelId: key.parcelID,
-		FilterHash:   filterHash,
-		AsOf:         timestamppb.New(key.asOf),
+		Version:       searchCursorVersion,
+		Tier:          uint32(key.tier),
+		Similarity:    key.similarity,
+		LastParcelId:  key.parcelID,
+		FilterHash:    filterHash,
+		AsOf:          timestamppb.New(key.asOf),
+		LastAddressId: key.addressID,
 	})
 	if err != nil {
 		return "", err
@@ -99,6 +102,9 @@ func decodeSearchCursor(s string, filterHash []byte, legalAsOf *timestamppb.Time
 	if _, err := uuid.Parse(c.GetLastParcelId()); err != nil {
 		return searchKey{}, invalid
 	}
+	if _, err := uuid.Parse(c.GetLastAddressId()); err != nil {
+		return searchKey{}, invalid
+	}
 	asOf := c.GetAsOf()
 	if asOf == nil || asOf.CheckValid() != nil || asOf.GetSeconds() <= minLegalTimeSeconds {
 		return searchKey{}, invalid
@@ -109,6 +115,7 @@ func decodeSearchCursor(s string, filterHash []byte, legalAsOf *timestamppb.Time
 	return searchKey{
 		tier:       int(c.GetTier()),
 		similarity: sim,
+		addressID:  c.GetLastAddressId(),
 		parcelID:   c.GetLastParcelId(),
 		asOf:       asOf.AsTime(),
 	}, nil

@@ -485,6 +485,84 @@ Next steps for whoever picks this up:
    - **Amend the budget, or the broad-query expectation,** in the spec. That's
      the owner's call.
 
+### Desktop run (2026-11-20)
+
+Ryzen 5 5600X (12 threads, 16 GB, WSL2) and Postgres 18.6 with the same
+testcontainers defaults. `mise run perf:search`, 200 runs per kind. Trigram
+index build 2.4 to 2.7 s.
+
+**Before: the query as first written.**
+
+| Kind | p50 | p95 | p99 |
+|---|---|---|---|
+| house-number prefix | 48.7 ms | 63.1 ms | 80.4 ms |
+| street fragment | 144.3 ms | 293.6 ms | 360.5 ms |
+| full address | 94.1 ms | 110 ms | 114.4 ms |
+| one-typo street | 190.9 ms | 1.087 s | 1.596 s |
+| broad (cap) | 3.817 s | 4.536 s | 6.422 s |
+| overall | 135.9 ms | 4.059 s | 4.536 s |
+
+The broad plan (`Row`) showed:
+- **Candidates were already sorted by `(tier, sim)` before the joins**, but
+  all 82,965 tied. The parcel `public_id` tie-break only exists after the
+  joins to `parcels`, so the incremental sort joined every candidate before
+  `LIMIT 1000` (about 2.75 s of 3.6 s). Ranking before the joins can't help
+  while the tie-break needs a joined column.
+- **`search_normalize` ran about 6 times per candidate:** in the recheck,
+  the duplicate filter, three tier tests and `word_similarity`.
+
+**Decision (owner, 2026-11-20):**
+1. Break ties on the address's internal key before the parcel `public_id`
+   (spec, "Ordering within a rank").
+2. Compute the normalised text once per candidate in the query. No schema
+   change.
+
+**What changed in the query:**
+- Candidates are ranked and sorted from `address_attributes` alone.
+  Visibility is a `LATERAL` probe under the cap, which now runs about 33
+  times instead of 82,965.
+- `unnest(ARRAY[search_normalize(...)])` computes the text once for scoring
+  and keeps the scan parallel-capable. Two approaches were rejected:
+  - A `MATERIALIZED` CTE: it lost parallelism, and the planner hash-joined
+    every candidate.
+  - `OFFSET 0`: it lost parallelism.
+- The cursor gained `last_address_id`.
+
+**After:**
+
+| Kind | p50 | p95 | p99 |
+|---|---|---|---|
+| house-number prefix | 44 ms | 54.8 ms | 64.8 ms |
+| street fragment | 68.7 ms | 104.7 ms | 113.2 ms |
+| full address | 92.2 ms | 107 ms | 128.3 ms |
+| one-typo street | 118.7 ms | 507.4 ms | 1.141 s |
+| broad (cap) | 1.371 s | 1.500 s | 1.542 s |
+| overall | 91.5 ms | 1.412 s | 1.500 s |
+
+**Still over budget**, almost entirely because of the broad kind. It's a
+fifth of all runs, so it sets the overall p95. What's left:
+- **The scan is CPU-bound in pg_trgm and the regex.** The planner prices
+  the regex at about one operator per row, so it rarely chooses a parallel
+  plan. One `EXPLAIN` went parallel (525 ms), but the timed runs go through
+  prepared statements, which run the serial plan (about 1.37 s).
+- **A stored normalised column alone wouldn't meet the budget.** This was
+  tested in a throwaway container, not the repo schema, with a generated
+  column and a trigram index on it:
+  - the broad query took about 725 ms serial;
+  - `LIKE '%row%'` took 28 ms;
+  - `'row' <% norm` took about 410 ms;
+  - `word_similarity` took about 250 ms more.
+
+  pg_trgm's own word-similarity work over 83,000 candidates is the floor.
+
+**Open for the owner:**
+- Amend the budget for cap-hitting queries.
+- Skip the fuzzy `<%` scan, or the similarity ordering, when the `LIKE` tiers
+  already fill the cap. This is a ranking change in the spec.
+- Lower the parallel-plan costs for the transaction with `SET LOCAL`, a
+  settings choice.
+- Add the stored column on top of one of the above.
+
 ## Final verification (before reporting the feature done)
 
 Check each intent success criterion against `main` after PR 2 merges, with

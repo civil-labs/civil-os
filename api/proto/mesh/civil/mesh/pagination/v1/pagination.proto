@@ -40,4 +40,7 @@ message SearchCursor {
   bytes filter_hash = 5;
   // The legal time every page resolves at, fixed by the first page.
   google.protobuf.Timestamp as_of = 6;
+  // public_id of the hit's address. It orders hits within a rank, before
+  // last_parcel_id.
+  string last_address_id = 7;
 }

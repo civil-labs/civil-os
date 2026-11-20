@@ -13,7 +13,10 @@ import (
 	paginationv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/pagination/v1"
 )
 
-const searchTestParcel = "a0000000-0000-4000-8000-000000000002"
+const (
+	searchTestParcel  = "a0000000-0000-4000-8000-000000000002"
+	searchTestAddress = "20000000-0000-4000-8000-000000000002"
+)
 
 func encodeSearchCursorMsg(t *testing.T, m *paginationv1.SearchCursor) string {
 	t.Helper()
@@ -30,7 +33,7 @@ func TestSearchCursorRoundTrip(t *testing.T) {
 	// The extremes, and a subnormal float32, must survive the round trip
 	// exactly: the keyset compares them as real in SQL.
 	for _, sim := range []float32{0, 1, 0.8, math.SmallestNonzeroFloat32} {
-		key := searchKey{tier: 2, similarity: sim, parcelID: searchTestParcel, asOf: asOf}
+		key := searchKey{tier: 2, similarity: sim, addressID: searchTestAddress, parcelID: searchTestParcel, asOf: asOf}
 		c, err := encodeSearchCursor(key, hash)
 		if err != nil {
 			t.Fatal(err)
@@ -39,7 +42,7 @@ func TestSearchCursorRoundTrip(t *testing.T) {
 		if err != nil {
 			t.Fatalf("similarity %g: %v", sim, err)
 		}
-		if got.tier != key.tier || got.similarity != key.similarity || got.parcelID != key.parcelID || !got.asOf.Equal(key.asOf) {
+		if got.tier != key.tier || got.similarity != key.similarity || got.addressID != key.addressID || got.parcelID != key.parcelID || !got.asOf.Equal(key.asOf) {
 			t.Errorf("round trip = %+v, want %+v", got, key)
 		}
 	}
@@ -56,7 +59,7 @@ func TestSearchCursorRejects(t *testing.T) {
 	valid := func() *paginationv1.SearchCursor {
 		return &paginationv1.SearchCursor{
 			Version: 1, Tier: 1, Similarity: 0.8, LastParcelId: searchTestParcel,
-			FilterHash: hash, AsOf: asOf,
+			FilterHash: hash, AsOf: asOf, LastAddressId: searchTestAddress,
 		}
 	}
 	with := func(f func(*paginationv1.SearchCursor)) string {
@@ -71,19 +74,21 @@ func TestSearchCursorRejects(t *testing.T) {
 		hash      []byte
 		legalAsOf *timestamppb.Timestamp
 	}{
-		"malformed base64":     {"not base64!", hash, nil},
-		"malformed protobuf":   {base64.RawURLEncoding.EncodeToString([]byte{0xff, 0xff}), hash, nil},
-		"version 2":            {with(func(m *paginationv1.SearchCursor) { m.Version = 2 }), hash, nil},
-		"tier 4":               {with(func(m *paginationv1.SearchCursor) { m.Tier = 4 }), hash, nil},
-		"similarity NaN":       {with(func(m *paginationv1.SearchCursor) { m.Similarity = float32(math.NaN()) }), hash, nil},
-		"similarity +Inf":      {with(func(m *paginationv1.SearchCursor) { m.Similarity = float32(math.Inf(1)) }), hash, nil},
-		"similarity -0.1":      {with(func(m *paginationv1.SearchCursor) { m.Similarity = -0.1 }), hash, nil},
-		"similarity 1.1":       {with(func(m *paginationv1.SearchCursor) { m.Similarity = 1.1 }), hash, nil},
-		"parcel ID not a UUID": {with(func(m *paginationv1.SearchCursor) { m.LastParcelId = "x' OR 1=1" }), hash, nil},
-		"no parcel ID":         {with(func(m *paginationv1.SearchCursor) { m.LastParcelId = "" }), hash, nil},
-		"as_of unset":          {with(func(m *paginationv1.SearchCursor) { m.AsOf = nil }), hash, nil},
-		"as_of before year 0":  {with(func(m *paginationv1.SearchCursor) { m.AsOf = &timestamppb.Timestamp{Seconds: minLegalTimeSeconds - 1} }), hash, nil},
-		"as_of invalid nanos":  {with(func(m *paginationv1.SearchCursor) { m.AsOf = &timestamppb.Timestamp{Seconds: 0, Nanos: -1} }), hash, nil},
+		"malformed base64":      {"not base64!", hash, nil},
+		"malformed protobuf":    {base64.RawURLEncoding.EncodeToString([]byte{0xff, 0xff}), hash, nil},
+		"version 2":             {with(func(m *paginationv1.SearchCursor) { m.Version = 2 }), hash, nil},
+		"tier 4":                {with(func(m *paginationv1.SearchCursor) { m.Tier = 4 }), hash, nil},
+		"similarity NaN":        {with(func(m *paginationv1.SearchCursor) { m.Similarity = float32(math.NaN()) }), hash, nil},
+		"similarity +Inf":       {with(func(m *paginationv1.SearchCursor) { m.Similarity = float32(math.Inf(1)) }), hash, nil},
+		"similarity -0.1":       {with(func(m *paginationv1.SearchCursor) { m.Similarity = -0.1 }), hash, nil},
+		"similarity 1.1":        {with(func(m *paginationv1.SearchCursor) { m.Similarity = 1.1 }), hash, nil},
+		"parcel ID not a UUID":  {with(func(m *paginationv1.SearchCursor) { m.LastParcelId = "x' OR 1=1" }), hash, nil},
+		"no parcel ID":          {with(func(m *paginationv1.SearchCursor) { m.LastParcelId = "" }), hash, nil},
+		"address ID not a UUID": {with(func(m *paginationv1.SearchCursor) { m.LastAddressId = "x' OR 1=1" }), hash, nil},
+		"no address ID":         {with(func(m *paginationv1.SearchCursor) { m.LastAddressId = "" }), hash, nil},
+		"as_of unset":           {with(func(m *paginationv1.SearchCursor) { m.AsOf = nil }), hash, nil},
+		"as_of before year 0":   {with(func(m *paginationv1.SearchCursor) { m.AsOf = &timestamppb.Timestamp{Seconds: minLegalTimeSeconds - 1} }), hash, nil},
+		"as_of invalid nanos":   {with(func(m *paginationv1.SearchCursor) { m.AsOf = &timestamppb.Timestamp{Seconds: 0, Nanos: -1} }), hash, nil},
 		"as_of differs from a set legal_as_of": {
 			with(func(m *paginationv1.SearchCursor) { m.FilterHash = hashSet }), hashSet, setAt,
 		},

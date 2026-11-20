@@ -160,6 +160,39 @@ func TestSearchVisibility(t *testing.T) {
 	}
 }
 
+// Parcels that share an address are ordered by parcel_id within the rank,
+// and pagination doesn't skip or repeat one across that tie. Parcel 21 shares
+// address 2 with parcel 2. It has no geometry in the fixtures, so it gets one
+// here.
+func TestSearchSharedAddress(t *testing.T) {
+	pool := tu.FixtureDatabase(t).Pool(t)
+	_, err := pool.Exec(context.Background(), `
+		INSERT INTO geo.parcel_geometry (parcel_id, feature_id, geom_web, legal_valid_range, trace_id)
+		SELECT p.parcel_id, 1021,
+		       extensions.ST_Multi(extensions.ST_MakeEnvelope(-139.99, -39.99, -139.9896, -39.9896, 4326)),
+		       tstzrange('2020-01-01 00:00:00+00', NULL), 'test'
+		FROM core.parcels p WHERE p.public_id = $1`, tu.ParcelID(tu.NoGeometryParcel))
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := startReaderOn(t, pool)
+
+	single := search(t, r, searchReq("2 fixture way", 100, nil, nil))
+	want := []string{tu.ParcelID(2), tu.ParcelID(tu.NoGeometryParcel)}
+	if got := hitIDs(single.Hits); len(got) < 2 || !slices.Equal(got[:2], want) {
+		t.Fatalf("2 fixture way = %v, want parcels 2 and 21 first, in that order", got)
+	}
+	for _, h := range single.Hits[:2] {
+		if h.GetAddressId() != tu.AddressID(2) {
+			t.Errorf("hit %s carries address %s, want address 2", h.GetParcelId(), h.GetAddressId())
+		}
+	}
+	walked, _ := walk(t, r, "2 fixture way", 1, nil)
+	if !slices.Equal(hitIDs(walked), hitIDs(single.Hits)) {
+		t.Errorf("first=1 walk = %v, want %v", hitIDs(walked), hitIDs(single.Hits))
+	}
+}
+
 func TestSearchPagination(t *testing.T) {
 	r := startReader(t)
 

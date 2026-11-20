@@ -555,13 +555,31 @@ fifth of all runs, so it sets the overall p95. What's left:
 
   pg_trgm's own word-similarity work over 83,000 candidates is the floor.
 
-**Open for the owner:**
-- Amend the budget for cap-hitting queries.
-- Skip the fuzzy `<%` scan, or the similarity ordering, when the `LIKE` tiers
-  already fill the cap. This is a ranking change in the spec.
-- Lower the parallel-plan costs for the transaction with `SET LOCAL`, a
-  settings choice.
-- Add the stored column on top of one of the above.
+**Exact-first prototype (not kept).** Ranking the `LIKE` tiers first, and
+running the fuzzy ranking only when visible exact hits don't fill the cap,
+returns the same list. Tier 3 ranks below every exact match. Every page
+resolves at the same `t`, so every page takes the same branch. The fuzzy
+branch was never executed for `Row`, and the broad kind fell to 835 ms at
+p50. But every query paid for the exact pass, so in a 20-run pass:
+- house-number prefix p50 rose from 44 to 85 ms;
+- full address p50 rose from 92 to 141 ms;
+- one-typo street p50 rose from 119 to 189 ms;
+- overall p95 was 870 ms.
+
+The owner discarded it.
+
+**Decision (owner, 2026-11-20): accept these numbers for now** and ship
+this version. The spec's budget row records the measured figures.
+
+Options for getting under the target later:
+- **A ranking change:** no similarity ordering within the exact tiers,
+  together with a stored normalised column. Estimated at about 100 ms for
+  the broad query, which pg_trgm's cost otherwise keeps at 250 ms or more.
+  This is a spec change plus a schema change through Atlas.
+- **A cheaper broad path:** a separate budget, or a smaller cap, for
+  cap-hitting queries.
+- **Parallel-plan costs:** lowered for the search transaction with
+  `SET LOCAL`.
 
 ## Final verification (before reporting the feature done)
 

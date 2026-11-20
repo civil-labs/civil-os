@@ -66,8 +66,7 @@ example) give network-dependent results.
 ## Constraints
 
 - The local stack only: `compose.yaml` and `dev/`. Cluster configuration (Helm chart,
-  gitops repo) is not edited from this repo. How Kubernetes resolves service names is
-  a separate question for those repos (see the open questions).
+  gitops repo) is not edited from this repo.
 - No change to the services' code or configuration names, unless the spec finds
   compose can't do it alone.
 - Keep `mise run up` and `mise run test:e2e` working unchanged for a developer.
@@ -99,5 +98,3 @@ example) give network-dependent results.
 - Should the gateway's tile proxy stop forwarding the `Authorization` header to the
   tile server, which doesn't need it? It's a separate fix, but this is where the risk
   showed up.
-- Is there a matching risk in Kubernetes? Pods there use the cluster's search domains
-  with `ndots:5`. Raise it with the chart repo rather than fixing it here.

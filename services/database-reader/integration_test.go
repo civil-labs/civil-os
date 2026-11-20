@@ -58,10 +58,10 @@ func startReader(t *testing.T) readerClients {
 }
 
 // startReaderOn serves the reader from pool, for tests that also change the
-// database directly.
-func startReaderOn(t *testing.T, pool *pgxpool.Pool) readerClients {
+// database directly or need a handler option.
+func startReaderOn(t *testing.T, pool *pgxpool.Pool, opts ...handlerOption) readerClients {
 	t.Helper()
-	srv := httptest.NewServer(newHandler(pool, slog.New(slog.DiscardHandler)))
+	srv := httptest.NewServer(newHandler(pool, slog.New(slog.DiscardHandler), opts...))
 	t.Cleanup(srv.Close)
 	c := http.DefaultClient
 	return readerClients{

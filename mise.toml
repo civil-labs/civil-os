@@ -27,6 +27,10 @@ run = "go test ./..."
 description = "Run integration tests against a PostGIS test container (needs Docker)"
 run = "go test -tags integration ./..."
 
+[tasks."perf:search"]
+description = "Address search latency check on 500,000 synthetic parcels (needs Docker; local only, not in CI)"
+run = "go test -tags perf -run TestSearchLatency -v -count=1 -timeout 90m ./services/database-reader"
+
 [tasks."test:e2e"]
 description = "Start (or rebuild) the compose stack, then run the end-to-end smoke tests against it"
 depends = ["up"]

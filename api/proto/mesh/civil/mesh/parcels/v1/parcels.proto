@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package civil.mesh.parcels.v1;
 
+import "civil/mesh/pagination/v1/pagination.proto";
 import "google/protobuf/timestamp.proto";
 import "google/type/interval.proto";
 
@@ -78,6 +79,12 @@ service ParcelReadService {
   rpc GetPrimaryImprovementConditionIdByFeatureId(GetPrimaryImprovementConditionIdByFeatureIdRequest) returns (GetPrimaryImprovementConditionIdByFeatureIdResponse) {}
 
   rpc GetPrimaryImprovementTypeIdByFeatureId(GetPrimaryImprovementTypeIdByFeatureIdRequest) returns (GetPrimaryImprovementTypeIdByFeatureIdResponse) {}
+
+  // Searches visible parcels by their address, ranked best first
+  // (docs/parcel-search/spec.md).
+  rpc SearchParcelsAddresses(SearchParcelsAddressesRequest) returns (SearchParcelsAddressesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 // Parcel mutations. Served by the database-writer, which connects with a
@@ -189,6 +196,25 @@ message GetParcelsWithImprovementSummaryByFeatureIdRequest {
 
 message GetParcelsWithImprovementSummaryByFeatureIdResponse {
   map<string, ParcelWithImprovementSummary> parcels = 1;
+}
+
+message SearchParcelsAddressesRequest {
+  string query = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
+  optional int32 first = 3;
+  optional string after = 4;
+}
+
+message SearchParcelsAddressesResponse {
+  repeated ParcelSearchHit hits = 1;
+  civil.mesh.pagination.v1.PageInfo page_info = 2;
+}
+
+message ParcelSearchHit {
+  string parcel_id = 1;
+  optional int64 feature_id = 2;
+  string address_id = 3;
+  string formatted_address = 4;
 }
 
 message UpdateParcelRequest {

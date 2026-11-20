@@ -8,6 +8,7 @@ package parcelsv1
 
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
+	v1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/pagination/v1"
 	_ "github.com/google/gnostic/openapiv3"
 	interval "google.golang.org/genproto/googleapis/type/interval"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -4624,11 +4625,206 @@ func (x *GetPrimaryImprovementTypeIdByFeatureIdResponse) GetValues() map[int64]s
 	return nil
 }
 
+type SearchParcelsAddressesRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Free text: part of an address. 1..200 characters. It must contain at
+	// least 3 letters or digits once punctuation is removed.
+	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	LegalAsOf     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=legal_as_of,json=legalAsOf,proto3,oneof" json:"legal_as_of,omitempty"`
+	First         *int32                 `protobuf:"varint,3,opt,name=first,proto3,oneof" json:"first,omitempty"`
+	After         *string                `protobuf:"bytes,4,opt,name=after,proto3,oneof" json:"after,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SearchParcelsAddressesRequest) Reset() {
+	*x = SearchParcelsAddressesRequest{}
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[81]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SearchParcelsAddressesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchParcelsAddressesRequest) ProtoMessage() {}
+
+func (x *SearchParcelsAddressesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[81]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchParcelsAddressesRequest.ProtoReflect.Descriptor instead.
+func (*SearchParcelsAddressesRequest) Descriptor() ([]byte, []int) {
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{81}
+}
+
+func (x *SearchParcelsAddressesRequest) GetQuery() string {
+	if x != nil {
+		return x.Query
+	}
+	return ""
+}
+
+func (x *SearchParcelsAddressesRequest) GetLegalAsOf() *timestamppb.Timestamp {
+	if x != nil {
+		return x.LegalAsOf
+	}
+	return nil
+}
+
+func (x *SearchParcelsAddressesRequest) GetFirst() int32 {
+	if x != nil && x.First != nil {
+		return *x.First
+	}
+	return 0
+}
+
+func (x *SearchParcelsAddressesRequest) GetAfter() string {
+	if x != nil && x.After != nil {
+		return *x.After
+	}
+	return ""
+}
+
+type SearchParcelsAddressesResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Best first. Fewer than `first` only on the last page.
+	Hits []*ParcelSearchHit `protobuf:"bytes,1,rep,name=hits,proto3" json:"hits,omitempty"`
+	// start_cursor and end_cursor mark the first and last hit. Pass end_cursor
+	// as `after` to read the next page.
+	PageInfo      *v1.PageInfo `protobuf:"bytes,2,opt,name=page_info,json=pageInfo,proto3" json:"page_info,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SearchParcelsAddressesResponse) Reset() {
+	*x = SearchParcelsAddressesResponse{}
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[82]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SearchParcelsAddressesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchParcelsAddressesResponse) ProtoMessage() {}
+
+func (x *SearchParcelsAddressesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[82]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchParcelsAddressesResponse.ProtoReflect.Descriptor instead.
+func (*SearchParcelsAddressesResponse) Descriptor() ([]byte, []int) {
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{82}
+}
+
+func (x *SearchParcelsAddressesResponse) GetHits() []*ParcelSearchHit {
+	if x != nil {
+		return x.Hits
+	}
+	return nil
+}
+
+func (x *SearchParcelsAddressesResponse) GetPageInfo() *v1.PageInfo {
+	if x != nil {
+		return x.PageInfo
+	}
+	return nil
+}
+
+// A parcel whose address matched a search.
+type ParcelSearchHit struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	ParcelId  string                 `protobuf:"bytes,1,opt,name=parcel_id,json=parcelId,proto3" json:"parcel_id,omitempty"`
+	FeatureId *int64                 `protobuf:"varint,2,opt,name=feature_id,json=featureId,proto3,oneof" json:"feature_id,omitempty"`
+	AddressId string                 `protobuf:"bytes,3,opt,name=address_id,json=addressId,proto3" json:"address_id,omitempty"`
+	// The address that matched at legal_as_of, as stored (not normalised).
+	FormattedAddress string `protobuf:"bytes,4,opt,name=formatted_address,json=formattedAddress,proto3" json:"formatted_address,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *ParcelSearchHit) Reset() {
+	*x = ParcelSearchHit{}
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[83]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ParcelSearchHit) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ParcelSearchHit) ProtoMessage() {}
+
+func (x *ParcelSearchHit) ProtoReflect() protoreflect.Message {
+	mi := &file_civil_public_parcels_v1_parcels_proto_msgTypes[83]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ParcelSearchHit.ProtoReflect.Descriptor instead.
+func (*ParcelSearchHit) Descriptor() ([]byte, []int) {
+	return file_civil_public_parcels_v1_parcels_proto_rawDescGZIP(), []int{83}
+}
+
+func (x *ParcelSearchHit) GetParcelId() string {
+	if x != nil {
+		return x.ParcelId
+	}
+	return ""
+}
+
+func (x *ParcelSearchHit) GetFeatureId() int64 {
+	if x != nil && x.FeatureId != nil {
+		return *x.FeatureId
+	}
+	return 0
+}
+
+func (x *ParcelSearchHit) GetAddressId() string {
+	if x != nil {
+		return x.AddressId
+	}
+	return ""
+}
+
+func (x *ParcelSearchHit) GetFormattedAddress() string {
+	if x != nil {
+		return x.FormattedAddress
+	}
+	return ""
+}
+
 var File_civil_public_parcels_v1_parcels_proto protoreflect.FileDescriptor
 
 const file_civil_public_parcels_v1_parcels_proto_rawDesc = "" +
 	"\n" +
-	"%civil/public/parcels/v1/parcels.proto\x12\x17civil.public.parcels.v1\x1a\x1bbuf/validate/validate.proto\x1a$gnostic/openapi/v3/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1agoogle/type/interval.proto\"\x98\x05\n" +
+	"%civil/public/parcels/v1/parcels.proto\x12\x17civil.public.parcels.v1\x1a\x1bbuf/validate/validate.proto\x1a+civil/public/pagination/v1/pagination.proto\x1a$gnostic/openapi/v3/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1agoogle/type/interval.proto\"\x98\x05\n" +
 	"\x11ParcelAffordances\x12\xd3\x01\n" +
 	"\x0eaffordance_ids\x18\x01 \x03(\tB\xab\x01\xbaG\x96\x01:R\x12P['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']\x92\x02?A list of unique identifiers for the affordances on the parcel.\xbaH\x0e\x92\x01\v\x102\x18\x01\"\x05r\x03\xb0\x01\x01R\raffordanceIds\x12,\n" +
 	"\amax_far\x18\x02 \x01(\x01B\x0e\xbaH\v\x12\t)\x00\x00\x00\x00\x00\x00\x00\x00H\x00R\x06maxFar\x88\x01\x01\x12?\n" +
@@ -5179,7 +5375,26 @@ const file_civil_public_parcels_v1_parcels_proto_rawDesc = "" +
 	"\x06values\x18\x01 \x03(\v2S.civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse.ValuesEntryR\x06values\x1a9\n" +
 	"\vValuesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\x03R\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01*\xc1\x04\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x8f\x05\n" +
+	"\x1dSearchParcelsAddressesRequest\x12\xa9\x01\n" +
+	"\x05query\x18\x01 \x01(\tB\x92\x01\xbaG\x84\x01:\x12\x12\x10'12 Fixture Way'\x92\x02mPart of an address, 1 to 200 characters, with at least 3 letters or digits. Case and punctuation are ignored.\xbaH\ar\x05\x10\x01\x18\xc8\x01R\x05query\x12\xb5\x01\n" +
+	"\vlegal_as_of\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampBt\xbaG^\x92\x02[The legal time to search at. Defaults to now, fixed by the first page for every later page.\xbaH\x10\xb2\x01\r*\v\b\x80\x92\xb8Ø\xfe\xff\xff\xff\x01H\x00R\tlegalAsOf\x88\x01\x01\x12X\n" +
+	"\x05first\x18\x03 \x01(\x05B=\xbaG1:\x04\x12\x0225\x92\x02(The page size, 1 to 100. Defaults to 25.\xbaH\x06\x1a\x04\x18d(\x01H\x01R\x05first\x88\x01\x01\x12\x8b\x01\n" +
+	"\x05after\x18\x04 \x01(\tBp\xbaGc\x92\x02`Return the hits after this cursor: page_info.end_cursor from a previous page of the same search.\xbaH\ar\x05\x10\x01\x18\x80\x04H\x02R\x05after\x88\x01\x01B\x0e\n" +
+	"\f_legal_as_ofB\b\n" +
+	"\x06_firstB\b\n" +
+	"\x06_after\"\x9e\x02\n" +
+	"\x1eSearchParcelsAddressesResponse\x12\x81\x01\n" +
+	"\x04hits\x18\x01 \x03(\v2(.civil.public.parcels.v1.ParcelSearchHitBC\xbaG@\x92\x02=The hits, best first. Fewer than first only on the last page.R\x04hits\x12x\n" +
+	"\tpage_info\x18\x02 \x01(\v2$.civil.public.pagination.v1.PageInfoB5\xbaG2\x92\x02/Pass end_cursor as after to read the next page.R\bpageInfo\"\xf2\x03\n" +
+	"\x0fParcelSearchHit\x12_\n" +
+	"\tparcel_id\x18\x01 \x01(\tBB\xbaG?:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x02\x12The parcel's UUID.R\bparcelId\x12Z\n" +
+	"\n" +
+	"feature_id\x18\x02 \x01(\x03B6\xbaG3\x92\x020The parcel's geometry feature ID at legal_as_of.H\x00R\tfeatureId\x88\x01\x01\x12t\n" +
+	"\n" +
+	"address_id\x18\x03 \x01(\tBU\xbaGR:(\x12&'a11c834a-9f12-4852-9bca-32dabc5def88'\x92\x02%The UUID of the address that matched.R\taddressId\x12\x9c\x01\n" +
+	"\x11formatted_address\x18\x04 \x01(\tBo\xbaGl:#\x12!'12 Fixture Way, Testville ZZ000'\x92\x02DThe address that matched at legal_as_of, as stored (not normalised).R\x10formattedAddressB\r\n" +
+	"\v_feature_id*\xc1\x04\n" +
 	"\x0fParcelAttribute\x12 \n" +
 	"\x1cPARCEL_ATTRIBUTE_UNSPECIFIED\x10\x00\x12$\n" +
 	" PARCEL_ATTRIBUTE_LAND_AREA_SQ_FT\x10\x01\x12 \n" +
@@ -5195,7 +5410,7 @@ const file_civil_public_parcels_v1_parcels_proto_rawDesc = "" +
 	"\x12=\n" +
 	"9PARCEL_ATTRIBUTE_PRIMARY_IMPROVEMENT_EFFECTIVE_YEAR_BUILT\x10\v\x125\n" +
 	"1PARCEL_ATTRIBUTE_PRIMARY_IMPROVEMENT_CONDITION_ID\x10\f\x120\n" +
-	",PARCEL_ATTRIBUTE_PRIMARY_IMPROVEMENT_TYPE_ID\x10\r2\x92.\n" +
+	",PARCEL_ATTRIBUTE_PRIMARY_IMPROVEMENT_TYPE_ID\x10\r2\xa3/\n" +
 	"\x0eParcelsService\x12\xc7\x01\n" +
 	"*GetParcelsWithImprovementSummaryByParcelId\x12J.civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdRequest\x1aK.civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse\"\x00\x12\xca\x01\n" +
 	"+GetParcelsWithImprovementSummaryByFeatureId\x12K.civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdRequest\x1aL.civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse\"\x00\x12\xb5\x01\n" +
@@ -5231,7 +5446,8 @@ const file_civil_public_parcels_v1_parcels_proto_rawDesc = "" +
 	")GetPrimaryImprovementYearBuiltByFeatureId\x12I.civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdRequest\x1aJ.civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse\"\x00\x12\xdf\x01\n" +
 	"2GetPrimaryImprovementEffectiveYearBuiltByFeatureId\x12R.civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest\x1aS.civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse\"\x00\x12\xca\x01\n" +
 	"+GetPrimaryImprovementConditionIdByFeatureId\x12K.civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdRequest\x1aL.civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse\"\x00\x12\xbb\x01\n" +
-	"&GetPrimaryImprovementTypeIdByFeatureId\x12F.civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdRequest\x1aG.civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse\"\x00\x12m\n" +
+	"&GetPrimaryImprovementTypeIdByFeatureId\x12F.civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdRequest\x1aG.civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse\"\x00\x12\x8e\x01\n" +
+	"\x16SearchParcelsAddresses\x126.civil.public.parcels.v1.SearchParcelsAddressesRequest\x1a7.civil.public.parcels.v1.SearchParcelsAddressesResponse\"\x03\x90\x02\x01\x12m\n" +
 	"\fUpdateParcel\x12,.civil.public.parcels.v1.UpdateParcelRequest\x1a-.civil.public.parcels.v1.UpdateParcelResponse\"\x00B\x89\x04\xbaG\x8c\x02\x12\xa6\x01\n" +
 	"\tCivil API\x12\x91\x01Public API description for the Civil platform. Auth token can be retrieved by prefixing \"auth-\" to the beginning of your jurisdiction's endpoint.2\x050.0.0\x1a8\n" +
 	"\x15http://localhost:8080\x12\x1fLocal stack (docker compose up)*':%\n" +
@@ -5255,7 +5471,7 @@ func file_civil_public_parcels_v1_parcels_proto_rawDescGZIP() []byte {
 }
 
 var file_civil_public_parcels_v1_parcels_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_civil_public_parcels_v1_parcels_proto_msgTypes = make([]protoimpl.MessageInfo, 114)
+var file_civil_public_parcels_v1_parcels_proto_msgTypes = make([]protoimpl.MessageInfo, 117)
 var file_civil_public_parcels_v1_parcels_proto_goTypes = []any{
 	(ParcelAttribute)(0),                                               // 0: civil.public.parcels.v1.ParcelAttribute
 	(*ParcelAffordances)(nil),                                          // 1: civil.public.parcels.v1.ParcelAffordances
@@ -5339,203 +5555,212 @@ var file_civil_public_parcels_v1_parcels_proto_goTypes = []any{
 	(*GetPrimaryImprovementConditionIdByFeatureIdResponse)(nil),        // 79: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse
 	(*GetPrimaryImprovementTypeIdByFeatureIdRequest)(nil),              // 80: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdRequest
 	(*GetPrimaryImprovementTypeIdByFeatureIdResponse)(nil),             // 81: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse
-	nil,                           // 82: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse.ParcelsEntry
-	nil,                           // 83: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse.ParcelsEntry
-	nil,                           // 84: civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdResponse.UniqueValuesEntry
-	nil,                           // 85: civil.public.parcels.v1.GetEquityComparablesResponse.ParcelsEntry
-	nil,                           // 86: civil.public.parcels.v1.GetSalesComparablesResponse.ParcelsEntry
-	nil,                           // 87: civil.public.parcels.v1.GetParcelIdsByFeatureIdResponse.ParcelIdsEntry
-	nil,                           // 88: civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse.ExtentsEntry
-	nil,                           // 89: civil.public.parcels.v1.GetLandAreaSqftByParcelIdResponse.ValuesEntry
-	nil,                           // 90: civil.public.parcels.v1.GetFrontageFtByParcelIdResponse.ValuesEntry
-	nil,                           // 91: civil.public.parcels.v1.GetDepthFtByParcelIdResponse.ValuesEntry
-	nil,                           // 92: civil.public.parcels.v1.GetLandUseIdByParcelIdResponse.ValuesEntry
-	nil,                           // 93: civil.public.parcels.v1.GetZoningIdByParcelIdResponse.ValuesEntry
-	nil,                           // 94: civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdResponse.ValuesEntry
-	nil,                           // 95: civil.public.parcels.v1.GetBedroomsByParcelIdResponse.ValuesEntry
-	nil,                           // 96: civil.public.parcels.v1.GetBathroomsByParcelIdResponse.ValuesEntry
-	nil,                           // 97: civil.public.parcels.v1.GetUnitsByParcelIdResponse.ValuesEntry
-	nil,                           // 98: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdResponse.ValuesEntry
-	nil,                           // 99: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse.ValuesEntry
-	nil,                           // 100: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdResponse.ValuesEntry
-	nil,                           // 101: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdResponse.ValuesEntry
-	nil,                           // 102: civil.public.parcels.v1.GetLandAreaSqftByFeatureIdResponse.ValuesEntry
-	nil,                           // 103: civil.public.parcels.v1.GetFrontageFtByFeatureIdResponse.ValuesEntry
-	nil,                           // 104: civil.public.parcels.v1.GetDepthFtByFeatureIdResponse.ValuesEntry
-	nil,                           // 105: civil.public.parcels.v1.GetLandUseIdByFeatureIdResponse.ValuesEntry
-	nil,                           // 106: civil.public.parcels.v1.GetZoningIdByFeatureIdResponse.ValuesEntry
-	nil,                           // 107: civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdResponse.ValuesEntry
-	nil,                           // 108: civil.public.parcels.v1.GetBedroomsByFeatureIdResponse.ValuesEntry
-	nil,                           // 109: civil.public.parcels.v1.GetBathroomsByFeatureIdResponse.ValuesEntry
-	nil,                           // 110: civil.public.parcels.v1.GetUnitsByFeatureIdResponse.ValuesEntry
-	nil,                           // 111: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse.ValuesEntry
-	nil,                           // 112: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse.ValuesEntry
-	nil,                           // 113: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse.ValuesEntry
-	nil,                           // 114: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse.ValuesEntry
-	(*timestamppb.Timestamp)(nil), // 115: google.protobuf.Timestamp
-	(*interval.Interval)(nil),     // 116: google.type.Interval
+	(*SearchParcelsAddressesRequest)(nil),                              // 82: civil.public.parcels.v1.SearchParcelsAddressesRequest
+	(*SearchParcelsAddressesResponse)(nil),                             // 83: civil.public.parcels.v1.SearchParcelsAddressesResponse
+	(*ParcelSearchHit)(nil),                                            // 84: civil.public.parcels.v1.ParcelSearchHit
+	nil,                                                                // 85: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse.ParcelsEntry
+	nil,                                                                // 86: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse.ParcelsEntry
+	nil,                                                                // 87: civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdResponse.UniqueValuesEntry
+	nil,                                                                // 88: civil.public.parcels.v1.GetEquityComparablesResponse.ParcelsEntry
+	nil,                                                                // 89: civil.public.parcels.v1.GetSalesComparablesResponse.ParcelsEntry
+	nil,                                                                // 90: civil.public.parcels.v1.GetParcelIdsByFeatureIdResponse.ParcelIdsEntry
+	nil,                                                                // 91: civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse.ExtentsEntry
+	nil,                                                                // 92: civil.public.parcels.v1.GetLandAreaSqftByParcelIdResponse.ValuesEntry
+	nil,                                                                // 93: civil.public.parcels.v1.GetFrontageFtByParcelIdResponse.ValuesEntry
+	nil,                                                                // 94: civil.public.parcels.v1.GetDepthFtByParcelIdResponse.ValuesEntry
+	nil,                                                                // 95: civil.public.parcels.v1.GetLandUseIdByParcelIdResponse.ValuesEntry
+	nil,                                                                // 96: civil.public.parcels.v1.GetZoningIdByParcelIdResponse.ValuesEntry
+	nil,                                                                // 97: civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdResponse.ValuesEntry
+	nil,                                                                // 98: civil.public.parcels.v1.GetBedroomsByParcelIdResponse.ValuesEntry
+	nil,                                                                // 99: civil.public.parcels.v1.GetBathroomsByParcelIdResponse.ValuesEntry
+	nil,                                                                // 100: civil.public.parcels.v1.GetUnitsByParcelIdResponse.ValuesEntry
+	nil,                                                                // 101: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdResponse.ValuesEntry
+	nil,                                                                // 102: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse.ValuesEntry
+	nil,                                                                // 103: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdResponse.ValuesEntry
+	nil,                                                                // 104: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdResponse.ValuesEntry
+	nil,                                                                // 105: civil.public.parcels.v1.GetLandAreaSqftByFeatureIdResponse.ValuesEntry
+	nil,                                                                // 106: civil.public.parcels.v1.GetFrontageFtByFeatureIdResponse.ValuesEntry
+	nil,                                                                // 107: civil.public.parcels.v1.GetDepthFtByFeatureIdResponse.ValuesEntry
+	nil,                                                                // 108: civil.public.parcels.v1.GetLandUseIdByFeatureIdResponse.ValuesEntry
+	nil,                                                                // 109: civil.public.parcels.v1.GetZoningIdByFeatureIdResponse.ValuesEntry
+	nil,                                                                // 110: civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdResponse.ValuesEntry
+	nil,                                                                // 111: civil.public.parcels.v1.GetBedroomsByFeatureIdResponse.ValuesEntry
+	nil,                                                                // 112: civil.public.parcels.v1.GetBathroomsByFeatureIdResponse.ValuesEntry
+	nil,                                                                // 113: civil.public.parcels.v1.GetUnitsByFeatureIdResponse.ValuesEntry
+	nil,                                                                // 114: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse.ValuesEntry
+	nil,                                                                // 115: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse.ValuesEntry
+	nil,                                                                // 116: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse.ValuesEntry
+	nil,                                                                // 117: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse.ValuesEntry
+	(*timestamppb.Timestamp)(nil),                                      // 118: google.protobuf.Timestamp
+	(*interval.Interval)(nil),                                          // 119: google.type.Interval
+	(*v1.PageInfo)(nil),                                                // 120: civil.public.pagination.v1.PageInfo
 }
 var file_civil_public_parcels_v1_parcels_proto_depIdxs = []int32{
 	3,   // 0: civil.public.parcels.v1.ParcelWithImprovementSummary.parcel_details:type_name -> civil.public.parcels.v1.ParcelDetails
 	2,   // 1: civil.public.parcels.v1.ParcelWithImprovementSummary.improvement_summary:type_name -> civil.public.parcels.v1.ParcelImprovementsSummary
-	115, // 2: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	82,  // 3: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse.parcels:type_name -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse.ParcelsEntry
-	115, // 4: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	83,  // 5: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse.parcels:type_name -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse.ParcelsEntry
+	118, // 2: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	85,  // 3: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse.parcels:type_name -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse.ParcelsEntry
+	118, // 4: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	86,  // 5: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse.parcels:type_name -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse.ParcelsEntry
 	0,   // 6: civil.public.parcels.v1.GetNumericalParcelAttributeStatsByIdRequest.attribute:type_name -> civil.public.parcels.v1.ParcelAttribute
-	115, // 7: civil.public.parcels.v1.GetNumericalParcelAttributeStatsByIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	115, // 8: civil.public.parcels.v1.GetNumericalParcelAttributeStatsByIdRequest.system_as_of:type_name -> google.protobuf.Timestamp
+	118, // 7: civil.public.parcels.v1.GetNumericalParcelAttributeStatsByIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	118, // 8: civil.public.parcels.v1.GetNumericalParcelAttributeStatsByIdRequest.system_as_of:type_name -> google.protobuf.Timestamp
 	0,   // 9: civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdRequest.attribute:type_name -> civil.public.parcels.v1.ParcelAttribute
-	115, // 10: civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	115, // 11: civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdRequest.system_as_of:type_name -> google.protobuf.Timestamp
-	84,  // 12: civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdResponse.unique_values:type_name -> civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdResponse.UniqueValuesEntry
+	118, // 10: civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	118, // 11: civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdRequest.system_as_of:type_name -> google.protobuf.Timestamp
+	87,  // 12: civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdResponse.unique_values:type_name -> civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdResponse.UniqueValuesEntry
 	0,   // 13: civil.public.parcels.v1.ComparableCriteria.attribute:type_name -> civil.public.parcels.v1.ParcelAttribute
 	0,   // 14: civil.public.parcels.v1.ComparableAttribute.attribute:type_name -> civil.public.parcels.v1.ParcelAttribute
 	16,  // 15: civil.public.parcels.v1.EquityComparableParcel.attributes:type_name -> civil.public.parcels.v1.ComparableAttribute
-	115, // 16: civil.public.parcels.v1.SaleComparableParcel.sale_time:type_name -> google.protobuf.Timestamp
+	118, // 16: civil.public.parcels.v1.SaleComparableParcel.sale_time:type_name -> google.protobuf.Timestamp
 	16,  // 17: civil.public.parcels.v1.SaleComparableParcel.attributes:type_name -> civil.public.parcels.v1.ComparableAttribute
 	15,  // 18: civil.public.parcels.v1.GetEquityComparablesRequest.criteria:type_name -> civil.public.parcels.v1.ComparableCriteria
-	85,  // 19: civil.public.parcels.v1.GetEquityComparablesResponse.parcels:type_name -> civil.public.parcels.v1.GetEquityComparablesResponse.ParcelsEntry
+	88,  // 19: civil.public.parcels.v1.GetEquityComparablesResponse.parcels:type_name -> civil.public.parcels.v1.GetEquityComparablesResponse.ParcelsEntry
 	15,  // 20: civil.public.parcels.v1.GetSalesComparablesRequest.criteria:type_name -> civil.public.parcels.v1.ComparableCriteria
-	116, // 21: civil.public.parcels.v1.GetSalesComparablesRequest.time_range:type_name -> google.type.Interval
-	86,  // 22: civil.public.parcels.v1.GetSalesComparablesResponse.parcels:type_name -> civil.public.parcels.v1.GetSalesComparablesResponse.ParcelsEntry
-	87,  // 23: civil.public.parcels.v1.GetParcelIdsByFeatureIdResponse.parcel_ids:type_name -> civil.public.parcels.v1.GetParcelIdsByFeatureIdResponse.ParcelIdsEntry
-	115, // 24: civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	88,  // 25: civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse.extents:type_name -> civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse.ExtentsEntry
-	115, // 26: civil.public.parcels.v1.GetLandAreaSqftByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	89,  // 27: civil.public.parcels.v1.GetLandAreaSqftByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetLandAreaSqftByParcelIdResponse.ValuesEntry
-	115, // 28: civil.public.parcels.v1.GetFrontageFtByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	90,  // 29: civil.public.parcels.v1.GetFrontageFtByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetFrontageFtByParcelIdResponse.ValuesEntry
-	115, // 30: civil.public.parcels.v1.GetDepthFtByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	91,  // 31: civil.public.parcels.v1.GetDepthFtByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetDepthFtByParcelIdResponse.ValuesEntry
-	115, // 32: civil.public.parcels.v1.GetLandUseIdByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	92,  // 33: civil.public.parcels.v1.GetLandUseIdByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetLandUseIdByParcelIdResponse.ValuesEntry
-	115, // 34: civil.public.parcels.v1.GetZoningIdByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	93,  // 35: civil.public.parcels.v1.GetZoningIdByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetZoningIdByParcelIdResponse.ValuesEntry
-	115, // 36: civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	94,  // 37: civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdResponse.ValuesEntry
-	115, // 38: civil.public.parcels.v1.GetBedroomsByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	95,  // 39: civil.public.parcels.v1.GetBedroomsByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetBedroomsByParcelIdResponse.ValuesEntry
-	115, // 40: civil.public.parcels.v1.GetBathroomsByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	96,  // 41: civil.public.parcels.v1.GetBathroomsByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetBathroomsByParcelIdResponse.ValuesEntry
-	115, // 42: civil.public.parcels.v1.GetUnitsByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	97,  // 43: civil.public.parcels.v1.GetUnitsByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetUnitsByParcelIdResponse.ValuesEntry
-	115, // 44: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	98,  // 45: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdResponse.ValuesEntry
-	115, // 46: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	99,  // 47: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse.ValuesEntry
-	115, // 48: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	100, // 49: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdResponse.ValuesEntry
-	115, // 50: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	101, // 51: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdResponse.ValuesEntry
-	115, // 52: civil.public.parcels.v1.GetLandAreaSqftByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	102, // 53: civil.public.parcels.v1.GetLandAreaSqftByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetLandAreaSqftByFeatureIdResponse.ValuesEntry
-	115, // 54: civil.public.parcels.v1.GetFrontageFtByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	103, // 55: civil.public.parcels.v1.GetFrontageFtByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetFrontageFtByFeatureIdResponse.ValuesEntry
-	115, // 56: civil.public.parcels.v1.GetDepthFtByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	104, // 57: civil.public.parcels.v1.GetDepthFtByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetDepthFtByFeatureIdResponse.ValuesEntry
-	115, // 58: civil.public.parcels.v1.GetLandUseIdByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	105, // 59: civil.public.parcels.v1.GetLandUseIdByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetLandUseIdByFeatureIdResponse.ValuesEntry
-	115, // 60: civil.public.parcels.v1.GetZoningIdByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	106, // 61: civil.public.parcels.v1.GetZoningIdByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetZoningIdByFeatureIdResponse.ValuesEntry
-	115, // 62: civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	107, // 63: civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdResponse.ValuesEntry
-	115, // 64: civil.public.parcels.v1.GetBedroomsByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	108, // 65: civil.public.parcels.v1.GetBedroomsByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetBedroomsByFeatureIdResponse.ValuesEntry
-	115, // 66: civil.public.parcels.v1.GetBathroomsByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	109, // 67: civil.public.parcels.v1.GetBathroomsByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetBathroomsByFeatureIdResponse.ValuesEntry
-	115, // 68: civil.public.parcels.v1.GetUnitsByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	110, // 69: civil.public.parcels.v1.GetUnitsByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetUnitsByFeatureIdResponse.ValuesEntry
-	115, // 70: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	111, // 71: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse.ValuesEntry
-	115, // 72: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	112, // 73: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse.ValuesEntry
-	115, // 74: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	113, // 75: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse.ValuesEntry
-	115, // 76: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	114, // 77: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse.ValuesEntry
-	4,   // 78: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse.ParcelsEntry.value:type_name -> civil.public.parcels.v1.ParcelWithImprovementSummary
-	4,   // 79: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse.ParcelsEntry.value:type_name -> civil.public.parcels.v1.ParcelWithImprovementSummary
-	17,  // 80: civil.public.parcels.v1.GetEquityComparablesResponse.ParcelsEntry.value:type_name -> civil.public.parcels.v1.EquityComparableParcel
-	18,  // 81: civil.public.parcels.v1.GetSalesComparablesResponse.ParcelsEntry.value:type_name -> civil.public.parcels.v1.SaleComparableParcel
-	27,  // 82: civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse.ExtentsEntry.value:type_name -> civil.public.parcels.v1.ExtentWGS84
-	5,   // 83: civil.public.parcels.v1.ParcelsService.GetParcelsWithImprovementSummaryByParcelId:input_type -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdRequest
-	7,   // 84: civil.public.parcels.v1.ParcelsService.GetParcelsWithImprovementSummaryByFeatureId:input_type -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdRequest
-	11,  // 85: civil.public.parcels.v1.ParcelsService.GetNumericalParcelAttributeStatsById:input_type -> civil.public.parcels.v1.GetNumericalParcelAttributeStatsByIdRequest
-	13,  // 86: civil.public.parcels.v1.ParcelsService.GetCategoricalParcelAttributeStatsById:input_type -> civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdRequest
-	19,  // 87: civil.public.parcels.v1.ParcelsService.GetEquityComparables:input_type -> civil.public.parcels.v1.GetEquityComparablesRequest
-	21,  // 88: civil.public.parcels.v1.ParcelsService.GetSalesComparables:input_type -> civil.public.parcels.v1.GetSalesComparablesRequest
-	23,  // 89: civil.public.parcels.v1.ParcelsService.GetParcelIdsByFeatureId:input_type -> civil.public.parcels.v1.GetParcelIdsByFeatureIdRequest
-	25,  // 90: civil.public.parcels.v1.ParcelsService.GetEstimatedParcelsExtentWGS84:input_type -> civil.public.parcels.v1.GetEstimatedParcelsExtentWGS84Request
-	28,  // 91: civil.public.parcels.v1.ParcelsService.GetParcelExtentsWGS84ByParcelId:input_type -> civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdRequest
-	30,  // 92: civil.public.parcels.v1.ParcelsService.GetLandAreaSqftByParcelId:input_type -> civil.public.parcels.v1.GetLandAreaSqftByParcelIdRequest
-	32,  // 93: civil.public.parcels.v1.ParcelsService.GetFrontageFtByParcelId:input_type -> civil.public.parcels.v1.GetFrontageFtByParcelIdRequest
-	34,  // 94: civil.public.parcels.v1.ParcelsService.GetDepthFtByParcelId:input_type -> civil.public.parcels.v1.GetDepthFtByParcelIdRequest
-	36,  // 95: civil.public.parcels.v1.ParcelsService.GetLandUseIdByParcelId:input_type -> civil.public.parcels.v1.GetLandUseIdByParcelIdRequest
-	38,  // 96: civil.public.parcels.v1.ParcelsService.GetZoningIdByParcelId:input_type -> civil.public.parcels.v1.GetZoningIdByParcelIdRequest
-	40,  // 97: civil.public.parcels.v1.ParcelsService.GetImprovementAreaSqftByParcelId:input_type -> civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdRequest
-	42,  // 98: civil.public.parcels.v1.ParcelsService.GetBedroomsByParcelId:input_type -> civil.public.parcels.v1.GetBedroomsByParcelIdRequest
-	44,  // 99: civil.public.parcels.v1.ParcelsService.GetBathroomsByParcelId:input_type -> civil.public.parcels.v1.GetBathroomsByParcelIdRequest
-	46,  // 100: civil.public.parcels.v1.ParcelsService.GetUnitsByParcelId:input_type -> civil.public.parcels.v1.GetUnitsByParcelIdRequest
-	48,  // 101: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementYearBuiltByParcelId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdRequest
-	50,  // 102: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementEffectiveYearBuiltByParcelId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest
-	52,  // 103: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementConditionIdByParcelId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdRequest
-	54,  // 104: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByParcelId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdRequest
-	56,  // 105: civil.public.parcels.v1.ParcelsService.GetLandAreaSqftByFeatureId:input_type -> civil.public.parcels.v1.GetLandAreaSqftByFeatureIdRequest
-	58,  // 106: civil.public.parcels.v1.ParcelsService.GetFrontageFtByFeatureId:input_type -> civil.public.parcels.v1.GetFrontageFtByFeatureIdRequest
-	60,  // 107: civil.public.parcels.v1.ParcelsService.GetDepthFtByFeatureId:input_type -> civil.public.parcels.v1.GetDepthFtByFeatureIdRequest
-	62,  // 108: civil.public.parcels.v1.ParcelsService.GetLandUseIdByFeatureId:input_type -> civil.public.parcels.v1.GetLandUseIdByFeatureIdRequest
-	64,  // 109: civil.public.parcels.v1.ParcelsService.GetZoningIdByFeatureId:input_type -> civil.public.parcels.v1.GetZoningIdByFeatureIdRequest
-	66,  // 110: civil.public.parcels.v1.ParcelsService.GetImprovementAreaSqftByFeatureId:input_type -> civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdRequest
-	68,  // 111: civil.public.parcels.v1.ParcelsService.GetBedroomsByFeatureId:input_type -> civil.public.parcels.v1.GetBedroomsByFeatureIdRequest
-	70,  // 112: civil.public.parcels.v1.ParcelsService.GetBathroomsByFeatureId:input_type -> civil.public.parcels.v1.GetBathroomsByFeatureIdRequest
-	72,  // 113: civil.public.parcels.v1.ParcelsService.GetUnitsByFeatureId:input_type -> civil.public.parcels.v1.GetUnitsByFeatureIdRequest
-	74,  // 114: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementYearBuiltByFeatureId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdRequest
-	76,  // 115: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementEffectiveYearBuiltByFeatureId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest
-	78,  // 116: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementConditionIdByFeatureId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdRequest
-	80,  // 117: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByFeatureId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdRequest
-	9,   // 118: civil.public.parcels.v1.ParcelsService.UpdateParcel:input_type -> civil.public.parcels.v1.UpdateParcelRequest
-	6,   // 119: civil.public.parcels.v1.ParcelsService.GetParcelsWithImprovementSummaryByParcelId:output_type -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse
-	8,   // 120: civil.public.parcels.v1.ParcelsService.GetParcelsWithImprovementSummaryByFeatureId:output_type -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse
-	12,  // 121: civil.public.parcels.v1.ParcelsService.GetNumericalParcelAttributeStatsById:output_type -> civil.public.parcels.v1.GetNumericalParcelAttributeStatsByIdResponse
-	14,  // 122: civil.public.parcels.v1.ParcelsService.GetCategoricalParcelAttributeStatsById:output_type -> civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdResponse
-	20,  // 123: civil.public.parcels.v1.ParcelsService.GetEquityComparables:output_type -> civil.public.parcels.v1.GetEquityComparablesResponse
-	22,  // 124: civil.public.parcels.v1.ParcelsService.GetSalesComparables:output_type -> civil.public.parcels.v1.GetSalesComparablesResponse
-	24,  // 125: civil.public.parcels.v1.ParcelsService.GetParcelIdsByFeatureId:output_type -> civil.public.parcels.v1.GetParcelIdsByFeatureIdResponse
-	26,  // 126: civil.public.parcels.v1.ParcelsService.GetEstimatedParcelsExtentWGS84:output_type -> civil.public.parcels.v1.GetEstimatedParcelsExtentWGS84Response
-	29,  // 127: civil.public.parcels.v1.ParcelsService.GetParcelExtentsWGS84ByParcelId:output_type -> civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse
-	31,  // 128: civil.public.parcels.v1.ParcelsService.GetLandAreaSqftByParcelId:output_type -> civil.public.parcels.v1.GetLandAreaSqftByParcelIdResponse
-	33,  // 129: civil.public.parcels.v1.ParcelsService.GetFrontageFtByParcelId:output_type -> civil.public.parcels.v1.GetFrontageFtByParcelIdResponse
-	35,  // 130: civil.public.parcels.v1.ParcelsService.GetDepthFtByParcelId:output_type -> civil.public.parcels.v1.GetDepthFtByParcelIdResponse
-	37,  // 131: civil.public.parcels.v1.ParcelsService.GetLandUseIdByParcelId:output_type -> civil.public.parcels.v1.GetLandUseIdByParcelIdResponse
-	39,  // 132: civil.public.parcels.v1.ParcelsService.GetZoningIdByParcelId:output_type -> civil.public.parcels.v1.GetZoningIdByParcelIdResponse
-	41,  // 133: civil.public.parcels.v1.ParcelsService.GetImprovementAreaSqftByParcelId:output_type -> civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdResponse
-	43,  // 134: civil.public.parcels.v1.ParcelsService.GetBedroomsByParcelId:output_type -> civil.public.parcels.v1.GetBedroomsByParcelIdResponse
-	45,  // 135: civil.public.parcels.v1.ParcelsService.GetBathroomsByParcelId:output_type -> civil.public.parcels.v1.GetBathroomsByParcelIdResponse
-	47,  // 136: civil.public.parcels.v1.ParcelsService.GetUnitsByParcelId:output_type -> civil.public.parcels.v1.GetUnitsByParcelIdResponse
-	49,  // 137: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementYearBuiltByParcelId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdResponse
-	51,  // 138: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementEffectiveYearBuiltByParcelId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse
-	53,  // 139: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementConditionIdByParcelId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdResponse
-	55,  // 140: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByParcelId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdResponse
-	57,  // 141: civil.public.parcels.v1.ParcelsService.GetLandAreaSqftByFeatureId:output_type -> civil.public.parcels.v1.GetLandAreaSqftByFeatureIdResponse
-	59,  // 142: civil.public.parcels.v1.ParcelsService.GetFrontageFtByFeatureId:output_type -> civil.public.parcels.v1.GetFrontageFtByFeatureIdResponse
-	61,  // 143: civil.public.parcels.v1.ParcelsService.GetDepthFtByFeatureId:output_type -> civil.public.parcels.v1.GetDepthFtByFeatureIdResponse
-	63,  // 144: civil.public.parcels.v1.ParcelsService.GetLandUseIdByFeatureId:output_type -> civil.public.parcels.v1.GetLandUseIdByFeatureIdResponse
-	65,  // 145: civil.public.parcels.v1.ParcelsService.GetZoningIdByFeatureId:output_type -> civil.public.parcels.v1.GetZoningIdByFeatureIdResponse
-	67,  // 146: civil.public.parcels.v1.ParcelsService.GetImprovementAreaSqftByFeatureId:output_type -> civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdResponse
-	69,  // 147: civil.public.parcels.v1.ParcelsService.GetBedroomsByFeatureId:output_type -> civil.public.parcels.v1.GetBedroomsByFeatureIdResponse
-	71,  // 148: civil.public.parcels.v1.ParcelsService.GetBathroomsByFeatureId:output_type -> civil.public.parcels.v1.GetBathroomsByFeatureIdResponse
-	73,  // 149: civil.public.parcels.v1.ParcelsService.GetUnitsByFeatureId:output_type -> civil.public.parcels.v1.GetUnitsByFeatureIdResponse
-	75,  // 150: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementYearBuiltByFeatureId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse
-	77,  // 151: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementEffectiveYearBuiltByFeatureId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse
-	79,  // 152: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementConditionIdByFeatureId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse
-	81,  // 153: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByFeatureId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse
-	10,  // 154: civil.public.parcels.v1.ParcelsService.UpdateParcel:output_type -> civil.public.parcels.v1.UpdateParcelResponse
-	119, // [119:155] is the sub-list for method output_type
-	83,  // [83:119] is the sub-list for method input_type
-	83,  // [83:83] is the sub-list for extension type_name
-	83,  // [83:83] is the sub-list for extension extendee
-	0,   // [0:83] is the sub-list for field type_name
+	119, // 21: civil.public.parcels.v1.GetSalesComparablesRequest.time_range:type_name -> google.type.Interval
+	89,  // 22: civil.public.parcels.v1.GetSalesComparablesResponse.parcels:type_name -> civil.public.parcels.v1.GetSalesComparablesResponse.ParcelsEntry
+	90,  // 23: civil.public.parcels.v1.GetParcelIdsByFeatureIdResponse.parcel_ids:type_name -> civil.public.parcels.v1.GetParcelIdsByFeatureIdResponse.ParcelIdsEntry
+	118, // 24: civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	91,  // 25: civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse.extents:type_name -> civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse.ExtentsEntry
+	118, // 26: civil.public.parcels.v1.GetLandAreaSqftByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	92,  // 27: civil.public.parcels.v1.GetLandAreaSqftByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetLandAreaSqftByParcelIdResponse.ValuesEntry
+	118, // 28: civil.public.parcels.v1.GetFrontageFtByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	93,  // 29: civil.public.parcels.v1.GetFrontageFtByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetFrontageFtByParcelIdResponse.ValuesEntry
+	118, // 30: civil.public.parcels.v1.GetDepthFtByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	94,  // 31: civil.public.parcels.v1.GetDepthFtByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetDepthFtByParcelIdResponse.ValuesEntry
+	118, // 32: civil.public.parcels.v1.GetLandUseIdByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	95,  // 33: civil.public.parcels.v1.GetLandUseIdByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetLandUseIdByParcelIdResponse.ValuesEntry
+	118, // 34: civil.public.parcels.v1.GetZoningIdByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	96,  // 35: civil.public.parcels.v1.GetZoningIdByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetZoningIdByParcelIdResponse.ValuesEntry
+	118, // 36: civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	97,  // 37: civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdResponse.ValuesEntry
+	118, // 38: civil.public.parcels.v1.GetBedroomsByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	98,  // 39: civil.public.parcels.v1.GetBedroomsByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetBedroomsByParcelIdResponse.ValuesEntry
+	118, // 40: civil.public.parcels.v1.GetBathroomsByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	99,  // 41: civil.public.parcels.v1.GetBathroomsByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetBathroomsByParcelIdResponse.ValuesEntry
+	118, // 42: civil.public.parcels.v1.GetUnitsByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	100, // 43: civil.public.parcels.v1.GetUnitsByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetUnitsByParcelIdResponse.ValuesEntry
+	118, // 44: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	101, // 45: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdResponse.ValuesEntry
+	118, // 46: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	102, // 47: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse.ValuesEntry
+	118, // 48: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	103, // 49: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdResponse.ValuesEntry
+	118, // 50: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	104, // 51: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdResponse.ValuesEntry
+	118, // 52: civil.public.parcels.v1.GetLandAreaSqftByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	105, // 53: civil.public.parcels.v1.GetLandAreaSqftByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetLandAreaSqftByFeatureIdResponse.ValuesEntry
+	118, // 54: civil.public.parcels.v1.GetFrontageFtByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	106, // 55: civil.public.parcels.v1.GetFrontageFtByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetFrontageFtByFeatureIdResponse.ValuesEntry
+	118, // 56: civil.public.parcels.v1.GetDepthFtByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	107, // 57: civil.public.parcels.v1.GetDepthFtByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetDepthFtByFeatureIdResponse.ValuesEntry
+	118, // 58: civil.public.parcels.v1.GetLandUseIdByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	108, // 59: civil.public.parcels.v1.GetLandUseIdByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetLandUseIdByFeatureIdResponse.ValuesEntry
+	118, // 60: civil.public.parcels.v1.GetZoningIdByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	109, // 61: civil.public.parcels.v1.GetZoningIdByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetZoningIdByFeatureIdResponse.ValuesEntry
+	118, // 62: civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	110, // 63: civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdResponse.ValuesEntry
+	118, // 64: civil.public.parcels.v1.GetBedroomsByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	111, // 65: civil.public.parcels.v1.GetBedroomsByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetBedroomsByFeatureIdResponse.ValuesEntry
+	118, // 66: civil.public.parcels.v1.GetBathroomsByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	112, // 67: civil.public.parcels.v1.GetBathroomsByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetBathroomsByFeatureIdResponse.ValuesEntry
+	118, // 68: civil.public.parcels.v1.GetUnitsByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	113, // 69: civil.public.parcels.v1.GetUnitsByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetUnitsByFeatureIdResponse.ValuesEntry
+	118, // 70: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	114, // 71: civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse.ValuesEntry
+	118, // 72: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	115, // 73: civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse.ValuesEntry
+	118, // 74: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	116, // 75: civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse.ValuesEntry
+	118, // 76: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	117, // 77: civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse.values:type_name -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse.ValuesEntry
+	118, // 78: civil.public.parcels.v1.SearchParcelsAddressesRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	84,  // 79: civil.public.parcels.v1.SearchParcelsAddressesResponse.hits:type_name -> civil.public.parcels.v1.ParcelSearchHit
+	120, // 80: civil.public.parcels.v1.SearchParcelsAddressesResponse.page_info:type_name -> civil.public.pagination.v1.PageInfo
+	4,   // 81: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse.ParcelsEntry.value:type_name -> civil.public.parcels.v1.ParcelWithImprovementSummary
+	4,   // 82: civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse.ParcelsEntry.value:type_name -> civil.public.parcels.v1.ParcelWithImprovementSummary
+	17,  // 83: civil.public.parcels.v1.GetEquityComparablesResponse.ParcelsEntry.value:type_name -> civil.public.parcels.v1.EquityComparableParcel
+	18,  // 84: civil.public.parcels.v1.GetSalesComparablesResponse.ParcelsEntry.value:type_name -> civil.public.parcels.v1.SaleComparableParcel
+	27,  // 85: civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse.ExtentsEntry.value:type_name -> civil.public.parcels.v1.ExtentWGS84
+	5,   // 86: civil.public.parcels.v1.ParcelsService.GetParcelsWithImprovementSummaryByParcelId:input_type -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdRequest
+	7,   // 87: civil.public.parcels.v1.ParcelsService.GetParcelsWithImprovementSummaryByFeatureId:input_type -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdRequest
+	11,  // 88: civil.public.parcels.v1.ParcelsService.GetNumericalParcelAttributeStatsById:input_type -> civil.public.parcels.v1.GetNumericalParcelAttributeStatsByIdRequest
+	13,  // 89: civil.public.parcels.v1.ParcelsService.GetCategoricalParcelAttributeStatsById:input_type -> civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdRequest
+	19,  // 90: civil.public.parcels.v1.ParcelsService.GetEquityComparables:input_type -> civil.public.parcels.v1.GetEquityComparablesRequest
+	21,  // 91: civil.public.parcels.v1.ParcelsService.GetSalesComparables:input_type -> civil.public.parcels.v1.GetSalesComparablesRequest
+	23,  // 92: civil.public.parcels.v1.ParcelsService.GetParcelIdsByFeatureId:input_type -> civil.public.parcels.v1.GetParcelIdsByFeatureIdRequest
+	25,  // 93: civil.public.parcels.v1.ParcelsService.GetEstimatedParcelsExtentWGS84:input_type -> civil.public.parcels.v1.GetEstimatedParcelsExtentWGS84Request
+	28,  // 94: civil.public.parcels.v1.ParcelsService.GetParcelExtentsWGS84ByParcelId:input_type -> civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdRequest
+	30,  // 95: civil.public.parcels.v1.ParcelsService.GetLandAreaSqftByParcelId:input_type -> civil.public.parcels.v1.GetLandAreaSqftByParcelIdRequest
+	32,  // 96: civil.public.parcels.v1.ParcelsService.GetFrontageFtByParcelId:input_type -> civil.public.parcels.v1.GetFrontageFtByParcelIdRequest
+	34,  // 97: civil.public.parcels.v1.ParcelsService.GetDepthFtByParcelId:input_type -> civil.public.parcels.v1.GetDepthFtByParcelIdRequest
+	36,  // 98: civil.public.parcels.v1.ParcelsService.GetLandUseIdByParcelId:input_type -> civil.public.parcels.v1.GetLandUseIdByParcelIdRequest
+	38,  // 99: civil.public.parcels.v1.ParcelsService.GetZoningIdByParcelId:input_type -> civil.public.parcels.v1.GetZoningIdByParcelIdRequest
+	40,  // 100: civil.public.parcels.v1.ParcelsService.GetImprovementAreaSqftByParcelId:input_type -> civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdRequest
+	42,  // 101: civil.public.parcels.v1.ParcelsService.GetBedroomsByParcelId:input_type -> civil.public.parcels.v1.GetBedroomsByParcelIdRequest
+	44,  // 102: civil.public.parcels.v1.ParcelsService.GetBathroomsByParcelId:input_type -> civil.public.parcels.v1.GetBathroomsByParcelIdRequest
+	46,  // 103: civil.public.parcels.v1.ParcelsService.GetUnitsByParcelId:input_type -> civil.public.parcels.v1.GetUnitsByParcelIdRequest
+	48,  // 104: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementYearBuiltByParcelId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdRequest
+	50,  // 105: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementEffectiveYearBuiltByParcelId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest
+	52,  // 106: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementConditionIdByParcelId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdRequest
+	54,  // 107: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByParcelId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdRequest
+	56,  // 108: civil.public.parcels.v1.ParcelsService.GetLandAreaSqftByFeatureId:input_type -> civil.public.parcels.v1.GetLandAreaSqftByFeatureIdRequest
+	58,  // 109: civil.public.parcels.v1.ParcelsService.GetFrontageFtByFeatureId:input_type -> civil.public.parcels.v1.GetFrontageFtByFeatureIdRequest
+	60,  // 110: civil.public.parcels.v1.ParcelsService.GetDepthFtByFeatureId:input_type -> civil.public.parcels.v1.GetDepthFtByFeatureIdRequest
+	62,  // 111: civil.public.parcels.v1.ParcelsService.GetLandUseIdByFeatureId:input_type -> civil.public.parcels.v1.GetLandUseIdByFeatureIdRequest
+	64,  // 112: civil.public.parcels.v1.ParcelsService.GetZoningIdByFeatureId:input_type -> civil.public.parcels.v1.GetZoningIdByFeatureIdRequest
+	66,  // 113: civil.public.parcels.v1.ParcelsService.GetImprovementAreaSqftByFeatureId:input_type -> civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdRequest
+	68,  // 114: civil.public.parcels.v1.ParcelsService.GetBedroomsByFeatureId:input_type -> civil.public.parcels.v1.GetBedroomsByFeatureIdRequest
+	70,  // 115: civil.public.parcels.v1.ParcelsService.GetBathroomsByFeatureId:input_type -> civil.public.parcels.v1.GetBathroomsByFeatureIdRequest
+	72,  // 116: civil.public.parcels.v1.ParcelsService.GetUnitsByFeatureId:input_type -> civil.public.parcels.v1.GetUnitsByFeatureIdRequest
+	74,  // 117: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementYearBuiltByFeatureId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdRequest
+	76,  // 118: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementEffectiveYearBuiltByFeatureId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest
+	78,  // 119: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementConditionIdByFeatureId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdRequest
+	80,  // 120: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByFeatureId:input_type -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdRequest
+	82,  // 121: civil.public.parcels.v1.ParcelsService.SearchParcelsAddresses:input_type -> civil.public.parcels.v1.SearchParcelsAddressesRequest
+	9,   // 122: civil.public.parcels.v1.ParcelsService.UpdateParcel:input_type -> civil.public.parcels.v1.UpdateParcelRequest
+	6,   // 123: civil.public.parcels.v1.ParcelsService.GetParcelsWithImprovementSummaryByParcelId:output_type -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse
+	8,   // 124: civil.public.parcels.v1.ParcelsService.GetParcelsWithImprovementSummaryByFeatureId:output_type -> civil.public.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse
+	12,  // 125: civil.public.parcels.v1.ParcelsService.GetNumericalParcelAttributeStatsById:output_type -> civil.public.parcels.v1.GetNumericalParcelAttributeStatsByIdResponse
+	14,  // 126: civil.public.parcels.v1.ParcelsService.GetCategoricalParcelAttributeStatsById:output_type -> civil.public.parcels.v1.GetCategoricalParcelAttributeStatsByIdResponse
+	20,  // 127: civil.public.parcels.v1.ParcelsService.GetEquityComparables:output_type -> civil.public.parcels.v1.GetEquityComparablesResponse
+	22,  // 128: civil.public.parcels.v1.ParcelsService.GetSalesComparables:output_type -> civil.public.parcels.v1.GetSalesComparablesResponse
+	24,  // 129: civil.public.parcels.v1.ParcelsService.GetParcelIdsByFeatureId:output_type -> civil.public.parcels.v1.GetParcelIdsByFeatureIdResponse
+	26,  // 130: civil.public.parcels.v1.ParcelsService.GetEstimatedParcelsExtentWGS84:output_type -> civil.public.parcels.v1.GetEstimatedParcelsExtentWGS84Response
+	29,  // 131: civil.public.parcels.v1.ParcelsService.GetParcelExtentsWGS84ByParcelId:output_type -> civil.public.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse
+	31,  // 132: civil.public.parcels.v1.ParcelsService.GetLandAreaSqftByParcelId:output_type -> civil.public.parcels.v1.GetLandAreaSqftByParcelIdResponse
+	33,  // 133: civil.public.parcels.v1.ParcelsService.GetFrontageFtByParcelId:output_type -> civil.public.parcels.v1.GetFrontageFtByParcelIdResponse
+	35,  // 134: civil.public.parcels.v1.ParcelsService.GetDepthFtByParcelId:output_type -> civil.public.parcels.v1.GetDepthFtByParcelIdResponse
+	37,  // 135: civil.public.parcels.v1.ParcelsService.GetLandUseIdByParcelId:output_type -> civil.public.parcels.v1.GetLandUseIdByParcelIdResponse
+	39,  // 136: civil.public.parcels.v1.ParcelsService.GetZoningIdByParcelId:output_type -> civil.public.parcels.v1.GetZoningIdByParcelIdResponse
+	41,  // 137: civil.public.parcels.v1.ParcelsService.GetImprovementAreaSqftByParcelId:output_type -> civil.public.parcels.v1.GetImprovementAreaSqftByParcelIdResponse
+	43,  // 138: civil.public.parcels.v1.ParcelsService.GetBedroomsByParcelId:output_type -> civil.public.parcels.v1.GetBedroomsByParcelIdResponse
+	45,  // 139: civil.public.parcels.v1.ParcelsService.GetBathroomsByParcelId:output_type -> civil.public.parcels.v1.GetBathroomsByParcelIdResponse
+	47,  // 140: civil.public.parcels.v1.ParcelsService.GetUnitsByParcelId:output_type -> civil.public.parcels.v1.GetUnitsByParcelIdResponse
+	49,  // 141: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementYearBuiltByParcelId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdResponse
+	51,  // 142: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementEffectiveYearBuiltByParcelId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse
+	53,  // 143: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementConditionIdByParcelId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdResponse
+	55,  // 144: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByParcelId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdResponse
+	57,  // 145: civil.public.parcels.v1.ParcelsService.GetLandAreaSqftByFeatureId:output_type -> civil.public.parcels.v1.GetLandAreaSqftByFeatureIdResponse
+	59,  // 146: civil.public.parcels.v1.ParcelsService.GetFrontageFtByFeatureId:output_type -> civil.public.parcels.v1.GetFrontageFtByFeatureIdResponse
+	61,  // 147: civil.public.parcels.v1.ParcelsService.GetDepthFtByFeatureId:output_type -> civil.public.parcels.v1.GetDepthFtByFeatureIdResponse
+	63,  // 148: civil.public.parcels.v1.ParcelsService.GetLandUseIdByFeatureId:output_type -> civil.public.parcels.v1.GetLandUseIdByFeatureIdResponse
+	65,  // 149: civil.public.parcels.v1.ParcelsService.GetZoningIdByFeatureId:output_type -> civil.public.parcels.v1.GetZoningIdByFeatureIdResponse
+	67,  // 150: civil.public.parcels.v1.ParcelsService.GetImprovementAreaSqftByFeatureId:output_type -> civil.public.parcels.v1.GetImprovementAreaSqftByFeatureIdResponse
+	69,  // 151: civil.public.parcels.v1.ParcelsService.GetBedroomsByFeatureId:output_type -> civil.public.parcels.v1.GetBedroomsByFeatureIdResponse
+	71,  // 152: civil.public.parcels.v1.ParcelsService.GetBathroomsByFeatureId:output_type -> civil.public.parcels.v1.GetBathroomsByFeatureIdResponse
+	73,  // 153: civil.public.parcels.v1.ParcelsService.GetUnitsByFeatureId:output_type -> civil.public.parcels.v1.GetUnitsByFeatureIdResponse
+	75,  // 154: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementYearBuiltByFeatureId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse
+	77,  // 155: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementEffectiveYearBuiltByFeatureId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse
+	79,  // 156: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementConditionIdByFeatureId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse
+	81,  // 157: civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByFeatureId:output_type -> civil.public.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse
+	83,  // 158: civil.public.parcels.v1.ParcelsService.SearchParcelsAddresses:output_type -> civil.public.parcels.v1.SearchParcelsAddressesResponse
+	10,  // 159: civil.public.parcels.v1.ParcelsService.UpdateParcel:output_type -> civil.public.parcels.v1.UpdateParcelResponse
+	123, // [123:160] is the sub-list for method output_type
+	86,  // [86:123] is the sub-list for method input_type
+	86,  // [86:86] is the sub-list for extension type_name
+	86,  // [86:86] is the sub-list for extension extendee
+	0,   // [0:86] is the sub-list for field type_name
 }
 
 func init() { file_civil_public_parcels_v1_parcels_proto_init() }
@@ -5580,13 +5805,15 @@ func file_civil_public_parcels_v1_parcels_proto_init() {
 	file_civil_public_parcels_v1_parcels_proto_msgTypes[75].OneofWrappers = []any{}
 	file_civil_public_parcels_v1_parcels_proto_msgTypes[77].OneofWrappers = []any{}
 	file_civil_public_parcels_v1_parcels_proto_msgTypes[79].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[81].OneofWrappers = []any{}
+	file_civil_public_parcels_v1_parcels_proto_msgTypes[83].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_civil_public_parcels_v1_parcels_proto_rawDesc), len(file_civil_public_parcels_v1_parcels_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   114,
+			NumMessages:   117,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

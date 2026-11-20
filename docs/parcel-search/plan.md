@@ -216,7 +216,7 @@ unit tests in `search_cursor_test.go`:
      removing spaces), return
      `InvalidArgument("query must contain at least 3 letters or digits")`;
    - `set_config` the threshold (`searchSimilarityThreshold`, a constant,
-     `"0.6"` until step 2.5 says otherwise).
+     `"0.6"`, confirmed in step 2.5).
 2. **Resolve `t`:** `legal_as_of` if set, otherwise the truncated now (see the
    decisions table). Decode `after` if present.
 3. **Query** (sketch; `$q` is the normalised query, already free of `%`, `_`
@@ -274,12 +274,13 @@ assertion helper isn't needed. Compare parcel IDs in order.
   - `2 fixture` begins with parcels 2 and 12, and parcel 2's hit carries
     `AddressID(2)` and `2 Fixture Way, Testville ZZ000`;
   - `2, FIXTURE-way` returns the same IDs in the same order;
-  - `fixtrue way` returns at least one hit;
+  - `fxture way` returns hits, all at tier 3 (step 2.5);
   - `fixture way` returns parcels 1–19 in ID order.
 - **Visibility:**
   - parcels 20 and 21 never appear, whatever the query;
-  - `5 Old Fixture` is empty now and returns parcel 5 at
-    `testutil.HistoryChange - 1 day`;
+  - `5 Old Fixture` now returns no hit carrying `5 Old Fixture Way`, and
+    parcel 5 at most at tier 3 with its current line (step 2.5). At
+    `testutil.HistoryChange - 1 day`, parcel 5 is first with the old line;
   - an address voided in the test (`startReaderOn` with a committed update)
     drops its parcel.
 - **Pagination:**
@@ -310,6 +311,27 @@ If 0.6 doesn't give the spec's results, the constant changes, and this plan
 and the spec's "Matching and ranking" are updated in this commit. The owner
 is told, because the spec names 0.6.
 
+**Done on 2026-11-19, on the compose fixtures.** Best `word_similarity`
+against any current address, and the number of addresses (of 21) at or
+above each threshold:
+
+| Query | Best | ≥ 0.6 | ≥ 0.5 |
+|---|---|---|---|
+| `fixtrue way` | 0.500 | 0 | 21 |
+| `fxture way` | 0.727 | 21 | 21 |
+| `fixture wya` | 0.750 | 21 | 21 |
+| `old way` | 0.500 | 0 | 21 |
+| `maple way` | 0.400 | 0 | 0 |
+| `5 Old Fixture` | 0.714 | 1 | 21 |
+| `2 fixture` | 1.000 | 21 | 21 |
+
+The owner kept 0.6 (2026-11-19). The spec's typo example became
+`fxture way`, because the `fixtrue` swap breaks four of the word's eight
+trigrams. Its history example was reworded: `5 Old Fixture` matches address
+5's current line at tier 3, so it can't return nothing now, but it never
+returns the old line. Both changes are in the spec's "Matching and ranking",
+"Fixtures" and "Tests". `maple way` is the empty-page query in the tests.
+
 **2.6 Public protos** (`feat: SearchParcelsAddresses in the public API`):
 - In `api/proto/public/civil/public/parcels/v1/parcels.proto`, the RPC with the
   spec's comment and `NO_SIDE_EFFECTS`. The request carries:
@@ -328,7 +350,8 @@ is told, because the spec names 0.6.
 - `mise run generate`, and commit `api/gen/go`. Check that the SDK index
   exports the new messages, and that `openapi.yaml` has the path.
 
-**2.7 Gateway** (`feat: serve SearchParcelsAddresses from the gateway`):
+**2.7 Gateway** (in 2.6's commit, because the gateway doesn't build until it
+implements a new public RPC, as with 2.1 and 2.3):
 - `ParcelServer.SearchParcelsAddresses` in `services/gateway/parcels.go`:
   - `first = 25` when unset, as the address/party RPCs do;
   - map the request and the hits one-to-one, with `PageInfo` copied;
@@ -356,8 +379,9 @@ is told, because the spec names 0.6.
 **2.9 Performance check** (`test: latency check for address search`):
 - **`dev/perf/search-dataset.sql`** loads 500,000 extra parcels into a database
   that already has the fixtures:
-  - one `INSERT ... SELECT` per table from `generate_series`, so it takes
-    seconds;
+  - one `INSERT ... SELECT` per table from `generate_series`. That took
+    1m44s to 2m06s on the owner's laptop, not seconds: the inserts maintain
+    the tables' GiST exclusion constraints and indexes;
   - each parcel gets a 30 m square on a grid (offset from the fixture grid),
     an attributes row with land use 1, and its own address;
   - addresses are `<house number> <street> <suffix>, <locality> ZZ<5 digits>`,
@@ -370,15 +394,18 @@ is told, because the spec names 0.6.
   - Start a fixture database and load the dataset. Before that, drop the
     trigram index, load, and time `CREATE INDEX` separately, so PR 2 can
     report the build time.
+  - Print `EXPLAIN (ANALYZE, BUFFERS)` for one query of each kind first, so
+    a slow kind can't hide the plans.
   - Start the reader in-process, warm up with 20 queries, then run each of
     the spec's five query kinds 200 times (fixed seeds), timing the mesh call.
+    `PERF_SEARCH_RUNS=<n>` changes the 200, for a quick run.
   - Print p50, p95 and p99 per kind and overall, the machine (`runtime`, CPU
     model from `/proc/cpuinfo`) and the row counts.
   - Fail if overall p95 > 200 ms or p99 > 500 ms.
-  - Also print `EXPLAIN (ANALYZE, BUFFERS)` for one query of each kind, to
-    show that the trigram index is used.
+  - Fail if any plan doesn't use the trigram index.
 - **`mise.toml`:** `[tasks."perf:search"]` runs
-  `go test -tags perf -run TestSearchLatency -v -timeout 30m ./services/database-reader`.
+  `go test -tags perf -run TestSearchLatency -v -count=1 -timeout 90m ./services/database-reader`.
+  At 30 m, a 200-run pass timed out on the laptop in the broad kind.
 - `mise run check` doesn't run it (build tag), and CI doesn't either. `go vet
   -tags perf ./...` goes in this step's checks, so the file can't rot
   unnoticed.
@@ -386,12 +413,173 @@ is told, because the spec names 0.6.
   numbers and the plans to the owner, who decides between changing the query
   and amending the spec.
 
+**Status on 2026-11-20: handed off to finish the performance check on the
+owner's desktop.** Everything in PR 2 is written and committed on
+`feat/search-parcels-addresses`. Every check below passes except
+`perf:search`, which hasn't been run to completion yet. See "Handoff:
+performance check" below.
+
 **Checks:**
 - `mise run check`, and `buf format --diff --exit-code` in `api/`.
 - Generated-code freshness.
 - `buf breaking` passes without `!`.
 - `mise run test:integration` and `mise run test:e2e`.
 - `mise run perf:search`, with its output in the PR description.
+
+### Handoff: performance check
+
+The owner ran the laptop numbers below on a 13th-gen Core i3-1315U (8 threads,
+16 GB) with testcontainers' Postgres defaults (`shared_buffers` 128 MB,
+`work_mem` 4 MB). The owner doesn't treat the laptop's absolute latencies as
+meaningful. The desktop run is the measurement. The *shape* of the results is
+the useful part.
+
+200-run pass (timed out during the broad kind, at the old 30 m timeout):
+
+| Kind | p50 | p95 | p99 |
+|---|---|---|---|
+| house-number prefix | 108 ms | 152 ms | 172 ms |
+| street fragment | 238 ms | 451 ms | 525 ms |
+| full address | 182 ms | 209 ms | 247 ms |
+| one-typo street | 277 ms | 1.73 s | 2.73 s |
+| broad (cap) | did not finish | | |
+
+A 1-run pass (`PERF_SEARCH_RUNS=1`) finished: broad (`Row`) took 6.7 s, and
+its `EXPLAIN ANALYZE` 7.9 s. The trigram index build took 5.1 to 5.2 s.
+
+What the broad plan shows:
+- **The index is used, and it's cheap:** the `BitmapOr` of the `%>` and
+  `LIKE` index scans takes about 30 ms.
+- **The recheck takes about 1.35 s** for about 83,000 candidates, a sixth of
+  the dataset. `core.search_normalize` (a regex) runs in the recheck, the
+  filter, the tier `CASE` and `word_similarity`, for every candidate.
+- **The visibility joins take about 6.5 s.** `addresses`,
+  `parcel_attributes`, `parcel_geometry` and `parcels` are index-probed once
+  per candidate (82,965 loops each), before the 1,000 cap applies, with
+  281,627 blocks read from disk. 128 MB of `shared_buffers` doesn't hold the
+  working set.
+
+Next steps for whoever picks this up:
+1. On the desktop, run `mise run perf:search` (200 runs per kind, up to
+   90 m). If the broad kind is still very slow, start with
+   `PERF_SEARCH_RUNS=20`. Record the machine line, every kind's percentiles,
+   the index build time and the five plans.
+2. If the budget is met, put the output in PR 2's description and finish
+   "Final verification".
+3. If it isn't, **don't change the query or the spec on your own.** Report
+   the numbers and plans to the owner, with options. Candidates the laptop
+   plan suggests, none tried yet:
+   - **Rank and cap before the visibility joins.** Sort the matching
+     `address_attributes` rows by `(tier, sim)` first, then join for
+     visibility, so the joins stop after about 1,000 visible hits instead of
+     running for every candidate. That keeps the spec's semantics if the
+     visibility filter is applied before the cap is counted (for example, a
+     `LATERAL` or nested loop under the `LIMIT`). Check the plan.
+   - **Compute the normalised text once per row**, in a column or a
+     materialised CTE, instead of the planner inlining
+     `core.search_normalize` four or more times. A stored generated column is
+     a schema change (Atlas, owner), so it needs the owner's agreement.
+   - **Postgres settings**, if the desktop numbers come mostly from disk reads
+     (`shared_buffers`, `effective_cache_size`). That's a deployment
+     concern. Note it, and don't tune the test container to pass.
+   - **Amend the budget, or the broad-query expectation,** in the spec. That's
+     the owner's call.
+
+### Desktop run (2026-11-20)
+
+Ryzen 5 5600X (12 threads, 16 GB, WSL2) and Postgres 18.6 with the same
+testcontainers defaults. `mise run perf:search`, 200 runs per kind. Trigram
+index build 2.4 to 2.7 s.
+
+**Before: the query as first written.**
+
+| Kind | p50 | p95 | p99 |
+|---|---|---|---|
+| house-number prefix | 48.7 ms | 63.1 ms | 80.4 ms |
+| street fragment | 144.3 ms | 293.6 ms | 360.5 ms |
+| full address | 94.1 ms | 110 ms | 114.4 ms |
+| one-typo street | 190.9 ms | 1.087 s | 1.596 s |
+| broad (cap) | 3.817 s | 4.536 s | 6.422 s |
+| overall | 135.9 ms | 4.059 s | 4.536 s |
+
+The broad plan (`Row`) showed:
+- **Candidates were already sorted by `(tier, sim)` before the joins**, but
+  all 82,965 tied. The parcel `public_id` tie-break only exists after the
+  joins to `parcels`, so the incremental sort joined every candidate before
+  `LIMIT 1000` (about 2.75 s of 3.6 s). Ranking before the joins can't help
+  while the tie-break needs a joined column.
+- **`search_normalize` ran about 6 times per candidate:** in the recheck,
+  the duplicate filter, three tier tests and `word_similarity`.
+
+**Decision (owner, 2026-11-20):**
+1. Break ties on the address's internal key before the parcel `public_id`
+   (spec, "Ordering within a rank").
+2. Compute the normalised text once per candidate in the query. No schema
+   change.
+
+**What changed in the query:**
+- Candidates are ranked and sorted from `address_attributes` alone.
+  Visibility is a `LATERAL` probe under the cap, which now runs about 33
+  times instead of 82,965.
+- `unnest(ARRAY[search_normalize(...)])` computes the text once for scoring
+  and keeps the scan parallel-capable. Two approaches were rejected:
+  - A `MATERIALIZED` CTE: it lost parallelism, and the planner hash-joined
+    every candidate.
+  - `OFFSET 0`: it lost parallelism.
+- The cursor gained `last_address_id`.
+
+**After:**
+
+| Kind | p50 | p95 | p99 |
+|---|---|---|---|
+| house-number prefix | 44 ms | 54.8 ms | 64.8 ms |
+| street fragment | 68.7 ms | 104.7 ms | 113.2 ms |
+| full address | 92.2 ms | 107 ms | 128.3 ms |
+| one-typo street | 118.7 ms | 507.4 ms | 1.141 s |
+| broad (cap) | 1.371 s | 1.500 s | 1.542 s |
+| overall | 91.5 ms | 1.412 s | 1.500 s |
+
+**Still over budget**, almost entirely because of the broad kind. It's a
+fifth of all runs, so it sets the overall p95. What's left:
+- **The scan is CPU-bound in pg_trgm and the regex.** The planner prices
+  the regex at about one operator per row, so it rarely chooses a parallel
+  plan. One `EXPLAIN` went parallel (525 ms), but the timed runs go through
+  prepared statements, which run the serial plan (about 1.37 s).
+- **A stored normalised column alone wouldn't meet the budget.** This was
+  tested in a throwaway container, not the repo schema, with a generated
+  column and a trigram index on it:
+  - the broad query took about 725 ms serial;
+  - `LIKE '%row%'` took 28 ms;
+  - `'row' <% norm` took about 410 ms;
+  - `word_similarity` took about 250 ms more.
+
+  pg_trgm's own word-similarity work over 83,000 candidates is the floor.
+
+**Exact-first prototype (not kept).** Ranking the `LIKE` tiers first, and
+running the fuzzy ranking only when visible exact hits don't fill the cap,
+returns the same list. Tier 3 ranks below every exact match. Every page
+resolves at the same `t`, so every page takes the same branch. The fuzzy
+branch was never executed for `Row`, and the broad kind fell to 835 ms at
+p50. But every query paid for the exact pass, so in a 20-run pass:
+- house-number prefix p50 rose from 44 to 85 ms;
+- full address p50 rose from 92 to 141 ms;
+- one-typo street p50 rose from 119 to 189 ms;
+- overall p95 was 870 ms.
+
+The owner discarded it.
+
+**Decision (owner, 2026-11-20): accept these numbers for now** and ship
+this version. The spec's budget row records the measured figures.
+
+Options for getting under the target later:
+- **A ranking change:** no similarity ordering within the exact tiers,
+  together with a stored normalised column. Estimated at about 100 ms for
+  the broad query, which pg_trgm's cost otherwise keeps at 250 ms or more.
+  This is a spec change plus a schema change through Atlas.
+- **A cheaper broad path:** a separate budget, or a smaller cap, for
+  cap-hitting queries.
+- **Parallel-plan costs:** lowered for the search transaction with
+  `SET LOCAL`.
 
 ## Final verification (before reporting the feature done)
 

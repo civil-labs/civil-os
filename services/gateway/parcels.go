@@ -46,6 +46,35 @@ func (s *ParcelServer) GetParcelsWithImprovementSummaryByParcelId(
 	return connect.NewResponse(publicRes), nil
 }
 
+func (s *ParcelServer) SearchParcelsAddresses(
+	ctx context.Context,
+	req *connect.Request[publicparcelsv1.SearchParcelsAddressesRequest],
+) (*connect.Response[publicparcelsv1.SearchParcelsAddressesResponse], error) {
+	s.logger.Debug("received SearchParcelsAddresses request")
+
+	m := req.Msg
+	meshRes, err := s.dbReaderClient.SearchParcelsAddresses(ctx, connect.NewRequest(&meshparcelsv1.SearchParcelsAddressesRequest{
+		Query: m.Query, LegalAsOf: m.LegalAsOf, First: pageSize(m.First), After: m.After,
+	}))
+	if err != nil {
+		s.logger.Error("upstream SearchParcelsAddresses request failed", slog.Any("error", err))
+		return nil, err // keep the mesh status code
+	}
+	return connect.NewResponse(&publicparcelsv1.SearchParcelsAddressesResponse{
+		Hits:     mapSlice(meshRes.Msg.Hits, mapParcelSearchHit),
+		PageInfo: mapPageInfo(meshRes.Msg.PageInfo),
+	}), nil
+}
+
+func mapParcelSearchHit(m *meshparcelsv1.ParcelSearchHit) *publicparcelsv1.ParcelSearchHit {
+	return &publicparcelsv1.ParcelSearchHit{
+		ParcelId:         m.GetParcelId(),
+		FeatureId:        m.FeatureId,
+		AddressId:        m.GetAddressId(),
+		FormattedAddress: m.GetFormattedAddress(),
+	}
+}
+
 func (s *ParcelServer) UpdateParcel(
 	ctx context.Context,
 	req *connect.Request[publicparcelsv1.UpdateParcelRequest],

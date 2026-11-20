@@ -142,6 +142,9 @@ const (
 	// ParcelReadServiceGetPrimaryImprovementTypeIdByFeatureIdProcedure is the fully-qualified name of
 	// the ParcelReadService's GetPrimaryImprovementTypeIdByFeatureId RPC.
 	ParcelReadServiceGetPrimaryImprovementTypeIdByFeatureIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetPrimaryImprovementTypeIdByFeatureId"
+	// ParcelReadServiceSearchParcelsAddressesProcedure is the fully-qualified name of the
+	// ParcelReadService's SearchParcelsAddresses RPC.
+	ParcelReadServiceSearchParcelsAddressesProcedure = "/civil.mesh.parcels.v1.ParcelReadService/SearchParcelsAddresses"
 	// ParcelWriteServiceUpdateParcelProcedure is the fully-qualified name of the ParcelWriteService's
 	// UpdateParcel RPC.
 	ParcelWriteServiceUpdateParcelProcedure = "/civil.mesh.parcels.v1.ParcelWriteService/UpdateParcel"
@@ -187,6 +190,9 @@ type ParcelReadServiceClient interface {
 	GetPrimaryImprovementEffectiveYearBuiltByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse], error)
 	GetPrimaryImprovementConditionIdByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementConditionIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementConditionIdByFeatureIdResponse], error)
 	GetPrimaryImprovementTypeIdByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementTypeIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementTypeIdByFeatureIdResponse], error)
+	// Searches visible parcels by their address, ranked best first
+	// (docs/parcel-search/spec.md).
+	SearchParcelsAddresses(context.Context, *connect.Request[v1.SearchParcelsAddressesRequest]) (*connect.Response[v1.SearchParcelsAddressesResponse], error)
 }
 
 // NewParcelReadServiceClient constructs a client for the civil.mesh.parcels.v1.ParcelReadService
@@ -410,6 +416,13 @@ func NewParcelReadServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			connect.WithSchema(parcelReadServiceMethods.ByName("GetPrimaryImprovementTypeIdByFeatureId")),
 			connect.WithClientOptions(opts...),
 		),
+		searchParcelsAddresses: connect.NewClient[v1.SearchParcelsAddressesRequest, v1.SearchParcelsAddressesResponse](
+			httpClient,
+			baseURL+ParcelReadServiceSearchParcelsAddressesProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("SearchParcelsAddresses")),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -450,6 +463,7 @@ type parcelReadServiceClient struct {
 	getPrimaryImprovementEffectiveYearBuiltByFeatureId *connect.Client[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest, v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse]
 	getPrimaryImprovementConditionIdByFeatureId        *connect.Client[v1.GetPrimaryImprovementConditionIdByFeatureIdRequest, v1.GetPrimaryImprovementConditionIdByFeatureIdResponse]
 	getPrimaryImprovementTypeIdByFeatureId             *connect.Client[v1.GetPrimaryImprovementTypeIdByFeatureIdRequest, v1.GetPrimaryImprovementTypeIdByFeatureIdResponse]
+	searchParcelsAddresses                             *connect.Client[v1.SearchParcelsAddressesRequest, v1.SearchParcelsAddressesResponse]
 }
 
 // GetParcelsWithImprovementSummaryByParcelId calls
@@ -645,6 +659,11 @@ func (c *parcelReadServiceClient) GetPrimaryImprovementTypeIdByFeatureId(ctx con
 	return c.getPrimaryImprovementTypeIdByFeatureId.CallUnary(ctx, req)
 }
 
+// SearchParcelsAddresses calls civil.mesh.parcels.v1.ParcelReadService.SearchParcelsAddresses.
+func (c *parcelReadServiceClient) SearchParcelsAddresses(ctx context.Context, req *connect.Request[v1.SearchParcelsAddressesRequest]) (*connect.Response[v1.SearchParcelsAddressesResponse], error) {
+	return c.searchParcelsAddresses.CallUnary(ctx, req)
+}
+
 // ParcelReadServiceHandler is an implementation of the civil.mesh.parcels.v1.ParcelReadService
 // service.
 type ParcelReadServiceHandler interface {
@@ -686,6 +705,9 @@ type ParcelReadServiceHandler interface {
 	GetPrimaryImprovementEffectiveYearBuiltByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse], error)
 	GetPrimaryImprovementConditionIdByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementConditionIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementConditionIdByFeatureIdResponse], error)
 	GetPrimaryImprovementTypeIdByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementTypeIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementTypeIdByFeatureIdResponse], error)
+	// Searches visible parcels by their address, ranked best first
+	// (docs/parcel-search/spec.md).
+	SearchParcelsAddresses(context.Context, *connect.Request[v1.SearchParcelsAddressesRequest]) (*connect.Response[v1.SearchParcelsAddressesResponse], error)
 }
 
 // NewParcelReadServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -905,6 +927,13 @@ func NewParcelReadServiceHandler(svc ParcelReadServiceHandler, opts ...connect.H
 		connect.WithSchema(parcelReadServiceMethods.ByName("GetPrimaryImprovementTypeIdByFeatureId")),
 		connect.WithHandlerOptions(opts...),
 	)
+	parcelReadServiceSearchParcelsAddressesHandler := connect.NewUnaryHandler(
+		ParcelReadServiceSearchParcelsAddressesProcedure,
+		svc.SearchParcelsAddresses,
+		connect.WithSchema(parcelReadServiceMethods.ByName("SearchParcelsAddresses")),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/civil.mesh.parcels.v1.ParcelReadService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ParcelReadServiceGetParcelsWithImprovementSummaryByParcelIdProcedure:
@@ -977,6 +1006,8 @@ func NewParcelReadServiceHandler(svc ParcelReadServiceHandler, opts ...connect.H
 			parcelReadServiceGetPrimaryImprovementConditionIdByFeatureIdHandler.ServeHTTP(w, r)
 		case ParcelReadServiceGetPrimaryImprovementTypeIdByFeatureIdProcedure:
 			parcelReadServiceGetPrimaryImprovementTypeIdByFeatureIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceSearchParcelsAddressesProcedure:
+			parcelReadServiceSearchParcelsAddressesHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -1124,6 +1155,10 @@ func (UnimplementedParcelReadServiceHandler) GetPrimaryImprovementConditionIdByF
 
 func (UnimplementedParcelReadServiceHandler) GetPrimaryImprovementTypeIdByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementTypeIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementTypeIdByFeatureIdResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementTypeIdByFeatureId is not implemented"))
+}
+
+func (UnimplementedParcelReadServiceHandler) SearchParcelsAddresses(context.Context, *connect.Request[v1.SearchParcelsAddressesRequest]) (*connect.Response[v1.SearchParcelsAddressesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.SearchParcelsAddresses is not implemented"))
 }
 
 // ParcelWriteServiceClient is a client for the civil.mesh.parcels.v1.ParcelWriteService service.

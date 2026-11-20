@@ -37,9 +37,9 @@ type PageInfo struct {
 	// Whether results precede this page. True exactly when the request set
 	// `after`.
 	HasPreviousPage bool `protobuf:"varint,2,opt,name=has_previous_page,json=hasPreviousPage,proto3" json:"has_previous_page,omitempty"`
-	// The cursor of the first edge. Unset when the page is empty.
+	// The cursor of the first result. Unset when the page is empty.
 	StartCursor *string `protobuf:"bytes,3,opt,name=start_cursor,json=startCursor,proto3,oneof" json:"start_cursor,omitempty"`
-	// The cursor of the last edge: pass it as `after` to read the next page.
+	// The cursor of the last result: pass it as `after` to read the next page.
 	// Unset when the page is empty.
 	EndCursor     *string `protobuf:"bytes,4,opt,name=end_cursor,json=endCursor,proto3,oneof" json:"end_cursor,omitempty"`
 	unknownFields protoimpl.UnknownFields

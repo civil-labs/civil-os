@@ -138,6 +138,9 @@ const (
 	// ParcelsServiceGetPrimaryImprovementTypeIdByFeatureIdProcedure is the fully-qualified name of the
 	// ParcelsService's GetPrimaryImprovementTypeIdByFeatureId RPC.
 	ParcelsServiceGetPrimaryImprovementTypeIdByFeatureIdProcedure = "/civil.public.parcels.v1.ParcelsService/GetPrimaryImprovementTypeIdByFeatureId"
+	// ParcelsServiceSearchParcelsAddressesProcedure is the fully-qualified name of the ParcelsService's
+	// SearchParcelsAddresses RPC.
+	ParcelsServiceSearchParcelsAddressesProcedure = "/civil.public.parcels.v1.ParcelsService/SearchParcelsAddresses"
 	// ParcelsServiceUpdateParcelProcedure is the fully-qualified name of the ParcelsService's
 	// UpdateParcel RPC.
 	ParcelsServiceUpdateParcelProcedure = "/civil.public.parcels.v1.ParcelsService/UpdateParcel"
@@ -185,6 +188,15 @@ type ParcelsServiceClient interface {
 	GetPrimaryImprovementEffectiveYearBuiltByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse], error)
 	GetPrimaryImprovementConditionIdByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementConditionIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementConditionIdByFeatureIdResponse], error)
 	GetPrimaryImprovementTypeIdByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementTypeIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementTypeIdByFeatureIdResponse], error)
+	// Searches visible parcels by their address, as of legal_as_of. Results
+	// are ranked, best first: an address starting with the query, then one
+	// with a word starting with it, then one containing it, then one similar
+	// to it. Matching ignores case and punctuation. At most 1,000 hits are
+	// returned across all pages. Refine the query to see others.
+	//
+	// When legal_as_of is unset, the first page fixes "now", and every later
+	// page read with its cursors resolves at that same time.
+	SearchParcelsAddresses(context.Context, *connect.Request[v1.SearchParcelsAddressesRequest]) (*connect.Response[v1.SearchParcelsAddressesResponse], error)
 	UpdateParcel(context.Context, *connect.Request[v1.UpdateParcelRequest]) (*connect.Response[v1.UpdateParcelResponse], error)
 }
 
@@ -410,6 +422,13 @@ func NewParcelsServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			connect.WithSchema(parcelsServiceMethods.ByName("GetPrimaryImprovementTypeIdByFeatureId")),
 			connect.WithClientOptions(opts...),
 		),
+		searchParcelsAddresses: connect.NewClient[v1.SearchParcelsAddressesRequest, v1.SearchParcelsAddressesResponse](
+			httpClient,
+			baseURL+ParcelsServiceSearchParcelsAddressesProcedure,
+			connect.WithSchema(parcelsServiceMethods.ByName("SearchParcelsAddresses")),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 		updateParcel: connect.NewClient[v1.UpdateParcelRequest, v1.UpdateParcelResponse](
 			httpClient,
 			baseURL+ParcelsServiceUpdateParcelProcedure,
@@ -456,6 +475,7 @@ type parcelsServiceClient struct {
 	getPrimaryImprovementEffectiveYearBuiltByFeatureId *connect.Client[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest, v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse]
 	getPrimaryImprovementConditionIdByFeatureId        *connect.Client[v1.GetPrimaryImprovementConditionIdByFeatureIdRequest, v1.GetPrimaryImprovementConditionIdByFeatureIdResponse]
 	getPrimaryImprovementTypeIdByFeatureId             *connect.Client[v1.GetPrimaryImprovementTypeIdByFeatureIdRequest, v1.GetPrimaryImprovementTypeIdByFeatureIdResponse]
+	searchParcelsAddresses                             *connect.Client[v1.SearchParcelsAddressesRequest, v1.SearchParcelsAddressesResponse]
 	updateParcel                                       *connect.Client[v1.UpdateParcelRequest, v1.UpdateParcelResponse]
 }
 
@@ -651,6 +671,11 @@ func (c *parcelsServiceClient) GetPrimaryImprovementTypeIdByFeatureId(ctx contex
 	return c.getPrimaryImprovementTypeIdByFeatureId.CallUnary(ctx, req)
 }
 
+// SearchParcelsAddresses calls civil.public.parcels.v1.ParcelsService.SearchParcelsAddresses.
+func (c *parcelsServiceClient) SearchParcelsAddresses(ctx context.Context, req *connect.Request[v1.SearchParcelsAddressesRequest]) (*connect.Response[v1.SearchParcelsAddressesResponse], error) {
+	return c.searchParcelsAddresses.CallUnary(ctx, req)
+}
+
 // UpdateParcel calls civil.public.parcels.v1.ParcelsService.UpdateParcel.
 func (c *parcelsServiceClient) UpdateParcel(ctx context.Context, req *connect.Request[v1.UpdateParcelRequest]) (*connect.Response[v1.UpdateParcelResponse], error) {
 	return c.updateParcel.CallUnary(ctx, req)
@@ -698,6 +723,15 @@ type ParcelsServiceHandler interface {
 	GetPrimaryImprovementEffectiveYearBuiltByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse], error)
 	GetPrimaryImprovementConditionIdByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementConditionIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementConditionIdByFeatureIdResponse], error)
 	GetPrimaryImprovementTypeIdByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementTypeIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementTypeIdByFeatureIdResponse], error)
+	// Searches visible parcels by their address, as of legal_as_of. Results
+	// are ranked, best first: an address starting with the query, then one
+	// with a word starting with it, then one containing it, then one similar
+	// to it. Matching ignores case and punctuation. At most 1,000 hits are
+	// returned across all pages. Refine the query to see others.
+	//
+	// When legal_as_of is unset, the first page fixes "now", and every later
+	// page read with its cursors resolves at that same time.
+	SearchParcelsAddresses(context.Context, *connect.Request[v1.SearchParcelsAddressesRequest]) (*connect.Response[v1.SearchParcelsAddressesResponse], error)
 	UpdateParcel(context.Context, *connect.Request[v1.UpdateParcelRequest]) (*connect.Response[v1.UpdateParcelResponse], error)
 }
 
@@ -919,6 +953,13 @@ func NewParcelsServiceHandler(svc ParcelsServiceHandler, opts ...connect.Handler
 		connect.WithSchema(parcelsServiceMethods.ByName("GetPrimaryImprovementTypeIdByFeatureId")),
 		connect.WithHandlerOptions(opts...),
 	)
+	parcelsServiceSearchParcelsAddressesHandler := connect.NewUnaryHandler(
+		ParcelsServiceSearchParcelsAddressesProcedure,
+		svc.SearchParcelsAddresses,
+		connect.WithSchema(parcelsServiceMethods.ByName("SearchParcelsAddresses")),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	parcelsServiceUpdateParcelHandler := connect.NewUnaryHandler(
 		ParcelsServiceUpdateParcelProcedure,
 		svc.UpdateParcel,
@@ -997,6 +1038,8 @@ func NewParcelsServiceHandler(svc ParcelsServiceHandler, opts ...connect.Handler
 			parcelsServiceGetPrimaryImprovementConditionIdByFeatureIdHandler.ServeHTTP(w, r)
 		case ParcelsServiceGetPrimaryImprovementTypeIdByFeatureIdProcedure:
 			parcelsServiceGetPrimaryImprovementTypeIdByFeatureIdHandler.ServeHTTP(w, r)
+		case ParcelsServiceSearchParcelsAddressesProcedure:
+			parcelsServiceSearchParcelsAddressesHandler.ServeHTTP(w, r)
 		case ParcelsServiceUpdateParcelProcedure:
 			parcelsServiceUpdateParcelHandler.ServeHTTP(w, r)
 		default:
@@ -1146,6 +1189,10 @@ func (UnimplementedParcelsServiceHandler) GetPrimaryImprovementConditionIdByFeat
 
 func (UnimplementedParcelsServiceHandler) GetPrimaryImprovementTypeIdByFeatureId(context.Context, *connect.Request[v1.GetPrimaryImprovementTypeIdByFeatureIdRequest]) (*connect.Response[v1.GetPrimaryImprovementTypeIdByFeatureIdResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.parcels.v1.ParcelsService.GetPrimaryImprovementTypeIdByFeatureId is not implemented"))
+}
+
+func (UnimplementedParcelsServiceHandler) SearchParcelsAddresses(context.Context, *connect.Request[v1.SearchParcelsAddressesRequest]) (*connect.Response[v1.SearchParcelsAddressesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.parcels.v1.ParcelsService.SearchParcelsAddresses is not implemented"))
 }
 
 func (UnimplementedParcelsServiceHandler) UpdateParcel(context.Context, *connect.Request[v1.UpdateParcelRequest]) (*connect.Response[v1.UpdateParcelResponse], error) {

@@ -9,6 +9,7 @@ package paginationv1
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -157,11 +158,113 @@ func (x *IdCursor) GetFilterHash() []byte {
 	return nil
 }
 
+// The decoded form of a SearchParcelsAddresses cursor
+// (docs/parcel-search/spec.md, Pagination): a position in the ranked hits.
+// Internal to the reader: clients only see its base64url encoding.
+type SearchCursor struct {
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	Version uint32                 `protobuf:"varint,1,opt,name=version,proto3" json:"version,omitempty"`
+	// Rank of the hit: 0 prefix, 1 word prefix, 2 substring, 3 similar.
+	Tier uint32 `protobuf:"varint,2,opt,name=tier,proto3" json:"tier,omitempty"`
+	// word_similarity of the hit, as the database's real.
+	Similarity float32 `protobuf:"fixed32,3,opt,name=similarity,proto3" json:"similarity,omitempty"`
+	// public_id of the hit's parcel.
+	LastParcelId string `protobuf:"bytes,4,opt,name=last_parcel_id,json=lastParcelId,proto3" json:"last_parcel_id,omitempty"`
+	// SHA-256 of the RPC, the normalised query and legal_as_of.
+	FilterHash []byte `protobuf:"bytes,5,opt,name=filter_hash,json=filterHash,proto3" json:"filter_hash,omitempty"`
+	// The legal time every page resolves at, fixed by the first page.
+	AsOf *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=as_of,json=asOf,proto3" json:"as_of,omitempty"`
+	// public_id of the hit's address. It orders hits within a rank, before
+	// last_parcel_id.
+	LastAddressId string `protobuf:"bytes,7,opt,name=last_address_id,json=lastAddressId,proto3" json:"last_address_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SearchCursor) Reset() {
+	*x = SearchCursor{}
+	mi := &file_civil_mesh_pagination_v1_pagination_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SearchCursor) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchCursor) ProtoMessage() {}
+
+func (x *SearchCursor) ProtoReflect() protoreflect.Message {
+	mi := &file_civil_mesh_pagination_v1_pagination_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchCursor.ProtoReflect.Descriptor instead.
+func (*SearchCursor) Descriptor() ([]byte, []int) {
+	return file_civil_mesh_pagination_v1_pagination_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *SearchCursor) GetVersion() uint32 {
+	if x != nil {
+		return x.Version
+	}
+	return 0
+}
+
+func (x *SearchCursor) GetTier() uint32 {
+	if x != nil {
+		return x.Tier
+	}
+	return 0
+}
+
+func (x *SearchCursor) GetSimilarity() float32 {
+	if x != nil {
+		return x.Similarity
+	}
+	return 0
+}
+
+func (x *SearchCursor) GetLastParcelId() string {
+	if x != nil {
+		return x.LastParcelId
+	}
+	return ""
+}
+
+func (x *SearchCursor) GetFilterHash() []byte {
+	if x != nil {
+		return x.FilterHash
+	}
+	return nil
+}
+
+func (x *SearchCursor) GetAsOf() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AsOf
+	}
+	return nil
+}
+
+func (x *SearchCursor) GetLastAddressId() string {
+	if x != nil {
+		return x.LastAddressId
+	}
+	return ""
+}
+
 var File_civil_mesh_pagination_v1_pagination_proto protoreflect.FileDescriptor
 
 const file_civil_mesh_pagination_v1_pagination_proto_rawDesc = "" +
 	"\n" +
-	")civil/mesh/pagination/v1/pagination.proto\x12\x18civil.mesh.pagination.v1\"\xc6\x01\n" +
+	")civil/mesh/pagination/v1/pagination.proto\x12\x18civil.mesh.pagination.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc6\x01\n" +
 	"\bPageInfo\x12\"\n" +
 	"\rhas_next_page\x18\x01 \x01(\bR\vhasNextPage\x12*\n" +
 	"\x11has_previous_page\x18\x02 \x01(\bR\x0fhasPreviousPage\x12&\n" +
@@ -174,7 +277,18 @@ const file_civil_mesh_pagination_v1_pagination_proto_rawDesc = "" +
 	"\aversion\x18\x01 \x01(\rR\aversion\x12\x17\n" +
 	"\alast_id\x18\x02 \x01(\tR\x06lastId\x12\x1f\n" +
 	"\vfilter_hash\x18\x03 \x01(\fR\n" +
-	"filterHashB\x88\x02\n" +
+	"filterHash\"\xfc\x01\n" +
+	"\fSearchCursor\x12\x18\n" +
+	"\aversion\x18\x01 \x01(\rR\aversion\x12\x12\n" +
+	"\x04tier\x18\x02 \x01(\rR\x04tier\x12\x1e\n" +
+	"\n" +
+	"similarity\x18\x03 \x01(\x02R\n" +
+	"similarity\x12$\n" +
+	"\x0elast_parcel_id\x18\x04 \x01(\tR\flastParcelId\x12\x1f\n" +
+	"\vfilter_hash\x18\x05 \x01(\fR\n" +
+	"filterHash\x12/\n" +
+	"\x05as_of\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\x04asOf\x12&\n" +
+	"\x0flast_address_id\x18\a \x01(\tR\rlastAddressIdB\x88\x02\n" +
 	"\x1ccom.civil.mesh.pagination.v1B\x0fPaginationProtoP\x01ZTgithub.com/civil-labs/civil-os/internal/gen/go/civil/mesh/pagination/v1;paginationv1\xa2\x02\x03CMP\xaa\x02\x18Civil.Mesh.Pagination.V1\xca\x02\x18Civil\\Mesh\\Pagination\\V1\xe2\x02$Civil\\Mesh\\Pagination\\V1\\GPBMetadata\xea\x02\x1bCivil::Mesh::Pagination::V1b\x06proto3"
 
 var (
@@ -189,17 +303,20 @@ func file_civil_mesh_pagination_v1_pagination_proto_rawDescGZIP() []byte {
 	return file_civil_mesh_pagination_v1_pagination_proto_rawDescData
 }
 
-var file_civil_mesh_pagination_v1_pagination_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_civil_mesh_pagination_v1_pagination_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_civil_mesh_pagination_v1_pagination_proto_goTypes = []any{
-	(*PageInfo)(nil), // 0: civil.mesh.pagination.v1.PageInfo
-	(*IdCursor)(nil), // 1: civil.mesh.pagination.v1.IdCursor
+	(*PageInfo)(nil),              // 0: civil.mesh.pagination.v1.PageInfo
+	(*IdCursor)(nil),              // 1: civil.mesh.pagination.v1.IdCursor
+	(*SearchCursor)(nil),          // 2: civil.mesh.pagination.v1.SearchCursor
+	(*timestamppb.Timestamp)(nil), // 3: google.protobuf.Timestamp
 }
 var file_civil_mesh_pagination_v1_pagination_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	3, // 0: civil.mesh.pagination.v1.SearchCursor.as_of:type_name -> google.protobuf.Timestamp
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_civil_mesh_pagination_v1_pagination_proto_init() }
@@ -214,7 +331,7 @@ func file_civil_mesh_pagination_v1_pagination_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_civil_mesh_pagination_v1_pagination_proto_rawDesc), len(file_civil_mesh_pagination_v1_pagination_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -135,6 +135,21 @@ func TestSmoke(t *testing.T) {
 		}
 	})
 
+	t.Run("search parcels by address", func(t *testing.T) {
+		res, err := parcels.SearchParcelsAddresses(ctx, authed(token, &parcelsv1.SearchParcelsAddressesRequest{
+			Query: "3 Fixture Way",
+		}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(res.Msg.Hits) == 0 || res.Msg.Hits[0].GetParcelId() != tu.ParcelID(3) {
+			t.Fatalf("3 Fixture Way = %v, want parcel 3 first", res.Msg.Hits)
+		}
+		if res.Msg.PageInfo.GetEndCursor() == "" {
+			t.Error("a non-empty page has no end_cursor")
+		}
+	})
+
 	t.Run("read, update, read back", func(t *testing.T) {
 		const n = 2
 		id := tu.ParcelID(n)

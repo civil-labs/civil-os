@@ -3,6 +3,7 @@ syntax = "proto3";
 package civil.public.parcels.v1;
 
 import "buf/validate/validate.proto";
+import "civil/public/pagination/v1/pagination.proto";
 import "gnostic/openapi/v3/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "google/type/interval.proto";
@@ -119,6 +120,20 @@ service ParcelsService {
   rpc GetPrimaryImprovementConditionIdByFeatureId(GetPrimaryImprovementConditionIdByFeatureIdRequest) returns (GetPrimaryImprovementConditionIdByFeatureIdResponse) {}
 
   rpc GetPrimaryImprovementTypeIdByFeatureId(GetPrimaryImprovementTypeIdByFeatureIdRequest) returns (GetPrimaryImprovementTypeIdByFeatureIdResponse) {}
+
+  // Search
+
+  // Searches visible parcels by their address, as of legal_as_of. Results
+  // are ranked, best first: an address starting with the query, then one
+  // with a word starting with it, then one containing it, then one similar
+  // to it. Matching ignores case and punctuation. At most 1,000 hits are
+  // returned across all pages. Refine the query to see others.
+  //
+  // When legal_as_of is unset, the first page fixes "now", and every later
+  // page read with its cursors resolves at that same time.
+  rpc SearchParcelsAddresses(SearchParcelsAddressesRequest) returns (SearchParcelsAddressesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // Mutation
 
@@ -1603,4 +1618,76 @@ message GetPrimaryImprovementTypeIdByFeatureIdRequest {
 
 message GetPrimaryImprovementTypeIdByFeatureIdResponse {
   map<int64, string> values = 1;
+}
+
+message SearchParcelsAddressesRequest {
+  // Free text: part of an address. 1..200 characters. It must contain at
+  // least 3 letters or digits once punctuation is removed.
+  string query = 1 [
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 200
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "Part of an address, 1 to 200 characters, with at least 3 letters or digits. Case and punctuation are ignored."
+      example: {yaml: "'12 Fixture Way'"}
+    }
+  ];
+
+  optional google.protobuf.Timestamp legal_as_of = 2 [
+    (buf.validate.field).timestamp = {
+      // Bounded to prevent integer overflow or absurd historical queries
+      gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+    },
+    (gnostic.openapi.v3.property) = {description: "The legal time to search at. Defaults to now, fixed by the first page for every later page."}
+  ];
+
+  optional int32 first = 3 [
+    (buf.validate.field).int32 = {
+      gte: 1
+      lte: 100
+    },
+    (gnostic.openapi.v3.property) = {
+      description: "The page size, 1 to 100. Defaults to 25."
+      example: {yaml: "25"}
+    }
+  ];
+
+  optional string after = 4 [
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 512
+    },
+    (gnostic.openapi.v3.property) = {description: "Return the hits after this cursor: page_info.end_cursor from a previous page of the same search."}
+  ];
+}
+
+message SearchParcelsAddressesResponse {
+  // Best first. Fewer than `first` only on the last page.
+  repeated ParcelSearchHit hits = 1 [(gnostic.openapi.v3.property) = {description: "The hits, best first. Fewer than first only on the last page."}];
+
+  // start_cursor and end_cursor mark the first and last hit. Pass end_cursor
+  // as `after` to read the next page.
+  civil.public.pagination.v1.PageInfo page_info = 2 [(gnostic.openapi.v3.property) = {description: "Pass end_cursor as after to read the next page."}];
+}
+
+// A parcel whose address matched a search.
+message ParcelSearchHit {
+  string parcel_id = 1 [(gnostic.openapi.v3.property) = {
+    description: "The parcel's UUID."
+    example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
+  }];
+
+  optional int64 feature_id = 2 [(gnostic.openapi.v3.property) = {description: "The parcel's geometry feature ID at legal_as_of."}];
+
+  string address_id = 3 [(gnostic.openapi.v3.property) = {
+    description: "The UUID of the address that matched."
+    example: {yaml: "'a11c834a-9f12-4852-9bca-32dabc5def88'"}
+  }];
+
+  // The address that matched at legal_as_of, as stored (not normalised).
+  string formatted_address = 4 [(gnostic.openapi.v3.property) = {
+    description: "The address that matched at legal_as_of, as stored (not normalised)."
+    example: {yaml: "'12 Fixture Way, Testville ZZ000'"}
+  }];
 }

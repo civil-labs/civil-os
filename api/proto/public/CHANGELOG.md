@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/civil-labs/civil-os/compare/public-api-v0.4.0...public-api-v0.4.1) (2026-11-20)
+
+
+### Features
+
+* search parcels by address ([#69](https://github.com/civil-labs/civil-os/issues/69)) ([2e4a27d](https://github.com/civil-labs/civil-os/commit/2e4a27d57aa0bd48a6df7fd6604a8665347d0c31))
+
 ## [0.4.0](https://github.com/civil-labs/civil-os/compare/public-api-v0.3.0...public-api-v0.4.0) (2026-11-18)
 
 

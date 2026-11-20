@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.1](https://github.com/civil-labs/civil-os/compare/v0.5.0...v0.5.1) (2026-11-20)
+
+
+### Features
+
+* search parcels by address ([#69](https://github.com/civil-labs/civil-os/issues/69)) ([2e4a27d](https://github.com/civil-labs/civil-os/commit/2e4a27d57aa0bd48a6df7fd6604a8665347d0c31))
+* trigram index for address search ([#64](https://github.com/civil-labs/civil-os/issues/64)) ([2193c2b](https://github.com/civil-labs/civil-os/commit/2193c2bd46398dd40c541b65dc0e195d76cce426))
+
 ## [0.5.0](https://github.com/civil-labs/civil-os/compare/v0.4.0...v0.5.0) (2026-11-18)
 
 

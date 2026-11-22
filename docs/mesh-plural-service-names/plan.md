@@ -85,11 +85,13 @@ the `…ServiceName` constants, `New…Client`, `New…Handler`, and the
     `TestReverseLookupPlacement`);
   - `test/e2e/smoke_test.go` (the neighborhoods client).
 
-The edit is a whole-word replacement of the nine old names across
-`services/` and `test/`, followed by `gofmt` and a build. The replacements
-run longest name first, so `ParcelReadService` isn't half-replaced inside
-another name. No old name is a prefix of a new one except by the inserted
-`s`, so a whole-word match is safe.
+The edit is a **substring** replacement of the nine old names across
+`services/` and `test/`, followed by `gofmt` and a build. It has to be a
+substring match, not a whole-word one: the generated identifiers embed the
+names (`NewNeighborhoodServiceClient`, `ParcelReadServiceName`,
+`UnimplementedValuationServiceHandler`), and a whole-word match would miss
+them. A substring match is safe because no new name contains an old one:
+each new name inserts an `s` inside the old name (`Parcel|s|ReadService`).
 
 **Check:** `mise run check`, `mise run test:integration`.
 
@@ -136,15 +138,15 @@ mise run test:e2e
 (cd api && mise exec -- buf format --diff --exit-code)
 mise run generate && git diff --exit-code api/gen/go internal/gen/go sdk/js/gen
 (cd api && mise exec -- buf breaking proto/public --against "../.git#ref=origin/main,subdir=api/proto/public")
-grep -rnwE 'ParcelReadService|ParcelWriteService|ImprovementReadService|LandUseReadService|RealPropertyTransferReadService|NeighborhoodReadService|ValuationReadService|NeighborhoodService|ValuationService' \
+grep -rnE 'ParcelReadService|ParcelWriteService|ImprovementReadService|LandUseReadService|RealPropertyTransferReadService|NeighborhoodReadService|ValuationReadService|NeighborhoodService|ValuationService' \
   --include='*.go' --include='*.proto' --include='*.ts' --include='*.yaml' --include='*.md' . \
   | grep -vE '^\./docs/[a-z0-9-]+/(intent|spec|plan)\.md|node_modules'   # expect no output
 ```
 
-The grep is case-sensitive, so it doesn't match the new names
-(`ParcelsReadService` differs by more than case), and `-w` keeps it off
-longer identifiers. Generated code is included, so stale generated names
-would show up.
+The grep matches substrings, so it also catches generated identifiers
+such as `NewNeighborhoodServiceClient`. It can't match a new name, because
+no new name contains an old one. Generated code is included, so stale
+generated names would show up.
 
 `buf breaking` is expected to report only `NeighborhoodService` and
 `ValuationService` as deleted from their files. It doesn't run on the mesh.

@@ -7,7 +7,18 @@ import (
 
 	publicaddressesv1connect "github.com/civil-labs/civil-os/api/gen/go/civil/public/addresses/v1/addressesv1connect"
 	publicpartiesv1connect "github.com/civil-labs/civil-os/api/gen/go/civil/public/parties/v1/partiesv1connect"
+	meshaddressesv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/addresses/v1"
+	meshpartiesv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parties/v1"
 )
+
+// TestMapAddressPartyResults: the paginated lookups' results are copied
+// through field by field (docs/pagination-without-edges/spec.md, "Gateway").
+func TestMapAddressPartyResults(t *testing.T) {
+	checkFullMapping(t, &meshaddressesv1.AddressParcel{}, mapAddressParcel)
+	checkFullMapping(t, &meshaddressesv1.AddressImprovement{}, mapAddressImprovement)
+	checkFullMapping(t, &meshpartiesv1.Party{}, mapParty)
+	checkFullMapping(t, &meshpartiesv1.PartyParcel{}, mapPartyParcel)
+}
 
 // TestAddressPartyPageSizeDefault: a paginated address or party lookup sent
 // without first reaches the mesh with the default of 25.

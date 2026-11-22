@@ -191,7 +191,6 @@ func checkFullMapping[M, P proto.Message](t *testing.T, mesh M, mapper func(M) P
 
 func TestMapTransfer(t *testing.T) {
 	checkFullMapping(t, &meshtransfersv1.RealPropertyTransfer{}, mapTransfer)
-	checkFullMapping(t, &meshtransfersv1.RealPropertyTransferEdge{}, mapTransferEdge)
 	checkFullMapping(t, &meshpaginationv1.PageInfo{}, mapPageInfo)
 
 	if mapPageInfo(nil) != nil {

@@ -102,40 +102,40 @@ func TestTransfersByParty(t *testing.T) {
 	ctx := context.Background()
 
 	p1 := byParty(t, r, &transfersv1.GetTransfersByPartyIdRequest{PartyIds: []string{partyID(1)}})
-	if want := ids(tu.TransferPrefix, 5, 2); !slices.Equal(edgeTransferIDs(p1.Edges), want) {
-		t.Fatalf("party 1 = %v, want transfers 5 then 2", edgeTransferIDs(p1.Edges))
+	if want := ids(tu.TransferPrefix, 5, 2); !slices.Equal(transferIDs(p1.Transfers), want) {
+		t.Fatalf("party 1 = %v, want transfers 5 then 2", transferIDs(p1.Transfers))
 	}
 	// Transfer 5's parcel 20 entry is voided, so party 10 is only on transfer 3.
-	if got := edgeTransferIDs(byParty(t, r, &transfersv1.GetTransfersByPartyIdRequest{PartyIds: []string{partyID(10)}}).Edges); !slices.Equal(got, ids(tu.TransferPrefix, 3)) {
+	if got := transferIDs(byParty(t, r, &transfersv1.GetTransfersByPartyIdRequest{PartyIds: []string{partyID(10)}}).Transfers); !slices.Equal(got, ids(tu.TransferPrefix, 3)) {
 		t.Errorf("party 10 = %v, want transfer 3 only", got)
 	}
-	if got := byParty(t, r, &transfersv1.GetTransfersByPartyIdRequest{PartyIds: []string{partyID(tu.VoidedParty)}}).Edges; len(got) != 0 {
-		t.Errorf("voided party 11 = %v, want nothing", edgeTransferIDs(got))
+	if got := byParty(t, r, &transfersv1.GetTransfersByPartyIdRequest{PartyIds: []string{partyID(tu.VoidedParty)}}).Transfers; len(got) != 0 {
+		t.Errorf("voided party 11 = %v, want nothing", transferIDs(got))
 	}
 
 	// The transfer is built as the other lookups build it.
-	if got, want := p1.Edges[1].GetNode(), oneTransfer(t, r, 2); got.String() != want.String() {
+	if got, want := p1.Transfers[1], oneTransfer(t, r, 2); got.String() != want.String() {
 		t.Errorf("transfer 2 by party differs from by ID:\n %v\n %v", got, want)
 	}
 
 	// A time range starting after transfer 2 leaves only transfer 5.
-	after2 := p1.Edges[1].GetNode().GetTransferTime().AsTime().Add(time.Second)
+	after2 := p1.Transfers[1].GetTransferTime().AsTime().Add(time.Second)
 	ranged := byParty(t, r, &transfersv1.GetTransfersByPartyIdRequest{
 		PartyIds:  []string{partyID(1)},
 		TimeRange: &interval.Interval{StartTime: timestamppb.New(after2)},
 	})
-	if got := edgeTransferIDs(ranged.Edges); !slices.Equal(got, ids(tu.TransferPrefix, 5)) {
+	if got := transferIDs(ranged.Transfers); !slices.Equal(got, ids(tu.TransferPrefix, 5)) {
 		t.Errorf("party 1 after transfer 2 = %v, want transfer 5", got)
 	}
 
 	// Pagination.
 	one := int32(1)
 	page1 := byParty(t, r, &transfersv1.GetTransfersByPartyIdRequest{PartyIds: []string{partyID(1)}, First: &one})
-	if pi := page1.GetPageInfo(); len(page1.Edges) != 1 || !pi.GetHasNextPage() || pi.GetHasPreviousPage() {
+	if pi := page1.GetPageInfo(); len(page1.Transfers) != 1 || !pi.GetHasNextPage() || pi.GetHasPreviousPage() {
 		t.Fatalf("page 1 = %v", page1)
 	}
 	page2 := byParty(t, r, &transfersv1.GetTransfersByPartyIdRequest{PartyIds: []string{partyID(1)}, First: &one, After: page1.GetPageInfo().EndCursor})
-	if pi := page2.GetPageInfo(); !slices.Equal(edgeTransferIDs(page2.Edges), ids(tu.TransferPrefix, 2)) || pi.GetHasNextPage() || !pi.GetHasPreviousPage() {
+	if pi := page2.GetPageInfo(); !slices.Equal(transferIDs(page2.Transfers), ids(tu.TransferPrefix, 2)) || pi.GetHasNextPage() || !pi.GetHasPreviousPage() {
 		t.Errorf("page 2 = %v", page2)
 	}
 

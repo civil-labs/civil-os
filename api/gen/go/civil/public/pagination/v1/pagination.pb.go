@@ -21,8 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Pagination state for a connection, following the GraphQL Cursor
-// Connections Specification (https://relay.dev/graphql/connections.htm).
+// Pagination state for a page of results.
 //
 // Paginated requests take `first` (the page size) and `after` (a cursor from
 // a previous page). To read every page, repeat the request with

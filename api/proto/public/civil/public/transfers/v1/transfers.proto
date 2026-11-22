@@ -131,13 +131,6 @@ message TransferCodeType {
   optional string description = 3;
 }
 
-// A transfer in a page of results, with its cursor.
-message RealPropertyTransferEdge {
-  // This transfer's position: pass it as `after` to continue after it.
-  string cursor = 1;
-  RealPropertyTransfer node = 2;
-}
-
 message GetTransfersByIdRequest {
   // 1 to 100 unique transfer UUIDs.
   repeated string transfer_ids = 1 [(buf.validate.field).repeated = {
@@ -188,7 +181,9 @@ message GetTransfersByParcelIdRequest {
 }
 
 message GetTransfersByParcelIdResponse {
-  repeated RealPropertyTransferEdge edges = 1;
+  // The page's transfers, newest first (by transfer time, then by ID,
+  // descending). Fewer than `first` only on the last page.
+  repeated RealPropertyTransfer transfers = 1;
   civil.public.pagination.v1.PageInfo page_info = 2;
 }
 
@@ -225,7 +220,9 @@ message GetTransfersByFeatureIdRequest {
 }
 
 message GetTransfersByFeatureIdResponse {
-  repeated RealPropertyTransferEdge edges = 1;
+  // The page's transfers, newest first (by transfer time, then by ID,
+  // descending). Fewer than `first` only on the last page.
+  repeated RealPropertyTransfer transfers = 1;
   civil.public.pagination.v1.PageInfo page_info = 2;
 }
 
@@ -262,6 +259,8 @@ message GetTransfersByPartyIdRequest {
 }
 
 message GetTransfersByPartyIdResponse {
-  repeated RealPropertyTransferEdge edges = 1;
+  // The page's transfers, newest first (by transfer time, then by ID,
+  // descending). Fewer than `first` only on the last page.
+  repeated RealPropertyTransfer transfers = 1;
   civil.public.pagination.v1.PageInfo page_info = 2;
 }

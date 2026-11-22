@@ -4,8 +4,8 @@ package civil.mesh.pagination.v1;
 
 import "google/protobuf/timestamp.proto";
 
-// Relay-style page info (https://relay.dev/graphql/connections.htm), the mesh
-// copy of civil.public.pagination.v1.PageInfo. Cursors are opaque.
+// Pagination state for a page of results, the mesh copy of
+// civil.public.pagination.v1.PageInfo. Cursors are opaque.
 message PageInfo {
   bool has_next_page = 1;
   bool has_previous_page = 2;
@@ -13,12 +13,12 @@ message PageInfo {
   optional string end_cursor = 4;
 }
 
-// The decoded form of an edge cursor for lookups ordered by one public ID
+// The decoded form of a page-boundary cursor for lookups ordered by one public ID
 // (docs/address-party-read-api/spec.md). Internal to the reader: clients only
 // see its base64url encoding.
 message IdCursor {
   uint32 version = 1;
-  // public_id of the last edge returned.
+  // public_id of the result the cursor marks.
   string last_id = 2;
   // SHA-256 of the canonical request filter, so a cursor can't be reused
   // with a different filter.

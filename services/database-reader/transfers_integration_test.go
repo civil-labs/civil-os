@@ -49,14 +49,6 @@ func byParcel(t *testing.T, r readerClients, req *transfersv1.GetTransfersByParc
 	return res.Msg
 }
 
-func edgeTransferIDs(edges []*transfersv1.RealPropertyTransferEdge) []string {
-	out := make([]string, len(edges))
-	for i, e := range edges {
-		out[i] = e.GetNode().GetTransferId()
-	}
-	return out
-}
-
 func transferIDs(ts []*transfersv1.RealPropertyTransfer) []string {
 	out := make([]string, len(ts))
 	for i, t := range ts {
@@ -283,23 +275,23 @@ func TestTransfersByParcelAndFeature(t *testing.T) {
 
 	// Queried by parcel 6 alone, transfer 3 still lists parcel 7 and both improvements.
 	res := byParcel(t, r, &transfersv1.GetTransfersByParcelIdRequest{ParcelIds: []string{tu.ParcelID(6)}})
-	if len(res.Edges) != 1 {
-		t.Fatalf("parcel 6: got %v", edgeTransferIDs(res.Edges))
+	if len(res.Transfers) != 1 {
+		t.Fatalf("parcel 6: got %v", transferIDs(res.Transfers))
 	}
-	if tr := res.Edges[0].GetNode(); len(tr.GetParcels()) != 2 || len(tr.GetImprovements()) != 2 {
+	if tr := res.Transfers[0]; len(tr.GetParcels()) != 2 || len(tr.GetImprovements()) != 2 {
 		t.Errorf("parcel 6: transfer 3 = %v", tr)
 	}
 
 	// A transfer covering several requested parcels appears once.
 	res = byParcel(t, r, &transfersv1.GetTransfersByParcelIdRequest{ParcelIds: []string{tu.ParcelID(6), tu.ParcelID(7)}})
-	if want := ids(tu.TransferPrefix, 3); !slices.Equal(edgeTransferIDs(res.Edges), want) {
-		t.Errorf("parcels 6 and 7: got %v", edgeTransferIDs(res.Edges))
+	if want := ids(tu.TransferPrefix, 3); !slices.Equal(transferIDs(res.Transfers), want) {
+		t.Errorf("parcels 6 and 7: got %v", transferIDs(res.Transfers))
 	}
 
 	// Newest first.
 	res = byParcel(t, r, &transfersv1.GetTransfersByParcelIdRequest{ParcelIds: []string{tu.ParcelID(5)}})
-	if want := ids(tu.TransferPrefix, 6, 1); !slices.Equal(edgeTransferIDs(res.Edges), want) {
-		t.Errorf("parcel 5: got %v, want %v", edgeTransferIDs(res.Edges), want)
+	if want := ids(tu.TransferPrefix, 6, 1); !slices.Equal(transferIDs(res.Transfers), want) {
+		t.Errorf("parcel 5: got %v, want %v", transferIDs(res.Transfers), want)
 	}
 
 	// The range is half-open: [2022-01-01, end of transfer 6) excludes both ends' outsiders.
@@ -307,26 +299,26 @@ func TestTransfersByParcelAndFeature(t *testing.T) {
 		ParcelIds: []string{tu.ParcelID(5)},
 		TimeRange: &interval.Interval{StartTime: timestamppb.New(time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC))},
 	})
-	if want := ids(tu.TransferPrefix, 6); !slices.Equal(edgeTransferIDs(res.Edges), want) {
-		t.Errorf("parcel 5 from 2022: got %v, want %v", edgeTransferIDs(res.Edges), want)
+	if want := ids(tu.TransferPrefix, 6); !slices.Equal(transferIDs(res.Transfers), want) {
+		t.Errorf("parcel 5 from 2022: got %v, want %v", transferIDs(res.Transfers), want)
 	}
 	res = byParcel(t, r, &transfersv1.GetTransfersByParcelIdRequest{
 		ParcelIds: []string{tu.ParcelID(5)},
 		TimeRange: &interval.Interval{EndTime: timestamppb.New(time.Date(2025, 1, 10, 0, 0, 0, 0, time.UTC))},
 	})
-	if want := ids(tu.TransferPrefix, 1); !slices.Equal(edgeTransferIDs(res.Edges), want) {
-		t.Errorf("parcel 5 before transfer 6's time: got %v, want %v", edgeTransferIDs(res.Edges), want)
+	if want := ids(tu.TransferPrefix, 1); !slices.Equal(transferIDs(res.Transfers), want) {
+		t.Errorf("parcel 5 before transfer 6's time: got %v, want %v", transferIDs(res.Transfers), want)
 	}
 
 	// The voided parcel and its feature return nothing.
 	res = byParcel(t, r, &transfersv1.GetTransfersByParcelIdRequest{ParcelIds: []string{tu.ParcelID(tu.VoidedParcel)}})
-	if len(res.Edges) != 0 {
-		t.Errorf("voided parcel: got %v", edgeTransferIDs(res.Edges))
+	if len(res.Transfers) != 0 {
+		t.Errorf("voided parcel: got %v", transferIDs(res.Transfers))
 	}
 	feat, err := r.transfers.GetTransfersByFeatureId(ctx, connect.NewRequest(&transfersv1.GetTransfersByFeatureIdRequest{
 		FeatureIds: []int64{tu.ParcelFeatureID(tu.VoidedParcel)},
 	}))
-	if err != nil || len(feat.Msg.Edges) != 0 {
+	if err != nil || len(feat.Msg.Transfers) != 0 {
 		t.Errorf("voided parcel's feature: got %v, %v", feat, err)
 	}
 
@@ -336,12 +328,12 @@ func TestTransfersByParcelAndFeature(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if want := ids(tu.TransferPrefix, tu.MultiGranteeTransfer); !slices.Equal(edgeTransferIDs(feat.Msg.Edges), want) {
-		t.Errorf("feature of parcel 2: got %v", edgeTransferIDs(feat.Msg.Edges))
+	if want := ids(tu.TransferPrefix, tu.MultiGranteeTransfer); !slices.Equal(transferIDs(feat.Msg.Transfers), want) {
+		t.Errorf("feature of parcel 2: got %v", transferIDs(feat.Msg.Transfers))
 	}
 
 	res = byParcel(t, r, &transfersv1.GetTransfersByParcelIdRequest{ParcelIds: []string{tu.MissingID}})
-	if len(res.Edges) != 0 || res.GetPageInfo().GetHasNextPage() {
+	if len(res.Transfers) != 0 || res.GetPageInfo().GetHasNextPage() {
 		t.Errorf("unknown parcel: got %v", res)
 	}
 }
@@ -353,31 +345,31 @@ func TestTransferPagination(t *testing.T) {
 	parcel5 := []string{tu.ParcelID(5)}
 
 	page1 := byParcel(t, r, &transfersv1.GetTransfersByParcelIdRequest{ParcelIds: parcel5, First: &one})
-	if want := ids(tu.TransferPrefix, 6); !slices.Equal(edgeTransferIDs(page1.Edges), want) {
-		t.Fatalf("page 1: got %v", edgeTransferIDs(page1.Edges))
+	if want := ids(tu.TransferPrefix, 6); !slices.Equal(transferIDs(page1.Transfers), want) {
+		t.Fatalf("page 1: got %v", transferIDs(page1.Transfers))
 	}
 	pi := page1.GetPageInfo()
-	if !pi.GetHasNextPage() || pi.GetHasPreviousPage() || pi.GetStartCursor() != page1.Edges[0].GetCursor() || pi.GetEndCursor() != page1.Edges[0].GetCursor() {
+	if !pi.GetHasNextPage() || pi.GetHasPreviousPage() || pi.GetStartCursor() == "" || pi.GetEndCursor() != pi.GetStartCursor() {
 		t.Errorf("page 1 info = %v", pi)
 	}
 
 	page2 := byParcel(t, r, &transfersv1.GetTransfersByParcelIdRequest{ParcelIds: parcel5, First: &one, After: pi.EndCursor})
-	if want := ids(tu.TransferPrefix, 1); !slices.Equal(edgeTransferIDs(page2.Edges), want) {
-		t.Fatalf("page 2: got %v", edgeTransferIDs(page2.Edges))
+	if want := ids(tu.TransferPrefix, 1); !slices.Equal(transferIDs(page2.Transfers), want) {
+		t.Fatalf("page 2: got %v", transferIDs(page2.Transfers))
 	}
 	if pi := page2.GetPageInfo(); pi.GetHasNextPage() || !pi.GetHasPreviousPage() {
 		t.Errorf("page 2 info = %v", pi)
 	}
 
 	page3 := byParcel(t, r, &transfersv1.GetTransfersByParcelIdRequest{ParcelIds: parcel5, After: page2.GetPageInfo().EndCursor})
-	if pi := page3.GetPageInfo(); len(page3.Edges) != 0 || pi.GetHasNextPage() || pi.StartCursor != nil || pi.EndCursor != nil {
+	if pi := page3.GetPageInfo(); len(page3.Transfers) != 0 || pi.GetHasNextPage() || pi.StartCursor != nil || pi.EndCursor != nil {
 		t.Errorf("past the end: got %v", page3)
 	}
 
 	// The reader clamps first itself, since the mesh has no validation.
 	big := int32(500)
-	if res := byParcel(t, r, &transfersv1.GetTransfersByParcelIdRequest{ParcelIds: parcel5, First: &big}); len(res.Edges) != 2 {
-		t.Errorf("first = 500: got %v", edgeTransferIDs(res.Edges))
+	if res := byParcel(t, r, &transfersv1.GetTransfersByParcelIdRequest{ParcelIds: parcel5, First: &big}); len(res.Transfers) != 2 {
+		t.Errorf("first = 500: got %v", transferIDs(res.Transfers))
 	}
 
 	bad := map[string]*transfersv1.GetTransfersByParcelIdRequest{

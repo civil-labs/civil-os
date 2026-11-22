@@ -51,11 +51,7 @@ func parcelsAtAddress(t *testing.T, r readerClients, n int, when *timestamppb.Ti
 	if err != nil {
 		t.Fatal(err)
 	}
-	var out []*addressesv1.AddressParcel
-	for _, e := range res.Msg.Edges {
-		out = append(out, e.GetNode())
-	}
-	return out
+	return res.Msg.Parcels
 }
 
 func improvementsAtAddress(t *testing.T, r readerClients, n int) []*addressesv1.AddressImprovement {
@@ -66,11 +62,7 @@ func improvementsAtAddress(t *testing.T, r readerClients, n int) []*addressesv1.
 	if err != nil {
 		t.Fatal(err)
 	}
-	var out []*addressesv1.AddressImprovement
-	for _, e := range res.Msg.Edges {
-		out = append(out, e.GetNode())
-	}
-	return out
+	return res.Msg.Improvements
 }
 
 func partiesAtAddress(t *testing.T, r readerClients, n int, when *timestamppb.Timestamp) []string {
@@ -82,8 +74,8 @@ func partiesAtAddress(t *testing.T, r readerClients, n int, when *timestamppb.Ti
 		t.Fatal(err)
 	}
 	var out []string
-	for _, e := range res.Msg.Edges {
-		out = append(out, e.GetNode().GetPartyId())
+	for _, p := range res.Msg.Parties {
+		out = append(out, p.GetPartyId())
 	}
 	return out
 }
@@ -96,11 +88,7 @@ func partyParcels(t *testing.T, r readerClients, n int) []*partiesv1.PartyParcel
 	if err != nil {
 		t.Fatal(err)
 	}
-	var out []*partiesv1.PartyParcel
-	for _, e := range res.Msg.Edges {
-		out = append(out, e.GetNode())
-	}
-	return out
+	return res.Msg.Parcels
 }
 
 func TestGetAddressesById(t *testing.T) {
@@ -284,11 +272,11 @@ func TestAddressPartyPagination(t *testing.T) {
 			t.Fatalf("page %d: %v", i+1, err)
 		}
 		pi := res.GetPageInfo()
-		if len(res.GetEdges()) != 1 || pi.GetHasNextPage() != want.next || pi.GetHasPreviousPage() != want.prev ||
-			pi.GetStartCursor() != res.GetEdges()[0].GetCursor() || pi.GetEndCursor() != res.GetEdges()[0].GetCursor() {
+		if len(res.GetParcels()) != 1 || pi.GetHasNextPage() != want.next || pi.GetHasPreviousPage() != want.prev ||
+			pi.GetStartCursor() == "" || pi.GetEndCursor() != pi.GetStartCursor() {
 			t.Fatalf("page %d = %v", i+1, res)
 		}
-		walked = append(walked, res.GetEdges()[0].GetNode().GetParcelId())
+		walked = append(walked, res.GetParcels()[0].GetParcelId())
 		after = pi.EndCursor
 	}
 	if want := ids(tu.ParcelPrefix, 2, 3, 13); !reflect.DeepEqual(walked, want) {
@@ -298,7 +286,7 @@ func TestAddressPartyPagination(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if pi := past.GetPageInfo(); len(past.GetEdges()) != 0 || pi.GetHasNextPage() || !pi.GetHasPreviousPage() ||
+	if pi := past.GetPageInfo(); len(past.GetParcels()) != 0 || pi.GetHasNextPage() || !pi.GetHasPreviousPage() ||
 		pi.StartCursor != nil || pi.EndCursor != nil {
 		t.Errorf("past the end = %v", past)
 	}
@@ -341,7 +329,8 @@ func TestAddressPartyPagination(t *testing.T) {
 	// The mesh has no validation, so the reader clamps first itself.
 	big := int32(500)
 	res, err := page(&partiesv1.GetParcelsByPartyIdRequest{PartyId: tu.PartyID(3), First: &big})
-	if err != nil || len(res.GetEdges()) != 3 || res.GetPageInfo().GetHasNextPage() {
+	if err != nil || len(res.GetParcels()) != 3 || res.GetPageInfo().GetHasNextPage() {
 		t.Errorf("first = 500: %v, %v", res, err)
 	}
 }
+

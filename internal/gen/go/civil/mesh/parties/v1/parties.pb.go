@@ -151,110 +151,6 @@ func (x *PartyParcel) GetOwnershipShare() string {
 	return ""
 }
 
-type PartyEdge struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Cursor        string                 `protobuf:"bytes,1,opt,name=cursor,proto3" json:"cursor,omitempty"`
-	Node          *Party                 `protobuf:"bytes,2,opt,name=node,proto3" json:"node,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *PartyEdge) Reset() {
-	*x = PartyEdge{}
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PartyEdge) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PartyEdge) ProtoMessage() {}
-
-func (x *PartyEdge) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PartyEdge.ProtoReflect.Descriptor instead.
-func (*PartyEdge) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_parties_v1_parties_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *PartyEdge) GetCursor() string {
-	if x != nil {
-		return x.Cursor
-	}
-	return ""
-}
-
-func (x *PartyEdge) GetNode() *Party {
-	if x != nil {
-		return x.Node
-	}
-	return nil
-}
-
-type PartyParcelEdge struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Cursor        string                 `protobuf:"bytes,1,opt,name=cursor,proto3" json:"cursor,omitempty"`
-	Node          *PartyParcel           `protobuf:"bytes,2,opt,name=node,proto3" json:"node,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *PartyParcelEdge) Reset() {
-	*x = PartyParcelEdge{}
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PartyParcelEdge) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PartyParcelEdge) ProtoMessage() {}
-
-func (x *PartyParcelEdge) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PartyParcelEdge.ProtoReflect.Descriptor instead.
-func (*PartyParcelEdge) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_parties_v1_parties_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *PartyParcelEdge) GetCursor() string {
-	if x != nil {
-		return x.Cursor
-	}
-	return ""
-}
-
-func (x *PartyParcelEdge) GetNode() *PartyParcel {
-	if x != nil {
-		return x.Node
-	}
-	return nil
-}
-
 type GetPartiesByIdRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PartyIds      []string               `protobuf:"bytes,1,rep,name=party_ids,json=partyIds,proto3" json:"party_ids,omitempty"`
@@ -265,7 +161,7 @@ type GetPartiesByIdRequest struct {
 
 func (x *GetPartiesByIdRequest) Reset() {
 	*x = GetPartiesByIdRequest{}
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[4]
+	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -277,7 +173,7 @@ func (x *GetPartiesByIdRequest) String() string {
 func (*GetPartiesByIdRequest) ProtoMessage() {}
 
 func (x *GetPartiesByIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[4]
+	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -290,7 +186,7 @@ func (x *GetPartiesByIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPartiesByIdRequest.ProtoReflect.Descriptor instead.
 func (*GetPartiesByIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_parties_v1_parties_proto_rawDescGZIP(), []int{4}
+	return file_civil_mesh_parties_v1_parties_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GetPartiesByIdRequest) GetPartyIds() []string {
@@ -316,7 +212,7 @@ type GetPartiesByIdResponse struct {
 
 func (x *GetPartiesByIdResponse) Reset() {
 	*x = GetPartiesByIdResponse{}
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[5]
+	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -328,7 +224,7 @@ func (x *GetPartiesByIdResponse) String() string {
 func (*GetPartiesByIdResponse) ProtoMessage() {}
 
 func (x *GetPartiesByIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[5]
+	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -341,7 +237,7 @@ func (x *GetPartiesByIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPartiesByIdResponse.ProtoReflect.Descriptor instead.
 func (*GetPartiesByIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_parties_v1_parties_proto_rawDescGZIP(), []int{5}
+	return file_civil_mesh_parties_v1_parties_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetPartiesByIdResponse) GetParties() map[string]*Party {
@@ -363,7 +259,7 @@ type GetParcelsByPartyIdRequest struct {
 
 func (x *GetParcelsByPartyIdRequest) Reset() {
 	*x = GetParcelsByPartyIdRequest{}
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[6]
+	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -375,7 +271,7 @@ func (x *GetParcelsByPartyIdRequest) String() string {
 func (*GetParcelsByPartyIdRequest) ProtoMessage() {}
 
 func (x *GetParcelsByPartyIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[6]
+	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -388,7 +284,7 @@ func (x *GetParcelsByPartyIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetParcelsByPartyIdRequest.ProtoReflect.Descriptor instead.
 func (*GetParcelsByPartyIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_parties_v1_parties_proto_rawDescGZIP(), []int{6}
+	return file_civil_mesh_parties_v1_parties_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetParcelsByPartyIdRequest) GetPartyId() string {
@@ -421,7 +317,7 @@ func (x *GetParcelsByPartyIdRequest) GetAfter() string {
 
 type GetParcelsByPartyIdResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Edges         []*PartyParcelEdge     `protobuf:"bytes,1,rep,name=edges,proto3" json:"edges,omitempty"`
+	Parcels       []*PartyParcel         `protobuf:"bytes,1,rep,name=parcels,proto3" json:"parcels,omitempty"`
 	PageInfo      *v1.PageInfo           `protobuf:"bytes,2,opt,name=page_info,json=pageInfo,proto3" json:"page_info,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -429,7 +325,7 @@ type GetParcelsByPartyIdResponse struct {
 
 func (x *GetParcelsByPartyIdResponse) Reset() {
 	*x = GetParcelsByPartyIdResponse{}
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[7]
+	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -441,7 +337,7 @@ func (x *GetParcelsByPartyIdResponse) String() string {
 func (*GetParcelsByPartyIdResponse) ProtoMessage() {}
 
 func (x *GetParcelsByPartyIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[7]
+	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -454,12 +350,12 @@ func (x *GetParcelsByPartyIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetParcelsByPartyIdResponse.ProtoReflect.Descriptor instead.
 func (*GetParcelsByPartyIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_parties_v1_parties_proto_rawDescGZIP(), []int{7}
+	return file_civil_mesh_parties_v1_parties_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *GetParcelsByPartyIdResponse) GetEdges() []*PartyParcelEdge {
+func (x *GetParcelsByPartyIdResponse) GetParcels() []*PartyParcel {
 	if x != nil {
-		return x.Edges
+		return x.Parcels
 	}
 	return nil
 }
@@ -488,13 +384,7 @@ const file_civil_mesh_parties_v1_parties_proto_rawDesc = "" +
 	"\n" +
 	"feature_id\x18\x02 \x01(\x03H\x00R\tfeatureId\x88\x01\x01\x12'\n" +
 	"\x0fownership_share\x18\x03 \x01(\tR\x0eownershipShareB\r\n" +
-	"\v_feature_id\"U\n" +
-	"\tPartyEdge\x12\x16\n" +
-	"\x06cursor\x18\x01 \x01(\tR\x06cursor\x120\n" +
-	"\x04node\x18\x02 \x01(\v2\x1c.civil.mesh.parties.v1.PartyR\x04node\"a\n" +
-	"\x0fPartyParcelEdge\x12\x16\n" +
-	"\x06cursor\x18\x01 \x01(\tR\x06cursor\x126\n" +
-	"\x04node\x18\x02 \x01(\v2\".civil.mesh.parties.v1.PartyParcelR\x04node\"\x85\x01\n" +
+	"\v_feature_id\"\x85\x01\n" +
 	"\x15GetPartiesByIdRequest\x12\x1b\n" +
 	"\tparty_ids\x18\x01 \x03(\tR\bpartyIds\x12?\n" +
 	"\vlegal_as_of\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\tlegalAsOf\x88\x01\x01B\x0e\n" +
@@ -513,7 +403,7 @@ const file_civil_mesh_parties_v1_parties_proto_rawDesc = "" +
 	"\x06_firstB\b\n" +
 	"\x06_after\"\x9c\x01\n" +
 	"\x1bGetParcelsByPartyIdResponse\x12<\n" +
-	"\x05edges\x18\x01 \x03(\v2&.civil.mesh.parties.v1.PartyParcelEdgeR\x05edges\x12?\n" +
+	"\aparcels\x18\x01 \x03(\v2\".civil.mesh.parties.v1.PartyParcelR\aparcels\x12?\n" +
 	"\tpage_info\x18\x02 \x01(\v2\".civil.mesh.pagination.v1.PageInfoR\bpageInfo2\x85\x02\n" +
 	"\x12PartiesReadService\x12o\n" +
 	"\x0eGetPartiesById\x12,.civil.mesh.parties.v1.GetPartiesByIdRequest\x1a-.civil.mesh.parties.v1.GetPartiesByIdResponse\"\x00\x12~\n" +
@@ -532,38 +422,34 @@ func file_civil_mesh_parties_v1_parties_proto_rawDescGZIP() []byte {
 	return file_civil_mesh_parties_v1_parties_proto_rawDescData
 }
 
-var file_civil_mesh_parties_v1_parties_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_civil_mesh_parties_v1_parties_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_civil_mesh_parties_v1_parties_proto_goTypes = []any{
 	(*Party)(nil),                       // 0: civil.mesh.parties.v1.Party
 	(*PartyParcel)(nil),                 // 1: civil.mesh.parties.v1.PartyParcel
-	(*PartyEdge)(nil),                   // 2: civil.mesh.parties.v1.PartyEdge
-	(*PartyParcelEdge)(nil),             // 3: civil.mesh.parties.v1.PartyParcelEdge
-	(*GetPartiesByIdRequest)(nil),       // 4: civil.mesh.parties.v1.GetPartiesByIdRequest
-	(*GetPartiesByIdResponse)(nil),      // 5: civil.mesh.parties.v1.GetPartiesByIdResponse
-	(*GetParcelsByPartyIdRequest)(nil),  // 6: civil.mesh.parties.v1.GetParcelsByPartyIdRequest
-	(*GetParcelsByPartyIdResponse)(nil), // 7: civil.mesh.parties.v1.GetParcelsByPartyIdResponse
-	nil,                                 // 8: civil.mesh.parties.v1.GetPartiesByIdResponse.PartiesEntry
-	(*timestamppb.Timestamp)(nil),       // 9: google.protobuf.Timestamp
-	(*v1.PageInfo)(nil),                 // 10: civil.mesh.pagination.v1.PageInfo
+	(*GetPartiesByIdRequest)(nil),       // 2: civil.mesh.parties.v1.GetPartiesByIdRequest
+	(*GetPartiesByIdResponse)(nil),      // 3: civil.mesh.parties.v1.GetPartiesByIdResponse
+	(*GetParcelsByPartyIdRequest)(nil),  // 4: civil.mesh.parties.v1.GetParcelsByPartyIdRequest
+	(*GetParcelsByPartyIdResponse)(nil), // 5: civil.mesh.parties.v1.GetParcelsByPartyIdResponse
+	nil,                                 // 6: civil.mesh.parties.v1.GetPartiesByIdResponse.PartiesEntry
+	(*timestamppb.Timestamp)(nil),       // 7: google.protobuf.Timestamp
+	(*v1.PageInfo)(nil),                 // 8: civil.mesh.pagination.v1.PageInfo
 }
 var file_civil_mesh_parties_v1_parties_proto_depIdxs = []int32{
-	0,  // 0: civil.mesh.parties.v1.PartyEdge.node:type_name -> civil.mesh.parties.v1.Party
-	1,  // 1: civil.mesh.parties.v1.PartyParcelEdge.node:type_name -> civil.mesh.parties.v1.PartyParcel
-	9,  // 2: civil.mesh.parties.v1.GetPartiesByIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	8,  // 3: civil.mesh.parties.v1.GetPartiesByIdResponse.parties:type_name -> civil.mesh.parties.v1.GetPartiesByIdResponse.PartiesEntry
-	9,  // 4: civil.mesh.parties.v1.GetParcelsByPartyIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	3,  // 5: civil.mesh.parties.v1.GetParcelsByPartyIdResponse.edges:type_name -> civil.mesh.parties.v1.PartyParcelEdge
-	10, // 6: civil.mesh.parties.v1.GetParcelsByPartyIdResponse.page_info:type_name -> civil.mesh.pagination.v1.PageInfo
-	0,  // 7: civil.mesh.parties.v1.GetPartiesByIdResponse.PartiesEntry.value:type_name -> civil.mesh.parties.v1.Party
-	4,  // 8: civil.mesh.parties.v1.PartiesReadService.GetPartiesById:input_type -> civil.mesh.parties.v1.GetPartiesByIdRequest
-	6,  // 9: civil.mesh.parties.v1.PartiesReadService.GetParcelsByPartyId:input_type -> civil.mesh.parties.v1.GetParcelsByPartyIdRequest
-	5,  // 10: civil.mesh.parties.v1.PartiesReadService.GetPartiesById:output_type -> civil.mesh.parties.v1.GetPartiesByIdResponse
-	7,  // 11: civil.mesh.parties.v1.PartiesReadService.GetParcelsByPartyId:output_type -> civil.mesh.parties.v1.GetParcelsByPartyIdResponse
-	10, // [10:12] is the sub-list for method output_type
-	8,  // [8:10] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	7, // 0: civil.mesh.parties.v1.GetPartiesByIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	6, // 1: civil.mesh.parties.v1.GetPartiesByIdResponse.parties:type_name -> civil.mesh.parties.v1.GetPartiesByIdResponse.PartiesEntry
+	7, // 2: civil.mesh.parties.v1.GetParcelsByPartyIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	1, // 3: civil.mesh.parties.v1.GetParcelsByPartyIdResponse.parcels:type_name -> civil.mesh.parties.v1.PartyParcel
+	8, // 4: civil.mesh.parties.v1.GetParcelsByPartyIdResponse.page_info:type_name -> civil.mesh.pagination.v1.PageInfo
+	0, // 5: civil.mesh.parties.v1.GetPartiesByIdResponse.PartiesEntry.value:type_name -> civil.mesh.parties.v1.Party
+	2, // 6: civil.mesh.parties.v1.PartiesReadService.GetPartiesById:input_type -> civil.mesh.parties.v1.GetPartiesByIdRequest
+	4, // 7: civil.mesh.parties.v1.PartiesReadService.GetParcelsByPartyId:input_type -> civil.mesh.parties.v1.GetParcelsByPartyIdRequest
+	3, // 8: civil.mesh.parties.v1.PartiesReadService.GetPartiesById:output_type -> civil.mesh.parties.v1.GetPartiesByIdResponse
+	5, // 9: civil.mesh.parties.v1.PartiesReadService.GetParcelsByPartyId:output_type -> civil.mesh.parties.v1.GetParcelsByPartyIdResponse
+	8, // [8:10] is the sub-list for method output_type
+	6, // [6:8] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_civil_mesh_parties_v1_parties_proto_init() }
@@ -573,15 +459,15 @@ func file_civil_mesh_parties_v1_parties_proto_init() {
 	}
 	file_civil_mesh_parties_v1_parties_proto_msgTypes[0].OneofWrappers = []any{}
 	file_civil_mesh_parties_v1_parties_proto_msgTypes[1].OneofWrappers = []any{}
+	file_civil_mesh_parties_v1_parties_proto_msgTypes[2].OneofWrappers = []any{}
 	file_civil_mesh_parties_v1_parties_proto_msgTypes[4].OneofWrappers = []any{}
-	file_civil_mesh_parties_v1_parties_proto_msgTypes[6].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_civil_mesh_parties_v1_parties_proto_rawDesc), len(file_civil_mesh_parties_v1_parties_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

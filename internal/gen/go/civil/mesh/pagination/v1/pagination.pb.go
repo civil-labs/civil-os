@@ -22,8 +22,8 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Relay-style page info (https://relay.dev/graphql/connections.htm), the mesh
-// copy of civil.public.pagination.v1.PageInfo. Cursors are opaque.
+// Pagination state for a page of results, the mesh copy of
+// civil.public.pagination.v1.PageInfo. Cursors are opaque.
 type PageInfo struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	HasNextPage     bool                   `protobuf:"varint,1,opt,name=has_next_page,json=hasNextPage,proto3" json:"has_next_page,omitempty"`
@@ -92,13 +92,13 @@ func (x *PageInfo) GetEndCursor() string {
 	return ""
 }
 
-// The decoded form of an edge cursor for lookups ordered by one public ID
+// The decoded form of a page-boundary cursor for lookups ordered by one public ID
 // (docs/address-party-read-api/spec.md). Internal to the reader: clients only
 // see its base64url encoding.
 type IdCursor struct {
 	state   protoimpl.MessageState `protogen:"open.v1"`
 	Version uint32                 `protobuf:"varint,1,opt,name=version,proto3" json:"version,omitempty"`
-	// public_id of the last edge returned.
+	// public_id of the result the cursor marks.
 	LastId string `protobuf:"bytes,2,opt,name=last_id,json=lastId,proto3" json:"last_id,omitempty"`
 	// SHA-256 of the canonical request filter, so a cursor can't be reused
 	// with a different filter.

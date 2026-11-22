@@ -494,58 +494,6 @@ func (x *TransferCodeType) GetDescription() string {
 	return ""
 }
 
-type RealPropertyTransferEdge struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Cursor        string                 `protobuf:"bytes,1,opt,name=cursor,proto3" json:"cursor,omitempty"`
-	Node          *RealPropertyTransfer  `protobuf:"bytes,2,opt,name=node,proto3" json:"node,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *RealPropertyTransferEdge) Reset() {
-	*x = RealPropertyTransferEdge{}
-	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *RealPropertyTransferEdge) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RealPropertyTransferEdge) ProtoMessage() {}
-
-func (x *RealPropertyTransferEdge) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RealPropertyTransferEdge.ProtoReflect.Descriptor instead.
-func (*RealPropertyTransferEdge) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_transfers_v1_transfers_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *RealPropertyTransferEdge) GetCursor() string {
-	if x != nil {
-		return x.Cursor
-	}
-	return ""
-}
-
-func (x *RealPropertyTransferEdge) GetNode() *RealPropertyTransfer {
-	if x != nil {
-		return x.Node
-	}
-	return nil
-}
-
 type GetTransfersByIdRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	TransferIds   []string               `protobuf:"bytes,1,rep,name=transfer_ids,json=transferIds,proto3" json:"transfer_ids,omitempty"`
@@ -555,7 +503,7 @@ type GetTransfersByIdRequest struct {
 
 func (x *GetTransfersByIdRequest) Reset() {
 	*x = GetTransfersByIdRequest{}
-	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[8]
+	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -567,7 +515,7 @@ func (x *GetTransfersByIdRequest) String() string {
 func (*GetTransfersByIdRequest) ProtoMessage() {}
 
 func (x *GetTransfersByIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[8]
+	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -580,7 +528,7 @@ func (x *GetTransfersByIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTransfersByIdRequest.ProtoReflect.Descriptor instead.
 func (*GetTransfersByIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_transfers_v1_transfers_proto_rawDescGZIP(), []int{8}
+	return file_civil_mesh_transfers_v1_transfers_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *GetTransfersByIdRequest) GetTransferIds() []string {
@@ -599,7 +547,7 @@ type GetTransfersByIdResponse struct {
 
 func (x *GetTransfersByIdResponse) Reset() {
 	*x = GetTransfersByIdResponse{}
-	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[9]
+	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -611,7 +559,7 @@ func (x *GetTransfersByIdResponse) String() string {
 func (*GetTransfersByIdResponse) ProtoMessage() {}
 
 func (x *GetTransfersByIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[9]
+	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -624,7 +572,7 @@ func (x *GetTransfersByIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTransfersByIdResponse.ProtoReflect.Descriptor instead.
 func (*GetTransfersByIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_transfers_v1_transfers_proto_rawDescGZIP(), []int{9}
+	return file_civil_mesh_transfers_v1_transfers_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *GetTransfersByIdResponse) GetTransfers() []*RealPropertyTransfer {
@@ -646,7 +594,7 @@ type GetTransfersByParcelIdRequest struct {
 
 func (x *GetTransfersByParcelIdRequest) Reset() {
 	*x = GetTransfersByParcelIdRequest{}
-	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[10]
+	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -658,7 +606,7 @@ func (x *GetTransfersByParcelIdRequest) String() string {
 func (*GetTransfersByParcelIdRequest) ProtoMessage() {}
 
 func (x *GetTransfersByParcelIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[10]
+	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -671,7 +619,7 @@ func (x *GetTransfersByParcelIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTransfersByParcelIdRequest.ProtoReflect.Descriptor instead.
 func (*GetTransfersByParcelIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_transfers_v1_transfers_proto_rawDescGZIP(), []int{10}
+	return file_civil_mesh_transfers_v1_transfers_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *GetTransfersByParcelIdRequest) GetParcelIds() []string {
@@ -703,16 +651,16 @@ func (x *GetTransfersByParcelIdRequest) GetAfter() string {
 }
 
 type GetTransfersByParcelIdResponse struct {
-	state         protoimpl.MessageState      `protogen:"open.v1"`
-	Edges         []*RealPropertyTransferEdge `protobuf:"bytes,1,rep,name=edges,proto3" json:"edges,omitempty"`
-	PageInfo      *v11.PageInfo               `protobuf:"bytes,2,opt,name=page_info,json=pageInfo,proto3" json:"page_info,omitempty"`
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Transfers     []*RealPropertyTransfer `protobuf:"bytes,1,rep,name=transfers,proto3" json:"transfers,omitempty"`
+	PageInfo      *v11.PageInfo           `protobuf:"bytes,2,opt,name=page_info,json=pageInfo,proto3" json:"page_info,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GetTransfersByParcelIdResponse) Reset() {
 	*x = GetTransfersByParcelIdResponse{}
-	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[11]
+	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -724,7 +672,7 @@ func (x *GetTransfersByParcelIdResponse) String() string {
 func (*GetTransfersByParcelIdResponse) ProtoMessage() {}
 
 func (x *GetTransfersByParcelIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[11]
+	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -737,12 +685,12 @@ func (x *GetTransfersByParcelIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTransfersByParcelIdResponse.ProtoReflect.Descriptor instead.
 func (*GetTransfersByParcelIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_transfers_v1_transfers_proto_rawDescGZIP(), []int{11}
+	return file_civil_mesh_transfers_v1_transfers_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *GetTransfersByParcelIdResponse) GetEdges() []*RealPropertyTransferEdge {
+func (x *GetTransfersByParcelIdResponse) GetTransfers() []*RealPropertyTransfer {
 	if x != nil {
-		return x.Edges
+		return x.Transfers
 	}
 	return nil
 }
@@ -766,7 +714,7 @@ type GetTransfersByFeatureIdRequest struct {
 
 func (x *GetTransfersByFeatureIdRequest) Reset() {
 	*x = GetTransfersByFeatureIdRequest{}
-	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[12]
+	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -778,7 +726,7 @@ func (x *GetTransfersByFeatureIdRequest) String() string {
 func (*GetTransfersByFeatureIdRequest) ProtoMessage() {}
 
 func (x *GetTransfersByFeatureIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[12]
+	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -791,7 +739,7 @@ func (x *GetTransfersByFeatureIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTransfersByFeatureIdRequest.ProtoReflect.Descriptor instead.
 func (*GetTransfersByFeatureIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_transfers_v1_transfers_proto_rawDescGZIP(), []int{12}
+	return file_civil_mesh_transfers_v1_transfers_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *GetTransfersByFeatureIdRequest) GetFeatureIds() []int64 {
@@ -823,16 +771,16 @@ func (x *GetTransfersByFeatureIdRequest) GetAfter() string {
 }
 
 type GetTransfersByFeatureIdResponse struct {
-	state         protoimpl.MessageState      `protogen:"open.v1"`
-	Edges         []*RealPropertyTransferEdge `protobuf:"bytes,1,rep,name=edges,proto3" json:"edges,omitempty"`
-	PageInfo      *v11.PageInfo               `protobuf:"bytes,2,opt,name=page_info,json=pageInfo,proto3" json:"page_info,omitempty"`
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Transfers     []*RealPropertyTransfer `protobuf:"bytes,1,rep,name=transfers,proto3" json:"transfers,omitempty"`
+	PageInfo      *v11.PageInfo           `protobuf:"bytes,2,opt,name=page_info,json=pageInfo,proto3" json:"page_info,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GetTransfersByFeatureIdResponse) Reset() {
 	*x = GetTransfersByFeatureIdResponse{}
-	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[13]
+	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -844,7 +792,7 @@ func (x *GetTransfersByFeatureIdResponse) String() string {
 func (*GetTransfersByFeatureIdResponse) ProtoMessage() {}
 
 func (x *GetTransfersByFeatureIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[13]
+	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -857,12 +805,12 @@ func (x *GetTransfersByFeatureIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTransfersByFeatureIdResponse.ProtoReflect.Descriptor instead.
 func (*GetTransfersByFeatureIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_transfers_v1_transfers_proto_rawDescGZIP(), []int{13}
+	return file_civil_mesh_transfers_v1_transfers_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *GetTransfersByFeatureIdResponse) GetEdges() []*RealPropertyTransferEdge {
+func (x *GetTransfersByFeatureIdResponse) GetTransfers() []*RealPropertyTransfer {
 	if x != nil {
-		return x.Edges
+		return x.Transfers
 	}
 	return nil
 }
@@ -874,7 +822,7 @@ func (x *GetTransfersByFeatureIdResponse) GetPageInfo() *v11.PageInfo {
 	return nil
 }
 
-// The decoded form of an edge cursor. Internal to the reader: clients only
+// The decoded form of a page-boundary cursor. Internal to the reader: clients only
 // see its base64url encoding.
 type TransferCursor struct {
 	state        protoimpl.MessageState `protogen:"open.v1"`
@@ -890,7 +838,7 @@ type TransferCursor struct {
 
 func (x *TransferCursor) Reset() {
 	*x = TransferCursor{}
-	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[14]
+	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -902,7 +850,7 @@ func (x *TransferCursor) String() string {
 func (*TransferCursor) ProtoMessage() {}
 
 func (x *TransferCursor) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[14]
+	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -915,7 +863,7 @@ func (x *TransferCursor) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TransferCursor.ProtoReflect.Descriptor instead.
 func (*TransferCursor) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_transfers_v1_transfers_proto_rawDescGZIP(), []int{14}
+	return file_civil_mesh_transfers_v1_transfers_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *TransferCursor) GetVersion() uint32 {
@@ -958,7 +906,7 @@ type GetTransfersByPartyIdRequest struct {
 
 func (x *GetTransfersByPartyIdRequest) Reset() {
 	*x = GetTransfersByPartyIdRequest{}
-	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[15]
+	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -970,7 +918,7 @@ func (x *GetTransfersByPartyIdRequest) String() string {
 func (*GetTransfersByPartyIdRequest) ProtoMessage() {}
 
 func (x *GetTransfersByPartyIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[15]
+	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -983,7 +931,7 @@ func (x *GetTransfersByPartyIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTransfersByPartyIdRequest.ProtoReflect.Descriptor instead.
 func (*GetTransfersByPartyIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_transfers_v1_transfers_proto_rawDescGZIP(), []int{15}
+	return file_civil_mesh_transfers_v1_transfers_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *GetTransfersByPartyIdRequest) GetPartyIds() []string {
@@ -1015,16 +963,16 @@ func (x *GetTransfersByPartyIdRequest) GetAfter() string {
 }
 
 type GetTransfersByPartyIdResponse struct {
-	state         protoimpl.MessageState      `protogen:"open.v1"`
-	Edges         []*RealPropertyTransferEdge `protobuf:"bytes,1,rep,name=edges,proto3" json:"edges,omitempty"`
-	PageInfo      *v11.PageInfo               `protobuf:"bytes,2,opt,name=page_info,json=pageInfo,proto3" json:"page_info,omitempty"`
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Transfers     []*RealPropertyTransfer `protobuf:"bytes,1,rep,name=transfers,proto3" json:"transfers,omitempty"`
+	PageInfo      *v11.PageInfo           `protobuf:"bytes,2,opt,name=page_info,json=pageInfo,proto3" json:"page_info,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GetTransfersByPartyIdResponse) Reset() {
 	*x = GetTransfersByPartyIdResponse{}
-	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[16]
+	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1036,7 +984,7 @@ func (x *GetTransfersByPartyIdResponse) String() string {
 func (*GetTransfersByPartyIdResponse) ProtoMessage() {}
 
 func (x *GetTransfersByPartyIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[16]
+	mi := &file_civil_mesh_transfers_v1_transfers_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1049,12 +997,12 @@ func (x *GetTransfersByPartyIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTransfersByPartyIdResponse.ProtoReflect.Descriptor instead.
 func (*GetTransfersByPartyIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_transfers_v1_transfers_proto_rawDescGZIP(), []int{16}
+	return file_civil_mesh_transfers_v1_transfers_proto_rawDescGZIP(), []int{15}
 }
 
-func (x *GetTransfersByPartyIdResponse) GetEdges() []*RealPropertyTransferEdge {
+func (x *GetTransfersByPartyIdResponse) GetTransfers() []*RealPropertyTransfer {
 	if x != nil {
-		return x.Edges
+		return x.Transfers
 	}
 	return nil
 }
@@ -1116,10 +1064,7 @@ const file_civil_mesh_transfers_v1_transfers_proto_rawDesc = "" +
 	"codeTypeId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12%\n" +
 	"\vdescription\x18\x03 \x01(\tH\x00R\vdescription\x88\x01\x01B\x0e\n" +
-	"\f_description\"u\n" +
-	"\x18RealPropertyTransferEdge\x12\x16\n" +
-	"\x06cursor\x18\x01 \x01(\tR\x06cursor\x12A\n" +
-	"\x04node\x18\x02 \x01(\v2-.civil.mesh.transfers.v1.RealPropertyTransferR\x04node\"<\n" +
+	"\f_description\"<\n" +
 	"\x17GetTransfersByIdRequest\x12!\n" +
 	"\ftransfer_ids\x18\x01 \x03(\tR\vtransferIds\"g\n" +
 	"\x18GetTransfersByIdResponse\x12K\n" +
@@ -1132,9 +1077,9 @@ const file_civil_mesh_transfers_v1_transfers_proto_rawDesc = "" +
 	"\x05first\x18\x03 \x01(\x05H\x00R\x05first\x88\x01\x01\x12\x19\n" +
 	"\x05after\x18\x04 \x01(\tH\x01R\x05after\x88\x01\x01B\b\n" +
 	"\x06_firstB\b\n" +
-	"\x06_after\"\xaa\x01\n" +
-	"\x1eGetTransfersByParcelIdResponse\x12G\n" +
-	"\x05edges\x18\x01 \x03(\v21.civil.mesh.transfers.v1.RealPropertyTransferEdgeR\x05edges\x12?\n" +
+	"\x06_after\"\xae\x01\n" +
+	"\x1eGetTransfersByParcelIdResponse\x12K\n" +
+	"\ttransfers\x18\x01 \x03(\v2-.civil.mesh.transfers.v1.RealPropertyTransferR\ttransfers\x12?\n" +
 	"\tpage_info\x18\x02 \x01(\v2\".civil.mesh.pagination.v1.PageInfoR\bpageInfo\"\xc1\x01\n" +
 	"\x1eGetTransfersByFeatureIdRequest\x12\x1f\n" +
 	"\vfeature_ids\x18\x01 \x03(\x03R\n" +
@@ -1144,9 +1089,9 @@ const file_civil_mesh_transfers_v1_transfers_proto_rawDesc = "" +
 	"\x05first\x18\x03 \x01(\x05H\x00R\x05first\x88\x01\x01\x12\x19\n" +
 	"\x05after\x18\x04 \x01(\tH\x01R\x05after\x88\x01\x01B\b\n" +
 	"\x06_firstB\b\n" +
-	"\x06_after\"\xab\x01\n" +
-	"\x1fGetTransfersByFeatureIdResponse\x12G\n" +
-	"\x05edges\x18\x01 \x03(\v21.civil.mesh.transfers.v1.RealPropertyTransferEdgeR\x05edges\x12?\n" +
+	"\x06_after\"\xaf\x01\n" +
+	"\x1fGetTransfersByFeatureIdResponse\x12K\n" +
+	"\ttransfers\x18\x01 \x03(\v2-.civil.mesh.transfers.v1.RealPropertyTransferR\ttransfers\x12?\n" +
 	"\tpage_info\x18\x02 \x01(\v2\".civil.mesh.pagination.v1.PageInfoR\bpageInfo\"\xad\x01\n" +
 	"\x0eTransferCursor\x12\x18\n" +
 	"\aversion\x18\x01 \x01(\rR\aversion\x12?\n" +
@@ -1162,9 +1107,9 @@ const file_civil_mesh_transfers_v1_transfers_proto_rawDesc = "" +
 	"\x05first\x18\x03 \x01(\x05H\x00R\x05first\x88\x01\x01\x12\x19\n" +
 	"\x05after\x18\x04 \x01(\tH\x01R\x05after\x88\x01\x01B\b\n" +
 	"\x06_firstB\b\n" +
-	"\x06_after\"\xa9\x01\n" +
-	"\x1dGetTransfersByPartyIdResponse\x12G\n" +
-	"\x05edges\x18\x01 \x03(\v21.civil.mesh.transfers.v1.RealPropertyTransferEdgeR\x05edges\x12?\n" +
+	"\x06_after\"\xad\x01\n" +
+	"\x1dGetTransfersByPartyIdResponse\x12K\n" +
+	"\ttransfers\x18\x01 \x03(\v2-.civil.mesh.transfers.v1.RealPropertyTransferR\ttransfers\x12?\n" +
 	"\tpage_info\x18\x02 \x01(\v2\".civil.mesh.pagination.v1.PageInfoR\bpageInfo2\xc6\x04\n" +
 	"\x1fRealPropertyTransferReadService\x12y\n" +
 	"\x10GetTransfersById\x120.civil.mesh.transfers.v1.GetTransfersByIdRequest\x1a1.civil.mesh.transfers.v1.GetTransfersByIdResponse\"\x00\x12\x8b\x01\n" +
@@ -1185,7 +1130,7 @@ func file_civil_mesh_transfers_v1_transfers_proto_rawDescGZIP() []byte {
 	return file_civil_mesh_transfers_v1_transfers_proto_rawDescData
 }
 
-var file_civil_mesh_transfers_v1_transfers_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
+var file_civil_mesh_transfers_v1_transfers_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_civil_mesh_transfers_v1_transfers_proto_goTypes = []any{
 	(*RealPropertyTransfer)(nil),            // 0: civil.mesh.transfers.v1.RealPropertyTransfer
 	(*TransferredParcel)(nil),               // 1: civil.mesh.transfers.v1.TransferredParcel
@@ -1194,24 +1139,23 @@ var file_civil_mesh_transfers_v1_transfers_proto_goTypes = []any{
 	(*TransferParty)(nil),                   // 4: civil.mesh.transfers.v1.TransferParty
 	(*TransferCode)(nil),                    // 5: civil.mesh.transfers.v1.TransferCode
 	(*TransferCodeType)(nil),                // 6: civil.mesh.transfers.v1.TransferCodeType
-	(*RealPropertyTransferEdge)(nil),        // 7: civil.mesh.transfers.v1.RealPropertyTransferEdge
-	(*GetTransfersByIdRequest)(nil),         // 8: civil.mesh.transfers.v1.GetTransfersByIdRequest
-	(*GetTransfersByIdResponse)(nil),        // 9: civil.mesh.transfers.v1.GetTransfersByIdResponse
-	(*GetTransfersByParcelIdRequest)(nil),   // 10: civil.mesh.transfers.v1.GetTransfersByParcelIdRequest
-	(*GetTransfersByParcelIdResponse)(nil),  // 11: civil.mesh.transfers.v1.GetTransfersByParcelIdResponse
-	(*GetTransfersByFeatureIdRequest)(nil),  // 12: civil.mesh.transfers.v1.GetTransfersByFeatureIdRequest
-	(*GetTransfersByFeatureIdResponse)(nil), // 13: civil.mesh.transfers.v1.GetTransfersByFeatureIdResponse
-	(*TransferCursor)(nil),                  // 14: civil.mesh.transfers.v1.TransferCursor
-	(*GetTransfersByPartyIdRequest)(nil),    // 15: civil.mesh.transfers.v1.GetTransfersByPartyIdRequest
-	(*GetTransfersByPartyIdResponse)(nil),   // 16: civil.mesh.transfers.v1.GetTransfersByPartyIdResponse
-	(*timestamppb.Timestamp)(nil),           // 17: google.protobuf.Timestamp
-	(*v1.Recording)(nil),                    // 18: civil.mesh.recordings.v1.Recording
-	(*interval.Interval)(nil),               // 19: google.type.Interval
-	(*v11.PageInfo)(nil),                    // 20: civil.mesh.pagination.v1.PageInfo
+	(*GetTransfersByIdRequest)(nil),         // 7: civil.mesh.transfers.v1.GetTransfersByIdRequest
+	(*GetTransfersByIdResponse)(nil),        // 8: civil.mesh.transfers.v1.GetTransfersByIdResponse
+	(*GetTransfersByParcelIdRequest)(nil),   // 9: civil.mesh.transfers.v1.GetTransfersByParcelIdRequest
+	(*GetTransfersByParcelIdResponse)(nil),  // 10: civil.mesh.transfers.v1.GetTransfersByParcelIdResponse
+	(*GetTransfersByFeatureIdRequest)(nil),  // 11: civil.mesh.transfers.v1.GetTransfersByFeatureIdRequest
+	(*GetTransfersByFeatureIdResponse)(nil), // 12: civil.mesh.transfers.v1.GetTransfersByFeatureIdResponse
+	(*TransferCursor)(nil),                  // 13: civil.mesh.transfers.v1.TransferCursor
+	(*GetTransfersByPartyIdRequest)(nil),    // 14: civil.mesh.transfers.v1.GetTransfersByPartyIdRequest
+	(*GetTransfersByPartyIdResponse)(nil),   // 15: civil.mesh.transfers.v1.GetTransfersByPartyIdResponse
+	(*timestamppb.Timestamp)(nil),           // 16: google.protobuf.Timestamp
+	(*v1.Recording)(nil),                    // 17: civil.mesh.recordings.v1.Recording
+	(*interval.Interval)(nil),               // 18: google.type.Interval
+	(*v11.PageInfo)(nil),                    // 19: civil.mesh.pagination.v1.PageInfo
 }
 var file_civil_mesh_transfers_v1_transfers_proto_depIdxs = []int32{
-	17, // 0: civil.mesh.transfers.v1.RealPropertyTransfer.transfer_time:type_name -> google.protobuf.Timestamp
-	18, // 1: civil.mesh.transfers.v1.RealPropertyTransfer.recordings:type_name -> civil.mesh.recordings.v1.Recording
+	16, // 0: civil.mesh.transfers.v1.RealPropertyTransfer.transfer_time:type_name -> google.protobuf.Timestamp
+	17, // 1: civil.mesh.transfers.v1.RealPropertyTransfer.recordings:type_name -> civil.mesh.recordings.v1.Recording
 	1,  // 2: civil.mesh.transfers.v1.RealPropertyTransfer.parcels:type_name -> civil.mesh.transfers.v1.TransferredParcel
 	2,  // 3: civil.mesh.transfers.v1.RealPropertyTransfer.improvements:type_name -> civil.mesh.transfers.v1.TransferredImprovement
 	5,  // 4: civil.mesh.transfers.v1.RealPropertyTransfer.codes:type_name -> civil.mesh.transfers.v1.TransferCode
@@ -1221,31 +1165,30 @@ var file_civil_mesh_transfers_v1_transfers_proto_depIdxs = []int32{
 	3,  // 8: civil.mesh.transfers.v1.TransferredImprovement.grantors:type_name -> civil.mesh.transfers.v1.TransferShare
 	3,  // 9: civil.mesh.transfers.v1.TransferredImprovement.grantees:type_name -> civil.mesh.transfers.v1.TransferShare
 	6,  // 10: civil.mesh.transfers.v1.TransferCode.type:type_name -> civil.mesh.transfers.v1.TransferCodeType
-	0,  // 11: civil.mesh.transfers.v1.RealPropertyTransferEdge.node:type_name -> civil.mesh.transfers.v1.RealPropertyTransfer
-	0,  // 12: civil.mesh.transfers.v1.GetTransfersByIdResponse.transfers:type_name -> civil.mesh.transfers.v1.RealPropertyTransfer
-	19, // 13: civil.mesh.transfers.v1.GetTransfersByParcelIdRequest.time_range:type_name -> google.type.Interval
-	7,  // 14: civil.mesh.transfers.v1.GetTransfersByParcelIdResponse.edges:type_name -> civil.mesh.transfers.v1.RealPropertyTransferEdge
-	20, // 15: civil.mesh.transfers.v1.GetTransfersByParcelIdResponse.page_info:type_name -> civil.mesh.pagination.v1.PageInfo
-	19, // 16: civil.mesh.transfers.v1.GetTransfersByFeatureIdRequest.time_range:type_name -> google.type.Interval
-	7,  // 17: civil.mesh.transfers.v1.GetTransfersByFeatureIdResponse.edges:type_name -> civil.mesh.transfers.v1.RealPropertyTransferEdge
-	20, // 18: civil.mesh.transfers.v1.GetTransfersByFeatureIdResponse.page_info:type_name -> civil.mesh.pagination.v1.PageInfo
-	17, // 19: civil.mesh.transfers.v1.TransferCursor.transfer_time:type_name -> google.protobuf.Timestamp
-	19, // 20: civil.mesh.transfers.v1.GetTransfersByPartyIdRequest.time_range:type_name -> google.type.Interval
-	7,  // 21: civil.mesh.transfers.v1.GetTransfersByPartyIdResponse.edges:type_name -> civil.mesh.transfers.v1.RealPropertyTransferEdge
-	20, // 22: civil.mesh.transfers.v1.GetTransfersByPartyIdResponse.page_info:type_name -> civil.mesh.pagination.v1.PageInfo
-	8,  // 23: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersById:input_type -> civil.mesh.transfers.v1.GetTransfersByIdRequest
-	10, // 24: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByParcelId:input_type -> civil.mesh.transfers.v1.GetTransfersByParcelIdRequest
-	12, // 25: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByFeatureId:input_type -> civil.mesh.transfers.v1.GetTransfersByFeatureIdRequest
-	15, // 26: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByPartyId:input_type -> civil.mesh.transfers.v1.GetTransfersByPartyIdRequest
-	9,  // 27: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersById:output_type -> civil.mesh.transfers.v1.GetTransfersByIdResponse
-	11, // 28: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByParcelId:output_type -> civil.mesh.transfers.v1.GetTransfersByParcelIdResponse
-	13, // 29: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByFeatureId:output_type -> civil.mesh.transfers.v1.GetTransfersByFeatureIdResponse
-	16, // 30: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByPartyId:output_type -> civil.mesh.transfers.v1.GetTransfersByPartyIdResponse
-	27, // [27:31] is the sub-list for method output_type
-	23, // [23:27] is the sub-list for method input_type
-	23, // [23:23] is the sub-list for extension type_name
-	23, // [23:23] is the sub-list for extension extendee
-	0,  // [0:23] is the sub-list for field type_name
+	0,  // 11: civil.mesh.transfers.v1.GetTransfersByIdResponse.transfers:type_name -> civil.mesh.transfers.v1.RealPropertyTransfer
+	18, // 12: civil.mesh.transfers.v1.GetTransfersByParcelIdRequest.time_range:type_name -> google.type.Interval
+	0,  // 13: civil.mesh.transfers.v1.GetTransfersByParcelIdResponse.transfers:type_name -> civil.mesh.transfers.v1.RealPropertyTransfer
+	19, // 14: civil.mesh.transfers.v1.GetTransfersByParcelIdResponse.page_info:type_name -> civil.mesh.pagination.v1.PageInfo
+	18, // 15: civil.mesh.transfers.v1.GetTransfersByFeatureIdRequest.time_range:type_name -> google.type.Interval
+	0,  // 16: civil.mesh.transfers.v1.GetTransfersByFeatureIdResponse.transfers:type_name -> civil.mesh.transfers.v1.RealPropertyTransfer
+	19, // 17: civil.mesh.transfers.v1.GetTransfersByFeatureIdResponse.page_info:type_name -> civil.mesh.pagination.v1.PageInfo
+	16, // 18: civil.mesh.transfers.v1.TransferCursor.transfer_time:type_name -> google.protobuf.Timestamp
+	18, // 19: civil.mesh.transfers.v1.GetTransfersByPartyIdRequest.time_range:type_name -> google.type.Interval
+	0,  // 20: civil.mesh.transfers.v1.GetTransfersByPartyIdResponse.transfers:type_name -> civil.mesh.transfers.v1.RealPropertyTransfer
+	19, // 21: civil.mesh.transfers.v1.GetTransfersByPartyIdResponse.page_info:type_name -> civil.mesh.pagination.v1.PageInfo
+	7,  // 22: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersById:input_type -> civil.mesh.transfers.v1.GetTransfersByIdRequest
+	9,  // 23: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByParcelId:input_type -> civil.mesh.transfers.v1.GetTransfersByParcelIdRequest
+	11, // 24: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByFeatureId:input_type -> civil.mesh.transfers.v1.GetTransfersByFeatureIdRequest
+	14, // 25: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByPartyId:input_type -> civil.mesh.transfers.v1.GetTransfersByPartyIdRequest
+	8,  // 26: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersById:output_type -> civil.mesh.transfers.v1.GetTransfersByIdResponse
+	10, // 27: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByParcelId:output_type -> civil.mesh.transfers.v1.GetTransfersByParcelIdResponse
+	12, // 28: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByFeatureId:output_type -> civil.mesh.transfers.v1.GetTransfersByFeatureIdResponse
+	15, // 29: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByPartyId:output_type -> civil.mesh.transfers.v1.GetTransfersByPartyIdResponse
+	26, // [26:30] is the sub-list for method output_type
+	22, // [22:26] is the sub-list for method input_type
+	22, // [22:22] is the sub-list for extension type_name
+	22, // [22:22] is the sub-list for extension extendee
+	0,  // [0:22] is the sub-list for field type_name
 }
 
 func init() { file_civil_mesh_transfers_v1_transfers_proto_init() }
@@ -1258,16 +1201,16 @@ func file_civil_mesh_transfers_v1_transfers_proto_init() {
 	file_civil_mesh_transfers_v1_transfers_proto_msgTypes[4].OneofWrappers = []any{}
 	file_civil_mesh_transfers_v1_transfers_proto_msgTypes[5].OneofWrappers = []any{}
 	file_civil_mesh_transfers_v1_transfers_proto_msgTypes[6].OneofWrappers = []any{}
-	file_civil_mesh_transfers_v1_transfers_proto_msgTypes[10].OneofWrappers = []any{}
-	file_civil_mesh_transfers_v1_transfers_proto_msgTypes[12].OneofWrappers = []any{}
-	file_civil_mesh_transfers_v1_transfers_proto_msgTypes[15].OneofWrappers = []any{}
+	file_civil_mesh_transfers_v1_transfers_proto_msgTypes[9].OneofWrappers = []any{}
+	file_civil_mesh_transfers_v1_transfers_proto_msgTypes[11].OneofWrappers = []any{}
+	file_civil_mesh_transfers_v1_transfers_proto_msgTypes[14].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_civil_mesh_transfers_v1_transfers_proto_rawDesc), len(file_civil_mesh_transfers_v1_transfers_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   17,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -58,16 +58,6 @@ message PartyParcel {
   string ownership_share = 3;
 }
 
-message PartyEdge {
-  string cursor = 1;
-  Party node = 2;
-}
-
-message PartyParcelEdge {
-  string cursor = 1;
-  PartyParcel node = 2;
-}
-
 message GetPartiesByIdRequest {
   // 1 to 100 unique party UUIDs.
   repeated string party_ids = 1 [(buf.validate.field).repeated = {
@@ -115,6 +105,8 @@ message GetParcelsByPartyIdRequest {
 }
 
 message GetParcelsByPartyIdResponse {
-  repeated PartyParcelEdge edges = 1;
+  // The page's parcels, ordered by `parcel_id`. Fewer than `first` only on
+  // the last page.
+  repeated PartyParcel parcels = 1;
   civil.public.pagination.v1.PageInfo page_info = 2;
 }

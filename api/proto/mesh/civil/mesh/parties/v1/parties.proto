@@ -26,16 +26,6 @@ message PartyParcel {
   string ownership_share = 3;
 }
 
-message PartyEdge {
-  string cursor = 1;
-  Party node = 2;
-}
-
-message PartyParcelEdge {
-  string cursor = 1;
-  PartyParcel node = 2;
-}
-
 message GetPartiesByIdRequest {
   repeated string party_ids = 1;
   optional google.protobuf.Timestamp legal_as_of = 2;
@@ -53,6 +43,6 @@ message GetParcelsByPartyIdRequest {
 }
 
 message GetParcelsByPartyIdResponse {
-  repeated PartyParcelEdge edges = 1;
+  repeated PartyParcel parcels = 1;
   civil.mesh.pagination.v1.PageInfo page_info = 2;
 }

@@ -37,66 +37,6 @@ func (s *AddressServer) GetAddressesById(
 	return connect.NewResponse(&publicaddressesv1.GetAddressesByIdResponse{Addresses: addresses}), nil
 }
 
-func (s *AddressServer) GetParcelsByAddressId(
-	ctx context.Context,
-	req *connect.Request[publicaddressesv1.GetParcelsByAddressIdRequest],
-) (*connect.Response[publicaddressesv1.GetParcelsByAddressIdResponse], error) {
-	s.logger.Debug("received GetParcelsByAddressId request")
-
-	m := req.Msg
-	meshRes, err := s.dbReaderClient.GetParcelsByAddressId(ctx, connect.NewRequest(&meshaddressesv1.GetParcelsByAddressIdRequest{
-		AddressId: m.AddressId, LegalAsOf: m.LegalAsOf, First: pageSize(m.First), After: m.After,
-	}))
-	if err != nil {
-		s.logger.Error("upstream GetParcelsByAddressId request failed", slog.Any("error", err))
-		return nil, err // keep the mesh status code
-	}
-	return connect.NewResponse(&publicaddressesv1.GetParcelsByAddressIdResponse{
-		Parcels:  mapSlice(meshRes.Msg.Parcels, mapAddressParcel),
-		PageInfo: mapPageInfo(meshRes.Msg.PageInfo),
-	}), nil
-}
-
-func (s *AddressServer) GetImprovementsByAddressId(
-	ctx context.Context,
-	req *connect.Request[publicaddressesv1.GetImprovementsByAddressIdRequest],
-) (*connect.Response[publicaddressesv1.GetImprovementsByAddressIdResponse], error) {
-	s.logger.Debug("received GetImprovementsByAddressId request")
-
-	m := req.Msg
-	meshRes, err := s.dbReaderClient.GetImprovementsByAddressId(ctx, connect.NewRequest(&meshaddressesv1.GetImprovementsByAddressIdRequest{
-		AddressId: m.AddressId, LegalAsOf: m.LegalAsOf, First: pageSize(m.First), After: m.After,
-	}))
-	if err != nil {
-		s.logger.Error("upstream GetImprovementsByAddressId request failed", slog.Any("error", err))
-		return nil, err // keep the mesh status code
-	}
-	return connect.NewResponse(&publicaddressesv1.GetImprovementsByAddressIdResponse{
-		Improvements: mapSlice(meshRes.Msg.Improvements, mapAddressImprovement),
-		PageInfo:     mapPageInfo(meshRes.Msg.PageInfo),
-	}), nil
-}
-
-func (s *AddressServer) GetPartiesByAddressId(
-	ctx context.Context,
-	req *connect.Request[publicaddressesv1.GetPartiesByAddressIdRequest],
-) (*connect.Response[publicaddressesv1.GetPartiesByAddressIdResponse], error) {
-	s.logger.Debug("received GetPartiesByAddressId request")
-
-	m := req.Msg
-	meshRes, err := s.dbReaderClient.GetPartiesByAddressId(ctx, connect.NewRequest(&meshaddressesv1.GetPartiesByAddressIdRequest{
-		AddressId: m.AddressId, LegalAsOf: m.LegalAsOf, First: pageSize(m.First), After: m.After,
-	}))
-	if err != nil {
-		s.logger.Error("upstream GetPartiesByAddressId request failed", slog.Any("error", err))
-		return nil, err // keep the mesh status code
-	}
-	return connect.NewResponse(&publicaddressesv1.GetPartiesByAddressIdResponse{
-		Parties:  mapSlice(meshRes.Msg.Parties, mapParty),
-		PageInfo: mapPageInfo(meshRes.Msg.PageInfo),
-	}), nil
-}
-
 func mapAddress(m *meshaddressesv1.Address) *publicaddressesv1.Address {
 	a := &publicaddressesv1.Address{
 		AddressId:        m.GetAddressId(),
@@ -116,18 +56,4 @@ func mapAddress(m *meshaddressesv1.Address) *publicaddressesv1.Address {
 		a.Country = &publicaddressesv1.Country{Code: c.GetCode(), Name: c.GetName()}
 	}
 	return a
-}
-
-func mapAddressParcel(m *meshaddressesv1.AddressParcel) *publicaddressesv1.AddressParcel {
-	return &publicaddressesv1.AddressParcel{
-		ParcelId:  m.GetParcelId(),
-		FeatureId: m.FeatureId,
-	}
-}
-
-func mapAddressImprovement(m *meshaddressesv1.AddressImprovement) *publicaddressesv1.AddressImprovement {
-	return &publicaddressesv1.AddressImprovement{
-		ImprovementId: m.GetImprovementId(),
-		ParcelIds:     m.GetParcelIds(),
-	}
 }

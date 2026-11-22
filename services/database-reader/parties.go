@@ -8,6 +8,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/jackc/pgx/v5"
 
+	parcelsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1"
 	partiesv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parties/v1"
 )
 
@@ -78,12 +79,12 @@ func (s *APIServer) GetPartiesById(
 
 func (s *APIServer) GetParcelsByPartyId(
 	ctx context.Context,
-	req *connect.Request[partiesv1.GetParcelsByPartyIdRequest],
-) (*connect.Response[partiesv1.GetParcelsByPartyIdResponse], error) {
+	req *connect.Request[parcelsv1.GetParcelsByPartyIdRequest],
+) (*connect.Response[parcelsv1.GetParcelsByPartyIdResponse], error) {
 	s.logger.Debug("received GetParcelsByPartyId request")
 
 	at := getTargetTime(req.Msg.LegalAsOf)
-	read := func(afterID *string, limit int) ([]*partiesv1.PartyParcel, error) {
+	read := func(afterID *string, limit int) ([]*parcelsv1.PartyParcel, error) {
 		// The party itself must be visible at t (rule 5).
 		rows, err := s.db.Query(ctx, `
 			SELECT p.public_id::text, pg.feature_id, pp.ownership_share::text
@@ -98,16 +99,16 @@ func (s *APIServer) GetParcelsByPartyId(
 		if err != nil {
 			return nil, s.dbError("party parcels", err)
 		}
-		return collectRows(rows, func(r pgx.Rows) (*partiesv1.PartyParcel, error) {
-			n := &partiesv1.PartyParcel{}
+		return collectRows(rows, func(r pgx.Rows) (*parcelsv1.PartyParcel, error) {
+			n := &parcelsv1.PartyParcel{}
 			return n, r.Scan(&n.ParcelId, &n.FeatureId, &n.OwnershipShare)
 		}, func(err error) error { return s.dbError("party parcels", err) })
 	}
 
 	nodes, pageInfo, err := pageByID("GetParcelsByPartyId", req.Msg.PartyId, req.Msg.LegalAsOf,
-		req.Msg.First, req.Msg.After, read, func(n *partiesv1.PartyParcel) string { return n.ParcelId })
+		req.Msg.First, req.Msg.After, read, func(n *parcelsv1.PartyParcel) string { return n.ParcelId })
 	if err != nil {
 		return nil, err
 	}
-	return connect.NewResponse(&partiesv1.GetParcelsByPartyIdResponse{Parcels: nodes, PageInfo: pageInfo}), nil
+	return connect.NewResponse(&parcelsv1.GetParcelsByPartyIdResponse{Parcels: nodes, PageInfo: pageInfo}), nil
 }

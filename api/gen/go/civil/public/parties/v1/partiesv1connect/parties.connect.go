@@ -36,9 +36,9 @@ const (
 	// PartiesServiceGetPartiesByIdProcedure is the fully-qualified name of the PartiesService's
 	// GetPartiesById RPC.
 	PartiesServiceGetPartiesByIdProcedure = "/civil.public.parties.v1.PartiesService/GetPartiesById"
-	// PartiesServiceGetParcelsByPartyIdProcedure is the fully-qualified name of the PartiesService's
-	// GetParcelsByPartyId RPC.
-	PartiesServiceGetParcelsByPartyIdProcedure = "/civil.public.parties.v1.PartiesService/GetParcelsByPartyId"
+	// PartiesServiceGetPartiesByAddressIdProcedure is the fully-qualified name of the PartiesService's
+	// GetPartiesByAddressId RPC.
+	PartiesServiceGetPartiesByAddressIdProcedure = "/civil.public.parties.v1.PartiesService/GetPartiesByAddressId"
 )
 
 // PartiesServiceClient is a client for the civil.public.parties.v1.PartiesService service.
@@ -46,11 +46,10 @@ type PartiesServiceClient interface {
 	// Returns the requested parties. Unknown IDs, voided parties and parties
 	// with no record at `legal_as_of` are left out.
 	GetPartiesById(context.Context, *connect.Request[v1.GetPartiesByIdRequest]) (*connect.Response[v1.GetPartiesByIdResponse], error)
-	// Returns the parcels a party holds at `legal_as_of`, each with its
-	// ownership share, ordered by `parcel_id`. Voided parcels and parcels with
-	// no geometry or record then are left out. An unknown or voided party has
-	// no parcels.
-	GetParcelsByPartyId(context.Context, *connect.Request[v1.GetParcelsByPartyIdRequest]) (*connect.Response[v1.GetParcelsByPartyIdResponse], error)
+	// Returns the parties whose mailing address, at `legal_as_of`, is this
+	// one, ordered by `party_id`. Voided parties are left out. An unknown or
+	// voided address has no parties.
+	GetPartiesByAddressId(context.Context, *connect.Request[v1.GetPartiesByAddressIdRequest]) (*connect.Response[v1.GetPartiesByAddressIdResponse], error)
 }
 
 // NewPartiesServiceClient constructs a client for the civil.public.parties.v1.PartiesService
@@ -71,10 +70,10 @@ func NewPartiesServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
-		getParcelsByPartyId: connect.NewClient[v1.GetParcelsByPartyIdRequest, v1.GetParcelsByPartyIdResponse](
+		getPartiesByAddressId: connect.NewClient[v1.GetPartiesByAddressIdRequest, v1.GetPartiesByAddressIdResponse](
 			httpClient,
-			baseURL+PartiesServiceGetParcelsByPartyIdProcedure,
-			connect.WithSchema(partiesServiceMethods.ByName("GetParcelsByPartyId")),
+			baseURL+PartiesServiceGetPartiesByAddressIdProcedure,
+			connect.WithSchema(partiesServiceMethods.ByName("GetPartiesByAddressId")),
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
@@ -83,8 +82,8 @@ func NewPartiesServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 
 // partiesServiceClient implements PartiesServiceClient.
 type partiesServiceClient struct {
-	getPartiesById      *connect.Client[v1.GetPartiesByIdRequest, v1.GetPartiesByIdResponse]
-	getParcelsByPartyId *connect.Client[v1.GetParcelsByPartyIdRequest, v1.GetParcelsByPartyIdResponse]
+	getPartiesById        *connect.Client[v1.GetPartiesByIdRequest, v1.GetPartiesByIdResponse]
+	getPartiesByAddressId *connect.Client[v1.GetPartiesByAddressIdRequest, v1.GetPartiesByAddressIdResponse]
 }
 
 // GetPartiesById calls civil.public.parties.v1.PartiesService.GetPartiesById.
@@ -92,9 +91,9 @@ func (c *partiesServiceClient) GetPartiesById(ctx context.Context, req *connect.
 	return c.getPartiesById.CallUnary(ctx, req)
 }
 
-// GetParcelsByPartyId calls civil.public.parties.v1.PartiesService.GetParcelsByPartyId.
-func (c *partiesServiceClient) GetParcelsByPartyId(ctx context.Context, req *connect.Request[v1.GetParcelsByPartyIdRequest]) (*connect.Response[v1.GetParcelsByPartyIdResponse], error) {
-	return c.getParcelsByPartyId.CallUnary(ctx, req)
+// GetPartiesByAddressId calls civil.public.parties.v1.PartiesService.GetPartiesByAddressId.
+func (c *partiesServiceClient) GetPartiesByAddressId(ctx context.Context, req *connect.Request[v1.GetPartiesByAddressIdRequest]) (*connect.Response[v1.GetPartiesByAddressIdResponse], error) {
+	return c.getPartiesByAddressId.CallUnary(ctx, req)
 }
 
 // PartiesServiceHandler is an implementation of the civil.public.parties.v1.PartiesService service.
@@ -102,11 +101,10 @@ type PartiesServiceHandler interface {
 	// Returns the requested parties. Unknown IDs, voided parties and parties
 	// with no record at `legal_as_of` are left out.
 	GetPartiesById(context.Context, *connect.Request[v1.GetPartiesByIdRequest]) (*connect.Response[v1.GetPartiesByIdResponse], error)
-	// Returns the parcels a party holds at `legal_as_of`, each with its
-	// ownership share, ordered by `parcel_id`. Voided parcels and parcels with
-	// no geometry or record then are left out. An unknown or voided party has
-	// no parcels.
-	GetParcelsByPartyId(context.Context, *connect.Request[v1.GetParcelsByPartyIdRequest]) (*connect.Response[v1.GetParcelsByPartyIdResponse], error)
+	// Returns the parties whose mailing address, at `legal_as_of`, is this
+	// one, ordered by `party_id`. Voided parties are left out. An unknown or
+	// voided address has no parties.
+	GetPartiesByAddressId(context.Context, *connect.Request[v1.GetPartiesByAddressIdRequest]) (*connect.Response[v1.GetPartiesByAddressIdResponse], error)
 }
 
 // NewPartiesServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -123,10 +121,10 @@ func NewPartiesServiceHandler(svc PartiesServiceHandler, opts ...connect.Handler
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
-	partiesServiceGetParcelsByPartyIdHandler := connect.NewUnaryHandler(
-		PartiesServiceGetParcelsByPartyIdProcedure,
-		svc.GetParcelsByPartyId,
-		connect.WithSchema(partiesServiceMethods.ByName("GetParcelsByPartyId")),
+	partiesServiceGetPartiesByAddressIdHandler := connect.NewUnaryHandler(
+		PartiesServiceGetPartiesByAddressIdProcedure,
+		svc.GetPartiesByAddressId,
+		connect.WithSchema(partiesServiceMethods.ByName("GetPartiesByAddressId")),
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
@@ -134,8 +132,8 @@ func NewPartiesServiceHandler(svc PartiesServiceHandler, opts ...connect.Handler
 		switch r.URL.Path {
 		case PartiesServiceGetPartiesByIdProcedure:
 			partiesServiceGetPartiesByIdHandler.ServeHTTP(w, r)
-		case PartiesServiceGetParcelsByPartyIdProcedure:
-			partiesServiceGetParcelsByPartyIdHandler.ServeHTTP(w, r)
+		case PartiesServiceGetPartiesByAddressIdProcedure:
+			partiesServiceGetPartiesByAddressIdHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -149,6 +147,6 @@ func (UnimplementedPartiesServiceHandler) GetPartiesById(context.Context, *conne
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.parties.v1.PartiesService.GetPartiesById is not implemented"))
 }
 
-func (UnimplementedPartiesServiceHandler) GetParcelsByPartyId(context.Context, *connect.Request[v1.GetParcelsByPartyIdRequest]) (*connect.Response[v1.GetParcelsByPartyIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.parties.v1.PartiesService.GetParcelsByPartyId is not implemented"))
+func (UnimplementedPartiesServiceHandler) GetPartiesByAddressId(context.Context, *connect.Request[v1.GetPartiesByAddressIdRequest]) (*connect.Response[v1.GetPartiesByAddressIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.parties.v1.PartiesService.GetPartiesByAddressId is not implemented"))
 }

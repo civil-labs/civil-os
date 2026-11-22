@@ -262,6 +262,7 @@ func TestSmoke(t *testing.T) {
 	t.Run("addresses and parties", func(t *testing.T) {
 		// Parcel 3 -> its owner, party 3 -> the owner's parcels and mailing address.
 		parties := partiesv1connect.NewPartiesServiceClient(httpClient, gatewayURL)
+		parcels := parcelsv1connect.NewParcelsServiceClient(httpClient, gatewayURL)
 		pr, err := parties.GetPartiesById(ctx, authed(token, &partiesv1.GetPartiesByIdRequest{
 			PartyIds: []string{tu.PartyID(3)},
 		}))
@@ -274,7 +275,7 @@ func TestSmoke(t *testing.T) {
 		}
 
 		one := int32(1)
-		pp, err := parties.GetParcelsByPartyId(ctx, authed(token, &partiesv1.GetParcelsByPartyIdRequest{
+		pp, err := parcels.GetParcelsByPartyId(ctx, authed(token, &parcelsv1.GetParcelsByPartyIdRequest{
 			PartyId: tu.PartyID(3), First: &one,
 		}))
 		if err != nil {
@@ -283,7 +284,7 @@ func TestSmoke(t *testing.T) {
 		if len(pp.Msg.Parcels) != 1 || !pp.Msg.GetPageInfo().GetHasNextPage() {
 			t.Fatalf("party 3 parcels, first page = %v", pp.Msg)
 		}
-		next, err := parties.GetParcelsByPartyId(ctx, authed(token, &partiesv1.GetParcelsByPartyIdRequest{
+		next, err := parcels.GetParcelsByPartyId(ctx, authed(token, &parcelsv1.GetParcelsByPartyIdRequest{
 			PartyId: tu.PartyID(3), After: pp.Msg.GetPageInfo().EndCursor,
 		}))
 		if err != nil {
@@ -303,7 +304,7 @@ func TestSmoke(t *testing.T) {
 		if a := ar.Msg.GetAddresses()[tu.AddressID(3)]; a.GetCountry().GetCode() != "ZZ" || a.GetCoordinates() == nil {
 			t.Errorf("address 3 = %v", a)
 		}
-		ap, err := addresses.GetParcelsByAddressId(ctx, authed(token, &addressesv1.GetParcelsByAddressIdRequest{
+		ap, err := parcels.GetParcelsByAddressId(ctx, authed(token, &parcelsv1.GetParcelsByAddressIdRequest{
 			AddressId: tu.AddressID(3),
 		}))
 		if err != nil {
@@ -313,7 +314,7 @@ func TestSmoke(t *testing.T) {
 			t.Errorf("parcels at address 3 = %v", ap.Msg)
 		}
 
-		_, err = parties.GetParcelsByPartyId(ctx, authed(token, &partiesv1.GetParcelsByPartyIdRequest{PartyId: "not-a-uuid"}))
+		_, err = parcels.GetParcelsByPartyId(ctx, authed(token, &parcelsv1.GetParcelsByPartyIdRequest{PartyId: "not-a-uuid"}))
 		if code := connect.CodeOf(err); code != connect.CodeInvalidArgument {
 			t.Errorf("non-UUID party: got %v (%v), want InvalidArgument", code, err)
 		}

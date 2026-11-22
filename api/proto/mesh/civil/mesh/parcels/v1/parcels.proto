@@ -85,6 +85,10 @@ service ParcelReadService {
   rpc SearchParcelsAddresses(SearchParcelsAddressesRequest) returns (SearchParcelsAddressesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+
+  rpc GetParcelsByAddressId(GetParcelsByAddressIdRequest) returns (GetParcelsByAddressIdResponse) {}
+
+  rpc GetParcelsByPartyId(GetParcelsByPartyIdRequest) returns (GetParcelsByPartyIdResponse) {}
 }
 
 // Parcel mutations. Served by the database-writer, which connects with a
@@ -629,4 +633,39 @@ message GetPrimaryImprovementTypeIdByFeatureIdRequest {
 
 message GetPrimaryImprovementTypeIdByFeatureIdResponse {
   map<int64, string> values = 1;
+}
+
+message AddressParcel {
+  string parcel_id = 1;
+  optional int64 feature_id = 2;
+}
+
+message GetParcelsByAddressIdRequest {
+  string address_id = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
+  optional int32 first = 3;
+  optional string after = 4;
+}
+
+message GetParcelsByAddressIdResponse {
+  repeated AddressParcel parcels = 1;
+  civil.mesh.pagination.v1.PageInfo page_info = 2;
+}
+
+message PartyParcel {
+  string parcel_id = 1;
+  optional int64 feature_id = 2;
+  string ownership_share = 3;
+}
+
+message GetParcelsByPartyIdRequest {
+  string party_id = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
+  optional int32 first = 3;
+  optional string after = 4;
+}
+
+message GetParcelsByPartyIdResponse {
+  repeated PartyParcel parcels = 1;
+  civil.mesh.pagination.v1.PageInfo page_info = 2;
 }

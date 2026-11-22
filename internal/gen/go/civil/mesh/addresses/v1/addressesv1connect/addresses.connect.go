@@ -36,24 +36,12 @@ const (
 	// AddressesReadServiceGetAddressesByIdProcedure is the fully-qualified name of the
 	// AddressesReadService's GetAddressesById RPC.
 	AddressesReadServiceGetAddressesByIdProcedure = "/civil.mesh.addresses.v1.AddressesReadService/GetAddressesById"
-	// AddressesReadServiceGetParcelsByAddressIdProcedure is the fully-qualified name of the
-	// AddressesReadService's GetParcelsByAddressId RPC.
-	AddressesReadServiceGetParcelsByAddressIdProcedure = "/civil.mesh.addresses.v1.AddressesReadService/GetParcelsByAddressId"
-	// AddressesReadServiceGetImprovementsByAddressIdProcedure is the fully-qualified name of the
-	// AddressesReadService's GetImprovementsByAddressId RPC.
-	AddressesReadServiceGetImprovementsByAddressIdProcedure = "/civil.mesh.addresses.v1.AddressesReadService/GetImprovementsByAddressId"
-	// AddressesReadServiceGetPartiesByAddressIdProcedure is the fully-qualified name of the
-	// AddressesReadService's GetPartiesByAddressId RPC.
-	AddressesReadServiceGetPartiesByAddressIdProcedure = "/civil.mesh.addresses.v1.AddressesReadService/GetPartiesByAddressId"
 )
 
 // AddressesReadServiceClient is a client for the civil.mesh.addresses.v1.AddressesReadService
 // service.
 type AddressesReadServiceClient interface {
 	GetAddressesById(context.Context, *connect.Request[v1.GetAddressesByIdRequest]) (*connect.Response[v1.GetAddressesByIdResponse], error)
-	GetParcelsByAddressId(context.Context, *connect.Request[v1.GetParcelsByAddressIdRequest]) (*connect.Response[v1.GetParcelsByAddressIdResponse], error)
-	GetImprovementsByAddressId(context.Context, *connect.Request[v1.GetImprovementsByAddressIdRequest]) (*connect.Response[v1.GetImprovementsByAddressIdResponse], error)
-	GetPartiesByAddressId(context.Context, *connect.Request[v1.GetPartiesByAddressIdRequest]) (*connect.Response[v1.GetPartiesByAddressIdResponse], error)
 }
 
 // NewAddressesReadServiceClient constructs a client for the
@@ -74,33 +62,12 @@ func NewAddressesReadServiceClient(httpClient connect.HTTPClient, baseURL string
 			connect.WithSchema(addressesReadServiceMethods.ByName("GetAddressesById")),
 			connect.WithClientOptions(opts...),
 		),
-		getParcelsByAddressId: connect.NewClient[v1.GetParcelsByAddressIdRequest, v1.GetParcelsByAddressIdResponse](
-			httpClient,
-			baseURL+AddressesReadServiceGetParcelsByAddressIdProcedure,
-			connect.WithSchema(addressesReadServiceMethods.ByName("GetParcelsByAddressId")),
-			connect.WithClientOptions(opts...),
-		),
-		getImprovementsByAddressId: connect.NewClient[v1.GetImprovementsByAddressIdRequest, v1.GetImprovementsByAddressIdResponse](
-			httpClient,
-			baseURL+AddressesReadServiceGetImprovementsByAddressIdProcedure,
-			connect.WithSchema(addressesReadServiceMethods.ByName("GetImprovementsByAddressId")),
-			connect.WithClientOptions(opts...),
-		),
-		getPartiesByAddressId: connect.NewClient[v1.GetPartiesByAddressIdRequest, v1.GetPartiesByAddressIdResponse](
-			httpClient,
-			baseURL+AddressesReadServiceGetPartiesByAddressIdProcedure,
-			connect.WithSchema(addressesReadServiceMethods.ByName("GetPartiesByAddressId")),
-			connect.WithClientOptions(opts...),
-		),
 	}
 }
 
 // addressesReadServiceClient implements AddressesReadServiceClient.
 type addressesReadServiceClient struct {
-	getAddressesById           *connect.Client[v1.GetAddressesByIdRequest, v1.GetAddressesByIdResponse]
-	getParcelsByAddressId      *connect.Client[v1.GetParcelsByAddressIdRequest, v1.GetParcelsByAddressIdResponse]
-	getImprovementsByAddressId *connect.Client[v1.GetImprovementsByAddressIdRequest, v1.GetImprovementsByAddressIdResponse]
-	getPartiesByAddressId      *connect.Client[v1.GetPartiesByAddressIdRequest, v1.GetPartiesByAddressIdResponse]
+	getAddressesById *connect.Client[v1.GetAddressesByIdRequest, v1.GetAddressesByIdResponse]
 }
 
 // GetAddressesById calls civil.mesh.addresses.v1.AddressesReadService.GetAddressesById.
@@ -108,29 +75,10 @@ func (c *addressesReadServiceClient) GetAddressesById(ctx context.Context, req *
 	return c.getAddressesById.CallUnary(ctx, req)
 }
 
-// GetParcelsByAddressId calls civil.mesh.addresses.v1.AddressesReadService.GetParcelsByAddressId.
-func (c *addressesReadServiceClient) GetParcelsByAddressId(ctx context.Context, req *connect.Request[v1.GetParcelsByAddressIdRequest]) (*connect.Response[v1.GetParcelsByAddressIdResponse], error) {
-	return c.getParcelsByAddressId.CallUnary(ctx, req)
-}
-
-// GetImprovementsByAddressId calls
-// civil.mesh.addresses.v1.AddressesReadService.GetImprovementsByAddressId.
-func (c *addressesReadServiceClient) GetImprovementsByAddressId(ctx context.Context, req *connect.Request[v1.GetImprovementsByAddressIdRequest]) (*connect.Response[v1.GetImprovementsByAddressIdResponse], error) {
-	return c.getImprovementsByAddressId.CallUnary(ctx, req)
-}
-
-// GetPartiesByAddressId calls civil.mesh.addresses.v1.AddressesReadService.GetPartiesByAddressId.
-func (c *addressesReadServiceClient) GetPartiesByAddressId(ctx context.Context, req *connect.Request[v1.GetPartiesByAddressIdRequest]) (*connect.Response[v1.GetPartiesByAddressIdResponse], error) {
-	return c.getPartiesByAddressId.CallUnary(ctx, req)
-}
-
 // AddressesReadServiceHandler is an implementation of the
 // civil.mesh.addresses.v1.AddressesReadService service.
 type AddressesReadServiceHandler interface {
 	GetAddressesById(context.Context, *connect.Request[v1.GetAddressesByIdRequest]) (*connect.Response[v1.GetAddressesByIdResponse], error)
-	GetParcelsByAddressId(context.Context, *connect.Request[v1.GetParcelsByAddressIdRequest]) (*connect.Response[v1.GetParcelsByAddressIdResponse], error)
-	GetImprovementsByAddressId(context.Context, *connect.Request[v1.GetImprovementsByAddressIdRequest]) (*connect.Response[v1.GetImprovementsByAddressIdResponse], error)
-	GetPartiesByAddressId(context.Context, *connect.Request[v1.GetPartiesByAddressIdRequest]) (*connect.Response[v1.GetPartiesByAddressIdResponse], error)
 }
 
 // NewAddressesReadServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -146,34 +94,10 @@ func NewAddressesReadServiceHandler(svc AddressesReadServiceHandler, opts ...con
 		connect.WithSchema(addressesReadServiceMethods.ByName("GetAddressesById")),
 		connect.WithHandlerOptions(opts...),
 	)
-	addressesReadServiceGetParcelsByAddressIdHandler := connect.NewUnaryHandler(
-		AddressesReadServiceGetParcelsByAddressIdProcedure,
-		svc.GetParcelsByAddressId,
-		connect.WithSchema(addressesReadServiceMethods.ByName("GetParcelsByAddressId")),
-		connect.WithHandlerOptions(opts...),
-	)
-	addressesReadServiceGetImprovementsByAddressIdHandler := connect.NewUnaryHandler(
-		AddressesReadServiceGetImprovementsByAddressIdProcedure,
-		svc.GetImprovementsByAddressId,
-		connect.WithSchema(addressesReadServiceMethods.ByName("GetImprovementsByAddressId")),
-		connect.WithHandlerOptions(opts...),
-	)
-	addressesReadServiceGetPartiesByAddressIdHandler := connect.NewUnaryHandler(
-		AddressesReadServiceGetPartiesByAddressIdProcedure,
-		svc.GetPartiesByAddressId,
-		connect.WithSchema(addressesReadServiceMethods.ByName("GetPartiesByAddressId")),
-		connect.WithHandlerOptions(opts...),
-	)
 	return "/civil.mesh.addresses.v1.AddressesReadService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case AddressesReadServiceGetAddressesByIdProcedure:
 			addressesReadServiceGetAddressesByIdHandler.ServeHTTP(w, r)
-		case AddressesReadServiceGetParcelsByAddressIdProcedure:
-			addressesReadServiceGetParcelsByAddressIdHandler.ServeHTTP(w, r)
-		case AddressesReadServiceGetImprovementsByAddressIdProcedure:
-			addressesReadServiceGetImprovementsByAddressIdHandler.ServeHTTP(w, r)
-		case AddressesReadServiceGetPartiesByAddressIdProcedure:
-			addressesReadServiceGetPartiesByAddressIdHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -185,16 +109,4 @@ type UnimplementedAddressesReadServiceHandler struct{}
 
 func (UnimplementedAddressesReadServiceHandler) GetAddressesById(context.Context, *connect.Request[v1.GetAddressesByIdRequest]) (*connect.Response[v1.GetAddressesByIdResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.addresses.v1.AddressesReadService.GetAddressesById is not implemented"))
-}
-
-func (UnimplementedAddressesReadServiceHandler) GetParcelsByAddressId(context.Context, *connect.Request[v1.GetParcelsByAddressIdRequest]) (*connect.Response[v1.GetParcelsByAddressIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.addresses.v1.AddressesReadService.GetParcelsByAddressId is not implemented"))
-}
-
-func (UnimplementedAddressesReadServiceHandler) GetImprovementsByAddressId(context.Context, *connect.Request[v1.GetImprovementsByAddressIdRequest]) (*connect.Response[v1.GetImprovementsByAddressIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.addresses.v1.AddressesReadService.GetImprovementsByAddressId is not implemented"))
-}
-
-func (UnimplementedAddressesReadServiceHandler) GetPartiesByAddressId(context.Context, *connect.Request[v1.GetPartiesByAddressIdRequest]) (*connect.Response[v1.GetPartiesByAddressIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.addresses.v1.AddressesReadService.GetPartiesByAddressId is not implemented"))
 }

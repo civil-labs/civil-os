@@ -144,6 +144,12 @@ const (
 	// ParcelsServiceUpdateParcelProcedure is the fully-qualified name of the ParcelsService's
 	// UpdateParcel RPC.
 	ParcelsServiceUpdateParcelProcedure = "/civil.public.parcels.v1.ParcelsService/UpdateParcel"
+	// ParcelsServiceGetParcelsByAddressIdProcedure is the fully-qualified name of the ParcelsService's
+	// GetParcelsByAddressId RPC.
+	ParcelsServiceGetParcelsByAddressIdProcedure = "/civil.public.parcels.v1.ParcelsService/GetParcelsByAddressId"
+	// ParcelsServiceGetParcelsByPartyIdProcedure is the fully-qualified name of the ParcelsService's
+	// GetParcelsByPartyId RPC.
+	ParcelsServiceGetParcelsByPartyIdProcedure = "/civil.public.parcels.v1.ParcelsService/GetParcelsByPartyId"
 )
 
 // ParcelsServiceClient is a client for the civil.public.parcels.v1.ParcelsService service.
@@ -198,6 +204,16 @@ type ParcelsServiceClient interface {
 	// page read with its cursors resolves at that same time.
 	SearchParcelsAddresses(context.Context, *connect.Request[v1.SearchParcelsAddressesRequest]) (*connect.Response[v1.SearchParcelsAddressesResponse], error)
 	UpdateParcel(context.Context, *connect.Request[v1.UpdateParcelRequest]) (*connect.Response[v1.UpdateParcelResponse], error)
+	// Returns the parcels whose address, at `legal_as_of`, is this one,
+	// ordered by `parcel_id`. Voided parcels and parcels with no geometry then
+	// are left out. An unknown or voided address has no parcels. Load their
+	// details with `GetParcelsWithImprovementSummaryByParcelId`.
+	GetParcelsByAddressId(context.Context, *connect.Request[v1.GetParcelsByAddressIdRequest]) (*connect.Response[v1.GetParcelsByAddressIdResponse], error)
+	// Returns the parcels a party holds at `legal_as_of`, each with its
+	// ownership share, ordered by `parcel_id`. Voided parcels and parcels with
+	// no geometry or record then are left out. An unknown or voided party has
+	// no parcels.
+	GetParcelsByPartyId(context.Context, *connect.Request[v1.GetParcelsByPartyIdRequest]) (*connect.Response[v1.GetParcelsByPartyIdResponse], error)
 }
 
 // NewParcelsServiceClient constructs a client for the civil.public.parcels.v1.ParcelsService
@@ -435,6 +451,20 @@ func NewParcelsServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			connect.WithSchema(parcelsServiceMethods.ByName("UpdateParcel")),
 			connect.WithClientOptions(opts...),
 		),
+		getParcelsByAddressId: connect.NewClient[v1.GetParcelsByAddressIdRequest, v1.GetParcelsByAddressIdResponse](
+			httpClient,
+			baseURL+ParcelsServiceGetParcelsByAddressIdProcedure,
+			connect.WithSchema(parcelsServiceMethods.ByName("GetParcelsByAddressId")),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
+		getParcelsByPartyId: connect.NewClient[v1.GetParcelsByPartyIdRequest, v1.GetParcelsByPartyIdResponse](
+			httpClient,
+			baseURL+ParcelsServiceGetParcelsByPartyIdProcedure,
+			connect.WithSchema(parcelsServiceMethods.ByName("GetParcelsByPartyId")),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -477,6 +507,8 @@ type parcelsServiceClient struct {
 	getPrimaryImprovementTypeIdByFeatureId             *connect.Client[v1.GetPrimaryImprovementTypeIdByFeatureIdRequest, v1.GetPrimaryImprovementTypeIdByFeatureIdResponse]
 	searchParcelsAddresses                             *connect.Client[v1.SearchParcelsAddressesRequest, v1.SearchParcelsAddressesResponse]
 	updateParcel                                       *connect.Client[v1.UpdateParcelRequest, v1.UpdateParcelResponse]
+	getParcelsByAddressId                              *connect.Client[v1.GetParcelsByAddressIdRequest, v1.GetParcelsByAddressIdResponse]
+	getParcelsByPartyId                                *connect.Client[v1.GetParcelsByPartyIdRequest, v1.GetParcelsByPartyIdResponse]
 }
 
 // GetParcelsWithImprovementSummaryByParcelId calls
@@ -681,6 +713,16 @@ func (c *parcelsServiceClient) UpdateParcel(ctx context.Context, req *connect.Re
 	return c.updateParcel.CallUnary(ctx, req)
 }
 
+// GetParcelsByAddressId calls civil.public.parcels.v1.ParcelsService.GetParcelsByAddressId.
+func (c *parcelsServiceClient) GetParcelsByAddressId(ctx context.Context, req *connect.Request[v1.GetParcelsByAddressIdRequest]) (*connect.Response[v1.GetParcelsByAddressIdResponse], error) {
+	return c.getParcelsByAddressId.CallUnary(ctx, req)
+}
+
+// GetParcelsByPartyId calls civil.public.parcels.v1.ParcelsService.GetParcelsByPartyId.
+func (c *parcelsServiceClient) GetParcelsByPartyId(ctx context.Context, req *connect.Request[v1.GetParcelsByPartyIdRequest]) (*connect.Response[v1.GetParcelsByPartyIdResponse], error) {
+	return c.getParcelsByPartyId.CallUnary(ctx, req)
+}
+
 // ParcelsServiceHandler is an implementation of the civil.public.parcels.v1.ParcelsService service.
 type ParcelsServiceHandler interface {
 	GetParcelsWithImprovementSummaryByParcelId(context.Context, *connect.Request[v1.GetParcelsWithImprovementSummaryByParcelIdRequest]) (*connect.Response[v1.GetParcelsWithImprovementSummaryByParcelIdResponse], error)
@@ -733,6 +775,16 @@ type ParcelsServiceHandler interface {
 	// page read with its cursors resolves at that same time.
 	SearchParcelsAddresses(context.Context, *connect.Request[v1.SearchParcelsAddressesRequest]) (*connect.Response[v1.SearchParcelsAddressesResponse], error)
 	UpdateParcel(context.Context, *connect.Request[v1.UpdateParcelRequest]) (*connect.Response[v1.UpdateParcelResponse], error)
+	// Returns the parcels whose address, at `legal_as_of`, is this one,
+	// ordered by `parcel_id`. Voided parcels and parcels with no geometry then
+	// are left out. An unknown or voided address has no parcels. Load their
+	// details with `GetParcelsWithImprovementSummaryByParcelId`.
+	GetParcelsByAddressId(context.Context, *connect.Request[v1.GetParcelsByAddressIdRequest]) (*connect.Response[v1.GetParcelsByAddressIdResponse], error)
+	// Returns the parcels a party holds at `legal_as_of`, each with its
+	// ownership share, ordered by `parcel_id`. Voided parcels and parcels with
+	// no geometry or record then are left out. An unknown or voided party has
+	// no parcels.
+	GetParcelsByPartyId(context.Context, *connect.Request[v1.GetParcelsByPartyIdRequest]) (*connect.Response[v1.GetParcelsByPartyIdResponse], error)
 }
 
 // NewParcelsServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -966,6 +1018,20 @@ func NewParcelsServiceHandler(svc ParcelsServiceHandler, opts ...connect.Handler
 		connect.WithSchema(parcelsServiceMethods.ByName("UpdateParcel")),
 		connect.WithHandlerOptions(opts...),
 	)
+	parcelsServiceGetParcelsByAddressIdHandler := connect.NewUnaryHandler(
+		ParcelsServiceGetParcelsByAddressIdProcedure,
+		svc.GetParcelsByAddressId,
+		connect.WithSchema(parcelsServiceMethods.ByName("GetParcelsByAddressId")),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
+	parcelsServiceGetParcelsByPartyIdHandler := connect.NewUnaryHandler(
+		ParcelsServiceGetParcelsByPartyIdProcedure,
+		svc.GetParcelsByPartyId,
+		connect.WithSchema(parcelsServiceMethods.ByName("GetParcelsByPartyId")),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/civil.public.parcels.v1.ParcelsService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ParcelsServiceGetParcelsWithImprovementSummaryByParcelIdProcedure:
@@ -1042,6 +1108,10 @@ func NewParcelsServiceHandler(svc ParcelsServiceHandler, opts ...connect.Handler
 			parcelsServiceSearchParcelsAddressesHandler.ServeHTTP(w, r)
 		case ParcelsServiceUpdateParcelProcedure:
 			parcelsServiceUpdateParcelHandler.ServeHTTP(w, r)
+		case ParcelsServiceGetParcelsByAddressIdProcedure:
+			parcelsServiceGetParcelsByAddressIdHandler.ServeHTTP(w, r)
+		case ParcelsServiceGetParcelsByPartyIdProcedure:
+			parcelsServiceGetParcelsByPartyIdHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -1197,4 +1267,12 @@ func (UnimplementedParcelsServiceHandler) SearchParcelsAddresses(context.Context
 
 func (UnimplementedParcelsServiceHandler) UpdateParcel(context.Context, *connect.Request[v1.UpdateParcelRequest]) (*connect.Response[v1.UpdateParcelResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.parcels.v1.ParcelsService.UpdateParcel is not implemented"))
+}
+
+func (UnimplementedParcelsServiceHandler) GetParcelsByAddressId(context.Context, *connect.Request[v1.GetParcelsByAddressIdRequest]) (*connect.Response[v1.GetParcelsByAddressIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.parcels.v1.ParcelsService.GetParcelsByAddressId is not implemented"))
+}
+
+func (UnimplementedParcelsServiceHandler) GetParcelsByPartyId(context.Context, *connect.Request[v1.GetParcelsByPartyIdRequest]) (*connect.Response[v1.GetParcelsByPartyIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.parcels.v1.ParcelsService.GetParcelsByPartyId is not implemented"))
 }

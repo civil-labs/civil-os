@@ -36,15 +36,6 @@ const (
 	// AddressesServiceGetAddressesByIdProcedure is the fully-qualified name of the AddressesService's
 	// GetAddressesById RPC.
 	AddressesServiceGetAddressesByIdProcedure = "/civil.public.addresses.v1.AddressesService/GetAddressesById"
-	// AddressesServiceGetParcelsByAddressIdProcedure is the fully-qualified name of the
-	// AddressesService's GetParcelsByAddressId RPC.
-	AddressesServiceGetParcelsByAddressIdProcedure = "/civil.public.addresses.v1.AddressesService/GetParcelsByAddressId"
-	// AddressesServiceGetImprovementsByAddressIdProcedure is the fully-qualified name of the
-	// AddressesService's GetImprovementsByAddressId RPC.
-	AddressesServiceGetImprovementsByAddressIdProcedure = "/civil.public.addresses.v1.AddressesService/GetImprovementsByAddressId"
-	// AddressesServiceGetPartiesByAddressIdProcedure is the fully-qualified name of the
-	// AddressesService's GetPartiesByAddressId RPC.
-	AddressesServiceGetPartiesByAddressIdProcedure = "/civil.public.addresses.v1.AddressesService/GetPartiesByAddressId"
 )
 
 // AddressesServiceClient is a client for the civil.public.addresses.v1.AddressesService service.
@@ -52,17 +43,6 @@ type AddressesServiceClient interface {
 	// Returns the requested addresses. Unknown IDs, voided addresses and
 	// addresses with no record at `legal_as_of` are left out.
 	GetAddressesById(context.Context, *connect.Request[v1.GetAddressesByIdRequest]) (*connect.Response[v1.GetAddressesByIdResponse], error)
-	// Returns the parcels whose address, at `legal_as_of`, is this one.
-	// Voided parcels and parcels with no geometry then are left out. Load
-	// their details with `ParcelsService.GetParcelsWithImprovementSummaryByParcelId`.
-	GetParcelsByAddressId(context.Context, *connect.Request[v1.GetParcelsByAddressIdRequest]) (*connect.Response[v1.GetParcelsByAddressIdResponse], error)
-	// Returns the improvements whose address, at `legal_as_of`, is this one,
-	// each with the parcels it sits on. Voided improvements, and improvements
-	// on no visible parcel, are left out.
-	GetImprovementsByAddressId(context.Context, *connect.Request[v1.GetImprovementsByAddressIdRequest]) (*connect.Response[v1.GetImprovementsByAddressIdResponse], error)
-	// Returns the parties whose mailing address, at `legal_as_of`, is this
-	// one. Voided parties are left out.
-	GetPartiesByAddressId(context.Context, *connect.Request[v1.GetPartiesByAddressIdRequest]) (*connect.Response[v1.GetPartiesByAddressIdResponse], error)
 }
 
 // NewAddressesServiceClient constructs a client for the civil.public.addresses.v1.AddressesService
@@ -83,57 +63,17 @@ func NewAddressesServiceClient(httpClient connect.HTTPClient, baseURL string, op
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
-		getParcelsByAddressId: connect.NewClient[v1.GetParcelsByAddressIdRequest, v1.GetParcelsByAddressIdResponse](
-			httpClient,
-			baseURL+AddressesServiceGetParcelsByAddressIdProcedure,
-			connect.WithSchema(addressesServiceMethods.ByName("GetParcelsByAddressId")),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-		getImprovementsByAddressId: connect.NewClient[v1.GetImprovementsByAddressIdRequest, v1.GetImprovementsByAddressIdResponse](
-			httpClient,
-			baseURL+AddressesServiceGetImprovementsByAddressIdProcedure,
-			connect.WithSchema(addressesServiceMethods.ByName("GetImprovementsByAddressId")),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-		getPartiesByAddressId: connect.NewClient[v1.GetPartiesByAddressIdRequest, v1.GetPartiesByAddressIdResponse](
-			httpClient,
-			baseURL+AddressesServiceGetPartiesByAddressIdProcedure,
-			connect.WithSchema(addressesServiceMethods.ByName("GetPartiesByAddressId")),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
 	}
 }
 
 // addressesServiceClient implements AddressesServiceClient.
 type addressesServiceClient struct {
-	getAddressesById           *connect.Client[v1.GetAddressesByIdRequest, v1.GetAddressesByIdResponse]
-	getParcelsByAddressId      *connect.Client[v1.GetParcelsByAddressIdRequest, v1.GetParcelsByAddressIdResponse]
-	getImprovementsByAddressId *connect.Client[v1.GetImprovementsByAddressIdRequest, v1.GetImprovementsByAddressIdResponse]
-	getPartiesByAddressId      *connect.Client[v1.GetPartiesByAddressIdRequest, v1.GetPartiesByAddressIdResponse]
+	getAddressesById *connect.Client[v1.GetAddressesByIdRequest, v1.GetAddressesByIdResponse]
 }
 
 // GetAddressesById calls civil.public.addresses.v1.AddressesService.GetAddressesById.
 func (c *addressesServiceClient) GetAddressesById(ctx context.Context, req *connect.Request[v1.GetAddressesByIdRequest]) (*connect.Response[v1.GetAddressesByIdResponse], error) {
 	return c.getAddressesById.CallUnary(ctx, req)
-}
-
-// GetParcelsByAddressId calls civil.public.addresses.v1.AddressesService.GetParcelsByAddressId.
-func (c *addressesServiceClient) GetParcelsByAddressId(ctx context.Context, req *connect.Request[v1.GetParcelsByAddressIdRequest]) (*connect.Response[v1.GetParcelsByAddressIdResponse], error) {
-	return c.getParcelsByAddressId.CallUnary(ctx, req)
-}
-
-// GetImprovementsByAddressId calls
-// civil.public.addresses.v1.AddressesService.GetImprovementsByAddressId.
-func (c *addressesServiceClient) GetImprovementsByAddressId(ctx context.Context, req *connect.Request[v1.GetImprovementsByAddressIdRequest]) (*connect.Response[v1.GetImprovementsByAddressIdResponse], error) {
-	return c.getImprovementsByAddressId.CallUnary(ctx, req)
-}
-
-// GetPartiesByAddressId calls civil.public.addresses.v1.AddressesService.GetPartiesByAddressId.
-func (c *addressesServiceClient) GetPartiesByAddressId(ctx context.Context, req *connect.Request[v1.GetPartiesByAddressIdRequest]) (*connect.Response[v1.GetPartiesByAddressIdResponse], error) {
-	return c.getPartiesByAddressId.CallUnary(ctx, req)
 }
 
 // AddressesServiceHandler is an implementation of the civil.public.addresses.v1.AddressesService
@@ -142,17 +82,6 @@ type AddressesServiceHandler interface {
 	// Returns the requested addresses. Unknown IDs, voided addresses and
 	// addresses with no record at `legal_as_of` are left out.
 	GetAddressesById(context.Context, *connect.Request[v1.GetAddressesByIdRequest]) (*connect.Response[v1.GetAddressesByIdResponse], error)
-	// Returns the parcels whose address, at `legal_as_of`, is this one.
-	// Voided parcels and parcels with no geometry then are left out. Load
-	// their details with `ParcelsService.GetParcelsWithImprovementSummaryByParcelId`.
-	GetParcelsByAddressId(context.Context, *connect.Request[v1.GetParcelsByAddressIdRequest]) (*connect.Response[v1.GetParcelsByAddressIdResponse], error)
-	// Returns the improvements whose address, at `legal_as_of`, is this one,
-	// each with the parcels it sits on. Voided improvements, and improvements
-	// on no visible parcel, are left out.
-	GetImprovementsByAddressId(context.Context, *connect.Request[v1.GetImprovementsByAddressIdRequest]) (*connect.Response[v1.GetImprovementsByAddressIdResponse], error)
-	// Returns the parties whose mailing address, at `legal_as_of`, is this
-	// one. Voided parties are left out.
-	GetPartiesByAddressId(context.Context, *connect.Request[v1.GetPartiesByAddressIdRequest]) (*connect.Response[v1.GetPartiesByAddressIdResponse], error)
 }
 
 // NewAddressesServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -169,37 +98,10 @@ func NewAddressesServiceHandler(svc AddressesServiceHandler, opts ...connect.Han
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
-	addressesServiceGetParcelsByAddressIdHandler := connect.NewUnaryHandler(
-		AddressesServiceGetParcelsByAddressIdProcedure,
-		svc.GetParcelsByAddressId,
-		connect.WithSchema(addressesServiceMethods.ByName("GetParcelsByAddressId")),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	addressesServiceGetImprovementsByAddressIdHandler := connect.NewUnaryHandler(
-		AddressesServiceGetImprovementsByAddressIdProcedure,
-		svc.GetImprovementsByAddressId,
-		connect.WithSchema(addressesServiceMethods.ByName("GetImprovementsByAddressId")),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	addressesServiceGetPartiesByAddressIdHandler := connect.NewUnaryHandler(
-		AddressesServiceGetPartiesByAddressIdProcedure,
-		svc.GetPartiesByAddressId,
-		connect.WithSchema(addressesServiceMethods.ByName("GetPartiesByAddressId")),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
 	return "/civil.public.addresses.v1.AddressesService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case AddressesServiceGetAddressesByIdProcedure:
 			addressesServiceGetAddressesByIdHandler.ServeHTTP(w, r)
-		case AddressesServiceGetParcelsByAddressIdProcedure:
-			addressesServiceGetParcelsByAddressIdHandler.ServeHTTP(w, r)
-		case AddressesServiceGetImprovementsByAddressIdProcedure:
-			addressesServiceGetImprovementsByAddressIdHandler.ServeHTTP(w, r)
-		case AddressesServiceGetPartiesByAddressIdProcedure:
-			addressesServiceGetPartiesByAddressIdHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -211,16 +113,4 @@ type UnimplementedAddressesServiceHandler struct{}
 
 func (UnimplementedAddressesServiceHandler) GetAddressesById(context.Context, *connect.Request[v1.GetAddressesByIdRequest]) (*connect.Response[v1.GetAddressesByIdResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.addresses.v1.AddressesService.GetAddressesById is not implemented"))
-}
-
-func (UnimplementedAddressesServiceHandler) GetParcelsByAddressId(context.Context, *connect.Request[v1.GetParcelsByAddressIdRequest]) (*connect.Response[v1.GetParcelsByAddressIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.addresses.v1.AddressesService.GetParcelsByAddressId is not implemented"))
-}
-
-func (UnimplementedAddressesServiceHandler) GetImprovementsByAddressId(context.Context, *connect.Request[v1.GetImprovementsByAddressIdRequest]) (*connect.Response[v1.GetImprovementsByAddressIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.addresses.v1.AddressesService.GetImprovementsByAddressId is not implemented"))
-}
-
-func (UnimplementedAddressesServiceHandler) GetPartiesByAddressId(context.Context, *connect.Request[v1.GetPartiesByAddressIdRequest]) (*connect.Response[v1.GetPartiesByAddressIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.addresses.v1.AddressesService.GetPartiesByAddressId is not implemented"))
 }

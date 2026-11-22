@@ -91,3 +91,30 @@ func mapImprovementConditions(meshConditions map[string]*meshimprovementsv1.Impr
 	}
 	return publicConditions
 }
+
+func (s *ImprovementServer) GetImprovementsByAddressId(
+	ctx context.Context,
+	req *connect.Request[publicimprovementsv1.GetImprovementsByAddressIdRequest],
+) (*connect.Response[publicimprovementsv1.GetImprovementsByAddressIdResponse], error) {
+	s.logger.Debug("received GetImprovementsByAddressId request")
+
+	m := req.Msg
+	meshRes, err := s.dbReaderClient.GetImprovementsByAddressId(ctx, connect.NewRequest(&meshimprovementsv1.GetImprovementsByAddressIdRequest{
+		AddressId: m.AddressId, LegalAsOf: m.LegalAsOf, First: pageSize(m.First), After: m.After,
+	}))
+	if err != nil {
+		s.logger.Error("upstream GetImprovementsByAddressId request failed", slog.Any("error", err))
+		return nil, err // keep the mesh status code
+	}
+	return connect.NewResponse(&publicimprovementsv1.GetImprovementsByAddressIdResponse{
+		Improvements: mapSlice(meshRes.Msg.Improvements, mapAddressImprovement),
+		PageInfo:     mapPageInfo(meshRes.Msg.PageInfo),
+	}), nil
+}
+
+func mapAddressImprovement(m *meshimprovementsv1.AddressImprovement) *publicimprovementsv1.AddressImprovement {
+	return &publicimprovementsv1.AddressImprovement{
+		ImprovementId: m.GetImprovementId(),
+		ParcelIds:     m.GetParcelIds(),
+	}
+}

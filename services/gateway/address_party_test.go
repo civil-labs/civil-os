@@ -1,37 +1,46 @@
 package main
 
 import (
+	"slices"
 	"testing"
 
 	"google.golang.org/protobuf/types/dynamicpb"
 
-	publicaddressesv1connect "github.com/civil-labs/civil-os/api/gen/go/civil/public/addresses/v1/addressesv1connect"
+	publicimprovementsv1connect "github.com/civil-labs/civil-os/api/gen/go/civil/public/improvements/v1/improvementsv1connect"
+	publicparcelsv1connect "github.com/civil-labs/civil-os/api/gen/go/civil/public/parcels/v1/parcelsv1connect"
 	publicpartiesv1connect "github.com/civil-labs/civil-os/api/gen/go/civil/public/parties/v1/partiesv1connect"
-	meshaddressesv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/addresses/v1"
+	meshimprovementsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/improvements/v1"
+	meshparcelsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1"
 	meshpartiesv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parties/v1"
 )
 
 // TestMapAddressPartyResults: the paginated lookups' results are copied
 // through field by field (docs/pagination-without-edges/spec.md, "Gateway").
 func TestMapAddressPartyResults(t *testing.T) {
-	checkFullMapping(t, &meshaddressesv1.AddressParcel{}, mapAddressParcel)
-	checkFullMapping(t, &meshaddressesv1.AddressImprovement{}, mapAddressImprovement)
+	checkFullMapping(t, &meshparcelsv1.AddressParcel{}, mapAddressParcel)
+	checkFullMapping(t, &meshimprovementsv1.AddressImprovement{}, mapAddressImprovement)
 	checkFullMapping(t, &meshpartiesv1.Party{}, mapParty)
-	checkFullMapping(t, &meshpartiesv1.PartyParcel{}, mapPartyParcel)
+	checkFullMapping(t, &meshparcelsv1.PartyParcel{}, mapPartyParcel)
 }
 
-// TestAddressPartyPageSizeDefault: a paginated address or party lookup sent
-// without first reaches the mesh with the default of 25.
+// TestAddressPartyPageSizeDefault: a paginated reverse lookup (or parcel
+// search) sent without first reaches the mesh with the default of 25. The
+// lookups live on the service of what they return
+// (docs/reverse-lookups-by-returned-type/spec.md).
 func TestAddressPartyPageSizeDefault(t *testing.T) {
 	g := startGateway(t, nil)
-	tested := 0
-	for _, service := range []string{publicaddressesv1connect.AddressesServiceName, publicpartiesv1connect.PartiesServiceName} {
+	var tested []string
+	for _, service := range []string{
+		publicparcelsv1connect.ParcelsServiceName,
+		publicimprovementsv1connect.ImprovementsServiceName,
+		publicpartiesv1connect.PartiesServiceName,
+	} {
 		for _, md := range methods(t, service) {
 			fd := md.Input().Fields().ByName("first")
 			if fd == nil {
 				continue
 			}
-			tested++
+			tested = append(tested, string(md.Name()))
 			t.Run(string(md.Name()), func(t *testing.T) {
 				req := dynamicpb.NewMessage(md.Input())
 				fillValid(req, 3)
@@ -48,7 +57,15 @@ func TestAddressPartyPageSizeDefault(t *testing.T) {
 			})
 		}
 	}
-	if tested != 4 {
-		t.Errorf("tested %d paginated RPCs, want 4", tested)
+	slices.Sort(tested)
+	want := []string{
+		"GetImprovementsByAddressId",
+		"GetParcelsByAddressId",
+		"GetParcelsByPartyId",
+		"GetPartiesByAddressId",
+		"SearchParcelsAddresses",
+	}
+	if !slices.Equal(tested, want) {
+		t.Errorf("tested paginated RPCs %v, want %v", tested, want)
 	}
 }

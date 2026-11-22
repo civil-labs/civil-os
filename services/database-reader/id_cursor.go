@@ -76,7 +76,7 @@ func decodeIDCursor(s string, filterHash []byte) (string, error) {
 // pageByID reads one page of a lookup ordered by public ID, ascending. read
 // returns up to limit nodes whose public ID is after afterID (every node
 // when afterID is nil), in order; idOf gives a node's public ID. It returns
-// the nodes with their cursors.
+// the page's nodes, and a PageInfo whose cursors mark the first and last.
 func pageByID[T any](
 	rpc, id string,
 	legalAsOf *timestamppb.Timestamp,
@@ -84,10 +84,10 @@ func pageByID[T any](
 	after *string,
 	read func(afterID *string, limit int) ([]T, error),
 	idOf func(T) string,
-) ([]T, []string, *paginationv1.PageInfo, error) {
+) ([]T, *paginationv1.PageInfo, error) {
 	pageInfo := &paginationv1.PageInfo{HasPreviousPage: after != nil}
 	if _, err := uuid.Parse(id); err != nil {
-		return nil, nil, nil, connect.NewError(connect.CodeInvalidArgument, errors.New("the ID must be a UUID"))
+		return nil, nil, connect.NewError(connect.CodeInvalidArgument, errors.New("the ID must be a UUID"))
 	}
 
 	hash := idFilterHash(rpc, id, legalAsOf)
@@ -95,7 +95,7 @@ func pageByID[T any](
 	if after != nil {
 		last, err := decodeIDCursor(*after, hash)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, err
 		}
 		afterID = &last
 	}
@@ -103,24 +103,23 @@ func pageByID[T any](
 	size := pageSize(first)
 	nodes, err := read(afterID, size+1)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 	if len(nodes) > size {
 		pageInfo.HasNextPage = true
 		nodes = nodes[:size]
 	}
 
-	cursors := make([]string, len(nodes))
-	for i, n := range nodes {
-		c, err := encodeIDCursor(idOf(n), hash)
-		if err != nil {
-			return nil, nil, nil, connect.NewError(connect.CodeInternal, errors.New("cursor encoding error"))
+	if len(nodes) > 0 {
+		start, err := encodeIDCursor(idOf(nodes[0]), hash)
+		end := start
+		if err == nil && len(nodes) > 1 {
+			end, err = encodeIDCursor(idOf(nodes[len(nodes)-1]), hash)
 		}
-		cursors[i] = c
+		if err != nil {
+			return nil, nil, connect.NewError(connect.CodeInternal, errors.New("cursor encoding error"))
+		}
+		pageInfo.StartCursor, pageInfo.EndCursor = &start, &end
 	}
-	if len(cursors) > 0 {
-		pageInfo.StartCursor = &cursors[0]
-		pageInfo.EndCursor = &cursors[len(cursors)-1]
-	}
-	return nodes, cursors, pageInfo, nil
+	return nodes, pageInfo, nil
 }

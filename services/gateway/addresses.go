@@ -52,7 +52,7 @@ func (s *AddressServer) GetParcelsByAddressId(
 		return nil, err // keep the mesh status code
 	}
 	return connect.NewResponse(&publicaddressesv1.GetParcelsByAddressIdResponse{
-		Edges:    mapSlice(meshRes.Msg.Edges, mapAddressParcelEdge),
+		Parcels:  mapSlice(meshRes.Msg.Parcels, mapAddressParcel),
 		PageInfo: mapPageInfo(meshRes.Msg.PageInfo),
 	}), nil
 }
@@ -72,8 +72,8 @@ func (s *AddressServer) GetImprovementsByAddressId(
 		return nil, err // keep the mesh status code
 	}
 	return connect.NewResponse(&publicaddressesv1.GetImprovementsByAddressIdResponse{
-		Edges:    mapSlice(meshRes.Msg.Edges, mapAddressImprovementEdge),
-		PageInfo: mapPageInfo(meshRes.Msg.PageInfo),
+		Improvements: mapSlice(meshRes.Msg.Improvements, mapAddressImprovement),
+		PageInfo:     mapPageInfo(meshRes.Msg.PageInfo),
 	}), nil
 }
 
@@ -92,7 +92,7 @@ func (s *AddressServer) GetPartiesByAddressId(
 		return nil, err // keep the mesh status code
 	}
 	return connect.NewResponse(&publicaddressesv1.GetPartiesByAddressIdResponse{
-		Edges:    mapSlice(meshRes.Msg.Edges, mapPartyEdge),
+		Parties:  mapSlice(meshRes.Msg.Parties, mapParty),
 		PageInfo: mapPageInfo(meshRes.Msg.PageInfo),
 	}), nil
 }
@@ -118,18 +118,16 @@ func mapAddress(m *meshaddressesv1.Address) *publicaddressesv1.Address {
 	return a
 }
 
-func mapAddressParcelEdge(m *meshaddressesv1.AddressParcelEdge) *publicaddressesv1.AddressParcelEdge {
-	n := m.GetNode()
-	return &publicaddressesv1.AddressParcelEdge{Cursor: m.GetCursor(), Node: &publicaddressesv1.AddressParcel{
-		ParcelId:  n.GetParcelId(),
-		FeatureId: n.FeatureId,
-	}}
+func mapAddressParcel(m *meshaddressesv1.AddressParcel) *publicaddressesv1.AddressParcel {
+	return &publicaddressesv1.AddressParcel{
+		ParcelId:  m.GetParcelId(),
+		FeatureId: m.FeatureId,
+	}
 }
 
-func mapAddressImprovementEdge(m *meshaddressesv1.AddressImprovementEdge) *publicaddressesv1.AddressImprovementEdge {
-	n := m.GetNode()
-	return &publicaddressesv1.AddressImprovementEdge{Cursor: m.GetCursor(), Node: &publicaddressesv1.AddressImprovement{
-		ImprovementId: n.GetImprovementId(),
-		ParcelIds:     n.GetParcelIds(),
-	}}
+func mapAddressImprovement(m *meshaddressesv1.AddressImprovement) *publicaddressesv1.AddressImprovement {
+	return &publicaddressesv1.AddressImprovement{
+		ImprovementId: m.GetImprovementId(),
+		ParcelIds:     m.GetParcelIds(),
+	}
 }

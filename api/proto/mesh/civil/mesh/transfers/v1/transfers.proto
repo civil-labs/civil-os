@@ -68,11 +68,6 @@ message TransferCodeType {
   optional string description = 3;
 }
 
-message RealPropertyTransferEdge {
-  string cursor = 1;
-  RealPropertyTransfer node = 2;
-}
-
 message GetTransfersByIdRequest {
   repeated string transfer_ids = 1;
 }
@@ -89,7 +84,7 @@ message GetTransfersByParcelIdRequest {
 }
 
 message GetTransfersByParcelIdResponse {
-  repeated RealPropertyTransferEdge edges = 1;
+  repeated RealPropertyTransfer transfers = 1;
   civil.mesh.pagination.v1.PageInfo page_info = 2;
 }
 
@@ -101,11 +96,11 @@ message GetTransfersByFeatureIdRequest {
 }
 
 message GetTransfersByFeatureIdResponse {
-  repeated RealPropertyTransferEdge edges = 1;
+  repeated RealPropertyTransfer transfers = 1;
   civil.mesh.pagination.v1.PageInfo page_info = 2;
 }
 
-// The decoded form of an edge cursor. Internal to the reader: clients only
+// The decoded form of a page-boundary cursor. Internal to the reader: clients only
 // see its base64url encoding.
 message TransferCursor {
   uint32 version = 1;
@@ -124,6 +119,6 @@ message GetTransfersByPartyIdRequest {
 }
 
 message GetTransfersByPartyIdResponse {
-  repeated RealPropertyTransferEdge edges = 1;
+  repeated RealPropertyTransfer transfers = 1;
   civil.mesh.pagination.v1.PageInfo page_info = 2;
 }

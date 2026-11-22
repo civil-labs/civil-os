@@ -45,12 +45,10 @@ lookups and `ParcelsService.SearchParcelsAddresses`. They share these rules:
 
 - **Request:** `optional int32 first` (the page size) and
   `optional string after` (a cursor from a previous page).
-- **Response:** the results and a `civil.public.pagination.v1.PageInfo
-  page_info`. New paginated RPCs, starting with `SearchParcelsAddresses`,
-  return `repeated <Thing> <things>` with no edges. The older RPCs still
-  return `repeated <Thing>Edge edges`, each with a `cursor` and the `node`,
-  until [`pagination-without-edges`](../../../docs/pagination-without-edges/intent.md)
-  removes them. Either way, `page_info.end_cursor` is all you need to page.
+- **Response:** `repeated <Thing> <things>` (the page's results, named for
+  what they are, such as `transfers` or `parcels`; search's are `hits`) and a
+  `civil.public.pagination.v1.PageInfo page_info`. Page with
+  `page_info.end_cursor`. Results carry no cursor of their own.
 - **Page size:** `first` is 1 to 100, and defaults to 25 when unset. A larger
   value is rejected with `InvalidArgument`, not reduced. The limits are part of
   the contract and the same on every instance.

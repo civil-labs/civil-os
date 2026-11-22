@@ -107,16 +107,12 @@ func (s *APIServer) GetParcelsByAddressId(
 		}, func(err error) error { return s.dbError("address parcels", err) })
 	}
 
-	nodes, cursors, pageInfo, err := pageByID("GetParcelsByAddressId", m.AddressId, m.LegalAsOf,
+	nodes, pageInfo, err := pageByID("GetParcelsByAddressId", m.AddressId, m.LegalAsOf,
 		m.First, m.After, read, func(n *addressesv1.AddressParcel) string { return n.ParcelId })
 	if err != nil {
 		return nil, err
 	}
-	edges := make([]*addressesv1.AddressParcelEdge, len(nodes))
-	for i, n := range nodes {
-		edges[i] = &addressesv1.AddressParcelEdge{Cursor: cursors[i], Node: n}
-	}
-	return connect.NewResponse(&addressesv1.GetParcelsByAddressIdResponse{Edges: edges, PageInfo: pageInfo}), nil
+	return connect.NewResponse(&addressesv1.GetParcelsByAddressIdResponse{Parcels: nodes, PageInfo: pageInfo}), nil
 }
 
 func (s *APIServer) GetImprovementsByAddressId(
@@ -151,16 +147,12 @@ func (s *APIServer) GetImprovementsByAddressId(
 		}, func(err error) error { return s.dbError("address improvements", err) })
 	}
 
-	nodes, cursors, pageInfo, err := pageByID("GetImprovementsByAddressId", m.AddressId, m.LegalAsOf,
+	nodes, pageInfo, err := pageByID("GetImprovementsByAddressId", m.AddressId, m.LegalAsOf,
 		m.First, m.After, read, func(n *addressesv1.AddressImprovement) string { return n.ImprovementId })
 	if err != nil {
 		return nil, err
 	}
-	edges := make([]*addressesv1.AddressImprovementEdge, len(nodes))
-	for i, n := range nodes {
-		edges[i] = &addressesv1.AddressImprovementEdge{Cursor: cursors[i], Node: n}
-	}
-	return connect.NewResponse(&addressesv1.GetImprovementsByAddressIdResponse{Edges: edges, PageInfo: pageInfo}), nil
+	return connect.NewResponse(&addressesv1.GetImprovementsByAddressIdResponse{Improvements: nodes, PageInfo: pageInfo}), nil
 }
 
 func (s *APIServer) GetPartiesByAddressId(
@@ -191,16 +183,12 @@ func (s *APIServer) GetPartiesByAddressId(
 		return parties, nil
 	}
 
-	nodes, cursors, pageInfo, err := pageByID("GetPartiesByAddressId", m.AddressId, m.LegalAsOf,
+	nodes, pageInfo, err := pageByID("GetPartiesByAddressId", m.AddressId, m.LegalAsOf,
 		m.First, m.After, read, func(n *partiesv1.Party) string { return n.PartyId })
 	if err != nil {
 		return nil, err
 	}
-	edges := make([]*partiesv1.PartyEdge, len(nodes))
-	for i, n := range nodes {
-		edges[i] = &partiesv1.PartyEdge{Cursor: cursors[i], Node: n}
-	}
-	return connect.NewResponse(&addressesv1.GetPartiesByAddressIdResponse{Edges: edges, PageInfo: pageInfo}), nil
+	return connect.NewResponse(&addressesv1.GetPartiesByAddressIdResponse{Parties: nodes, PageInfo: pageInfo}), nil
 }
 
 // collectRows scans every row with scan, mapping any error with wrap.

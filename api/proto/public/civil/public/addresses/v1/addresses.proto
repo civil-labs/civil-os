@@ -95,16 +95,6 @@ message AddressImprovement {
   repeated string parcel_ids = 2;
 }
 
-message AddressParcelEdge {
-  string cursor = 1;
-  AddressParcel node = 2;
-}
-
-message AddressImprovementEdge {
-  string cursor = 1;
-  AddressImprovement node = 2;
-}
-
 message GetAddressesByIdRequest {
   // 1 to 100 unique address UUIDs.
   repeated string address_ids = 1 [(buf.validate.field).repeated = {
@@ -152,7 +142,9 @@ message GetParcelsByAddressIdRequest {
 }
 
 message GetParcelsByAddressIdResponse {
-  repeated AddressParcelEdge edges = 1;
+  // The page's parcels, ordered by `parcel_id`. Fewer than `first` only on
+  // the last page.
+  repeated AddressParcel parcels = 1;
   civil.public.pagination.v1.PageInfo page_info = 2;
 }
 
@@ -180,7 +172,9 @@ message GetImprovementsByAddressIdRequest {
 }
 
 message GetImprovementsByAddressIdResponse {
-  repeated AddressImprovementEdge edges = 1;
+  // The page's improvements, ordered by `improvement_id`. Fewer than `first`
+  // only on the last page.
+  repeated AddressImprovement improvements = 1;
   civil.public.pagination.v1.PageInfo page_info = 2;
 }
 
@@ -208,6 +202,8 @@ message GetPartiesByAddressIdRequest {
 }
 
 message GetPartiesByAddressIdResponse {
-  repeated civil.public.parties.v1.PartyEdge edges = 1;
+  // The page's parties, ordered by `party_id`. Fewer than `first` only on
+  // the last page.
+  repeated civil.public.parties.v1.Party parties = 1;
   civil.public.pagination.v1.PageInfo page_info = 2;
 }

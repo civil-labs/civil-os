@@ -54,7 +54,7 @@ func (s *PartyServer) GetParcelsByPartyId(
 		return nil, err // keep the mesh status code
 	}
 	return connect.NewResponse(&publicpartiesv1.GetParcelsByPartyIdResponse{
-		Edges:    mapSlice(meshRes.Msg.Edges, mapPartyParcelEdge),
+		Parcels:  mapSlice(meshRes.Msg.Parcels, mapPartyParcel),
 		PageInfo: mapPageInfo(meshRes.Msg.PageInfo),
 	}), nil
 }
@@ -68,15 +68,10 @@ func mapParty(m *meshpartiesv1.Party) *publicpartiesv1.Party {
 	}
 }
 
-func mapPartyEdge(m *meshpartiesv1.PartyEdge) *publicpartiesv1.PartyEdge {
-	return &publicpartiesv1.PartyEdge{Cursor: m.GetCursor(), Node: mapParty(m.GetNode())}
-}
-
-func mapPartyParcelEdge(m *meshpartiesv1.PartyParcelEdge) *publicpartiesv1.PartyParcelEdge {
-	n := m.GetNode()
-	return &publicpartiesv1.PartyParcelEdge{Cursor: m.GetCursor(), Node: &publicpartiesv1.PartyParcel{
-		ParcelId:       n.GetParcelId(),
-		FeatureId:      n.FeatureId,
-		OwnershipShare: n.GetOwnershipShare(),
-	}}
+func mapPartyParcel(m *meshpartiesv1.PartyParcel) *publicpartiesv1.PartyParcel {
+	return &publicpartiesv1.PartyParcel{
+		ParcelId:       m.GetParcelId(),
+		FeatureId:      m.FeatureId,
+		OwnershipShare: m.GetOwnershipShare(),
+	}
 }

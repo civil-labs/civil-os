@@ -104,14 +104,10 @@ func (s *APIServer) GetParcelsByPartyId(
 		}, func(err error) error { return s.dbError("party parcels", err) })
 	}
 
-	nodes, cursors, pageInfo, err := pageByID("GetParcelsByPartyId", req.Msg.PartyId, req.Msg.LegalAsOf,
+	nodes, pageInfo, err := pageByID("GetParcelsByPartyId", req.Msg.PartyId, req.Msg.LegalAsOf,
 		req.Msg.First, req.Msg.After, read, func(n *partiesv1.PartyParcel) string { return n.ParcelId })
 	if err != nil {
 		return nil, err
 	}
-	edges := make([]*partiesv1.PartyParcelEdge, len(nodes))
-	for i, n := range nodes {
-		edges[i] = &partiesv1.PartyParcelEdge{Cursor: cursors[i], Node: n}
-	}
-	return connect.NewResponse(&partiesv1.GetParcelsByPartyIdResponse{Edges: edges, PageInfo: pageInfo}), nil
+	return connect.NewResponse(&partiesv1.GetParcelsByPartyIdResponse{Parcels: nodes, PageInfo: pageInfo}), nil
 }

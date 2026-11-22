@@ -168,12 +168,12 @@ func (s *APIServer) GetTransfersByParcelId(
 ) (*connect.Response[transfersv1.GetTransfersByParcelIdResponse], error) {
 	s.logger.Debug("received GetTransfersByParcelId request", slog.Int("ids", len(req.Msg.ParcelIds)))
 
-	edges, pageInfo, err := s.pageTransfers(ctx, "GetTransfersByParcelId", transfersByParcelFilter,
+	transfers, pageInfo, err := s.pageTransfers(ctx, "GetTransfersByParcelId", transfersByParcelFilter,
 		req.Msg.ParcelIds, req.Msg.ParcelIds, req.Msg.TimeRange, req.Msg.First, req.Msg.After)
 	if err != nil {
 		return nil, err
 	}
-	return connect.NewResponse(&transfersv1.GetTransfersByParcelIdResponse{Edges: edges, PageInfo: pageInfo}), nil
+	return connect.NewResponse(&transfersv1.GetTransfersByParcelIdResponse{Transfers: transfers, PageInfo: pageInfo}), nil
 }
 
 func (s *APIServer) GetTransfersByFeatureId(
@@ -186,12 +186,12 @@ func (s *APIServer) GetTransfersByFeatureId(
 	for i, id := range req.Msg.FeatureIds {
 		hashIDs[i] = strconv.FormatInt(id, 10)
 	}
-	edges, pageInfo, err := s.pageTransfers(ctx, "GetTransfersByFeatureId", transfersByFeatureFilter,
+	transfers, pageInfo, err := s.pageTransfers(ctx, "GetTransfersByFeatureId", transfersByFeatureFilter,
 		req.Msg.FeatureIds, hashIDs, req.Msg.TimeRange, req.Msg.First, req.Msg.After)
 	if err != nil {
 		return nil, err
 	}
-	return connect.NewResponse(&transfersv1.GetTransfersByFeatureIdResponse{Edges: edges, PageInfo: pageInfo}), nil
+	return connect.NewResponse(&transfersv1.GetTransfersByFeatureIdResponse{Transfers: transfers, PageInfo: pageInfo}), nil
 }
 
 func (s *APIServer) GetTransfersByPartyId(
@@ -200,12 +200,12 @@ func (s *APIServer) GetTransfersByPartyId(
 ) (*connect.Response[transfersv1.GetTransfersByPartyIdResponse], error) {
 	s.logger.Debug("received GetTransfersByPartyId request", slog.Int("ids", len(req.Msg.PartyIds)))
 
-	edges, pageInfo, err := s.pageTransfers(ctx, "GetTransfersByPartyId", transfersByPartyFilter,
+	transfers, pageInfo, err := s.pageTransfers(ctx, "GetTransfersByPartyId", transfersByPartyFilter,
 		req.Msg.PartyIds, req.Msg.PartyIds, req.Msg.TimeRange, req.Msg.First, req.Msg.After)
 	if err != nil {
 		return nil, err
 	}
-	return connect.NewResponse(&transfersv1.GetTransfersByPartyIdResponse{Edges: edges, PageInfo: pageInfo}), nil
+	return connect.NewResponse(&transfersv1.GetTransfersByPartyIdResponse{Transfers: transfers, PageInfo: pageInfo}), nil
 }
 
 // pageTransfers reads one page of a paginated transfer lookup. ids is the
@@ -219,7 +219,7 @@ func (s *APIServer) pageTransfers(
 	timeRange *interval.Interval,
 	first *int32,
 	after *string,
-) ([]*transfersv1.RealPropertyTransferEdge, *paginationv1.PageInfo, error) {
+) ([]*transfersv1.RealPropertyTransfer, *paginationv1.PageInfo, error) {
 	pageInfo := &paginationv1.PageInfo{HasPreviousPage: after != nil}
 	if len(hashIDs) == 0 {
 		return nil, pageInfo, nil
@@ -245,20 +245,19 @@ func (s *APIServer) pageTransfers(
 		transfers, keys = transfers[:size], keys[:size]
 	}
 
-	edges := make([]*transfersv1.RealPropertyTransferEdge, len(transfers))
-	for i, t := range transfers {
-		cursor, err := encodeTransferCursor(keys[i], hash)
+	if len(transfers) > 0 {
+		start, err := encodeTransferCursor(keys[0], hash)
+		end := start
+		if err == nil && len(keys) > 1 {
+			end, err = encodeTransferCursor(keys[len(keys)-1], hash)
+		}
 		if err != nil {
 			s.logger.Error("failed to encode transfer cursor", slog.Any("error", err))
 			return nil, nil, connect.NewError(connect.CodeInternal, fmt.Errorf("cursor encoding error"))
 		}
-		edges[i] = &transfersv1.RealPropertyTransferEdge{Cursor: cursor, Node: t}
+		pageInfo.StartCursor, pageInfo.EndCursor = &start, &end
 	}
-	if len(edges) > 0 {
-		pageInfo.StartCursor = &edges[0].Cursor
-		pageInfo.EndCursor = &edges[len(edges)-1].Cursor
-	}
-	return edges, pageInfo, nil
+	return transfers, pageInfo, nil
 }
 
 // readTransfers returns the visible transfers matching filter, in sort

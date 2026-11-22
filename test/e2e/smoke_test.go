@@ -239,14 +239,14 @@ func TestSmoke(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if len(res.Msg.Edges) != 1 || res.Msg.Edges[0].GetNode().GetTransferId() != tu.TransferID(tu.MultiGranteeTransfer) {
-			t.Fatalf("parcel %d transfers = %v", tu.MultiOwnerParcel, res.Msg.Edges)
+		if len(res.Msg.Transfers) != 1 || res.Msg.Transfers[0].GetTransferId() != tu.TransferID(tu.MultiGranteeTransfer) {
+			t.Fatalf("parcel %d transfers = %v", tu.MultiOwnerParcel, res.Msg.Transfers)
 		}
-		tr := res.Msg.Edges[0].GetNode()
+		tr := res.Msg.Transfers[0]
 		if len(tr.GetParcels()) != 1 || len(tr.GetParcels()[0].GetGrantees()) != 2 || len(tr.GetParties()) != 3 {
 			t.Errorf("transfer %d = %v, want 2 grantee shares and 3 parties", tu.MultiGranteeTransfer, tr)
 		}
-		if pi := res.Msg.GetPageInfo(); pi.GetHasNextPage() || pi.GetEndCursor() != res.Msg.Edges[0].GetCursor() {
+		if pi := res.Msg.GetPageInfo(); pi.GetHasNextPage() || pi.GetEndCursor() == "" || pi.GetEndCursor() != pi.GetStartCursor() {
 			t.Errorf("page info = %v", pi)
 		}
 
@@ -280,7 +280,7 @@ func TestSmoke(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if len(pp.Msg.Edges) != 1 || !pp.Msg.GetPageInfo().GetHasNextPage() {
+		if len(pp.Msg.Parcels) != 1 || !pp.Msg.GetPageInfo().GetHasNextPage() {
 			t.Fatalf("party 3 parcels, first page = %v", pp.Msg)
 		}
 		next, err := parties.GetParcelsByPartyId(ctx, authed(token, &partiesv1.GetParcelsByPartyIdRequest{
@@ -289,7 +289,7 @@ func TestSmoke(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if len(next.Msg.Edges) != 2 || next.Msg.GetPageInfo().GetHasNextPage() {
+		if len(next.Msg.Parcels) != 2 || next.Msg.GetPageInfo().GetHasNextPage() {
 			t.Errorf("party 3 parcels after the first = %v, want the other 2", next.Msg)
 		}
 
@@ -309,7 +309,7 @@ func TestSmoke(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if len(ap.Msg.Edges) != 1 || ap.Msg.Edges[0].GetNode().GetParcelId() != tu.ParcelID(3) {
+		if len(ap.Msg.Parcels) != 1 || ap.Msg.Parcels[0].GetParcelId() != tu.ParcelID(3) {
 			t.Errorf("parcels at address 3 = %v", ap.Msg)
 		}
 
@@ -343,8 +343,8 @@ func TestSmoke(t *testing.T) {
 			t.Fatal(err)
 		}
 		var got []string
-		for _, e := range res.Msg.Edges {
-			got = append(got, e.GetNode().GetTransferId())
+		for _, tr := range res.Msg.Transfers {
+			got = append(got, tr.GetTransferId())
 		}
 		if want := []string{tu.TransferID(5), tu.TransferID(2)}; !slices.Equal(got, want) {
 			t.Errorf("party 1 transfers = %v, want %v", got, want)

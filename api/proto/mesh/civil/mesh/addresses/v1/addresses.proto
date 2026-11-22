@@ -53,16 +53,6 @@ message AddressImprovement {
   repeated string parcel_ids = 2;
 }
 
-message AddressParcelEdge {
-  string cursor = 1;
-  AddressParcel node = 2;
-}
-
-message AddressImprovementEdge {
-  string cursor = 1;
-  AddressImprovement node = 2;
-}
-
 message GetAddressesByIdRequest {
   repeated string address_ids = 1;
   optional google.protobuf.Timestamp legal_as_of = 2;
@@ -80,7 +70,7 @@ message GetParcelsByAddressIdRequest {
 }
 
 message GetParcelsByAddressIdResponse {
-  repeated AddressParcelEdge edges = 1;
+  repeated AddressParcel parcels = 1;
   civil.mesh.pagination.v1.PageInfo page_info = 2;
 }
 
@@ -92,7 +82,7 @@ message GetImprovementsByAddressIdRequest {
 }
 
 message GetImprovementsByAddressIdResponse {
-  repeated AddressImprovementEdge edges = 1;
+  repeated AddressImprovement improvements = 1;
   civil.mesh.pagination.v1.PageInfo page_info = 2;
 }
 
@@ -104,6 +94,6 @@ message GetPartiesByAddressIdRequest {
 }
 
 message GetPartiesByAddressIdResponse {
-  repeated civil.mesh.parties.v1.PartyEdge edges = 1;
+  repeated civil.mesh.parties.v1.Party parties = 1;
   civil.mesh.pagination.v1.PageInfo page_info = 2;
 }

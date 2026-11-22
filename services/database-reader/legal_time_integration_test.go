@@ -42,6 +42,34 @@ func parcelDetails(t *testing.T, r readerClients, at *time.Time, ns ...int) map[
 	return out
 }
 
+// moveParcelToAddress gives fixture parcel p fixture address a, over its
+// existing attributes row, in this test's own database copy. It updates rather
+// than inserts, because no_overlapping_parcel_attributes forbids a second row
+// over the same range.
+func moveParcelToAddress(t *testing.T, pool *pgxpool.Pool, p, a int) {
+	t.Helper()
+	_, err := pool.Exec(context.Background(), `
+		UPDATE core.parcel_attributes SET address_id = (SELECT address_id FROM core.addresses WHERE public_id = $1)
+		WHERE parcel_id = (SELECT parcel_id FROM core.parcels WHERE public_id = $2)`,
+		tu.AddressID(a), tu.ParcelID(p))
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+// movePartyToAddress gives fixture party p fixture mailing address a, over its
+// existing attributes rows, in this test's own database copy.
+func movePartyToAddress(t *testing.T, pool *pgxpool.Pool, p, a int) {
+	t.Helper()
+	_, err := pool.Exec(context.Background(), `
+		UPDATE core.party_attributes SET address_id = (SELECT address_id FROM core.addresses WHERE public_id = $1)
+		WHERE party_id = (SELECT party_id FROM core.parties WHERE public_id = $2)`,
+		tu.AddressID(a), tu.PartyID(p))
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 // voidAddress voids fixture address n in this test's own database copy.
 func voidAddress(t *testing.T, pool *pgxpool.Pool, n int) {
 	t.Helper()

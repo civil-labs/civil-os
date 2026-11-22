@@ -69,8 +69,8 @@ func (s *TransferServer) GetTransfersByParcelId(
 		return nil, err // keep the mesh status code
 	}
 	return connect.NewResponse(&publictransfersv1.GetTransfersByParcelIdResponse{
-		Edges:    mapSlice(meshRes.Msg.Edges, mapTransferEdge),
-		PageInfo: mapPageInfo(meshRes.Msg.PageInfo),
+		Transfers: mapSlice(meshRes.Msg.Transfers, mapTransfer),
+		PageInfo:  mapPageInfo(meshRes.Msg.PageInfo),
 	}), nil
 }
 
@@ -91,8 +91,8 @@ func (s *TransferServer) GetTransfersByFeatureId(
 		return nil, err // keep the mesh status code
 	}
 	return connect.NewResponse(&publictransfersv1.GetTransfersByFeatureIdResponse{
-		Edges:    mapSlice(meshRes.Msg.Edges, mapTransferEdge),
-		PageInfo: mapPageInfo(meshRes.Msg.PageInfo),
+		Transfers: mapSlice(meshRes.Msg.Transfers, mapTransfer),
+		PageInfo:  mapPageInfo(meshRes.Msg.PageInfo),
 	}), nil
 }
 
@@ -113,8 +113,8 @@ func (s *TransferServer) GetTransfersByPartyId(
 		return nil, err // keep the mesh status code
 	}
 	return connect.NewResponse(&publictransfersv1.GetTransfersByPartyIdResponse{
-		Edges:    mapSlice(meshRes.Msg.Edges, mapTransferEdge),
-		PageInfo: mapPageInfo(meshRes.Msg.PageInfo),
+		Transfers: mapSlice(meshRes.Msg.Transfers, mapTransfer),
+		PageInfo:  mapPageInfo(meshRes.Msg.PageInfo),
 	}), nil
 }
 
@@ -142,14 +142,6 @@ func mapPageInfo(m *meshpaginationv1.PageInfo) *publicpaginationv1.PageInfo {
 		StartCursor:     m.StartCursor,
 		EndCursor:       m.EndCursor,
 	}
-}
-
-func mapTransferEdge(m *meshtransfersv1.RealPropertyTransferEdge) *publictransfersv1.RealPropertyTransferEdge {
-	e := &publictransfersv1.RealPropertyTransferEdge{Cursor: m.Cursor}
-	if m.Node != nil {
-		e.Node = mapTransfer(m.Node)
-	}
-	return e
 }
 
 func mapTransfer(m *meshtransfersv1.RealPropertyTransfer) *publictransfersv1.RealPropertyTransfer {

@@ -49,10 +49,11 @@ test reads, run `mise run check` yourself.
   commit that release-please reads. Use `feat:`, `fix:`, `docs:`, `test:`,
   `ci:`, `build:`, `refactor:` and `chore:`, with `!` for breaking changes.
   Only `feat`, `fix` and other user-facing types trigger a release.
-- **Mesh naming:** `<Entity>ReadService` is served by the reader and
-  `<Entity>WriteService` by the writer. New services use the plural public
-  domain name (`AddressesReadService`, `PartiesReadService`); see
-  `docs/mesh-plural-service-names/intent.md`. The public API keeps its own names.
+- **Mesh naming:** a mesh service is the public service's domain plus
+  `ReadService` (served by the reader) or `WriteService` (served by the
+  writer): `ParcelsService` → `ParcelsReadService`, `ParcelsWriteService`.
+  New public services take a plural domain name unless the noun has none
+  (`ZoningService`). `TestMeshServiceNames` in the gateway enforces it.
 - **RPC placement:** an RPC lives on the service of the records it returns,
   whatever it looks them up by. A link record belongs to the side the request
   doesn't name. See `docs/reverse-lookups-by-returned-type/spec.md`.

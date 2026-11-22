@@ -31,7 +31,7 @@ serves one jurisdiction.
 |---|---|---|---|
 | gateway | `services/gateway` | 8080 | The only public entry point. Validates OIDC ID tokens, applies CORS, serves the public API, maps public requests to mesh calls, and proxies `/tiles/` to the tile server. |
 | database-reader | `services/database-reader` | 50051 | Serves every mesh `*ReadService` with read-only SQL: parcels, improvements, land uses, zoning, valuations, neighborhoods, real property transfers, addresses and parties. |
-| database-writer | `services/database-writer` | 50052 | Serves `ParcelWriteService` (`UpdateParcel`). Optional: without it, the gateway answers writes with `Unavailable`. |
+| database-writer | `services/database-writer` | 50052 | Serves `ParcelsWriteService` (`UpdateParcel`). Optional: without it, the gateway answers writes with `Unavailable`. |
 | tile-server | `services/tile-server` | 3000 | [Martin](https://maplibre.org/martin/), serving vector tiles from the database's `core.get_parcel_tiles` function. |
 
 ## Public and mesh APIs
@@ -52,12 +52,13 @@ without breaking clients. Generated Go code for both is committed.
 
 ### Read/write split
 
-Mesh services follow one naming pattern: `<Entity>ReadService` is served by the
-reader, and `<Entity>WriteService` is served by the writer. New services take
-the plural public domain name, such as `AddressesReadService` and
-`PartiesReadService`; the older singular names are due to be renamed
-(`docs/mesh-plural-service-names/intent.md`). Today the only write
-service is `ParcelWriteService`. The public API keeps one `ParcelsService` for
+A mesh service is its public service's domain plus `ReadService` (served by
+the reader) or `WriteService` (served by the writer): `ParcelsService` has
+`ParcelsReadService` and `ParcelsWriteService`. New public services take a
+plural domain name unless the noun has none (`ZoningService`), so going from
+a public service to its mesh service only swaps the suffix
+(`docs/mesh-plural-service-names/spec.md`). Today the only write service is
+`ParcelsWriteService`. The public API keeps one `ParcelsService` for
 both. The gateway sends `UpdateParcel` to the writer and every other parcel RPC
 to the reader.
 

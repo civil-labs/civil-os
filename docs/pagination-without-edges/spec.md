@@ -4,7 +4,7 @@
 |---|---|
 | **Author / product owner** | Jackson |
 | **Date** | 2026-11-21 |
-| **Status** | Draft. Field names, the clean break, the reference messages, `start_cursor` and field numbering are proposals awaiting sign-off in review. Accepted when merged. |
+| **Status** | Draft. Field names, the clean break, the reference messages, and `start_cursor` are proposals awaiting sign-off in review. The owner decided field numbering on 2026-11-21. Accepted when merged. |
 | **Intent** | [`intent.md`](intent.md) |
 
 This spec sets out the contract: the new response shape for every paginated
@@ -43,8 +43,8 @@ change.
 
 | Question | Decision |
 |---|---|
-| Field numbers | **The new field takes number 3. Number 1 and the name `edges` are reserved.** Reusing 1 would change the field's type in place. A client built against the old shape would then decode each item as an edge without any error: a `RealPropertyTransfer`'s `transfer_id` (field 1, a string) would read as the edge's `cursor`, and its `transfer_time` (field 2, a message) as the `node`. With a new number, an old client sees an empty `edges` list and an unchanged `page_info`. That's still wrong, but empty rather than corrupted, and easier to diagnose. `page_info` keeps number 2. |
-| The mesh | **Changes in the same way, with the same numbering.** The mesh promises no compatibility, but the gateway and the reader roll out separately in a cluster. During a rollout, a new gateway can talk to an old reader. A reused field number would turn that into silently corrupted results. A new one turns it into empty pages for the minutes the rollout takes. The mesh `Edge` messages are deleted, and `TransferCursor`'s comment stops calling it an edge cursor. |
+| Field numbers | **The new field takes number 1, in place of `edges`** (owner, 2026-11-21). `page_info` keeps number 2, so every paginated response, search included, has its results at 1 and `page_info` at 2. Changing field 1's type means a client built against the old shape gets no decoding error: it reads each item as an edge, so a `RealPropertyTransfer`'s `transfer_id` (field 1, a string) would read as the edge's `cursor`, and its `transfer_time` (field 2, a message) as the `node`. That's accepted. The records app is the only client of these RPCs, and it moves to the new shape in the same release cycle (see [The records app](#the-records-app)). |
+| The mesh | **Changes in the same way, with the same numbering.** The mesh promises no compatibility. The gateway and the reader roll out separately in a cluster, so for the minutes a rollout takes, a gateway and a reader on different versions can misread each other's paginated responses. This is accepted along with the public numbering. The mesh `Edge` messages are deleted, and `TransferCursor`'s comment stops calling it an edge cursor. |
 | Cursors | **Their encoding doesn't change.** `TransferCursor`, the ID cursor and the search cursor keep their version, fields and filter hash. The reader encodes only the first and last item's cursor, for `start_cursor` and `end_cursor`, instead of one per item. So an `end_cursor` from before the release still works after it. That isn't promised (the intent says it doesn't need to be), but it means a client mid-walk during the rollout won't fail. |
 | `PageInfo` comments | **Stop citing Relay.** The public message's header currently reads "Pagination state for a connection, following the GraphQL Cursor Connections Specification". It becomes "Pagination state for a page of results". The field comments already say "first result" and "last result" and stay as they are. The mesh `PageInfo` gets the same rewording. These are comment-only changes. |
 | SDK examples | **Nothing to change.** `sdk/js/README.md` has no pagination example, and nothing else under `sdk/` mentions edges. The README's pagination section (below) is the example. |
@@ -68,11 +68,9 @@ message GetTransfersByParcelIdResponse {
 
 // After
 message GetTransfersByParcelIdResponse {
-  reserved 1;
-  reserved "edges";
   // The page's transfers, in the RPC's order. Fewer than `first` only on the
   // last page.
-  repeated RealPropertyTransfer transfers = 3;
+  repeated RealPropertyTransfer transfers = 1;
   // Pass page_info.end_cursor as `after` to read the next page.
   civil.public.pagination.v1.PageInfo page_info = 2;
 }
@@ -167,8 +165,9 @@ published, and isn't part of this work. The change it needs:
 - its five call sites pass that prop.
 
 **Deployment order:** a deployment must not run this civil-os release with a
-records app still on SDK 0.4.x, because the app would show every paginated
-list as empty. The records app release that moves to 0.5.0 has to be ready
+records app still on SDK 0.4.x, because the app would misread every paginated
+response (see [Field numbers](#further-decisions)): rows with missing or wrong
+values, and links that go nowhere. The records app release that moves to 0.5.0 has to be ready
 before a deployment picks up this civil-os version. Both are pinned in the
 deployment repos, which aren't changed from here.
 
@@ -190,6 +189,6 @@ deployment repos, which aren't changed from here.
 - **e2e** (`test/e2e/smoke_test.go`): the transfers, address and party
   checks read the new fields, and the multi-page walk for `GetParcelsByPartyId`
   stays.
-- **A proto check:** `grep -rE 'Edge\b|edges' api/proto` finds nothing outside
-  `reserved` lines. It's run by hand for the PR. It's not a CI step, since the
-  success criterion only has to be met once.
+- **A proto check:** `grep -rE 'Edge\b|edges' api/proto` finds nothing.
+  It's run by hand for the PR. It's not a CI step, since the success
+  criterion only has to be met once.

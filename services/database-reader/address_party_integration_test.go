@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	addressesv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/addresses/v1"
+	paginationv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/pagination/v1"
 	partiesv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parties/v1"
 	tu "github.com/civil-labs/civil-os/internal/testutil"
 )
@@ -334,3 +335,95 @@ func TestAddressPartyPagination(t *testing.T) {
 	}
 }
 
+// walkPages reads every page of a lookup with first = 1, checking each page's
+// PageInfo, and returns the IDs in the order they came. read returns one
+// page's IDs and PageInfo for the given after.
+func walkPages(t *testing.T, name string, read func(first *int32, after *string) ([]string, *paginationv1.PageInfo)) []string {
+	t.Helper()
+	one := int32(1)
+	var walked []string
+	var after *string
+	for i := 0; ; i++ {
+		got, pi := read(&one, after)
+		if len(got) != 1 || pi.GetHasPreviousPage() != (i > 0) ||
+			pi.GetStartCursor() == "" || pi.GetEndCursor() != pi.GetStartCursor() {
+			t.Fatalf("%s page %d = %v, %v", name, i+1, got, pi)
+		}
+		walked = append(walked, got...)
+		if !pi.GetHasNextPage() {
+			break
+		}
+		if i > 10 {
+			t.Fatalf("%s: more pages than results", name)
+		}
+		after = pi.EndCursor
+	}
+	big := int32(100)
+	if all, pi := read(&big, nil); !reflect.DeepEqual(walked, all) || pi.GetHasNextPage() {
+		t.Errorf("%s: walked %v, one page of 100 gave %v", name, walked, all)
+	}
+	return walked
+}
+
+// TestAddressLookupPagination walks every page of the three address lookups
+// (docs/pagination-without-edges/plan.md, step 1.2). Parcel 4 and party 4 are
+// moved to address 3, so each lookup has two results.
+func TestAddressLookupPagination(t *testing.T) {
+	ctx := context.Background()
+	pool := tu.FixtureDatabase(t).Pool(t)
+	moveParcelToAddress(t, pool, 4, 3)
+	movePartyToAddress(t, pool, 4, 3)
+	r := startReaderOn(t, pool)
+	addr := tu.AddressID(3)
+
+	parcels := walkPages(t, "parcels", func(first *int32, after *string) ([]string, *paginationv1.PageInfo) {
+		res, err := r.addresses.GetParcelsByAddressId(ctx, connect.NewRequest(&addressesv1.GetParcelsByAddressIdRequest{
+			AddressId: addr, First: first, After: after,
+		}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		var out []string
+		for _, p := range res.Msg.Parcels {
+			out = append(out, p.GetParcelId())
+		}
+		return out, res.Msg.PageInfo
+	})
+	if want := ids(tu.ParcelPrefix, 3, 4); !reflect.DeepEqual(parcels, want) {
+		t.Errorf("parcels at address 3 = %v, want %v", parcels, want)
+	}
+
+	imps := walkPages(t, "improvements", func(first *int32, after *string) ([]string, *paginationv1.PageInfo) {
+		res, err := r.addresses.GetImprovementsByAddressId(ctx, connect.NewRequest(&addressesv1.GetImprovementsByAddressIdRequest{
+			AddressId: addr, First: first, After: after,
+		}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		var out []string
+		for _, i := range res.Msg.Improvements {
+			out = append(out, i.GetImprovementId())
+		}
+		return out, res.Msg.PageInfo
+	})
+	if want := ids(tu.ImprovementPrefix, 3, 16); !reflect.DeepEqual(imps, want) {
+		t.Errorf("improvements at address 3 = %v, want %v", imps, want)
+	}
+
+	parties := walkPages(t, "parties", func(first *int32, after *string) ([]string, *paginationv1.PageInfo) {
+		res, err := r.addresses.GetPartiesByAddressId(ctx, connect.NewRequest(&addressesv1.GetPartiesByAddressIdRequest{
+			AddressId: addr, First: first, After: after,
+		}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		var out []string
+		for _, p := range res.Msg.Parties {
+			out = append(out, p.GetPartyId())
+		}
+		return out, res.Msg.PageInfo
+	})
+	if want := ids(tu.PartyPrefix, 3, 4); !reflect.DeepEqual(parties, want) {
+		t.Errorf("parties at address 3 = %v, want %v", parties, want)
+	}
+}

@@ -37,28 +37,6 @@ func (s *PartyServer) GetPartiesById(
 	return connect.NewResponse(&publicpartiesv1.GetPartiesByIdResponse{Parties: parties}), nil
 }
 
-func (s *PartyServer) GetParcelsByPartyId(
-	ctx context.Context,
-	req *connect.Request[publicpartiesv1.GetParcelsByPartyIdRequest],
-) (*connect.Response[publicpartiesv1.GetParcelsByPartyIdResponse], error) {
-	s.logger.Debug("received GetParcelsByPartyId request")
-
-	meshRes, err := s.dbReaderClient.GetParcelsByPartyId(ctx, connect.NewRequest(&meshpartiesv1.GetParcelsByPartyIdRequest{
-		PartyId:   req.Msg.PartyId,
-		LegalAsOf: req.Msg.LegalAsOf,
-		First:     pageSize(req.Msg.First),
-		After:     req.Msg.After,
-	}))
-	if err != nil {
-		s.logger.Error("upstream GetParcelsByPartyId request failed", slog.Any("error", err))
-		return nil, err // keep the mesh status code
-	}
-	return connect.NewResponse(&publicpartiesv1.GetParcelsByPartyIdResponse{
-		Parcels:  mapSlice(meshRes.Msg.Parcels, mapPartyParcel),
-		PageInfo: mapPageInfo(meshRes.Msg.PageInfo),
-	}), nil
-}
-
 func mapParty(m *meshpartiesv1.Party) *publicpartiesv1.Party {
 	return &publicpartiesv1.Party{
 		PartyId:          m.GetPartyId(),
@@ -68,10 +46,22 @@ func mapParty(m *meshpartiesv1.Party) *publicpartiesv1.Party {
 	}
 }
 
-func mapPartyParcel(m *meshpartiesv1.PartyParcel) *publicpartiesv1.PartyParcel {
-	return &publicpartiesv1.PartyParcel{
-		ParcelId:       m.GetParcelId(),
-		FeatureId:      m.FeatureId,
-		OwnershipShare: m.GetOwnershipShare(),
+func (s *PartyServer) GetPartiesByAddressId(
+	ctx context.Context,
+	req *connect.Request[publicpartiesv1.GetPartiesByAddressIdRequest],
+) (*connect.Response[publicpartiesv1.GetPartiesByAddressIdResponse], error) {
+	s.logger.Debug("received GetPartiesByAddressId request")
+
+	m := req.Msg
+	meshRes, err := s.dbReaderClient.GetPartiesByAddressId(ctx, connect.NewRequest(&meshpartiesv1.GetPartiesByAddressIdRequest{
+		AddressId: m.AddressId, LegalAsOf: m.LegalAsOf, First: pageSize(m.First), After: m.After,
+	}))
+	if err != nil {
+		s.logger.Error("upstream GetPartiesByAddressId request failed", slog.Any("error", err))
+		return nil, err // keep the mesh status code
 	}
+	return connect.NewResponse(&publicpartiesv1.GetPartiesByAddressIdResponse{
+		Parties:  mapSlice(meshRes.Msg.Parties, mapParty),
+		PageInfo: mapPageInfo(meshRes.Msg.PageInfo),
+	}), nil
 }

@@ -18,11 +18,10 @@ service PartiesService {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
-  // Returns the parcels a party holds at `legal_as_of`, each with its
-  // ownership share, ordered by `parcel_id`. Voided parcels and parcels with
-  // no geometry or record then are left out. An unknown or voided party has
-  // no parcels.
-  rpc GetParcelsByPartyId(GetParcelsByPartyIdRequest) returns (GetParcelsByPartyIdResponse) {
+  // Returns the parties whose mailing address, at `legal_as_of`, is this
+  // one, ordered by `party_id`. Voided parties are left out. An unknown or
+  // voided address has no parties.
+  rpc GetPartiesByAddressId(GetPartiesByAddressIdRequest) returns (GetPartiesByAddressIdResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
@@ -43,19 +42,6 @@ message Party {
   // The mailing address's formatted text. Set exactly when
   // `mailing_address_id` is.
   optional string mailing_address = 4;
-}
-
-// A parcel a party holds.
-message PartyParcel {
-  // The parcel's UUID.
-  string parcel_id = 1;
-
-  // The parcel's geometry feature ID at `legal_as_of`.
-  optional int64 feature_id = 2;
-
-  // The party's share of the parcel, a decimal string in (0, 1] with up to
-  // 4 places, such as "0.5000".
-  string ownership_share = 3;
 }
 
 message GetPartiesByIdRequest {
@@ -81,11 +67,11 @@ message GetPartiesByIdResponse {
   map<string, Party> parties = 1;
 }
 
-message GetParcelsByPartyIdRequest {
-  // The party's UUID.
-  string party_id = 1 [(buf.validate.field).string.uuid = true];
+message GetPartiesByAddressIdRequest {
+  // The address's UUID.
+  string address_id = 1 [(buf.validate.field).string.uuid = true];
 
-  // The legal time to read the holdings at. Defaults to now.
+  // The legal time to read at. Defaults to now.
   optional google.protobuf.Timestamp legal_as_of = 2 [(buf.validate.field).timestamp = {
     gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
   }];
@@ -96,7 +82,7 @@ message GetParcelsByPartyIdRequest {
     lte: 100
   }];
 
-  // Return the parcels after this cursor, from a previous page of the same
+  // Return the records after this cursor, from a previous page of the same
   // request.
   optional string after = 4 [(buf.validate.field).string = {
     min_len: 1
@@ -104,9 +90,9 @@ message GetParcelsByPartyIdRequest {
   }];
 }
 
-message GetParcelsByPartyIdResponse {
-  // The page's parcels, ordered by `parcel_id`. Fewer than `first` only on
+message GetPartiesByAddressIdResponse {
+  // The page's parties, ordered by `party_id`. Fewer than `first` only on
   // the last page.
-  repeated PartyParcel parcels = 1;
+  repeated Party parties = 1;
   civil.public.pagination.v1.PageInfo page_info = 2;
 }

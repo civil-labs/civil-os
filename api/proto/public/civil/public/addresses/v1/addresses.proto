@@ -3,41 +3,20 @@ syntax = "proto3";
 package civil.public.addresses.v1;
 
 import "buf/validate/validate.proto";
-import "civil/public/pagination/v1/pagination.proto";
-import "civil/public/parties/v1/parties.proto";
 import "google/protobuf/timestamp.proto";
 import "google/type/latlng.proto";
 
-// Reads addresses, and the parcels, improvements and parties that use them.
+// Reads addresses. The records at an address are read from their own
+// services: `ParcelsService.GetParcelsByAddressId`,
+// `ImprovementsService.GetImprovementsByAddressId` and
+// `PartiesService.GetPartiesByAddressId`.
 //
 // Every read takes an optional `legal_as_of`, defaulting to now. An address
-// is returned only when it isn't voided and has a record at that time. The
-// lookups by address are ordered by the returned record's ID, and return
-// nothing for an unknown or voided address.
+// is returned only when it isn't voided and has a record at that time.
 service AddressesService {
   // Returns the requested addresses. Unknown IDs, voided addresses and
   // addresses with no record at `legal_as_of` are left out.
   rpc GetAddressesById(GetAddressesByIdRequest) returns (GetAddressesByIdResponse) {
-    option idempotency_level = NO_SIDE_EFFECTS;
-  }
-
-  // Returns the parcels whose address, at `legal_as_of`, is this one.
-  // Voided parcels and parcels with no geometry then are left out. Load
-  // their details with `ParcelsService.GetParcelsWithImprovementSummaryByParcelId`.
-  rpc GetParcelsByAddressId(GetParcelsByAddressIdRequest) returns (GetParcelsByAddressIdResponse) {
-    option idempotency_level = NO_SIDE_EFFECTS;
-  }
-
-  // Returns the improvements whose address, at `legal_as_of`, is this one,
-  // each with the parcels it sits on. Voided improvements, and improvements
-  // on no visible parcel, are left out.
-  rpc GetImprovementsByAddressId(GetImprovementsByAddressIdRequest) returns (GetImprovementsByAddressIdResponse) {
-    option idempotency_level = NO_SIDE_EFFECTS;
-  }
-
-  // Returns the parties whose mailing address, at `legal_as_of`, is this
-  // one. Voided parties are left out.
-  rpc GetPartiesByAddressId(GetPartiesByAddressIdRequest) returns (GetPartiesByAddressIdResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 }
@@ -77,24 +56,6 @@ message AdministrativeArea {
   string name = 2;
 }
 
-// A parcel at an address.
-message AddressParcel {
-  // The parcel's UUID.
-  string parcel_id = 1;
-
-  // The parcel's geometry feature ID at `legal_as_of`.
-  optional int64 feature_id = 2;
-}
-
-// An improvement at an address.
-message AddressImprovement {
-  // The improvement's UUID.
-  string improvement_id = 1;
-
-  // The parcels it sits on at `legal_as_of`, ordered by UUID. Never empty.
-  repeated string parcel_ids = 2;
-}
-
 message GetAddressesByIdRequest {
   // 1 to 100 unique address UUIDs.
   repeated string address_ids = 1 [(buf.validate.field).repeated = {
@@ -116,94 +77,4 @@ message GetAddressesByIdRequest {
 message GetAddressesByIdResponse {
   // The addresses found, keyed by address UUID.
   map<string, Address> addresses = 1;
-}
-
-message GetParcelsByAddressIdRequest {
-  // The address's UUID.
-  string address_id = 1 [(buf.validate.field).string.uuid = true];
-
-  // The legal time to read at. Defaults to now.
-  optional google.protobuf.Timestamp legal_as_of = 2 [(buf.validate.field).timestamp = {
-    gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
-  }];
-
-  // The page size, 1 to 100. Defaults to 25.
-  optional int32 first = 3 [(buf.validate.field).int32 = {
-    gte: 1
-    lte: 100
-  }];
-
-  // Return the records after this cursor, from a previous page of the same
-  // request.
-  optional string after = 4 [(buf.validate.field).string = {
-    min_len: 1
-    max_len: 512
-  }];
-}
-
-message GetParcelsByAddressIdResponse {
-  // The page's parcels, ordered by `parcel_id`. Fewer than `first` only on
-  // the last page.
-  repeated AddressParcel parcels = 1;
-  civil.public.pagination.v1.PageInfo page_info = 2;
-}
-
-message GetImprovementsByAddressIdRequest {
-  // The address's UUID.
-  string address_id = 1 [(buf.validate.field).string.uuid = true];
-
-  // The legal time to read at. Defaults to now.
-  optional google.protobuf.Timestamp legal_as_of = 2 [(buf.validate.field).timestamp = {
-    gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
-  }];
-
-  // The page size, 1 to 100. Defaults to 25.
-  optional int32 first = 3 [(buf.validate.field).int32 = {
-    gte: 1
-    lte: 100
-  }];
-
-  // Return the records after this cursor, from a previous page of the same
-  // request.
-  optional string after = 4 [(buf.validate.field).string = {
-    min_len: 1
-    max_len: 512
-  }];
-}
-
-message GetImprovementsByAddressIdResponse {
-  // The page's improvements, ordered by `improvement_id`. Fewer than `first`
-  // only on the last page.
-  repeated AddressImprovement improvements = 1;
-  civil.public.pagination.v1.PageInfo page_info = 2;
-}
-
-message GetPartiesByAddressIdRequest {
-  // The address's UUID.
-  string address_id = 1 [(buf.validate.field).string.uuid = true];
-
-  // The legal time to read at. Defaults to now.
-  optional google.protobuf.Timestamp legal_as_of = 2 [(buf.validate.field).timestamp = {
-    gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
-  }];
-
-  // The page size, 1 to 100. Defaults to 25.
-  optional int32 first = 3 [(buf.validate.field).int32 = {
-    gte: 1
-    lte: 100
-  }];
-
-  // Return the records after this cursor, from a previous page of the same
-  // request.
-  optional string after = 4 [(buf.validate.field).string = {
-    min_len: 1
-    max_len: 512
-  }];
-}
-
-message GetPartiesByAddressIdResponse {
-  // The page's parties, ordered by `party_id`. Fewer than `first` only on
-  // the last page.
-  repeated civil.public.parties.v1.Party parties = 1;
-  civil.public.pagination.v1.PageInfo page_info = 2;
 }

@@ -7,8 +7,11 @@
 package improvementsv1
 
 import (
+	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
+	v1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/pagination/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -310,11 +313,193 @@ func (x *GetImprovementConditionsResponse) GetImprovementConditions() map[string
 	return nil
 }
 
+// An improvement at an address.
+type AddressImprovement struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The improvement's UUID.
+	ImprovementId string `protobuf:"bytes,1,opt,name=improvement_id,json=improvementId,proto3" json:"improvement_id,omitempty"`
+	// The parcels it sits on at `legal_as_of`, ordered by UUID. Never empty.
+	ParcelIds     []string `protobuf:"bytes,2,rep,name=parcel_ids,json=parcelIds,proto3" json:"parcel_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AddressImprovement) Reset() {
+	*x = AddressImprovement{}
+	mi := &file_civil_public_improvements_v1_improvements_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddressImprovement) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddressImprovement) ProtoMessage() {}
+
+func (x *AddressImprovement) ProtoReflect() protoreflect.Message {
+	mi := &file_civil_public_improvements_v1_improvements_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddressImprovement.ProtoReflect.Descriptor instead.
+func (*AddressImprovement) Descriptor() ([]byte, []int) {
+	return file_civil_public_improvements_v1_improvements_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *AddressImprovement) GetImprovementId() string {
+	if x != nil {
+		return x.ImprovementId
+	}
+	return ""
+}
+
+func (x *AddressImprovement) GetParcelIds() []string {
+	if x != nil {
+		return x.ParcelIds
+	}
+	return nil
+}
+
+type GetImprovementsByAddressIdRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The address's UUID.
+	AddressId string `protobuf:"bytes,1,opt,name=address_id,json=addressId,proto3" json:"address_id,omitempty"`
+	// The legal time to read at. Defaults to now.
+	LegalAsOf *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=legal_as_of,json=legalAsOf,proto3,oneof" json:"legal_as_of,omitempty"`
+	// The page size, 1 to 100. Defaults to 25.
+	First *int32 `protobuf:"varint,3,opt,name=first,proto3,oneof" json:"first,omitempty"`
+	// Return the records after this cursor, from a previous page of the same
+	// request.
+	After         *string `protobuf:"bytes,4,opt,name=after,proto3,oneof" json:"after,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetImprovementsByAddressIdRequest) Reset() {
+	*x = GetImprovementsByAddressIdRequest{}
+	mi := &file_civil_public_improvements_v1_improvements_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetImprovementsByAddressIdRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetImprovementsByAddressIdRequest) ProtoMessage() {}
+
+func (x *GetImprovementsByAddressIdRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_civil_public_improvements_v1_improvements_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetImprovementsByAddressIdRequest.ProtoReflect.Descriptor instead.
+func (*GetImprovementsByAddressIdRequest) Descriptor() ([]byte, []int) {
+	return file_civil_public_improvements_v1_improvements_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *GetImprovementsByAddressIdRequest) GetAddressId() string {
+	if x != nil {
+		return x.AddressId
+	}
+	return ""
+}
+
+func (x *GetImprovementsByAddressIdRequest) GetLegalAsOf() *timestamppb.Timestamp {
+	if x != nil {
+		return x.LegalAsOf
+	}
+	return nil
+}
+
+func (x *GetImprovementsByAddressIdRequest) GetFirst() int32 {
+	if x != nil && x.First != nil {
+		return *x.First
+	}
+	return 0
+}
+
+func (x *GetImprovementsByAddressIdRequest) GetAfter() string {
+	if x != nil && x.After != nil {
+		return *x.After
+	}
+	return ""
+}
+
+type GetImprovementsByAddressIdResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The page's improvements, ordered by `improvement_id`. Fewer than `first`
+	// only on the last page.
+	Improvements  []*AddressImprovement `protobuf:"bytes,1,rep,name=improvements,proto3" json:"improvements,omitempty"`
+	PageInfo      *v1.PageInfo          `protobuf:"bytes,2,opt,name=page_info,json=pageInfo,proto3" json:"page_info,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetImprovementsByAddressIdResponse) Reset() {
+	*x = GetImprovementsByAddressIdResponse{}
+	mi := &file_civil_public_improvements_v1_improvements_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetImprovementsByAddressIdResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetImprovementsByAddressIdResponse) ProtoMessage() {}
+
+func (x *GetImprovementsByAddressIdResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_civil_public_improvements_v1_improvements_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetImprovementsByAddressIdResponse.ProtoReflect.Descriptor instead.
+func (*GetImprovementsByAddressIdResponse) Descriptor() ([]byte, []int) {
+	return file_civil_public_improvements_v1_improvements_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *GetImprovementsByAddressIdResponse) GetImprovements() []*AddressImprovement {
+	if x != nil {
+		return x.Improvements
+	}
+	return nil
+}
+
+func (x *GetImprovementsByAddressIdResponse) GetPageInfo() *v1.PageInfo {
+	if x != nil {
+		return x.PageInfo
+	}
+	return nil
+}
+
 var File_civil_public_improvements_v1_improvements_proto protoreflect.FileDescriptor
 
 const file_civil_public_improvements_v1_improvements_proto_rawDesc = "" +
 	"\n" +
-	"/civil/public/improvements/v1/improvements.proto\x12\x1ccivil.public.improvements.v1\"k\n" +
+	"/civil/public/improvements/v1/improvements.proto\x12\x1ccivil.public.improvements.v1\x1a\x1bbuf/validate/validate.proto\x1a+civil/public/pagination/v1/pagination.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"k\n" +
 	"\x0fImprovementType\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
@@ -336,10 +521,28 @@ const file_civil_public_improvements_v1_improvements_proto_rawDesc = "" +
 	"\x16improvement_conditions\x18\x01 \x03(\v2Y.civil.public.improvements.v1.GetImprovementConditionsResponse.ImprovementConditionsEntryR\x15improvementConditions\x1a|\n" +
 	"\x1aImprovementConditionsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12H\n" +
-	"\x05value\x18\x02 \x01(\v22.civil.public.improvements.v1.ImprovementConditionR\x05value:\x028\x012\xc8\x02\n" +
+	"\x05value\x18\x02 \x01(\v22.civil.public.improvements.v1.ImprovementConditionR\x05value:\x028\x01\"Z\n" +
+	"\x12AddressImprovement\x12%\n" +
+	"\x0eimprovement_id\x18\x01 \x01(\tR\rimprovementId\x12\x1d\n" +
+	"\n" +
+	"parcel_ids\x18\x02 \x03(\tR\tparcelIds\"\x93\x02\n" +
+	"!GetImprovementsByAddressIdRequest\x12'\n" +
+	"\n" +
+	"address_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\taddressId\x12T\n" +
+	"\vlegal_as_of\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampB\x13\xbaH\x10\xb2\x01\r*\v\b\x80\x92\xb8Ø\xfe\xff\xff\xff\x01H\x00R\tlegalAsOf\x88\x01\x01\x12$\n" +
+	"\x05first\x18\x03 \x01(\x05B\t\xbaH\x06\x1a\x04\x18d(\x01H\x01R\x05first\x88\x01\x01\x12%\n" +
+	"\x05after\x18\x04 \x01(\tB\n" +
+	"\xbaH\ar\x05\x10\x01\x18\x80\x04H\x02R\x05after\x88\x01\x01B\x0e\n" +
+	"\f_legal_as_ofB\b\n" +
+	"\x06_firstB\b\n" +
+	"\x06_after\"\xbd\x01\n" +
+	"\"GetImprovementsByAddressIdResponse\x12T\n" +
+	"\fimprovements\x18\x01 \x03(\v20.civil.public.improvements.v1.AddressImprovementR\fimprovements\x12A\n" +
+	"\tpage_info\x18\x02 \x01(\v2$.civil.public.pagination.v1.PageInfoR\bpageInfo2\xef\x03\n" +
 	"\x13ImprovementsService\x12\x8f\x01\n" +
 	"\x13GetImprovementTypes\x128.civil.public.improvements.v1.GetImprovementTypesRequest\x1a9.civil.public.improvements.v1.GetImprovementTypesResponse\"\x03\x90\x02\x01\x12\x9e\x01\n" +
-	"\x18GetImprovementConditions\x12=.civil.public.improvements.v1.GetImprovementConditionsRequest\x1a>.civil.public.improvements.v1.GetImprovementConditionsResponse\"\x03\x90\x02\x01B\xa1\x02\n" +
+	"\x18GetImprovementConditions\x12=.civil.public.improvements.v1.GetImprovementConditionsRequest\x1a>.civil.public.improvements.v1.GetImprovementConditionsResponse\"\x03\x90\x02\x01\x12\xa4\x01\n" +
+	"\x1aGetImprovementsByAddressId\x12?.civil.public.improvements.v1.GetImprovementsByAddressIdRequest\x1a@.civil.public.improvements.v1.GetImprovementsByAddressIdResponse\"\x03\x90\x02\x01B\xa1\x02\n" +
 	" com.civil.public.improvements.v1B\x11ImprovementsProtoP\x01ZUgithub.com/civil-labs/civil-os/api/gen/go/civil/public/improvements/v1;improvementsv1\xa2\x02\x03CPI\xaa\x02\x1cCivil.Public.Improvements.V1\xca\x02\x1dCivil\\Public_\\Improvements\\V1\xe2\x02)Civil\\Public_\\Improvements\\V1\\GPBMetadata\xea\x02\x1fCivil::Public::Improvements::V1b\x06proto3"
 
 var (
@@ -354,31 +557,41 @@ func file_civil_public_improvements_v1_improvements_proto_rawDescGZIP() []byte {
 	return file_civil_public_improvements_v1_improvements_proto_rawDescData
 }
 
-var file_civil_public_improvements_v1_improvements_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_civil_public_improvements_v1_improvements_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_civil_public_improvements_v1_improvements_proto_goTypes = []any{
-	(*ImprovementType)(nil),                  // 0: civil.public.improvements.v1.ImprovementType
-	(*GetImprovementTypesRequest)(nil),       // 1: civil.public.improvements.v1.GetImprovementTypesRequest
-	(*GetImprovementTypesResponse)(nil),      // 2: civil.public.improvements.v1.GetImprovementTypesResponse
-	(*ImprovementCondition)(nil),             // 3: civil.public.improvements.v1.ImprovementCondition
-	(*GetImprovementConditionsRequest)(nil),  // 4: civil.public.improvements.v1.GetImprovementConditionsRequest
-	(*GetImprovementConditionsResponse)(nil), // 5: civil.public.improvements.v1.GetImprovementConditionsResponse
-	nil,                                      // 6: civil.public.improvements.v1.GetImprovementTypesResponse.ImprovementTypesEntry
-	nil,                                      // 7: civil.public.improvements.v1.GetImprovementConditionsResponse.ImprovementConditionsEntry
+	(*ImprovementType)(nil),                    // 0: civil.public.improvements.v1.ImprovementType
+	(*GetImprovementTypesRequest)(nil),         // 1: civil.public.improvements.v1.GetImprovementTypesRequest
+	(*GetImprovementTypesResponse)(nil),        // 2: civil.public.improvements.v1.GetImprovementTypesResponse
+	(*ImprovementCondition)(nil),               // 3: civil.public.improvements.v1.ImprovementCondition
+	(*GetImprovementConditionsRequest)(nil),    // 4: civil.public.improvements.v1.GetImprovementConditionsRequest
+	(*GetImprovementConditionsResponse)(nil),   // 5: civil.public.improvements.v1.GetImprovementConditionsResponse
+	(*AddressImprovement)(nil),                 // 6: civil.public.improvements.v1.AddressImprovement
+	(*GetImprovementsByAddressIdRequest)(nil),  // 7: civil.public.improvements.v1.GetImprovementsByAddressIdRequest
+	(*GetImprovementsByAddressIdResponse)(nil), // 8: civil.public.improvements.v1.GetImprovementsByAddressIdResponse
+	nil,                           // 9: civil.public.improvements.v1.GetImprovementTypesResponse.ImprovementTypesEntry
+	nil,                           // 10: civil.public.improvements.v1.GetImprovementConditionsResponse.ImprovementConditionsEntry
+	(*timestamppb.Timestamp)(nil), // 11: google.protobuf.Timestamp
+	(*v1.PageInfo)(nil),           // 12: civil.public.pagination.v1.PageInfo
 }
 var file_civil_public_improvements_v1_improvements_proto_depIdxs = []int32{
-	6, // 0: civil.public.improvements.v1.GetImprovementTypesResponse.improvement_types:type_name -> civil.public.improvements.v1.GetImprovementTypesResponse.ImprovementTypesEntry
-	7, // 1: civil.public.improvements.v1.GetImprovementConditionsResponse.improvement_conditions:type_name -> civil.public.improvements.v1.GetImprovementConditionsResponse.ImprovementConditionsEntry
-	0, // 2: civil.public.improvements.v1.GetImprovementTypesResponse.ImprovementTypesEntry.value:type_name -> civil.public.improvements.v1.ImprovementType
-	3, // 3: civil.public.improvements.v1.GetImprovementConditionsResponse.ImprovementConditionsEntry.value:type_name -> civil.public.improvements.v1.ImprovementCondition
-	1, // 4: civil.public.improvements.v1.ImprovementsService.GetImprovementTypes:input_type -> civil.public.improvements.v1.GetImprovementTypesRequest
-	4, // 5: civil.public.improvements.v1.ImprovementsService.GetImprovementConditions:input_type -> civil.public.improvements.v1.GetImprovementConditionsRequest
-	2, // 6: civil.public.improvements.v1.ImprovementsService.GetImprovementTypes:output_type -> civil.public.improvements.v1.GetImprovementTypesResponse
-	5, // 7: civil.public.improvements.v1.ImprovementsService.GetImprovementConditions:output_type -> civil.public.improvements.v1.GetImprovementConditionsResponse
-	6, // [6:8] is the sub-list for method output_type
-	4, // [4:6] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	9,  // 0: civil.public.improvements.v1.GetImprovementTypesResponse.improvement_types:type_name -> civil.public.improvements.v1.GetImprovementTypesResponse.ImprovementTypesEntry
+	10, // 1: civil.public.improvements.v1.GetImprovementConditionsResponse.improvement_conditions:type_name -> civil.public.improvements.v1.GetImprovementConditionsResponse.ImprovementConditionsEntry
+	11, // 2: civil.public.improvements.v1.GetImprovementsByAddressIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	6,  // 3: civil.public.improvements.v1.GetImprovementsByAddressIdResponse.improvements:type_name -> civil.public.improvements.v1.AddressImprovement
+	12, // 4: civil.public.improvements.v1.GetImprovementsByAddressIdResponse.page_info:type_name -> civil.public.pagination.v1.PageInfo
+	0,  // 5: civil.public.improvements.v1.GetImprovementTypesResponse.ImprovementTypesEntry.value:type_name -> civil.public.improvements.v1.ImprovementType
+	3,  // 6: civil.public.improvements.v1.GetImprovementConditionsResponse.ImprovementConditionsEntry.value:type_name -> civil.public.improvements.v1.ImprovementCondition
+	1,  // 7: civil.public.improvements.v1.ImprovementsService.GetImprovementTypes:input_type -> civil.public.improvements.v1.GetImprovementTypesRequest
+	4,  // 8: civil.public.improvements.v1.ImprovementsService.GetImprovementConditions:input_type -> civil.public.improvements.v1.GetImprovementConditionsRequest
+	7,  // 9: civil.public.improvements.v1.ImprovementsService.GetImprovementsByAddressId:input_type -> civil.public.improvements.v1.GetImprovementsByAddressIdRequest
+	2,  // 10: civil.public.improvements.v1.ImprovementsService.GetImprovementTypes:output_type -> civil.public.improvements.v1.GetImprovementTypesResponse
+	5,  // 11: civil.public.improvements.v1.ImprovementsService.GetImprovementConditions:output_type -> civil.public.improvements.v1.GetImprovementConditionsResponse
+	8,  // 12: civil.public.improvements.v1.ImprovementsService.GetImprovementsByAddressId:output_type -> civil.public.improvements.v1.GetImprovementsByAddressIdResponse
+	10, // [10:13] is the sub-list for method output_type
+	7,  // [7:10] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_civil_public_improvements_v1_improvements_proto_init() }
@@ -387,13 +600,14 @@ func file_civil_public_improvements_v1_improvements_proto_init() {
 		return
 	}
 	file_civil_public_improvements_v1_improvements_proto_msgTypes[3].OneofWrappers = []any{}
+	file_civil_public_improvements_v1_improvements_proto_msgTypes[7].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_civil_public_improvements_v1_improvements_proto_rawDesc), len(file_civil_public_improvements_v1_improvements_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

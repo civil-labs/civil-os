@@ -846,3 +846,60 @@ func (s *ParcelServer) GetPrimaryImprovementTypeIdByFeatureId(ctx context.Contex
 	logReturnedValues(s.logger, "GetPrimaryImprovementTypeIdByFeatureId", sample, meshRes.Msg.Values)
 	return connect.NewResponse(&publicparcelsv1.GetPrimaryImprovementTypeIdByFeatureIdResponse{Values: meshRes.Msg.Values}), nil
 }
+
+func (s *ParcelServer) GetParcelsByAddressId(
+	ctx context.Context,
+	req *connect.Request[publicparcelsv1.GetParcelsByAddressIdRequest],
+) (*connect.Response[publicparcelsv1.GetParcelsByAddressIdResponse], error) {
+	s.logger.Debug("received GetParcelsByAddressId request")
+
+	m := req.Msg
+	meshRes, err := s.dbReaderClient.GetParcelsByAddressId(ctx, connect.NewRequest(&meshparcelsv1.GetParcelsByAddressIdRequest{
+		AddressId: m.AddressId, LegalAsOf: m.LegalAsOf, First: pageSize(m.First), After: m.After,
+	}))
+	if err != nil {
+		s.logger.Error("upstream GetParcelsByAddressId request failed", slog.Any("error", err))
+		return nil, err // keep the mesh status code
+	}
+	return connect.NewResponse(&publicparcelsv1.GetParcelsByAddressIdResponse{
+		Parcels:  mapSlice(meshRes.Msg.Parcels, mapAddressParcel),
+		PageInfo: mapPageInfo(meshRes.Msg.PageInfo),
+	}), nil
+}
+
+func (s *ParcelServer) GetParcelsByPartyId(
+	ctx context.Context,
+	req *connect.Request[publicparcelsv1.GetParcelsByPartyIdRequest],
+) (*connect.Response[publicparcelsv1.GetParcelsByPartyIdResponse], error) {
+	s.logger.Debug("received GetParcelsByPartyId request")
+
+	meshRes, err := s.dbReaderClient.GetParcelsByPartyId(ctx, connect.NewRequest(&meshparcelsv1.GetParcelsByPartyIdRequest{
+		PartyId:   req.Msg.PartyId,
+		LegalAsOf: req.Msg.LegalAsOf,
+		First:     pageSize(req.Msg.First),
+		After:     req.Msg.After,
+	}))
+	if err != nil {
+		s.logger.Error("upstream GetParcelsByPartyId request failed", slog.Any("error", err))
+		return nil, err // keep the mesh status code
+	}
+	return connect.NewResponse(&publicparcelsv1.GetParcelsByPartyIdResponse{
+		Parcels:  mapSlice(meshRes.Msg.Parcels, mapPartyParcel),
+		PageInfo: mapPageInfo(meshRes.Msg.PageInfo),
+	}), nil
+}
+
+func mapAddressParcel(m *meshparcelsv1.AddressParcel) *publicparcelsv1.AddressParcel {
+	return &publicparcelsv1.AddressParcel{
+		ParcelId:  m.GetParcelId(),
+		FeatureId: m.FeatureId,
+	}
+}
+
+func mapPartyParcel(m *meshparcelsv1.PartyParcel) *publicparcelsv1.PartyParcel {
+	return &publicparcelsv1.PartyParcel{
+		ParcelId:       m.GetParcelId(),
+		FeatureId:      m.FeatureId,
+		OwnershipShare: m.GetOwnershipShare(),
+	}
+}

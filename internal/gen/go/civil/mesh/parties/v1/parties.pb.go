@@ -91,66 +91,6 @@ func (x *Party) GetMailingAddress() string {
 	return ""
 }
 
-type PartyParcel struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	ParcelId       string                 `protobuf:"bytes,1,opt,name=parcel_id,json=parcelId,proto3" json:"parcel_id,omitempty"`
-	FeatureId      *int64                 `protobuf:"varint,2,opt,name=feature_id,json=featureId,proto3,oneof" json:"feature_id,omitempty"`
-	OwnershipShare string                 `protobuf:"bytes,3,opt,name=ownership_share,json=ownershipShare,proto3" json:"ownership_share,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-func (x *PartyParcel) Reset() {
-	*x = PartyParcel{}
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PartyParcel) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PartyParcel) ProtoMessage() {}
-
-func (x *PartyParcel) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PartyParcel.ProtoReflect.Descriptor instead.
-func (*PartyParcel) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_parties_v1_parties_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *PartyParcel) GetParcelId() string {
-	if x != nil {
-		return x.ParcelId
-	}
-	return ""
-}
-
-func (x *PartyParcel) GetFeatureId() int64 {
-	if x != nil && x.FeatureId != nil {
-		return *x.FeatureId
-	}
-	return 0
-}
-
-func (x *PartyParcel) GetOwnershipShare() string {
-	if x != nil {
-		return x.OwnershipShare
-	}
-	return ""
-}
-
 type GetPartiesByIdRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PartyIds      []string               `protobuf:"bytes,1,rep,name=party_ids,json=partyIds,proto3" json:"party_ids,omitempty"`
@@ -161,7 +101,7 @@ type GetPartiesByIdRequest struct {
 
 func (x *GetPartiesByIdRequest) Reset() {
 	*x = GetPartiesByIdRequest{}
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[2]
+	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -173,7 +113,7 @@ func (x *GetPartiesByIdRequest) String() string {
 func (*GetPartiesByIdRequest) ProtoMessage() {}
 
 func (x *GetPartiesByIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[2]
+	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -186,7 +126,7 @@ func (x *GetPartiesByIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPartiesByIdRequest.ProtoReflect.Descriptor instead.
 func (*GetPartiesByIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_parties_v1_parties_proto_rawDescGZIP(), []int{2}
+	return file_civil_mesh_parties_v1_parties_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GetPartiesByIdRequest) GetPartyIds() []string {
@@ -212,7 +152,7 @@ type GetPartiesByIdResponse struct {
 
 func (x *GetPartiesByIdResponse) Reset() {
 	*x = GetPartiesByIdResponse{}
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[3]
+	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -224,7 +164,7 @@ func (x *GetPartiesByIdResponse) String() string {
 func (*GetPartiesByIdResponse) ProtoMessage() {}
 
 func (x *GetPartiesByIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[3]
+	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -237,7 +177,7 @@ func (x *GetPartiesByIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPartiesByIdResponse.ProtoReflect.Descriptor instead.
 func (*GetPartiesByIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_parties_v1_parties_proto_rawDescGZIP(), []int{3}
+	return file_civil_mesh_parties_v1_parties_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GetPartiesByIdResponse) GetParties() map[string]*Party {
@@ -247,9 +187,9 @@ func (x *GetPartiesByIdResponse) GetParties() map[string]*Party {
 	return nil
 }
 
-type GetParcelsByPartyIdRequest struct {
+type GetPartiesByAddressIdRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PartyId       string                 `protobuf:"bytes,1,opt,name=party_id,json=partyId,proto3" json:"party_id,omitempty"`
+	AddressId     string                 `protobuf:"bytes,1,opt,name=address_id,json=addressId,proto3" json:"address_id,omitempty"`
 	LegalAsOf     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=legal_as_of,json=legalAsOf,proto3,oneof" json:"legal_as_of,omitempty"`
 	First         *int32                 `protobuf:"varint,3,opt,name=first,proto3,oneof" json:"first,omitempty"`
 	After         *string                `protobuf:"bytes,4,opt,name=after,proto3,oneof" json:"after,omitempty"`
@@ -257,21 +197,21 @@ type GetParcelsByPartyIdRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetParcelsByPartyIdRequest) Reset() {
-	*x = GetParcelsByPartyIdRequest{}
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[4]
+func (x *GetPartiesByAddressIdRequest) Reset() {
+	*x = GetPartiesByAddressIdRequest{}
+	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetParcelsByPartyIdRequest) String() string {
+func (x *GetPartiesByAddressIdRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetParcelsByPartyIdRequest) ProtoMessage() {}
+func (*GetPartiesByAddressIdRequest) ProtoMessage() {}
 
-func (x *GetParcelsByPartyIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[4]
+func (x *GetPartiesByAddressIdRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -282,62 +222,62 @@ func (x *GetParcelsByPartyIdRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetParcelsByPartyIdRequest.ProtoReflect.Descriptor instead.
-func (*GetParcelsByPartyIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_parties_v1_parties_proto_rawDescGZIP(), []int{4}
+// Deprecated: Use GetPartiesByAddressIdRequest.ProtoReflect.Descriptor instead.
+func (*GetPartiesByAddressIdRequest) Descriptor() ([]byte, []int) {
+	return file_civil_mesh_parties_v1_parties_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *GetParcelsByPartyIdRequest) GetPartyId() string {
+func (x *GetPartiesByAddressIdRequest) GetAddressId() string {
 	if x != nil {
-		return x.PartyId
+		return x.AddressId
 	}
 	return ""
 }
 
-func (x *GetParcelsByPartyIdRequest) GetLegalAsOf() *timestamppb.Timestamp {
+func (x *GetPartiesByAddressIdRequest) GetLegalAsOf() *timestamppb.Timestamp {
 	if x != nil {
 		return x.LegalAsOf
 	}
 	return nil
 }
 
-func (x *GetParcelsByPartyIdRequest) GetFirst() int32 {
+func (x *GetPartiesByAddressIdRequest) GetFirst() int32 {
 	if x != nil && x.First != nil {
 		return *x.First
 	}
 	return 0
 }
 
-func (x *GetParcelsByPartyIdRequest) GetAfter() string {
+func (x *GetPartiesByAddressIdRequest) GetAfter() string {
 	if x != nil && x.After != nil {
 		return *x.After
 	}
 	return ""
 }
 
-type GetParcelsByPartyIdResponse struct {
+type GetPartiesByAddressIdResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Parcels       []*PartyParcel         `protobuf:"bytes,1,rep,name=parcels,proto3" json:"parcels,omitempty"`
+	Parties       []*Party               `protobuf:"bytes,1,rep,name=parties,proto3" json:"parties,omitempty"`
 	PageInfo      *v1.PageInfo           `protobuf:"bytes,2,opt,name=page_info,json=pageInfo,proto3" json:"page_info,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetParcelsByPartyIdResponse) Reset() {
-	*x = GetParcelsByPartyIdResponse{}
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[5]
+func (x *GetPartiesByAddressIdResponse) Reset() {
+	*x = GetPartiesByAddressIdResponse{}
+	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetParcelsByPartyIdResponse) String() string {
+func (x *GetPartiesByAddressIdResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetParcelsByPartyIdResponse) ProtoMessage() {}
+func (*GetPartiesByAddressIdResponse) ProtoMessage() {}
 
-func (x *GetParcelsByPartyIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[5]
+func (x *GetPartiesByAddressIdResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_civil_mesh_parties_v1_parties_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -348,19 +288,19 @@ func (x *GetParcelsByPartyIdResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetParcelsByPartyIdResponse.ProtoReflect.Descriptor instead.
-func (*GetParcelsByPartyIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_mesh_parties_v1_parties_proto_rawDescGZIP(), []int{5}
+// Deprecated: Use GetPartiesByAddressIdResponse.ProtoReflect.Descriptor instead.
+func (*GetPartiesByAddressIdResponse) Descriptor() ([]byte, []int) {
+	return file_civil_mesh_parties_v1_parties_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *GetParcelsByPartyIdResponse) GetParcels() []*PartyParcel {
+func (x *GetPartiesByAddressIdResponse) GetParties() []*Party {
 	if x != nil {
-		return x.Parcels
+		return x.Parties
 	}
 	return nil
 }
 
-func (x *GetParcelsByPartyIdResponse) GetPageInfo() *v1.PageInfo {
+func (x *GetPartiesByAddressIdResponse) GetPageInfo() *v1.PageInfo {
 	if x != nil {
 		return x.PageInfo
 	}
@@ -378,13 +318,7 @@ const file_civil_mesh_parties_v1_parties_proto_rawDesc = "" +
 	"\x12mailing_address_id\x18\x03 \x01(\tH\x00R\x10mailingAddressId\x88\x01\x01\x12,\n" +
 	"\x0fmailing_address\x18\x04 \x01(\tH\x01R\x0emailingAddress\x88\x01\x01B\x15\n" +
 	"\x13_mailing_address_idB\x12\n" +
-	"\x10_mailing_address\"\x86\x01\n" +
-	"\vPartyParcel\x12\x1b\n" +
-	"\tparcel_id\x18\x01 \x01(\tR\bparcelId\x12\"\n" +
-	"\n" +
-	"feature_id\x18\x02 \x01(\x03H\x00R\tfeatureId\x88\x01\x01\x12'\n" +
-	"\x0fownership_share\x18\x03 \x01(\tR\x0eownershipShareB\r\n" +
-	"\v_feature_id\"\x85\x01\n" +
+	"\x10_mailing_address\"\x85\x01\n" +
 	"\x15GetPartiesByIdRequest\x12\x1b\n" +
 	"\tparty_ids\x18\x01 \x03(\tR\bpartyIds\x12?\n" +
 	"\vlegal_as_of\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\tlegalAsOf\x88\x01\x01B\x0e\n" +
@@ -393,21 +327,22 @@ const file_civil_mesh_parties_v1_parties_proto_rawDesc = "" +
 	"\aparties\x18\x01 \x03(\v2:.civil.mesh.parties.v1.GetPartiesByIdResponse.PartiesEntryR\aparties\x1aX\n" +
 	"\fPartiesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x122\n" +
-	"\x05value\x18\x02 \x01(\v2\x1c.civil.mesh.parties.v1.PartyR\x05value:\x028\x01\"\xd2\x01\n" +
-	"\x1aGetParcelsByPartyIdRequest\x12\x19\n" +
-	"\bparty_id\x18\x01 \x01(\tR\apartyId\x12?\n" +
+	"\x05value\x18\x02 \x01(\v2\x1c.civil.mesh.parties.v1.PartyR\x05value:\x028\x01\"\xd8\x01\n" +
+	"\x1cGetPartiesByAddressIdRequest\x12\x1d\n" +
+	"\n" +
+	"address_id\x18\x01 \x01(\tR\taddressId\x12?\n" +
 	"\vlegal_as_of\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\tlegalAsOf\x88\x01\x01\x12\x19\n" +
 	"\x05first\x18\x03 \x01(\x05H\x01R\x05first\x88\x01\x01\x12\x19\n" +
 	"\x05after\x18\x04 \x01(\tH\x02R\x05after\x88\x01\x01B\x0e\n" +
 	"\f_legal_as_ofB\b\n" +
 	"\x06_firstB\b\n" +
-	"\x06_after\"\x9c\x01\n" +
-	"\x1bGetParcelsByPartyIdResponse\x12<\n" +
-	"\aparcels\x18\x01 \x03(\v2\".civil.mesh.parties.v1.PartyParcelR\aparcels\x12?\n" +
-	"\tpage_info\x18\x02 \x01(\v2\".civil.mesh.pagination.v1.PageInfoR\bpageInfo2\x85\x02\n" +
+	"\x06_after\"\x98\x01\n" +
+	"\x1dGetPartiesByAddressIdResponse\x126\n" +
+	"\aparties\x18\x01 \x03(\v2\x1c.civil.mesh.parties.v1.PartyR\aparties\x12?\n" +
+	"\tpage_info\x18\x02 \x01(\v2\".civil.mesh.pagination.v1.PageInfoR\bpageInfo2\x8c\x02\n" +
 	"\x12PartiesReadService\x12o\n" +
-	"\x0eGetPartiesById\x12,.civil.mesh.parties.v1.GetPartiesByIdRequest\x1a-.civil.mesh.parties.v1.GetPartiesByIdResponse\"\x00\x12~\n" +
-	"\x13GetParcelsByPartyId\x121.civil.mesh.parties.v1.GetParcelsByPartyIdRequest\x1a2.civil.mesh.parties.v1.GetParcelsByPartyIdResponse\"\x00B\xf0\x01\n" +
+	"\x0eGetPartiesById\x12,.civil.mesh.parties.v1.GetPartiesByIdRequest\x1a-.civil.mesh.parties.v1.GetPartiesByIdResponse\"\x00\x12\x84\x01\n" +
+	"\x15GetPartiesByAddressId\x123.civil.mesh.parties.v1.GetPartiesByAddressIdRequest\x1a4.civil.mesh.parties.v1.GetPartiesByAddressIdResponse\"\x00B\xf0\x01\n" +
 	"\x19com.civil.mesh.parties.v1B\fPartiesProtoP\x01ZNgithub.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parties/v1;partiesv1\xa2\x02\x03CMP\xaa\x02\x15Civil.Mesh.Parties.V1\xca\x02\x15Civil\\Mesh\\Parties\\V1\xe2\x02!Civil\\Mesh\\Parties\\V1\\GPBMetadata\xea\x02\x18Civil::Mesh::Parties::V1b\x06proto3"
 
 var (
@@ -422,29 +357,28 @@ func file_civil_mesh_parties_v1_parties_proto_rawDescGZIP() []byte {
 	return file_civil_mesh_parties_v1_parties_proto_rawDescData
 }
 
-var file_civil_mesh_parties_v1_parties_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_civil_mesh_parties_v1_parties_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_civil_mesh_parties_v1_parties_proto_goTypes = []any{
-	(*Party)(nil),                       // 0: civil.mesh.parties.v1.Party
-	(*PartyParcel)(nil),                 // 1: civil.mesh.parties.v1.PartyParcel
-	(*GetPartiesByIdRequest)(nil),       // 2: civil.mesh.parties.v1.GetPartiesByIdRequest
-	(*GetPartiesByIdResponse)(nil),      // 3: civil.mesh.parties.v1.GetPartiesByIdResponse
-	(*GetParcelsByPartyIdRequest)(nil),  // 4: civil.mesh.parties.v1.GetParcelsByPartyIdRequest
-	(*GetParcelsByPartyIdResponse)(nil), // 5: civil.mesh.parties.v1.GetParcelsByPartyIdResponse
-	nil,                                 // 6: civil.mesh.parties.v1.GetPartiesByIdResponse.PartiesEntry
-	(*timestamppb.Timestamp)(nil),       // 7: google.protobuf.Timestamp
-	(*v1.PageInfo)(nil),                 // 8: civil.mesh.pagination.v1.PageInfo
+	(*Party)(nil),                         // 0: civil.mesh.parties.v1.Party
+	(*GetPartiesByIdRequest)(nil),         // 1: civil.mesh.parties.v1.GetPartiesByIdRequest
+	(*GetPartiesByIdResponse)(nil),        // 2: civil.mesh.parties.v1.GetPartiesByIdResponse
+	(*GetPartiesByAddressIdRequest)(nil),  // 3: civil.mesh.parties.v1.GetPartiesByAddressIdRequest
+	(*GetPartiesByAddressIdResponse)(nil), // 4: civil.mesh.parties.v1.GetPartiesByAddressIdResponse
+	nil,                                   // 5: civil.mesh.parties.v1.GetPartiesByIdResponse.PartiesEntry
+	(*timestamppb.Timestamp)(nil),         // 6: google.protobuf.Timestamp
+	(*v1.PageInfo)(nil),                   // 7: civil.mesh.pagination.v1.PageInfo
 }
 var file_civil_mesh_parties_v1_parties_proto_depIdxs = []int32{
-	7, // 0: civil.mesh.parties.v1.GetPartiesByIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	6, // 1: civil.mesh.parties.v1.GetPartiesByIdResponse.parties:type_name -> civil.mesh.parties.v1.GetPartiesByIdResponse.PartiesEntry
-	7, // 2: civil.mesh.parties.v1.GetParcelsByPartyIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	1, // 3: civil.mesh.parties.v1.GetParcelsByPartyIdResponse.parcels:type_name -> civil.mesh.parties.v1.PartyParcel
-	8, // 4: civil.mesh.parties.v1.GetParcelsByPartyIdResponse.page_info:type_name -> civil.mesh.pagination.v1.PageInfo
+	6, // 0: civil.mesh.parties.v1.GetPartiesByIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	5, // 1: civil.mesh.parties.v1.GetPartiesByIdResponse.parties:type_name -> civil.mesh.parties.v1.GetPartiesByIdResponse.PartiesEntry
+	6, // 2: civil.mesh.parties.v1.GetPartiesByAddressIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	0, // 3: civil.mesh.parties.v1.GetPartiesByAddressIdResponse.parties:type_name -> civil.mesh.parties.v1.Party
+	7, // 4: civil.mesh.parties.v1.GetPartiesByAddressIdResponse.page_info:type_name -> civil.mesh.pagination.v1.PageInfo
 	0, // 5: civil.mesh.parties.v1.GetPartiesByIdResponse.PartiesEntry.value:type_name -> civil.mesh.parties.v1.Party
-	2, // 6: civil.mesh.parties.v1.PartiesReadService.GetPartiesById:input_type -> civil.mesh.parties.v1.GetPartiesByIdRequest
-	4, // 7: civil.mesh.parties.v1.PartiesReadService.GetParcelsByPartyId:input_type -> civil.mesh.parties.v1.GetParcelsByPartyIdRequest
-	3, // 8: civil.mesh.parties.v1.PartiesReadService.GetPartiesById:output_type -> civil.mesh.parties.v1.GetPartiesByIdResponse
-	5, // 9: civil.mesh.parties.v1.PartiesReadService.GetParcelsByPartyId:output_type -> civil.mesh.parties.v1.GetParcelsByPartyIdResponse
+	1, // 6: civil.mesh.parties.v1.PartiesReadService.GetPartiesById:input_type -> civil.mesh.parties.v1.GetPartiesByIdRequest
+	3, // 7: civil.mesh.parties.v1.PartiesReadService.GetPartiesByAddressId:input_type -> civil.mesh.parties.v1.GetPartiesByAddressIdRequest
+	2, // 8: civil.mesh.parties.v1.PartiesReadService.GetPartiesById:output_type -> civil.mesh.parties.v1.GetPartiesByIdResponse
+	4, // 9: civil.mesh.parties.v1.PartiesReadService.GetPartiesByAddressId:output_type -> civil.mesh.parties.v1.GetPartiesByAddressIdResponse
 	8, // [8:10] is the sub-list for method output_type
 	6, // [6:8] is the sub-list for method input_type
 	6, // [6:6] is the sub-list for extension type_name
@@ -459,15 +393,14 @@ func file_civil_mesh_parties_v1_parties_proto_init() {
 	}
 	file_civil_mesh_parties_v1_parties_proto_msgTypes[0].OneofWrappers = []any{}
 	file_civil_mesh_parties_v1_parties_proto_msgTypes[1].OneofWrappers = []any{}
-	file_civil_mesh_parties_v1_parties_proto_msgTypes[2].OneofWrappers = []any{}
-	file_civil_mesh_parties_v1_parties_proto_msgTypes[4].OneofWrappers = []any{}
+	file_civil_mesh_parties_v1_parties_proto_msgTypes[3].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_civil_mesh_parties_v1_parties_proto_rawDesc), len(file_civil_mesh_parties_v1_parties_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -9,6 +9,8 @@ import (
 	"google.golang.org/genproto/googleapis/type/latlng"
 
 	addressesv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/addresses/v1"
+	improvementsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/improvements/v1"
+	parcelsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1"
 	partiesv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parties/v1"
 )
 
@@ -81,13 +83,13 @@ func (s *APIServer) GetAddressesById(
 
 func (s *APIServer) GetParcelsByAddressId(
 	ctx context.Context,
-	req *connect.Request[addressesv1.GetParcelsByAddressIdRequest],
-) (*connect.Response[addressesv1.GetParcelsByAddressIdResponse], error) {
+	req *connect.Request[parcelsv1.GetParcelsByAddressIdRequest],
+) (*connect.Response[parcelsv1.GetParcelsByAddressIdResponse], error) {
 	s.logger.Debug("received GetParcelsByAddressId request")
 
 	m := req.Msg
 	at := getTargetTime(m.LegalAsOf)
-	read := func(afterID *string, limit int) ([]*addressesv1.AddressParcel, error) {
+	read := func(afterID *string, limit int) ([]*parcelsv1.AddressParcel, error) {
 		// Visible parcels whose attributes at t name the address (rules 3 and 5).
 		rows, err := s.db.Query(ctx, visibleAddressCTE+`
 			SELECT p.public_id::text, pg.feature_id
@@ -101,29 +103,29 @@ func (s *APIServer) GetParcelsByAddressId(
 		if err != nil {
 			return nil, s.dbError("address parcels", err)
 		}
-		return collectRows(rows, func(r pgx.Rows) (*addressesv1.AddressParcel, error) {
-			n := &addressesv1.AddressParcel{}
+		return collectRows(rows, func(r pgx.Rows) (*parcelsv1.AddressParcel, error) {
+			n := &parcelsv1.AddressParcel{}
 			return n, r.Scan(&n.ParcelId, &n.FeatureId)
 		}, func(err error) error { return s.dbError("address parcels", err) })
 	}
 
 	nodes, pageInfo, err := pageByID("GetParcelsByAddressId", m.AddressId, m.LegalAsOf,
-		m.First, m.After, read, func(n *addressesv1.AddressParcel) string { return n.ParcelId })
+		m.First, m.After, read, func(n *parcelsv1.AddressParcel) string { return n.ParcelId })
 	if err != nil {
 		return nil, err
 	}
-	return connect.NewResponse(&addressesv1.GetParcelsByAddressIdResponse{Parcels: nodes, PageInfo: pageInfo}), nil
+	return connect.NewResponse(&parcelsv1.GetParcelsByAddressIdResponse{Parcels: nodes, PageInfo: pageInfo}), nil
 }
 
 func (s *APIServer) GetImprovementsByAddressId(
 	ctx context.Context,
-	req *connect.Request[addressesv1.GetImprovementsByAddressIdRequest],
-) (*connect.Response[addressesv1.GetImprovementsByAddressIdResponse], error) {
+	req *connect.Request[improvementsv1.GetImprovementsByAddressIdRequest],
+) (*connect.Response[improvementsv1.GetImprovementsByAddressIdResponse], error) {
 	s.logger.Debug("received GetImprovementsByAddressId request")
 
 	m := req.Msg
 	at := getTargetTime(m.LegalAsOf)
-	read := func(afterID *string, limit int) ([]*addressesv1.AddressImprovement, error) {
+	read := func(afterID *string, limit int) ([]*improvementsv1.AddressImprovement, error) {
 		// Improvements whose attributes at t name the address, with the
 		// visible parcels they sit on then. The inner joins drop an
 		// improvement with no visible parcel (rule 4).
@@ -141,24 +143,24 @@ func (s *APIServer) GetImprovementsByAddressId(
 		if err != nil {
 			return nil, s.dbError("address improvements", err)
 		}
-		return collectRows(rows, func(r pgx.Rows) (*addressesv1.AddressImprovement, error) {
-			n := &addressesv1.AddressImprovement{}
+		return collectRows(rows, func(r pgx.Rows) (*improvementsv1.AddressImprovement, error) {
+			n := &improvementsv1.AddressImprovement{}
 			return n, r.Scan(&n.ImprovementId, &n.ParcelIds)
 		}, func(err error) error { return s.dbError("address improvements", err) })
 	}
 
 	nodes, pageInfo, err := pageByID("GetImprovementsByAddressId", m.AddressId, m.LegalAsOf,
-		m.First, m.After, read, func(n *addressesv1.AddressImprovement) string { return n.ImprovementId })
+		m.First, m.After, read, func(n *improvementsv1.AddressImprovement) string { return n.ImprovementId })
 	if err != nil {
 		return nil, err
 	}
-	return connect.NewResponse(&addressesv1.GetImprovementsByAddressIdResponse{Improvements: nodes, PageInfo: pageInfo}), nil
+	return connect.NewResponse(&improvementsv1.GetImprovementsByAddressIdResponse{Improvements: nodes, PageInfo: pageInfo}), nil
 }
 
 func (s *APIServer) GetPartiesByAddressId(
 	ctx context.Context,
-	req *connect.Request[addressesv1.GetPartiesByAddressIdRequest],
-) (*connect.Response[addressesv1.GetPartiesByAddressIdResponse], error) {
+	req *connect.Request[partiesv1.GetPartiesByAddressIdRequest],
+) (*connect.Response[partiesv1.GetPartiesByAddressIdResponse], error) {
 	s.logger.Debug("received GetPartiesByAddressId request")
 
 	m := req.Msg
@@ -188,7 +190,7 @@ func (s *APIServer) GetPartiesByAddressId(
 	if err != nil {
 		return nil, err
 	}
-	return connect.NewResponse(&addressesv1.GetPartiesByAddressIdResponse{Parties: nodes, PageInfo: pageInfo}), nil
+	return connect.NewResponse(&partiesv1.GetPartiesByAddressIdResponse{Parties: nodes, PageInfo: pageInfo}), nil
 }
 
 // collectRows scans every row with scan, mapping any error with wrap.

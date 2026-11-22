@@ -2,10 +2,15 @@ syntax = "proto3";
 
 package civil.mesh.improvements.v1;
 
+import "civil/mesh/pagination/v1/pagination.proto";
+import "google/protobuf/timestamp.proto";
+
 service ImprovementReadService {
   rpc GetImprovementTypes(GetImprovementTypesRequest) returns (GetImprovementTypesResponse) {}
 
   rpc GetImprovementConditions(GetImprovementConditionsRequest) returns (GetImprovementConditionsResponse) {}
+
+  rpc GetImprovementsByAddressId(GetImprovementsByAddressIdRequest) returns (GetImprovementsByAddressIdResponse) {}
 }
 
 message ImprovementType {
@@ -32,4 +37,21 @@ message GetImprovementConditionsRequest {}
 
 message GetImprovementConditionsResponse {
   map<string, ImprovementCondition> improvement_conditions = 1;
+}
+
+message AddressImprovement {
+  string improvement_id = 1;
+  repeated string parcel_ids = 2;
+}
+
+message GetImprovementsByAddressIdRequest {
+  string address_id = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
+  optional int32 first = 3;
+  optional string after = 4;
+}
+
+message GetImprovementsByAddressIdResponse {
+  repeated AddressImprovement improvements = 1;
+  civil.mesh.pagination.v1.PageInfo page_info = 2;
 }

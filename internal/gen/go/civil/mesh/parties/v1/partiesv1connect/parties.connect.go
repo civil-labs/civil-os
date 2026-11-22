@@ -36,15 +36,15 @@ const (
 	// PartiesReadServiceGetPartiesByIdProcedure is the fully-qualified name of the PartiesReadService's
 	// GetPartiesById RPC.
 	PartiesReadServiceGetPartiesByIdProcedure = "/civil.mesh.parties.v1.PartiesReadService/GetPartiesById"
-	// PartiesReadServiceGetParcelsByPartyIdProcedure is the fully-qualified name of the
-	// PartiesReadService's GetParcelsByPartyId RPC.
-	PartiesReadServiceGetParcelsByPartyIdProcedure = "/civil.mesh.parties.v1.PartiesReadService/GetParcelsByPartyId"
+	// PartiesReadServiceGetPartiesByAddressIdProcedure is the fully-qualified name of the
+	// PartiesReadService's GetPartiesByAddressId RPC.
+	PartiesReadServiceGetPartiesByAddressIdProcedure = "/civil.mesh.parties.v1.PartiesReadService/GetPartiesByAddressId"
 )
 
 // PartiesReadServiceClient is a client for the civil.mesh.parties.v1.PartiesReadService service.
 type PartiesReadServiceClient interface {
 	GetPartiesById(context.Context, *connect.Request[v1.GetPartiesByIdRequest]) (*connect.Response[v1.GetPartiesByIdResponse], error)
-	GetParcelsByPartyId(context.Context, *connect.Request[v1.GetParcelsByPartyIdRequest]) (*connect.Response[v1.GetParcelsByPartyIdResponse], error)
+	GetPartiesByAddressId(context.Context, *connect.Request[v1.GetPartiesByAddressIdRequest]) (*connect.Response[v1.GetPartiesByAddressIdResponse], error)
 }
 
 // NewPartiesReadServiceClient constructs a client for the civil.mesh.parties.v1.PartiesReadService
@@ -64,10 +64,10 @@ func NewPartiesReadServiceClient(httpClient connect.HTTPClient, baseURL string, 
 			connect.WithSchema(partiesReadServiceMethods.ByName("GetPartiesById")),
 			connect.WithClientOptions(opts...),
 		),
-		getParcelsByPartyId: connect.NewClient[v1.GetParcelsByPartyIdRequest, v1.GetParcelsByPartyIdResponse](
+		getPartiesByAddressId: connect.NewClient[v1.GetPartiesByAddressIdRequest, v1.GetPartiesByAddressIdResponse](
 			httpClient,
-			baseURL+PartiesReadServiceGetParcelsByPartyIdProcedure,
-			connect.WithSchema(partiesReadServiceMethods.ByName("GetParcelsByPartyId")),
+			baseURL+PartiesReadServiceGetPartiesByAddressIdProcedure,
+			connect.WithSchema(partiesReadServiceMethods.ByName("GetPartiesByAddressId")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -75,8 +75,8 @@ func NewPartiesReadServiceClient(httpClient connect.HTTPClient, baseURL string, 
 
 // partiesReadServiceClient implements PartiesReadServiceClient.
 type partiesReadServiceClient struct {
-	getPartiesById      *connect.Client[v1.GetPartiesByIdRequest, v1.GetPartiesByIdResponse]
-	getParcelsByPartyId *connect.Client[v1.GetParcelsByPartyIdRequest, v1.GetParcelsByPartyIdResponse]
+	getPartiesById        *connect.Client[v1.GetPartiesByIdRequest, v1.GetPartiesByIdResponse]
+	getPartiesByAddressId *connect.Client[v1.GetPartiesByAddressIdRequest, v1.GetPartiesByAddressIdResponse]
 }
 
 // GetPartiesById calls civil.mesh.parties.v1.PartiesReadService.GetPartiesById.
@@ -84,16 +84,16 @@ func (c *partiesReadServiceClient) GetPartiesById(ctx context.Context, req *conn
 	return c.getPartiesById.CallUnary(ctx, req)
 }
 
-// GetParcelsByPartyId calls civil.mesh.parties.v1.PartiesReadService.GetParcelsByPartyId.
-func (c *partiesReadServiceClient) GetParcelsByPartyId(ctx context.Context, req *connect.Request[v1.GetParcelsByPartyIdRequest]) (*connect.Response[v1.GetParcelsByPartyIdResponse], error) {
-	return c.getParcelsByPartyId.CallUnary(ctx, req)
+// GetPartiesByAddressId calls civil.mesh.parties.v1.PartiesReadService.GetPartiesByAddressId.
+func (c *partiesReadServiceClient) GetPartiesByAddressId(ctx context.Context, req *connect.Request[v1.GetPartiesByAddressIdRequest]) (*connect.Response[v1.GetPartiesByAddressIdResponse], error) {
+	return c.getPartiesByAddressId.CallUnary(ctx, req)
 }
 
 // PartiesReadServiceHandler is an implementation of the civil.mesh.parties.v1.PartiesReadService
 // service.
 type PartiesReadServiceHandler interface {
 	GetPartiesById(context.Context, *connect.Request[v1.GetPartiesByIdRequest]) (*connect.Response[v1.GetPartiesByIdResponse], error)
-	GetParcelsByPartyId(context.Context, *connect.Request[v1.GetParcelsByPartyIdRequest]) (*connect.Response[v1.GetParcelsByPartyIdResponse], error)
+	GetPartiesByAddressId(context.Context, *connect.Request[v1.GetPartiesByAddressIdRequest]) (*connect.Response[v1.GetPartiesByAddressIdResponse], error)
 }
 
 // NewPartiesReadServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -109,18 +109,18 @@ func NewPartiesReadServiceHandler(svc PartiesReadServiceHandler, opts ...connect
 		connect.WithSchema(partiesReadServiceMethods.ByName("GetPartiesById")),
 		connect.WithHandlerOptions(opts...),
 	)
-	partiesReadServiceGetParcelsByPartyIdHandler := connect.NewUnaryHandler(
-		PartiesReadServiceGetParcelsByPartyIdProcedure,
-		svc.GetParcelsByPartyId,
-		connect.WithSchema(partiesReadServiceMethods.ByName("GetParcelsByPartyId")),
+	partiesReadServiceGetPartiesByAddressIdHandler := connect.NewUnaryHandler(
+		PartiesReadServiceGetPartiesByAddressIdProcedure,
+		svc.GetPartiesByAddressId,
+		connect.WithSchema(partiesReadServiceMethods.ByName("GetPartiesByAddressId")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/civil.mesh.parties.v1.PartiesReadService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case PartiesReadServiceGetPartiesByIdProcedure:
 			partiesReadServiceGetPartiesByIdHandler.ServeHTTP(w, r)
-		case PartiesReadServiceGetParcelsByPartyIdProcedure:
-			partiesReadServiceGetParcelsByPartyIdHandler.ServeHTTP(w, r)
+		case PartiesReadServiceGetPartiesByAddressIdProcedure:
+			partiesReadServiceGetPartiesByAddressIdHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -134,6 +134,6 @@ func (UnimplementedPartiesReadServiceHandler) GetPartiesById(context.Context, *c
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parties.v1.PartiesReadService.GetPartiesById is not implemented"))
 }
 
-func (UnimplementedPartiesReadServiceHandler) GetParcelsByPartyId(context.Context, *connect.Request[v1.GetParcelsByPartyIdRequest]) (*connect.Response[v1.GetParcelsByPartyIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parties.v1.PartiesReadService.GetParcelsByPartyId is not implemented"))
+func (UnimplementedPartiesReadServiceHandler) GetPartiesByAddressId(context.Context, *connect.Request[v1.GetPartiesByAddressIdRequest]) (*connect.Response[v1.GetPartiesByAddressIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parties.v1.PartiesReadService.GetPartiesByAddressId is not implemented"))
 }

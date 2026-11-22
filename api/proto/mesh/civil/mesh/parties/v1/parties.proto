@@ -10,7 +10,7 @@ import "google/protobuf/timestamp.proto";
 service PartiesReadService {
   rpc GetPartiesById(GetPartiesByIdRequest) returns (GetPartiesByIdResponse) {}
 
-  rpc GetParcelsByPartyId(GetParcelsByPartyIdRequest) returns (GetParcelsByPartyIdResponse) {}
+  rpc GetPartiesByAddressId(GetPartiesByAddressIdRequest) returns (GetPartiesByAddressIdResponse) {}
 }
 
 message Party {
@@ -18,12 +18,6 @@ message Party {
   string name = 2;
   optional string mailing_address_id = 3;
   optional string mailing_address = 4;
-}
-
-message PartyParcel {
-  string parcel_id = 1;
-  optional int64 feature_id = 2;
-  string ownership_share = 3;
 }
 
 message GetPartiesByIdRequest {
@@ -35,14 +29,14 @@ message GetPartiesByIdResponse {
   map<string, Party> parties = 1;
 }
 
-message GetParcelsByPartyIdRequest {
-  string party_id = 1;
+message GetPartiesByAddressIdRequest {
+  string address_id = 1;
   optional google.protobuf.Timestamp legal_as_of = 2;
   optional int32 first = 3;
   optional string after = 4;
 }
 
-message GetParcelsByPartyIdResponse {
-  repeated PartyParcel parcels = 1;
+message GetPartiesByAddressIdResponse {
+  repeated Party parties = 1;
   civil.mesh.pagination.v1.PageInfo page_info = 2;
 }

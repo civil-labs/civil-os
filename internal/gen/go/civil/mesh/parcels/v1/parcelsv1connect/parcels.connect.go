@@ -145,6 +145,12 @@ const (
 	// ParcelReadServiceSearchParcelsAddressesProcedure is the fully-qualified name of the
 	// ParcelReadService's SearchParcelsAddresses RPC.
 	ParcelReadServiceSearchParcelsAddressesProcedure = "/civil.mesh.parcels.v1.ParcelReadService/SearchParcelsAddresses"
+	// ParcelReadServiceGetParcelsByAddressIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetParcelsByAddressId RPC.
+	ParcelReadServiceGetParcelsByAddressIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetParcelsByAddressId"
+	// ParcelReadServiceGetParcelsByPartyIdProcedure is the fully-qualified name of the
+	// ParcelReadService's GetParcelsByPartyId RPC.
+	ParcelReadServiceGetParcelsByPartyIdProcedure = "/civil.mesh.parcels.v1.ParcelReadService/GetParcelsByPartyId"
 	// ParcelWriteServiceUpdateParcelProcedure is the fully-qualified name of the ParcelWriteService's
 	// UpdateParcel RPC.
 	ParcelWriteServiceUpdateParcelProcedure = "/civil.mesh.parcels.v1.ParcelWriteService/UpdateParcel"
@@ -193,6 +199,8 @@ type ParcelReadServiceClient interface {
 	// Searches visible parcels by their address, ranked best first
 	// (docs/parcel-search/spec.md).
 	SearchParcelsAddresses(context.Context, *connect.Request[v1.SearchParcelsAddressesRequest]) (*connect.Response[v1.SearchParcelsAddressesResponse], error)
+	GetParcelsByAddressId(context.Context, *connect.Request[v1.GetParcelsByAddressIdRequest]) (*connect.Response[v1.GetParcelsByAddressIdResponse], error)
+	GetParcelsByPartyId(context.Context, *connect.Request[v1.GetParcelsByPartyIdRequest]) (*connect.Response[v1.GetParcelsByPartyIdResponse], error)
 }
 
 // NewParcelReadServiceClient constructs a client for the civil.mesh.parcels.v1.ParcelReadService
@@ -423,6 +431,18 @@ func NewParcelReadServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
+		getParcelsByAddressId: connect.NewClient[v1.GetParcelsByAddressIdRequest, v1.GetParcelsByAddressIdResponse](
+			httpClient,
+			baseURL+ParcelReadServiceGetParcelsByAddressIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetParcelsByAddressId")),
+			connect.WithClientOptions(opts...),
+		),
+		getParcelsByPartyId: connect.NewClient[v1.GetParcelsByPartyIdRequest, v1.GetParcelsByPartyIdResponse](
+			httpClient,
+			baseURL+ParcelReadServiceGetParcelsByPartyIdProcedure,
+			connect.WithSchema(parcelReadServiceMethods.ByName("GetParcelsByPartyId")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -464,6 +484,8 @@ type parcelReadServiceClient struct {
 	getPrimaryImprovementConditionIdByFeatureId        *connect.Client[v1.GetPrimaryImprovementConditionIdByFeatureIdRequest, v1.GetPrimaryImprovementConditionIdByFeatureIdResponse]
 	getPrimaryImprovementTypeIdByFeatureId             *connect.Client[v1.GetPrimaryImprovementTypeIdByFeatureIdRequest, v1.GetPrimaryImprovementTypeIdByFeatureIdResponse]
 	searchParcelsAddresses                             *connect.Client[v1.SearchParcelsAddressesRequest, v1.SearchParcelsAddressesResponse]
+	getParcelsByAddressId                              *connect.Client[v1.GetParcelsByAddressIdRequest, v1.GetParcelsByAddressIdResponse]
+	getParcelsByPartyId                                *connect.Client[v1.GetParcelsByPartyIdRequest, v1.GetParcelsByPartyIdResponse]
 }
 
 // GetParcelsWithImprovementSummaryByParcelId calls
@@ -664,6 +686,16 @@ func (c *parcelReadServiceClient) SearchParcelsAddresses(ctx context.Context, re
 	return c.searchParcelsAddresses.CallUnary(ctx, req)
 }
 
+// GetParcelsByAddressId calls civil.mesh.parcels.v1.ParcelReadService.GetParcelsByAddressId.
+func (c *parcelReadServiceClient) GetParcelsByAddressId(ctx context.Context, req *connect.Request[v1.GetParcelsByAddressIdRequest]) (*connect.Response[v1.GetParcelsByAddressIdResponse], error) {
+	return c.getParcelsByAddressId.CallUnary(ctx, req)
+}
+
+// GetParcelsByPartyId calls civil.mesh.parcels.v1.ParcelReadService.GetParcelsByPartyId.
+func (c *parcelReadServiceClient) GetParcelsByPartyId(ctx context.Context, req *connect.Request[v1.GetParcelsByPartyIdRequest]) (*connect.Response[v1.GetParcelsByPartyIdResponse], error) {
+	return c.getParcelsByPartyId.CallUnary(ctx, req)
+}
+
 // ParcelReadServiceHandler is an implementation of the civil.mesh.parcels.v1.ParcelReadService
 // service.
 type ParcelReadServiceHandler interface {
@@ -708,6 +740,8 @@ type ParcelReadServiceHandler interface {
 	// Searches visible parcels by their address, ranked best first
 	// (docs/parcel-search/spec.md).
 	SearchParcelsAddresses(context.Context, *connect.Request[v1.SearchParcelsAddressesRequest]) (*connect.Response[v1.SearchParcelsAddressesResponse], error)
+	GetParcelsByAddressId(context.Context, *connect.Request[v1.GetParcelsByAddressIdRequest]) (*connect.Response[v1.GetParcelsByAddressIdResponse], error)
+	GetParcelsByPartyId(context.Context, *connect.Request[v1.GetParcelsByPartyIdRequest]) (*connect.Response[v1.GetParcelsByPartyIdResponse], error)
 }
 
 // NewParcelReadServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -934,6 +968,18 @@ func NewParcelReadServiceHandler(svc ParcelReadServiceHandler, opts ...connect.H
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
+	parcelReadServiceGetParcelsByAddressIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetParcelsByAddressIdProcedure,
+		svc.GetParcelsByAddressId,
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetParcelsByAddressId")),
+		connect.WithHandlerOptions(opts...),
+	)
+	parcelReadServiceGetParcelsByPartyIdHandler := connect.NewUnaryHandler(
+		ParcelReadServiceGetParcelsByPartyIdProcedure,
+		svc.GetParcelsByPartyId,
+		connect.WithSchema(parcelReadServiceMethods.ByName("GetParcelsByPartyId")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/civil.mesh.parcels.v1.ParcelReadService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ParcelReadServiceGetParcelsWithImprovementSummaryByParcelIdProcedure:
@@ -1008,6 +1054,10 @@ func NewParcelReadServiceHandler(svc ParcelReadServiceHandler, opts ...connect.H
 			parcelReadServiceGetPrimaryImprovementTypeIdByFeatureIdHandler.ServeHTTP(w, r)
 		case ParcelReadServiceSearchParcelsAddressesProcedure:
 			parcelReadServiceSearchParcelsAddressesHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetParcelsByAddressIdProcedure:
+			parcelReadServiceGetParcelsByAddressIdHandler.ServeHTTP(w, r)
+		case ParcelReadServiceGetParcelsByPartyIdProcedure:
+			parcelReadServiceGetParcelsByPartyIdHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -1159,6 +1209,14 @@ func (UnimplementedParcelReadServiceHandler) GetPrimaryImprovementTypeIdByFeatur
 
 func (UnimplementedParcelReadServiceHandler) SearchParcelsAddresses(context.Context, *connect.Request[v1.SearchParcelsAddressesRequest]) (*connect.Response[v1.SearchParcelsAddressesResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.SearchParcelsAddresses is not implemented"))
+}
+
+func (UnimplementedParcelReadServiceHandler) GetParcelsByAddressId(context.Context, *connect.Request[v1.GetParcelsByAddressIdRequest]) (*connect.Response[v1.GetParcelsByAddressIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetParcelsByAddressId is not implemented"))
+}
+
+func (UnimplementedParcelReadServiceHandler) GetParcelsByPartyId(context.Context, *connect.Request[v1.GetParcelsByPartyIdRequest]) (*connect.Response[v1.GetParcelsByPartyIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.parcels.v1.ParcelReadService.GetParcelsByPartyId is not implemented"))
 }
 
 // ParcelWriteServiceClient is a client for the civil.mesh.parcels.v1.ParcelWriteService service.

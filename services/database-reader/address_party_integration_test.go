@@ -12,7 +12,9 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	addressesv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/addresses/v1"
+	improvementsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/improvements/v1"
 	paginationv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/pagination/v1"
+	parcelsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1"
 	partiesv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parties/v1"
 	tu "github.com/civil-labs/civil-os/internal/testutil"
 )
@@ -44,9 +46,9 @@ func partiesByID(t *testing.T, r readerClients, when *timestamppb.Timestamp, ids
 	return res.Msg.Parties
 }
 
-func parcelsAtAddress(t *testing.T, r readerClients, n int, when *timestamppb.Timestamp) []*addressesv1.AddressParcel {
+func parcelsAtAddress(t *testing.T, r readerClients, n int, when *timestamppb.Timestamp) []*parcelsv1.AddressParcel {
 	t.Helper()
-	res, err := r.addresses.GetParcelsByAddressId(context.Background(), connect.NewRequest(&addressesv1.GetParcelsByAddressIdRequest{
+	res, err := r.parcels.GetParcelsByAddressId(context.Background(), connect.NewRequest(&parcelsv1.GetParcelsByAddressIdRequest{
 		AddressId: tu.AddressID(n), LegalAsOf: when,
 	}))
 	if err != nil {
@@ -55,9 +57,9 @@ func parcelsAtAddress(t *testing.T, r readerClients, n int, when *timestamppb.Ti
 	return res.Msg.Parcels
 }
 
-func improvementsAtAddress(t *testing.T, r readerClients, n int) []*addressesv1.AddressImprovement {
+func improvementsAtAddress(t *testing.T, r readerClients, n int) []*improvementsv1.AddressImprovement {
 	t.Helper()
-	res, err := r.addresses.GetImprovementsByAddressId(context.Background(), connect.NewRequest(&addressesv1.GetImprovementsByAddressIdRequest{
+	res, err := r.improvements.GetImprovementsByAddressId(context.Background(), connect.NewRequest(&improvementsv1.GetImprovementsByAddressIdRequest{
 		AddressId: tu.AddressID(n),
 	}))
 	if err != nil {
@@ -68,7 +70,7 @@ func improvementsAtAddress(t *testing.T, r readerClients, n int) []*addressesv1.
 
 func partiesAtAddress(t *testing.T, r readerClients, n int, when *timestamppb.Timestamp) []string {
 	t.Helper()
-	res, err := r.addresses.GetPartiesByAddressId(context.Background(), connect.NewRequest(&addressesv1.GetPartiesByAddressIdRequest{
+	res, err := r.parties.GetPartiesByAddressId(context.Background(), connect.NewRequest(&partiesv1.GetPartiesByAddressIdRequest{
 		AddressId: tu.AddressID(n), LegalAsOf: when,
 	}))
 	if err != nil {
@@ -81,9 +83,9 @@ func partiesAtAddress(t *testing.T, r readerClients, n int, when *timestamppb.Ti
 	return out
 }
 
-func partyParcels(t *testing.T, r readerClients, n int) []*partiesv1.PartyParcel {
+func partyParcels(t *testing.T, r readerClients, n int) []*parcelsv1.PartyParcel {
 	t.Helper()
-	res, err := r.parties.GetParcelsByPartyId(context.Background(), connect.NewRequest(&partiesv1.GetParcelsByPartyIdRequest{
+	res, err := r.parcels.GetParcelsByPartyId(context.Background(), connect.NewRequest(&parcelsv1.GetParcelsByPartyIdRequest{
 		PartyId: tu.PartyID(n),
 	}))
 	if err != nil {
@@ -256,8 +258,8 @@ func TestGetParcelsByPartyId(t *testing.T) {
 func TestAddressPartyPagination(t *testing.T) {
 	r := startReader(t)
 	ctx := context.Background()
-	page := func(req *partiesv1.GetParcelsByPartyIdRequest) (*partiesv1.GetParcelsByPartyIdResponse, error) {
-		res, err := r.parties.GetParcelsByPartyId(ctx, connect.NewRequest(req))
+	page := func(req *parcelsv1.GetParcelsByPartyIdRequest) (*parcelsv1.GetParcelsByPartyIdResponse, error) {
+		res, err := r.parcels.GetParcelsByPartyId(ctx, connect.NewRequest(req))
 		if err != nil {
 			return nil, err
 		}
@@ -268,7 +270,7 @@ func TestAddressPartyPagination(t *testing.T) {
 	var walked []string
 	var after *string
 	for i, want := range []struct{ next, prev bool }{{true, false}, {true, true}, {false, true}} {
-		res, err := page(&partiesv1.GetParcelsByPartyIdRequest{PartyId: tu.PartyID(3), First: &one, After: after})
+		res, err := page(&parcelsv1.GetParcelsByPartyIdRequest{PartyId: tu.PartyID(3), First: &one, After: after})
 		if err != nil {
 			t.Fatalf("page %d: %v", i+1, err)
 		}
@@ -283,7 +285,7 @@ func TestAddressPartyPagination(t *testing.T) {
 	if want := ids(tu.ParcelPrefix, 2, 3, 13); !reflect.DeepEqual(walked, want) {
 		t.Errorf("walked %v, want %v", walked, want)
 	}
-	past, err := page(&partiesv1.GetParcelsByPartyIdRequest{PartyId: tu.PartyID(3), After: after})
+	past, err := page(&parcelsv1.GetParcelsByPartyIdRequest{PartyId: tu.PartyID(3), After: after})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -292,33 +294,33 @@ func TestAddressPartyPagination(t *testing.T) {
 		t.Errorf("past the end = %v", past)
 	}
 
-	first, err := page(&partiesv1.GetParcelsByPartyIdRequest{PartyId: tu.PartyID(3), First: &one})
+	first, err := page(&parcelsv1.GetParcelsByPartyIdRequest{PartyId: tu.PartyID(3), First: &one})
 	if err != nil {
 		t.Fatal(err)
 	}
 	cursor := first.GetPageInfo().EndCursor
 	for name, call := range map[string]func() error{
 		"another party": func() error {
-			_, err := page(&partiesv1.GetParcelsByPartyIdRequest{PartyId: tu.PartyID(2), After: cursor})
+			_, err := page(&parcelsv1.GetParcelsByPartyIdRequest{PartyId: tu.PartyID(2), After: cursor})
 			return err
 		},
 		"another legal_as_of": func() error {
-			_, err := page(&partiesv1.GetParcelsByPartyIdRequest{PartyId: tu.PartyID(3), LegalAsOf: at(beforeHistory), After: cursor})
+			_, err := page(&parcelsv1.GetParcelsByPartyIdRequest{PartyId: tu.PartyID(3), LegalAsOf: at(beforeHistory), After: cursor})
 			return err
 		},
 		"another RPC": func() error {
-			_, err := r.addresses.GetParcelsByAddressId(ctx, connect.NewRequest(&addressesv1.GetParcelsByAddressIdRequest{
+			_, err := r.parcels.GetParcelsByAddressId(ctx, connect.NewRequest(&parcelsv1.GetParcelsByAddressIdRequest{
 				AddressId: tu.PartyID(3), After: cursor,
 			}))
 			return err
 		},
 		"malformed cursor": func() error {
 			bad := "%%%"
-			_, err := page(&partiesv1.GetParcelsByPartyIdRequest{PartyId: tu.PartyID(3), After: &bad})
+			_, err := page(&parcelsv1.GetParcelsByPartyIdRequest{PartyId: tu.PartyID(3), After: &bad})
 			return err
 		},
 		"non-UUID ID": func() error {
-			_, err := page(&partiesv1.GetParcelsByPartyIdRequest{PartyId: "not-a-uuid"})
+			_, err := page(&parcelsv1.GetParcelsByPartyIdRequest{PartyId: "not-a-uuid"})
 			return err
 		},
 	} {
@@ -329,7 +331,7 @@ func TestAddressPartyPagination(t *testing.T) {
 
 	// The mesh has no validation, so the reader clamps first itself.
 	big := int32(500)
-	res, err := page(&partiesv1.GetParcelsByPartyIdRequest{PartyId: tu.PartyID(3), First: &big})
+	res, err := page(&parcelsv1.GetParcelsByPartyIdRequest{PartyId: tu.PartyID(3), First: &big})
 	if err != nil || len(res.GetParcels()) != 3 || res.GetPageInfo().GetHasNextPage() {
 		t.Errorf("first = 500: %v, %v", res, err)
 	}
@@ -377,7 +379,7 @@ func TestAddressLookupPagination(t *testing.T) {
 	addr := tu.AddressID(3)
 
 	parcels := walkPages(t, "parcels", func(first *int32, after *string) ([]string, *paginationv1.PageInfo) {
-		res, err := r.addresses.GetParcelsByAddressId(ctx, connect.NewRequest(&addressesv1.GetParcelsByAddressIdRequest{
+		res, err := r.parcels.GetParcelsByAddressId(ctx, connect.NewRequest(&parcelsv1.GetParcelsByAddressIdRequest{
 			AddressId: addr, First: first, After: after,
 		}))
 		if err != nil {
@@ -394,7 +396,7 @@ func TestAddressLookupPagination(t *testing.T) {
 	}
 
 	imps := walkPages(t, "improvements", func(first *int32, after *string) ([]string, *paginationv1.PageInfo) {
-		res, err := r.addresses.GetImprovementsByAddressId(ctx, connect.NewRequest(&addressesv1.GetImprovementsByAddressIdRequest{
+		res, err := r.improvements.GetImprovementsByAddressId(ctx, connect.NewRequest(&improvementsv1.GetImprovementsByAddressIdRequest{
 			AddressId: addr, First: first, After: after,
 		}))
 		if err != nil {
@@ -411,7 +413,7 @@ func TestAddressLookupPagination(t *testing.T) {
 	}
 
 	parties := walkPages(t, "parties", func(first *int32, after *string) ([]string, *paginationv1.PageInfo) {
-		res, err := r.addresses.GetPartiesByAddressId(ctx, connect.NewRequest(&addressesv1.GetPartiesByAddressIdRequest{
+		res, err := r.parties.GetPartiesByAddressId(ctx, connect.NewRequest(&partiesv1.GetPartiesByAddressIdRequest{
 			AddressId: addr, First: first, After: after,
 		}))
 		if err != nil {

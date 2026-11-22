@@ -8,8 +8,6 @@ package addressesv1
 
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
-	v1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/pagination/v1"
-	v11 "github.com/civil-labs/civil-os/api/gen/go/civil/public/parties/v1"
 	latlng "google.golang.org/genproto/googleapis/type/latlng"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -262,116 +260,6 @@ func (x *AdministrativeArea) GetName() string {
 	return ""
 }
 
-// A parcel at an address.
-type AddressParcel struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The parcel's UUID.
-	ParcelId string `protobuf:"bytes,1,opt,name=parcel_id,json=parcelId,proto3" json:"parcel_id,omitempty"`
-	// The parcel's geometry feature ID at `legal_as_of`.
-	FeatureId     *int64 `protobuf:"varint,2,opt,name=feature_id,json=featureId,proto3,oneof" json:"feature_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AddressParcel) Reset() {
-	*x = AddressParcel{}
-	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AddressParcel) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AddressParcel) ProtoMessage() {}
-
-func (x *AddressParcel) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AddressParcel.ProtoReflect.Descriptor instead.
-func (*AddressParcel) Descriptor() ([]byte, []int) {
-	return file_civil_public_addresses_v1_addresses_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *AddressParcel) GetParcelId() string {
-	if x != nil {
-		return x.ParcelId
-	}
-	return ""
-}
-
-func (x *AddressParcel) GetFeatureId() int64 {
-	if x != nil && x.FeatureId != nil {
-		return *x.FeatureId
-	}
-	return 0
-}
-
-// An improvement at an address.
-type AddressImprovement struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The improvement's UUID.
-	ImprovementId string `protobuf:"bytes,1,opt,name=improvement_id,json=improvementId,proto3" json:"improvement_id,omitempty"`
-	// The parcels it sits on at `legal_as_of`, ordered by UUID. Never empty.
-	ParcelIds     []string `protobuf:"bytes,2,rep,name=parcel_ids,json=parcelIds,proto3" json:"parcel_ids,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AddressImprovement) Reset() {
-	*x = AddressImprovement{}
-	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AddressImprovement) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AddressImprovement) ProtoMessage() {}
-
-func (x *AddressImprovement) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AddressImprovement.ProtoReflect.Descriptor instead.
-func (*AddressImprovement) Descriptor() ([]byte, []int) {
-	return file_civil_public_addresses_v1_addresses_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *AddressImprovement) GetImprovementId() string {
-	if x != nil {
-		return x.ImprovementId
-	}
-	return ""
-}
-
-func (x *AddressImprovement) GetParcelIds() []string {
-	if x != nil {
-		return x.ParcelIds
-	}
-	return nil
-}
-
 type GetAddressesByIdRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// 1 to 100 unique address UUIDs.
@@ -384,7 +272,7 @@ type GetAddressesByIdRequest struct {
 
 func (x *GetAddressesByIdRequest) Reset() {
 	*x = GetAddressesByIdRequest{}
-	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[5]
+	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -396,7 +284,7 @@ func (x *GetAddressesByIdRequest) String() string {
 func (*GetAddressesByIdRequest) ProtoMessage() {}
 
 func (x *GetAddressesByIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[5]
+	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -409,7 +297,7 @@ func (x *GetAddressesByIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAddressesByIdRequest.ProtoReflect.Descriptor instead.
 func (*GetAddressesByIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_addresses_v1_addresses_proto_rawDescGZIP(), []int{5}
+	return file_civil_public_addresses_v1_addresses_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetAddressesByIdRequest) GetAddressIds() []string {
@@ -436,7 +324,7 @@ type GetAddressesByIdResponse struct {
 
 func (x *GetAddressesByIdResponse) Reset() {
 	*x = GetAddressesByIdResponse{}
-	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[6]
+	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -448,7 +336,7 @@ func (x *GetAddressesByIdResponse) String() string {
 func (*GetAddressesByIdResponse) ProtoMessage() {}
 
 func (x *GetAddressesByIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[6]
+	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -461,7 +349,7 @@ func (x *GetAddressesByIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAddressesByIdResponse.ProtoReflect.Descriptor instead.
 func (*GetAddressesByIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_addresses_v1_addresses_proto_rawDescGZIP(), []int{6}
+	return file_civil_public_addresses_v1_addresses_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetAddressesByIdResponse) GetAddresses() map[string]*Address {
@@ -471,392 +359,11 @@ func (x *GetAddressesByIdResponse) GetAddresses() map[string]*Address {
 	return nil
 }
 
-type GetParcelsByAddressIdRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The address's UUID.
-	AddressId string `protobuf:"bytes,1,opt,name=address_id,json=addressId,proto3" json:"address_id,omitempty"`
-	// The legal time to read at. Defaults to now.
-	LegalAsOf *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=legal_as_of,json=legalAsOf,proto3,oneof" json:"legal_as_of,omitempty"`
-	// The page size, 1 to 100. Defaults to 25.
-	First *int32 `protobuf:"varint,3,opt,name=first,proto3,oneof" json:"first,omitempty"`
-	// Return the records after this cursor, from a previous page of the same
-	// request.
-	After         *string `protobuf:"bytes,4,opt,name=after,proto3,oneof" json:"after,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetParcelsByAddressIdRequest) Reset() {
-	*x = GetParcelsByAddressIdRequest{}
-	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetParcelsByAddressIdRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetParcelsByAddressIdRequest) ProtoMessage() {}
-
-func (x *GetParcelsByAddressIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetParcelsByAddressIdRequest.ProtoReflect.Descriptor instead.
-func (*GetParcelsByAddressIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_addresses_v1_addresses_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *GetParcelsByAddressIdRequest) GetAddressId() string {
-	if x != nil {
-		return x.AddressId
-	}
-	return ""
-}
-
-func (x *GetParcelsByAddressIdRequest) GetLegalAsOf() *timestamppb.Timestamp {
-	if x != nil {
-		return x.LegalAsOf
-	}
-	return nil
-}
-
-func (x *GetParcelsByAddressIdRequest) GetFirst() int32 {
-	if x != nil && x.First != nil {
-		return *x.First
-	}
-	return 0
-}
-
-func (x *GetParcelsByAddressIdRequest) GetAfter() string {
-	if x != nil && x.After != nil {
-		return *x.After
-	}
-	return ""
-}
-
-type GetParcelsByAddressIdResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The page's parcels, ordered by `parcel_id`. Fewer than `first` only on
-	// the last page.
-	Parcels       []*AddressParcel `protobuf:"bytes,1,rep,name=parcels,proto3" json:"parcels,omitempty"`
-	PageInfo      *v1.PageInfo     `protobuf:"bytes,2,opt,name=page_info,json=pageInfo,proto3" json:"page_info,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetParcelsByAddressIdResponse) Reset() {
-	*x = GetParcelsByAddressIdResponse{}
-	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetParcelsByAddressIdResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetParcelsByAddressIdResponse) ProtoMessage() {}
-
-func (x *GetParcelsByAddressIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetParcelsByAddressIdResponse.ProtoReflect.Descriptor instead.
-func (*GetParcelsByAddressIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_addresses_v1_addresses_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *GetParcelsByAddressIdResponse) GetParcels() []*AddressParcel {
-	if x != nil {
-		return x.Parcels
-	}
-	return nil
-}
-
-func (x *GetParcelsByAddressIdResponse) GetPageInfo() *v1.PageInfo {
-	if x != nil {
-		return x.PageInfo
-	}
-	return nil
-}
-
-type GetImprovementsByAddressIdRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The address's UUID.
-	AddressId string `protobuf:"bytes,1,opt,name=address_id,json=addressId,proto3" json:"address_id,omitempty"`
-	// The legal time to read at. Defaults to now.
-	LegalAsOf *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=legal_as_of,json=legalAsOf,proto3,oneof" json:"legal_as_of,omitempty"`
-	// The page size, 1 to 100. Defaults to 25.
-	First *int32 `protobuf:"varint,3,opt,name=first,proto3,oneof" json:"first,omitempty"`
-	// Return the records after this cursor, from a previous page of the same
-	// request.
-	After         *string `protobuf:"bytes,4,opt,name=after,proto3,oneof" json:"after,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetImprovementsByAddressIdRequest) Reset() {
-	*x = GetImprovementsByAddressIdRequest{}
-	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetImprovementsByAddressIdRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetImprovementsByAddressIdRequest) ProtoMessage() {}
-
-func (x *GetImprovementsByAddressIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetImprovementsByAddressIdRequest.ProtoReflect.Descriptor instead.
-func (*GetImprovementsByAddressIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_addresses_v1_addresses_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *GetImprovementsByAddressIdRequest) GetAddressId() string {
-	if x != nil {
-		return x.AddressId
-	}
-	return ""
-}
-
-func (x *GetImprovementsByAddressIdRequest) GetLegalAsOf() *timestamppb.Timestamp {
-	if x != nil {
-		return x.LegalAsOf
-	}
-	return nil
-}
-
-func (x *GetImprovementsByAddressIdRequest) GetFirst() int32 {
-	if x != nil && x.First != nil {
-		return *x.First
-	}
-	return 0
-}
-
-func (x *GetImprovementsByAddressIdRequest) GetAfter() string {
-	if x != nil && x.After != nil {
-		return *x.After
-	}
-	return ""
-}
-
-type GetImprovementsByAddressIdResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The page's improvements, ordered by `improvement_id`. Fewer than `first`
-	// only on the last page.
-	Improvements  []*AddressImprovement `protobuf:"bytes,1,rep,name=improvements,proto3" json:"improvements,omitempty"`
-	PageInfo      *v1.PageInfo          `protobuf:"bytes,2,opt,name=page_info,json=pageInfo,proto3" json:"page_info,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetImprovementsByAddressIdResponse) Reset() {
-	*x = GetImprovementsByAddressIdResponse{}
-	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetImprovementsByAddressIdResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetImprovementsByAddressIdResponse) ProtoMessage() {}
-
-func (x *GetImprovementsByAddressIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[10]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetImprovementsByAddressIdResponse.ProtoReflect.Descriptor instead.
-func (*GetImprovementsByAddressIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_addresses_v1_addresses_proto_rawDescGZIP(), []int{10}
-}
-
-func (x *GetImprovementsByAddressIdResponse) GetImprovements() []*AddressImprovement {
-	if x != nil {
-		return x.Improvements
-	}
-	return nil
-}
-
-func (x *GetImprovementsByAddressIdResponse) GetPageInfo() *v1.PageInfo {
-	if x != nil {
-		return x.PageInfo
-	}
-	return nil
-}
-
-type GetPartiesByAddressIdRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The address's UUID.
-	AddressId string `protobuf:"bytes,1,opt,name=address_id,json=addressId,proto3" json:"address_id,omitempty"`
-	// The legal time to read at. Defaults to now.
-	LegalAsOf *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=legal_as_of,json=legalAsOf,proto3,oneof" json:"legal_as_of,omitempty"`
-	// The page size, 1 to 100. Defaults to 25.
-	First *int32 `protobuf:"varint,3,opt,name=first,proto3,oneof" json:"first,omitempty"`
-	// Return the records after this cursor, from a previous page of the same
-	// request.
-	After         *string `protobuf:"bytes,4,opt,name=after,proto3,oneof" json:"after,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetPartiesByAddressIdRequest) Reset() {
-	*x = GetPartiesByAddressIdRequest{}
-	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[11]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetPartiesByAddressIdRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetPartiesByAddressIdRequest) ProtoMessage() {}
-
-func (x *GetPartiesByAddressIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[11]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetPartiesByAddressIdRequest.ProtoReflect.Descriptor instead.
-func (*GetPartiesByAddressIdRequest) Descriptor() ([]byte, []int) {
-	return file_civil_public_addresses_v1_addresses_proto_rawDescGZIP(), []int{11}
-}
-
-func (x *GetPartiesByAddressIdRequest) GetAddressId() string {
-	if x != nil {
-		return x.AddressId
-	}
-	return ""
-}
-
-func (x *GetPartiesByAddressIdRequest) GetLegalAsOf() *timestamppb.Timestamp {
-	if x != nil {
-		return x.LegalAsOf
-	}
-	return nil
-}
-
-func (x *GetPartiesByAddressIdRequest) GetFirst() int32 {
-	if x != nil && x.First != nil {
-		return *x.First
-	}
-	return 0
-}
-
-func (x *GetPartiesByAddressIdRequest) GetAfter() string {
-	if x != nil && x.After != nil {
-		return *x.After
-	}
-	return ""
-}
-
-type GetPartiesByAddressIdResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The page's parties, ordered by `party_id`. Fewer than `first` only on
-	// the last page.
-	Parties       []*v11.Party `protobuf:"bytes,1,rep,name=parties,proto3" json:"parties,omitempty"`
-	PageInfo      *v1.PageInfo `protobuf:"bytes,2,opt,name=page_info,json=pageInfo,proto3" json:"page_info,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetPartiesByAddressIdResponse) Reset() {
-	*x = GetPartiesByAddressIdResponse{}
-	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[12]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetPartiesByAddressIdResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetPartiesByAddressIdResponse) ProtoMessage() {}
-
-func (x *GetPartiesByAddressIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_civil_public_addresses_v1_addresses_proto_msgTypes[12]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetPartiesByAddressIdResponse.ProtoReflect.Descriptor instead.
-func (*GetPartiesByAddressIdResponse) Descriptor() ([]byte, []int) {
-	return file_civil_public_addresses_v1_addresses_proto_rawDescGZIP(), []int{12}
-}
-
-func (x *GetPartiesByAddressIdResponse) GetParties() []*v11.Party {
-	if x != nil {
-		return x.Parties
-	}
-	return nil
-}
-
-func (x *GetPartiesByAddressIdResponse) GetPageInfo() *v1.PageInfo {
-	if x != nil {
-		return x.PageInfo
-	}
-	return nil
-}
-
 var File_civil_public_addresses_v1_addresses_proto protoreflect.FileDescriptor
 
 const file_civil_public_addresses_v1_addresses_proto_rawDesc = "" +
 	"\n" +
-	")civil/public/addresses/v1/addresses.proto\x12\x19civil.public.addresses.v1\x1a\x1bbuf/validate/validate.proto\x1a+civil/public/pagination/v1/pagination.proto\x1a%civil/public/parties/v1/parties.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x18google/type/latlng.proto\"\xc2\x05\n" +
+	")civil/public/addresses/v1/addresses.proto\x12\x19civil.public.addresses.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x18google/type/latlng.proto\"\xc2\x05\n" +
 	"\aAddress\x12\x1d\n" +
 	"\n" +
 	"address_id\x18\x01 \x01(\tR\taddressId\x12+\n" +
@@ -887,16 +394,7 @@ const file_civil_public_addresses_v1_addresses_proto_rawDesc = "" +
 	"\x04name\x18\x02 \x01(\tR\x04name\"<\n" +
 	"\x12AdministrativeArea\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\tR\x04code\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\"_\n" +
-	"\rAddressParcel\x12\x1b\n" +
-	"\tparcel_id\x18\x01 \x01(\tR\bparcelId\x12\"\n" +
-	"\n" +
-	"feature_id\x18\x02 \x01(\x03H\x00R\tfeatureId\x88\x01\x01B\r\n" +
-	"\v_feature_id\"Z\n" +
-	"\x12AddressImprovement\x12%\n" +
-	"\x0eimprovement_id\x18\x01 \x01(\tR\rimprovementId\x12\x1d\n" +
-	"\n" +
-	"parcel_ids\x18\x02 \x03(\tR\tparcelIds\"\xb5\x01\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\"\xb5\x01\n" +
 	"\x17GetAddressesByIdRequest\x124\n" +
 	"\vaddress_ids\x18\x01 \x03(\tB\x13\xbaH\x10\x92\x01\r\b\x01\x10d\x18\x01\"\x05r\x03\xb0\x01\x01R\n" +
 	"addressIds\x12T\n" +
@@ -906,51 +404,9 @@ const file_civil_public_addresses_v1_addresses_proto_rawDesc = "" +
 	"\taddresses\x18\x01 \x03(\v2B.civil.public.addresses.v1.GetAddressesByIdResponse.AddressesEntryR\taddresses\x1a`\n" +
 	"\x0eAddressesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x128\n" +
-	"\x05value\x18\x02 \x01(\v2\".civil.public.addresses.v1.AddressR\x05value:\x028\x01\"\x8e\x02\n" +
-	"\x1cGetParcelsByAddressIdRequest\x12'\n" +
-	"\n" +
-	"address_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\taddressId\x12T\n" +
-	"\vlegal_as_of\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampB\x13\xbaH\x10\xb2\x01\r*\v\b\x80\x92\xb8Ø\xfe\xff\xff\xff\x01H\x00R\tlegalAsOf\x88\x01\x01\x12$\n" +
-	"\x05first\x18\x03 \x01(\x05B\t\xbaH\x06\x1a\x04\x18d(\x01H\x01R\x05first\x88\x01\x01\x12%\n" +
-	"\x05after\x18\x04 \x01(\tB\n" +
-	"\xbaH\ar\x05\x10\x01\x18\x80\x04H\x02R\x05after\x88\x01\x01B\x0e\n" +
-	"\f_legal_as_ofB\b\n" +
-	"\x06_firstB\b\n" +
-	"\x06_after\"\xa6\x01\n" +
-	"\x1dGetParcelsByAddressIdResponse\x12B\n" +
-	"\aparcels\x18\x01 \x03(\v2(.civil.public.addresses.v1.AddressParcelR\aparcels\x12A\n" +
-	"\tpage_info\x18\x02 \x01(\v2$.civil.public.pagination.v1.PageInfoR\bpageInfo\"\x93\x02\n" +
-	"!GetImprovementsByAddressIdRequest\x12'\n" +
-	"\n" +
-	"address_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\taddressId\x12T\n" +
-	"\vlegal_as_of\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampB\x13\xbaH\x10\xb2\x01\r*\v\b\x80\x92\xb8Ø\xfe\xff\xff\xff\x01H\x00R\tlegalAsOf\x88\x01\x01\x12$\n" +
-	"\x05first\x18\x03 \x01(\x05B\t\xbaH\x06\x1a\x04\x18d(\x01H\x01R\x05first\x88\x01\x01\x12%\n" +
-	"\x05after\x18\x04 \x01(\tB\n" +
-	"\xbaH\ar\x05\x10\x01\x18\x80\x04H\x02R\x05after\x88\x01\x01B\x0e\n" +
-	"\f_legal_as_ofB\b\n" +
-	"\x06_firstB\b\n" +
-	"\x06_after\"\xba\x01\n" +
-	"\"GetImprovementsByAddressIdResponse\x12Q\n" +
-	"\fimprovements\x18\x01 \x03(\v2-.civil.public.addresses.v1.AddressImprovementR\fimprovements\x12A\n" +
-	"\tpage_info\x18\x02 \x01(\v2$.civil.public.pagination.v1.PageInfoR\bpageInfo\"\x8e\x02\n" +
-	"\x1cGetPartiesByAddressIdRequest\x12'\n" +
-	"\n" +
-	"address_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\taddressId\x12T\n" +
-	"\vlegal_as_of\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampB\x13\xbaH\x10\xb2\x01\r*\v\b\x80\x92\xb8Ø\xfe\xff\xff\xff\x01H\x00R\tlegalAsOf\x88\x01\x01\x12$\n" +
-	"\x05first\x18\x03 \x01(\x05B\t\xbaH\x06\x1a\x04\x18d(\x01H\x01R\x05first\x88\x01\x01\x12%\n" +
-	"\x05after\x18\x04 \x01(\tB\n" +
-	"\xbaH\ar\x05\x10\x01\x18\x80\x04H\x02R\x05after\x88\x01\x01B\x0e\n" +
-	"\f_legal_as_ofB\b\n" +
-	"\x06_firstB\b\n" +
-	"\x06_after\"\x9c\x01\n" +
-	"\x1dGetPartiesByAddressIdResponse\x128\n" +
-	"\aparties\x18\x01 \x03(\v2\x1e.civil.public.parties.v1.PartyR\aparties\x12A\n" +
-	"\tpage_info\x18\x02 \x01(\v2$.civil.public.pagination.v1.PageInfoR\bpageInfo2\xda\x04\n" +
+	"\x05value\x18\x02 \x01(\v2\".civil.public.addresses.v1.AddressR\x05value:\x028\x012\x95\x01\n" +
 	"\x10AddressesService\x12\x80\x01\n" +
-	"\x10GetAddressesById\x122.civil.public.addresses.v1.GetAddressesByIdRequest\x1a3.civil.public.addresses.v1.GetAddressesByIdResponse\"\x03\x90\x02\x01\x12\x8f\x01\n" +
-	"\x15GetParcelsByAddressId\x127.civil.public.addresses.v1.GetParcelsByAddressIdRequest\x1a8.civil.public.addresses.v1.GetParcelsByAddressIdResponse\"\x03\x90\x02\x01\x12\x9e\x01\n" +
-	"\x1aGetImprovementsByAddressId\x12<.civil.public.addresses.v1.GetImprovementsByAddressIdRequest\x1a=.civil.public.addresses.v1.GetImprovementsByAddressIdResponse\"\x03\x90\x02\x01\x12\x8f\x01\n" +
-	"\x15GetPartiesByAddressId\x127.civil.public.addresses.v1.GetPartiesByAddressIdRequest\x1a8.civil.public.addresses.v1.GetPartiesByAddressIdResponse\"\x03\x90\x02\x01B\x89\x02\n" +
+	"\x10GetAddressesById\x122.civil.public.addresses.v1.GetAddressesByIdRequest\x1a3.civil.public.addresses.v1.GetAddressesByIdResponse\"\x03\x90\x02\x01B\x89\x02\n" +
 	"\x1dcom.civil.public.addresses.v1B\x0eAddressesProtoP\x01ZOgithub.com/civil-labs/civil-os/api/gen/go/civil/public/addresses/v1;addressesv1\xa2\x02\x03CPA\xaa\x02\x19Civil.Public.Addresses.V1\xca\x02\x1aCivil\\Public_\\Addresses\\V1\xe2\x02&Civil\\Public_\\Addresses\\V1\\GPBMetadata\xea\x02\x1cCivil::Public::Addresses::V1b\x06proto3"
 
 var (
@@ -965,56 +421,31 @@ func file_civil_public_addresses_v1_addresses_proto_rawDescGZIP() []byte {
 	return file_civil_public_addresses_v1_addresses_proto_rawDescData
 }
 
-var file_civil_public_addresses_v1_addresses_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_civil_public_addresses_v1_addresses_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_civil_public_addresses_v1_addresses_proto_goTypes = []any{
-	(*Address)(nil),                            // 0: civil.public.addresses.v1.Address
-	(*Country)(nil),                            // 1: civil.public.addresses.v1.Country
-	(*AdministrativeArea)(nil),                 // 2: civil.public.addresses.v1.AdministrativeArea
-	(*AddressParcel)(nil),                      // 3: civil.public.addresses.v1.AddressParcel
-	(*AddressImprovement)(nil),                 // 4: civil.public.addresses.v1.AddressImprovement
-	(*GetAddressesByIdRequest)(nil),            // 5: civil.public.addresses.v1.GetAddressesByIdRequest
-	(*GetAddressesByIdResponse)(nil),           // 6: civil.public.addresses.v1.GetAddressesByIdResponse
-	(*GetParcelsByAddressIdRequest)(nil),       // 7: civil.public.addresses.v1.GetParcelsByAddressIdRequest
-	(*GetParcelsByAddressIdResponse)(nil),      // 8: civil.public.addresses.v1.GetParcelsByAddressIdResponse
-	(*GetImprovementsByAddressIdRequest)(nil),  // 9: civil.public.addresses.v1.GetImprovementsByAddressIdRequest
-	(*GetImprovementsByAddressIdResponse)(nil), // 10: civil.public.addresses.v1.GetImprovementsByAddressIdResponse
-	(*GetPartiesByAddressIdRequest)(nil),       // 11: civil.public.addresses.v1.GetPartiesByAddressIdRequest
-	(*GetPartiesByAddressIdResponse)(nil),      // 12: civil.public.addresses.v1.GetPartiesByAddressIdResponse
-	nil,                                        // 13: civil.public.addresses.v1.GetAddressesByIdResponse.AddressesEntry
-	(*latlng.LatLng)(nil),                      // 14: google.type.LatLng
-	(*timestamppb.Timestamp)(nil),              // 15: google.protobuf.Timestamp
-	(*v1.PageInfo)(nil),                        // 16: civil.public.pagination.v1.PageInfo
-	(*v11.Party)(nil),                          // 17: civil.public.parties.v1.Party
+	(*Address)(nil),                  // 0: civil.public.addresses.v1.Address
+	(*Country)(nil),                  // 1: civil.public.addresses.v1.Country
+	(*AdministrativeArea)(nil),       // 2: civil.public.addresses.v1.AdministrativeArea
+	(*GetAddressesByIdRequest)(nil),  // 3: civil.public.addresses.v1.GetAddressesByIdRequest
+	(*GetAddressesByIdResponse)(nil), // 4: civil.public.addresses.v1.GetAddressesByIdResponse
+	nil,                              // 5: civil.public.addresses.v1.GetAddressesByIdResponse.AddressesEntry
+	(*latlng.LatLng)(nil),            // 6: google.type.LatLng
+	(*timestamppb.Timestamp)(nil),    // 7: google.protobuf.Timestamp
 }
 var file_civil_public_addresses_v1_addresses_proto_depIdxs = []int32{
-	2,  // 0: civil.public.addresses.v1.Address.administrative_area:type_name -> civil.public.addresses.v1.AdministrativeArea
-	1,  // 1: civil.public.addresses.v1.Address.country:type_name -> civil.public.addresses.v1.Country
-	14, // 2: civil.public.addresses.v1.Address.coordinates:type_name -> google.type.LatLng
-	15, // 3: civil.public.addresses.v1.GetAddressesByIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	13, // 4: civil.public.addresses.v1.GetAddressesByIdResponse.addresses:type_name -> civil.public.addresses.v1.GetAddressesByIdResponse.AddressesEntry
-	15, // 5: civil.public.addresses.v1.GetParcelsByAddressIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	3,  // 6: civil.public.addresses.v1.GetParcelsByAddressIdResponse.parcels:type_name -> civil.public.addresses.v1.AddressParcel
-	16, // 7: civil.public.addresses.v1.GetParcelsByAddressIdResponse.page_info:type_name -> civil.public.pagination.v1.PageInfo
-	15, // 8: civil.public.addresses.v1.GetImprovementsByAddressIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	4,  // 9: civil.public.addresses.v1.GetImprovementsByAddressIdResponse.improvements:type_name -> civil.public.addresses.v1.AddressImprovement
-	16, // 10: civil.public.addresses.v1.GetImprovementsByAddressIdResponse.page_info:type_name -> civil.public.pagination.v1.PageInfo
-	15, // 11: civil.public.addresses.v1.GetPartiesByAddressIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
-	17, // 12: civil.public.addresses.v1.GetPartiesByAddressIdResponse.parties:type_name -> civil.public.parties.v1.Party
-	16, // 13: civil.public.addresses.v1.GetPartiesByAddressIdResponse.page_info:type_name -> civil.public.pagination.v1.PageInfo
-	0,  // 14: civil.public.addresses.v1.GetAddressesByIdResponse.AddressesEntry.value:type_name -> civil.public.addresses.v1.Address
-	5,  // 15: civil.public.addresses.v1.AddressesService.GetAddressesById:input_type -> civil.public.addresses.v1.GetAddressesByIdRequest
-	7,  // 16: civil.public.addresses.v1.AddressesService.GetParcelsByAddressId:input_type -> civil.public.addresses.v1.GetParcelsByAddressIdRequest
-	9,  // 17: civil.public.addresses.v1.AddressesService.GetImprovementsByAddressId:input_type -> civil.public.addresses.v1.GetImprovementsByAddressIdRequest
-	11, // 18: civil.public.addresses.v1.AddressesService.GetPartiesByAddressId:input_type -> civil.public.addresses.v1.GetPartiesByAddressIdRequest
-	6,  // 19: civil.public.addresses.v1.AddressesService.GetAddressesById:output_type -> civil.public.addresses.v1.GetAddressesByIdResponse
-	8,  // 20: civil.public.addresses.v1.AddressesService.GetParcelsByAddressId:output_type -> civil.public.addresses.v1.GetParcelsByAddressIdResponse
-	10, // 21: civil.public.addresses.v1.AddressesService.GetImprovementsByAddressId:output_type -> civil.public.addresses.v1.GetImprovementsByAddressIdResponse
-	12, // 22: civil.public.addresses.v1.AddressesService.GetPartiesByAddressId:output_type -> civil.public.addresses.v1.GetPartiesByAddressIdResponse
-	19, // [19:23] is the sub-list for method output_type
-	15, // [15:19] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	2, // 0: civil.public.addresses.v1.Address.administrative_area:type_name -> civil.public.addresses.v1.AdministrativeArea
+	1, // 1: civil.public.addresses.v1.Address.country:type_name -> civil.public.addresses.v1.Country
+	6, // 2: civil.public.addresses.v1.Address.coordinates:type_name -> google.type.LatLng
+	7, // 3: civil.public.addresses.v1.GetAddressesByIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	5, // 4: civil.public.addresses.v1.GetAddressesByIdResponse.addresses:type_name -> civil.public.addresses.v1.GetAddressesByIdResponse.AddressesEntry
+	0, // 5: civil.public.addresses.v1.GetAddressesByIdResponse.AddressesEntry.value:type_name -> civil.public.addresses.v1.Address
+	3, // 6: civil.public.addresses.v1.AddressesService.GetAddressesById:input_type -> civil.public.addresses.v1.GetAddressesByIdRequest
+	4, // 7: civil.public.addresses.v1.AddressesService.GetAddressesById:output_type -> civil.public.addresses.v1.GetAddressesByIdResponse
+	7, // [7:8] is the sub-list for method output_type
+	6, // [6:7] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_civil_public_addresses_v1_addresses_proto_init() }
@@ -1024,17 +455,13 @@ func file_civil_public_addresses_v1_addresses_proto_init() {
 	}
 	file_civil_public_addresses_v1_addresses_proto_msgTypes[0].OneofWrappers = []any{}
 	file_civil_public_addresses_v1_addresses_proto_msgTypes[3].OneofWrappers = []any{}
-	file_civil_public_addresses_v1_addresses_proto_msgTypes[5].OneofWrappers = []any{}
-	file_civil_public_addresses_v1_addresses_proto_msgTypes[7].OneofWrappers = []any{}
-	file_civil_public_addresses_v1_addresses_proto_msgTypes[9].OneofWrappers = []any{}
-	file_civil_public_addresses_v1_addresses_proto_msgTypes[11].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_civil_public_addresses_v1_addresses_proto_rawDesc), len(file_civil_public_addresses_v1_addresses_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

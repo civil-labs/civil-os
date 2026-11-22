@@ -53,6 +53,9 @@ test reads, run `mise run check` yourself.
   `<Entity>WriteService` by the writer. New services use the plural public
   domain name (`AddressesReadService`, `PartiesReadService`); see
   `docs/mesh-plural-service-names/intent.md`. The public API keeps its own names.
+- **RPC placement:** an RPC lives on the service of the records it returns,
+  whatever it looks them up by. A link record belongs to the side the request
+  doesn't name. See `docs/reverse-lookups-by-returned-type/spec.md`.
 - **Config:** env vars are `CIVIL_OS_<SERVICE>_<SETTING>`. Services refuse to
   start if a pre-rename `CIVIL_*` variable is set. Update the table in
   `docs/architecture.md` when you add one.

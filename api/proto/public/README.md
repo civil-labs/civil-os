@@ -6,15 +6,15 @@ one port.
 
 | Package | Service | What it serves |
 |---|---|---|
-| `civil.public.parcels.v1` | `ParcelsService` | Parcel details, attribute lookups by parcel or map feature, parcel extents (bounding boxes), stats, comparables, address search (`SearchParcelsAddresses`, paginated), `UpdateParcel` |
-| `civil.public.improvements.v1` | `ImprovementsService` | Improvement types and conditions |
+| `civil.public.parcels.v1` | `ParcelsService` | Parcel details, attribute lookups by parcel or map feature, parcel extents (bounding boxes), stats, comparables, address search (`SearchParcelsAddresses`, paginated), the parcels at an address or held by a party (paginated), `UpdateParcel` |
+| `civil.public.improvements.v1` | `ImprovementsService` | Improvement types and conditions, and the improvements at an address (paginated) |
 | `civil.public.landuses.v1` | `LandUsesService` | Land uses and land-use types |
 | `civil.public.zoning.v1` | `ZoningService` | Zoning designations |
 | `civil.public.neighborhoods.v1` | `NeighborhoodService` | Neighborhood definitions (with `is_legal`), and neighborhoods with the definitions that use them, optionally filtered by definition. Both RPCs accept Connect GET. |
 | `civil.public.valuations.v1` | `ValuationService` | Valuations |
 | `civil.public.transfers.v1` | `RealPropertyTransfersService` | Real property transfers by transfer, parcel, map feature or party, with grantors, grantees, shares, codes and recordings. Paginated. |
-| `civil.public.addresses.v1` | `AddressesService` | Addresses, and the parcels, improvements and parties at an address. The lookups by address are paginated. |
-| `civil.public.parties.v1` | `PartiesService` | Parties (owners, grantors, grantees) and the parcels a party holds. Paginated. |
+| `civil.public.addresses.v1` | `AddressesService` | Addresses by ID |
+| `civil.public.parties.v1` | `PartiesService` | Parties (owners, grantors, grantees) by ID, and the parties with a mailing address (paginated) |
 | `civil.public.instance.v1` | `InstanceService` | Instance metadata and auth issuer (no token needed) |
 | `civil.public.dex.v1` | `DexService` | Dex OIDC client administration, when the instance runs Dex |
 
@@ -23,6 +23,14 @@ Two packages only hold messages that other services share:
 (`Recording`, a document recorded with the county clerk).
 
 Sales comparables are served by `ParcelsService.GetSalesComparables`.
+
+### Where an RPC lives
+
+An RPC lives on the service of the records it returns, whatever it looks
+them up by. A link record, such as a parcel with a party's share, belongs to
+the side the request doesn't name. So the parcels at an address are
+`ParcelsService.GetParcelsByAddressId`, not an `AddressesService` RPC. See
+[`reverse-lookups-by-returned-type`](../../../docs/reverse-lookups-by-returned-type/spec.md).
 
 Requests are validated with [protovalidate](https://protovalidate.com) rules
 declared in the protos. For example, every parcel ID must be a UUID.
@@ -40,8 +48,11 @@ declared in the protos. For example, every parcel ID must be a UUID.
 ## Pagination
 
 APIs that can return many results are paginated with cursors.
-`RealPropertyTransfersService` was the first, followed by the address and party
-lookups and `ParcelsService.SearchParcelsAddresses`. They share these rules:
+`RealPropertyTransfersService` was the first, followed by the reverse lookups
+(`ParcelsService.GetParcelsByAddressId` and `GetParcelsByPartyId`,
+`ImprovementsService.GetImprovementsByAddressId` and
+`PartiesService.GetPartiesByAddressId`) and
+`ParcelsService.SearchParcelsAddresses`. They share these rules:
 
 - **Request:** `optional int32 first` (the page size) and
   `optional string after` (a cursor from a previous page).

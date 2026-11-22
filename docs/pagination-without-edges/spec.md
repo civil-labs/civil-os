@@ -142,8 +142,12 @@ pagination (`first` / `after`) is supported for now", stays.
   edges`. `buf breaking` against the PR's base fails on the deleted messages
   and fields, and the `!` lets it pass with a warning
   ([`../breaking-check-baseline/spec.md`](../breaking-check-baseline/spec.md)).
-- **The squash commit carries a `BREAKING CHANGE:` footer** with the
-  migration note, so release-please puts it in `api/proto/public/CHANGELOG.md`:
+- **The PR description carries a `BREAKING CHANGE:` note** in a
+  release-please `BEGIN_COMMIT_OVERRIDE` block, so release-please puts it in
+  `api/proto/public/CHANGELOG.md`. *Corrected 2026-11-21, while planning:*
+  this first said the squash commit carries the footer, but the repo
+  squash-merges with a blank body, so a commit footer is dropped (see
+  [`plan.md`](plan.md)). The note:
 
   > Paginated responses no longer wrap results in edges. Read
   > `response.transfers` (or `parcels`, `improvements`, `parties`) instead of

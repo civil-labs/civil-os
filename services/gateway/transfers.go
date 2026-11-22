@@ -20,7 +20,7 @@ import (
 const defaultTransferPageSize int32 = 25
 
 type TransferServer struct {
-	dbReaderClient meshtransfersv1connect.RealPropertyTransferReadServiceClient
+	dbReaderClient meshtransfersv1connect.RealPropertyTransfersReadServiceClient
 	logger         *slog.Logger
 }
 

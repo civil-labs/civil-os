@@ -14,8 +14,8 @@ import (
 )
 
 type ParcelServer struct {
-	dbReaderClient meshparcelsv1connect.ParcelReadServiceClient
-	dbWriterClient meshparcelsv1connect.ParcelWriteServiceClient // nil when writes are disabled
+	dbReaderClient meshparcelsv1connect.ParcelsReadServiceClient
+	dbWriterClient meshparcelsv1connect.ParcelsWriteServiceClient // nil when writes are disabled
 	logger         *slog.Logger
 }
 

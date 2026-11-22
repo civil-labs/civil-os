@@ -41,13 +41,13 @@ const (
 )
 
 type readerClients struct {
-	parcels       parcelsv1connect.ParcelReadServiceClient
-	improvements  improvementsv1connect.ImprovementReadServiceClient
-	landUses      landusesv1connect.LandUseReadServiceClient
+	parcels       parcelsv1connect.ParcelsReadServiceClient
+	improvements  improvementsv1connect.ImprovementsReadServiceClient
+	landUses      landusesv1connect.LandUsesReadServiceClient
 	zoning        zoningv1connect.ZoningReadServiceClient
-	valuations    valuationsv1connect.ValuationReadServiceClient
-	neighborhoods neighborhoodsv1connect.NeighborhoodReadServiceClient
-	transfers     transfersv1connect.RealPropertyTransferReadServiceClient
+	valuations    valuationsv1connect.ValuationsReadServiceClient
+	neighborhoods neighborhoodsv1connect.NeighborhoodsReadServiceClient
+	transfers     transfersv1connect.RealPropertyTransfersReadServiceClient
 	addresses     addressesv1connect.AddressesReadServiceClient
 	parties       partiesv1connect.PartiesReadServiceClient
 }
@@ -65,13 +65,13 @@ func startReaderOn(t *testing.T, pool *pgxpool.Pool, opts ...handlerOption) read
 	t.Cleanup(srv.Close)
 	c := http.DefaultClient
 	return readerClients{
-		parcels:       parcelsv1connect.NewParcelReadServiceClient(c, srv.URL),
-		improvements:  improvementsv1connect.NewImprovementReadServiceClient(c, srv.URL),
-		landUses:      landusesv1connect.NewLandUseReadServiceClient(c, srv.URL),
+		parcels:       parcelsv1connect.NewParcelsReadServiceClient(c, srv.URL),
+		improvements:  improvementsv1connect.NewImprovementsReadServiceClient(c, srv.URL),
+		landUses:      landusesv1connect.NewLandUsesReadServiceClient(c, srv.URL),
 		zoning:        zoningv1connect.NewZoningReadServiceClient(c, srv.URL),
-		valuations:    valuationsv1connect.NewValuationReadServiceClient(c, srv.URL),
-		neighborhoods: neighborhoodsv1connect.NewNeighborhoodReadServiceClient(c, srv.URL),
-		transfers:     transfersv1connect.NewRealPropertyTransferReadServiceClient(c, srv.URL),
+		valuations:    valuationsv1connect.NewValuationsReadServiceClient(c, srv.URL),
+		neighborhoods: neighborhoodsv1connect.NewNeighborhoodsReadServiceClient(c, srv.URL),
+		transfers:     transfersv1connect.NewRealPropertyTransfersReadServiceClient(c, srv.URL),
 		addresses:     addressesv1connect.NewAddressesReadServiceClient(c, srv.URL),
 		parties:       partiesv1connect.NewPartiesReadServiceClient(c, srv.URL),
 	}

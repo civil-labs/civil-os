@@ -435,7 +435,7 @@ message GetParcelsWithImprovementSummaryByParcelIdRequest {
 
     // Gnostic annotation for example
     (gnostic.openapi.v3.property) = {
-      description: "A neighborhood definition ID from NeighborhoodService.GetNeighborhoodDefinitions. Without one, neighborhood_id is unset."
+      description: "A neighborhood definition ID from NeighborhoodsService.GetNeighborhoodDefinitions. Without one, neighborhood_id is unset."
       example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
     }
   ];
@@ -471,7 +471,7 @@ message GetParcelsWithImprovementSummaryByFeatureIdRequest {
 
     // Gnostic annotation for example
     (gnostic.openapi.v3.property) = {
-      description: "A neighborhood definition ID from NeighborhoodService.GetNeighborhoodDefinitions. Without one, neighborhood_id is unset."
+      description: "A neighborhood definition ID from NeighborhoodsService.GetNeighborhoodDefinitions. Without one, neighborhood_id is unset."
       example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
     }
   ];

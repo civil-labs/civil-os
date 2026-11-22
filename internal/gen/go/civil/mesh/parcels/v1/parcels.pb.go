@@ -5936,8 +5936,8 @@ const file_civil_mesh_parcels_v1_parcels_proto_rawDesc = "" +
 	"\x12=\n" +
 	"9PARCEL_ATTRIBUTE_PRIMARY_IMPROVEMENT_EFFECTIVE_YEAR_BUILT\x10\v\x125\n" +
 	"1PARCEL_ATTRIBUTE_PRIMARY_IMPROVEMENT_CONDITION_ID\x10\f\x120\n" +
-	",PARCEL_ATTRIBUTE_PRIMARY_IMPROVEMENT_TYPE_ID\x10\r2\xf3.\n" +
-	"\x11ParcelReadService\x12\xc3\x01\n" +
+	",PARCEL_ATTRIBUTE_PRIMARY_IMPROVEMENT_TYPE_ID\x10\r2\xf4.\n" +
+	"\x12ParcelsReadService\x12\xc3\x01\n" +
 	"*GetParcelsWithImprovementSummaryByParcelId\x12H.civil.mesh.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdRequest\x1aI.civil.mesh.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse\"\x00\x12\xc6\x01\n" +
 	"+GetParcelsWithImprovementSummaryByFeatureId\x12I.civil.mesh.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdRequest\x1aJ.civil.mesh.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse\"\x00\x12\x96\x01\n" +
 	"\x1bGetNumericalParcelStatsById\x129.civil.mesh.parcels.v1.GetNumericalParcelStatsByIdRequest\x1a:.civil.mesh.parcels.v1.GetNumericalParcelStatsByIdResponse\"\x00\x12\x9c\x01\n" +
@@ -5975,8 +5975,8 @@ const file_civil_mesh_parcels_v1_parcels_proto_rawDesc = "" +
 	"&GetPrimaryImprovementTypeIdByFeatureId\x12D.civil.mesh.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdRequest\x1aE.civil.mesh.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse\"\x00\x12\x8a\x01\n" +
 	"\x16SearchParcelsAddresses\x124.civil.mesh.parcels.v1.SearchParcelsAddressesRequest\x1a5.civil.mesh.parcels.v1.SearchParcelsAddressesResponse\"\x03\x90\x02\x01\x12\x84\x01\n" +
 	"\x15GetParcelsByAddressId\x123.civil.mesh.parcels.v1.GetParcelsByAddressIdRequest\x1a4.civil.mesh.parcels.v1.GetParcelsByAddressIdResponse\"\x00\x12~\n" +
-	"\x13GetParcelsByPartyId\x121.civil.mesh.parcels.v1.GetParcelsByPartyIdRequest\x1a2.civil.mesh.parcels.v1.GetParcelsByPartyIdResponse\"\x002\x7f\n" +
-	"\x12ParcelWriteService\x12i\n" +
+	"\x13GetParcelsByPartyId\x121.civil.mesh.parcels.v1.GetParcelsByPartyIdRequest\x1a2.civil.mesh.parcels.v1.GetParcelsByPartyIdResponse\"\x002\x80\x01\n" +
+	"\x13ParcelsWriteService\x12i\n" +
 	"\fUpdateParcel\x12*.civil.mesh.parcels.v1.UpdateParcelRequest\x1a+.civil.mesh.parcels.v1.UpdateParcelResponse\"\x00B\xf0\x01\n" +
 	"\x19com.civil.mesh.parcels.v1B\fParcelsProtoP\x01ZNgithub.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1;parcelsv1\xa2\x02\x03CMP\xaa\x02\x15Civil.Mesh.Parcels.V1\xca\x02\x15Civil\\Mesh\\Parcels\\V1\xe2\x02!Civil\\Mesh\\Parcels\\V1\\GPBMetadata\xea\x02\x18Civil::Mesh::Parcels::V1b\x06proto3"
 
@@ -6217,84 +6217,84 @@ var file_civil_mesh_parcels_v1_parcels_proto_depIdxs = []int32{
 	20,  // 89: civil.mesh.parcels.v1.GetEquityComparablesResponse.ParcelsEntry.value:type_name -> civil.mesh.parcels.v1.EquityComparableParcel
 	21,  // 90: civil.mesh.parcels.v1.GetSalesComparablesResponse.ParcelsEntry.value:type_name -> civil.mesh.parcels.v1.SaleComparableParcel
 	31,  // 91: civil.mesh.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse.ExtentsEntry.value:type_name -> civil.mesh.parcels.v1.ExtentWGS84
-	5,   // 92: civil.mesh.parcels.v1.ParcelReadService.GetParcelsWithImprovementSummaryByParcelId:input_type -> civil.mesh.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdRequest
-	7,   // 93: civil.mesh.parcels.v1.ParcelReadService.GetParcelsWithImprovementSummaryByFeatureId:input_type -> civil.mesh.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdRequest
-	14,  // 94: civil.mesh.parcels.v1.ParcelReadService.GetNumericalParcelStatsById:input_type -> civil.mesh.parcels.v1.GetNumericalParcelStatsByIdRequest
-	16,  // 95: civil.mesh.parcels.v1.ParcelReadService.GetCategoricalParcelStatsById:input_type -> civil.mesh.parcels.v1.GetCategoricalParcelStatsByIdRequest
-	22,  // 96: civil.mesh.parcels.v1.ParcelReadService.GetEquityComparables:input_type -> civil.mesh.parcels.v1.GetEquityComparablesRequest
-	24,  // 97: civil.mesh.parcels.v1.ParcelReadService.GetSalesComparables:input_type -> civil.mesh.parcels.v1.GetSalesComparablesRequest
-	27,  // 98: civil.mesh.parcels.v1.ParcelReadService.GetParcelIdsByFeatureId:input_type -> civil.mesh.parcels.v1.GetParcelIdsByFeatureIdRequest
-	29,  // 99: civil.mesh.parcels.v1.ParcelReadService.GetEstimatedParcelsExtentWGS84:input_type -> civil.mesh.parcels.v1.GetEstimatedParcelsExtentWGS84Request
-	32,  // 100: civil.mesh.parcels.v1.ParcelReadService.GetParcelExtentsWGS84ByParcelId:input_type -> civil.mesh.parcels.v1.GetParcelExtentsWGS84ByParcelIdRequest
-	34,  // 101: civil.mesh.parcels.v1.ParcelReadService.GetLandAreaSqftByParcelId:input_type -> civil.mesh.parcels.v1.GetLandAreaSqftByParcelIdRequest
-	36,  // 102: civil.mesh.parcels.v1.ParcelReadService.GetFrontageFtByParcelId:input_type -> civil.mesh.parcels.v1.GetFrontageFtByParcelIdRequest
-	38,  // 103: civil.mesh.parcels.v1.ParcelReadService.GetDepthFtByParcelId:input_type -> civil.mesh.parcels.v1.GetDepthFtByParcelIdRequest
-	40,  // 104: civil.mesh.parcels.v1.ParcelReadService.GetLandUseIdByParcelId:input_type -> civil.mesh.parcels.v1.GetLandUseIdByParcelIdRequest
-	42,  // 105: civil.mesh.parcels.v1.ParcelReadService.GetZoningIdByParcelId:input_type -> civil.mesh.parcels.v1.GetZoningIdByParcelIdRequest
-	44,  // 106: civil.mesh.parcels.v1.ParcelReadService.GetImprovementAreaSqftByParcelId:input_type -> civil.mesh.parcels.v1.GetImprovementAreaSqftByParcelIdRequest
-	46,  // 107: civil.mesh.parcels.v1.ParcelReadService.GetBedroomsByParcelId:input_type -> civil.mesh.parcels.v1.GetBedroomsByParcelIdRequest
-	48,  // 108: civil.mesh.parcels.v1.ParcelReadService.GetBathroomsByParcelId:input_type -> civil.mesh.parcels.v1.GetBathroomsByParcelIdRequest
-	50,  // 109: civil.mesh.parcels.v1.ParcelReadService.GetUnitsByParcelId:input_type -> civil.mesh.parcels.v1.GetUnitsByParcelIdRequest
-	52,  // 110: civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementYearBuiltByParcelId:input_type -> civil.mesh.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdRequest
-	54,  // 111: civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementEffectiveYearBuiltByParcelId:input_type -> civil.mesh.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest
-	56,  // 112: civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementConditionIdByParcelId:input_type -> civil.mesh.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdRequest
-	58,  // 113: civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementTypeIdByParcelId:input_type -> civil.mesh.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdRequest
-	60,  // 114: civil.mesh.parcels.v1.ParcelReadService.GetLandAreaSqftByFeatureId:input_type -> civil.mesh.parcels.v1.GetLandAreaSqftByFeatureIdRequest
-	62,  // 115: civil.mesh.parcels.v1.ParcelReadService.GetFrontageFtByFeatureId:input_type -> civil.mesh.parcels.v1.GetFrontageFtByFeatureIdRequest
-	64,  // 116: civil.mesh.parcels.v1.ParcelReadService.GetDepthFtByFeatureId:input_type -> civil.mesh.parcels.v1.GetDepthFtByFeatureIdRequest
-	66,  // 117: civil.mesh.parcels.v1.ParcelReadService.GetLandUseIdByFeatureId:input_type -> civil.mesh.parcels.v1.GetLandUseIdByFeatureIdRequest
-	68,  // 118: civil.mesh.parcels.v1.ParcelReadService.GetZoningIdByFeatureId:input_type -> civil.mesh.parcels.v1.GetZoningIdByFeatureIdRequest
-	70,  // 119: civil.mesh.parcels.v1.ParcelReadService.GetImprovementAreaSqftByFeatureId:input_type -> civil.mesh.parcels.v1.GetImprovementAreaSqftByFeatureIdRequest
-	72,  // 120: civil.mesh.parcels.v1.ParcelReadService.GetBedroomsByFeatureId:input_type -> civil.mesh.parcels.v1.GetBedroomsByFeatureIdRequest
-	74,  // 121: civil.mesh.parcels.v1.ParcelReadService.GetBathroomsByFeatureId:input_type -> civil.mesh.parcels.v1.GetBathroomsByFeatureIdRequest
-	76,  // 122: civil.mesh.parcels.v1.ParcelReadService.GetUnitsByFeatureId:input_type -> civil.mesh.parcels.v1.GetUnitsByFeatureIdRequest
-	78,  // 123: civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementYearBuiltByFeatureId:input_type -> civil.mesh.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdRequest
-	80,  // 124: civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementEffectiveYearBuiltByFeatureId:input_type -> civil.mesh.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest
-	82,  // 125: civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementConditionIdByFeatureId:input_type -> civil.mesh.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdRequest
-	84,  // 126: civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementTypeIdByFeatureId:input_type -> civil.mesh.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdRequest
-	9,   // 127: civil.mesh.parcels.v1.ParcelReadService.SearchParcelsAddresses:input_type -> civil.mesh.parcels.v1.SearchParcelsAddressesRequest
-	87,  // 128: civil.mesh.parcels.v1.ParcelReadService.GetParcelsByAddressId:input_type -> civil.mesh.parcels.v1.GetParcelsByAddressIdRequest
-	90,  // 129: civil.mesh.parcels.v1.ParcelReadService.GetParcelsByPartyId:input_type -> civil.mesh.parcels.v1.GetParcelsByPartyIdRequest
-	12,  // 130: civil.mesh.parcels.v1.ParcelWriteService.UpdateParcel:input_type -> civil.mesh.parcels.v1.UpdateParcelRequest
-	6,   // 131: civil.mesh.parcels.v1.ParcelReadService.GetParcelsWithImprovementSummaryByParcelId:output_type -> civil.mesh.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse
-	8,   // 132: civil.mesh.parcels.v1.ParcelReadService.GetParcelsWithImprovementSummaryByFeatureId:output_type -> civil.mesh.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse
-	15,  // 133: civil.mesh.parcels.v1.ParcelReadService.GetNumericalParcelStatsById:output_type -> civil.mesh.parcels.v1.GetNumericalParcelStatsByIdResponse
-	17,  // 134: civil.mesh.parcels.v1.ParcelReadService.GetCategoricalParcelStatsById:output_type -> civil.mesh.parcels.v1.GetCategoricalParcelStatsByIdResponse
-	23,  // 135: civil.mesh.parcels.v1.ParcelReadService.GetEquityComparables:output_type -> civil.mesh.parcels.v1.GetEquityComparablesResponse
-	25,  // 136: civil.mesh.parcels.v1.ParcelReadService.GetSalesComparables:output_type -> civil.mesh.parcels.v1.GetSalesComparablesResponse
-	28,  // 137: civil.mesh.parcels.v1.ParcelReadService.GetParcelIdsByFeatureId:output_type -> civil.mesh.parcels.v1.GetParcelIdsByFeatureIdResponse
-	30,  // 138: civil.mesh.parcels.v1.ParcelReadService.GetEstimatedParcelsExtentWGS84:output_type -> civil.mesh.parcels.v1.GetEstimatedParcelsExtentWGS84Response
-	33,  // 139: civil.mesh.parcels.v1.ParcelReadService.GetParcelExtentsWGS84ByParcelId:output_type -> civil.mesh.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse
-	35,  // 140: civil.mesh.parcels.v1.ParcelReadService.GetLandAreaSqftByParcelId:output_type -> civil.mesh.parcels.v1.GetLandAreaSqftByParcelIdResponse
-	37,  // 141: civil.mesh.parcels.v1.ParcelReadService.GetFrontageFtByParcelId:output_type -> civil.mesh.parcels.v1.GetFrontageFtByParcelIdResponse
-	39,  // 142: civil.mesh.parcels.v1.ParcelReadService.GetDepthFtByParcelId:output_type -> civil.mesh.parcels.v1.GetDepthFtByParcelIdResponse
-	41,  // 143: civil.mesh.parcels.v1.ParcelReadService.GetLandUseIdByParcelId:output_type -> civil.mesh.parcels.v1.GetLandUseIdByParcelIdResponse
-	43,  // 144: civil.mesh.parcels.v1.ParcelReadService.GetZoningIdByParcelId:output_type -> civil.mesh.parcels.v1.GetZoningIdByParcelIdResponse
-	45,  // 145: civil.mesh.parcels.v1.ParcelReadService.GetImprovementAreaSqftByParcelId:output_type -> civil.mesh.parcels.v1.GetImprovementAreaSqftByParcelIdResponse
-	47,  // 146: civil.mesh.parcels.v1.ParcelReadService.GetBedroomsByParcelId:output_type -> civil.mesh.parcels.v1.GetBedroomsByParcelIdResponse
-	49,  // 147: civil.mesh.parcels.v1.ParcelReadService.GetBathroomsByParcelId:output_type -> civil.mesh.parcels.v1.GetBathroomsByParcelIdResponse
-	51,  // 148: civil.mesh.parcels.v1.ParcelReadService.GetUnitsByParcelId:output_type -> civil.mesh.parcels.v1.GetUnitsByParcelIdResponse
-	53,  // 149: civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementYearBuiltByParcelId:output_type -> civil.mesh.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdResponse
-	55,  // 150: civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementEffectiveYearBuiltByParcelId:output_type -> civil.mesh.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse
-	57,  // 151: civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementConditionIdByParcelId:output_type -> civil.mesh.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdResponse
-	59,  // 152: civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementTypeIdByParcelId:output_type -> civil.mesh.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdResponse
-	61,  // 153: civil.mesh.parcels.v1.ParcelReadService.GetLandAreaSqftByFeatureId:output_type -> civil.mesh.parcels.v1.GetLandAreaSqftByFeatureIdResponse
-	63,  // 154: civil.mesh.parcels.v1.ParcelReadService.GetFrontageFtByFeatureId:output_type -> civil.mesh.parcels.v1.GetFrontageFtByFeatureIdResponse
-	65,  // 155: civil.mesh.parcels.v1.ParcelReadService.GetDepthFtByFeatureId:output_type -> civil.mesh.parcels.v1.GetDepthFtByFeatureIdResponse
-	67,  // 156: civil.mesh.parcels.v1.ParcelReadService.GetLandUseIdByFeatureId:output_type -> civil.mesh.parcels.v1.GetLandUseIdByFeatureIdResponse
-	69,  // 157: civil.mesh.parcels.v1.ParcelReadService.GetZoningIdByFeatureId:output_type -> civil.mesh.parcels.v1.GetZoningIdByFeatureIdResponse
-	71,  // 158: civil.mesh.parcels.v1.ParcelReadService.GetImprovementAreaSqftByFeatureId:output_type -> civil.mesh.parcels.v1.GetImprovementAreaSqftByFeatureIdResponse
-	73,  // 159: civil.mesh.parcels.v1.ParcelReadService.GetBedroomsByFeatureId:output_type -> civil.mesh.parcels.v1.GetBedroomsByFeatureIdResponse
-	75,  // 160: civil.mesh.parcels.v1.ParcelReadService.GetBathroomsByFeatureId:output_type -> civil.mesh.parcels.v1.GetBathroomsByFeatureIdResponse
-	77,  // 161: civil.mesh.parcels.v1.ParcelReadService.GetUnitsByFeatureId:output_type -> civil.mesh.parcels.v1.GetUnitsByFeatureIdResponse
-	79,  // 162: civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementYearBuiltByFeatureId:output_type -> civil.mesh.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse
-	81,  // 163: civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementEffectiveYearBuiltByFeatureId:output_type -> civil.mesh.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse
-	83,  // 164: civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementConditionIdByFeatureId:output_type -> civil.mesh.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse
-	85,  // 165: civil.mesh.parcels.v1.ParcelReadService.GetPrimaryImprovementTypeIdByFeatureId:output_type -> civil.mesh.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse
-	10,  // 166: civil.mesh.parcels.v1.ParcelReadService.SearchParcelsAddresses:output_type -> civil.mesh.parcels.v1.SearchParcelsAddressesResponse
-	88,  // 167: civil.mesh.parcels.v1.ParcelReadService.GetParcelsByAddressId:output_type -> civil.mesh.parcels.v1.GetParcelsByAddressIdResponse
-	91,  // 168: civil.mesh.parcels.v1.ParcelReadService.GetParcelsByPartyId:output_type -> civil.mesh.parcels.v1.GetParcelsByPartyIdResponse
-	13,  // 169: civil.mesh.parcels.v1.ParcelWriteService.UpdateParcel:output_type -> civil.mesh.parcels.v1.UpdateParcelResponse
+	5,   // 92: civil.mesh.parcels.v1.ParcelsReadService.GetParcelsWithImprovementSummaryByParcelId:input_type -> civil.mesh.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdRequest
+	7,   // 93: civil.mesh.parcels.v1.ParcelsReadService.GetParcelsWithImprovementSummaryByFeatureId:input_type -> civil.mesh.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdRequest
+	14,  // 94: civil.mesh.parcels.v1.ParcelsReadService.GetNumericalParcelStatsById:input_type -> civil.mesh.parcels.v1.GetNumericalParcelStatsByIdRequest
+	16,  // 95: civil.mesh.parcels.v1.ParcelsReadService.GetCategoricalParcelStatsById:input_type -> civil.mesh.parcels.v1.GetCategoricalParcelStatsByIdRequest
+	22,  // 96: civil.mesh.parcels.v1.ParcelsReadService.GetEquityComparables:input_type -> civil.mesh.parcels.v1.GetEquityComparablesRequest
+	24,  // 97: civil.mesh.parcels.v1.ParcelsReadService.GetSalesComparables:input_type -> civil.mesh.parcels.v1.GetSalesComparablesRequest
+	27,  // 98: civil.mesh.parcels.v1.ParcelsReadService.GetParcelIdsByFeatureId:input_type -> civil.mesh.parcels.v1.GetParcelIdsByFeatureIdRequest
+	29,  // 99: civil.mesh.parcels.v1.ParcelsReadService.GetEstimatedParcelsExtentWGS84:input_type -> civil.mesh.parcels.v1.GetEstimatedParcelsExtentWGS84Request
+	32,  // 100: civil.mesh.parcels.v1.ParcelsReadService.GetParcelExtentsWGS84ByParcelId:input_type -> civil.mesh.parcels.v1.GetParcelExtentsWGS84ByParcelIdRequest
+	34,  // 101: civil.mesh.parcels.v1.ParcelsReadService.GetLandAreaSqftByParcelId:input_type -> civil.mesh.parcels.v1.GetLandAreaSqftByParcelIdRequest
+	36,  // 102: civil.mesh.parcels.v1.ParcelsReadService.GetFrontageFtByParcelId:input_type -> civil.mesh.parcels.v1.GetFrontageFtByParcelIdRequest
+	38,  // 103: civil.mesh.parcels.v1.ParcelsReadService.GetDepthFtByParcelId:input_type -> civil.mesh.parcels.v1.GetDepthFtByParcelIdRequest
+	40,  // 104: civil.mesh.parcels.v1.ParcelsReadService.GetLandUseIdByParcelId:input_type -> civil.mesh.parcels.v1.GetLandUseIdByParcelIdRequest
+	42,  // 105: civil.mesh.parcels.v1.ParcelsReadService.GetZoningIdByParcelId:input_type -> civil.mesh.parcels.v1.GetZoningIdByParcelIdRequest
+	44,  // 106: civil.mesh.parcels.v1.ParcelsReadService.GetImprovementAreaSqftByParcelId:input_type -> civil.mesh.parcels.v1.GetImprovementAreaSqftByParcelIdRequest
+	46,  // 107: civil.mesh.parcels.v1.ParcelsReadService.GetBedroomsByParcelId:input_type -> civil.mesh.parcels.v1.GetBedroomsByParcelIdRequest
+	48,  // 108: civil.mesh.parcels.v1.ParcelsReadService.GetBathroomsByParcelId:input_type -> civil.mesh.parcels.v1.GetBathroomsByParcelIdRequest
+	50,  // 109: civil.mesh.parcels.v1.ParcelsReadService.GetUnitsByParcelId:input_type -> civil.mesh.parcels.v1.GetUnitsByParcelIdRequest
+	52,  // 110: civil.mesh.parcels.v1.ParcelsReadService.GetPrimaryImprovementYearBuiltByParcelId:input_type -> civil.mesh.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdRequest
+	54,  // 111: civil.mesh.parcels.v1.ParcelsReadService.GetPrimaryImprovementEffectiveYearBuiltByParcelId:input_type -> civil.mesh.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdRequest
+	56,  // 112: civil.mesh.parcels.v1.ParcelsReadService.GetPrimaryImprovementConditionIdByParcelId:input_type -> civil.mesh.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdRequest
+	58,  // 113: civil.mesh.parcels.v1.ParcelsReadService.GetPrimaryImprovementTypeIdByParcelId:input_type -> civil.mesh.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdRequest
+	60,  // 114: civil.mesh.parcels.v1.ParcelsReadService.GetLandAreaSqftByFeatureId:input_type -> civil.mesh.parcels.v1.GetLandAreaSqftByFeatureIdRequest
+	62,  // 115: civil.mesh.parcels.v1.ParcelsReadService.GetFrontageFtByFeatureId:input_type -> civil.mesh.parcels.v1.GetFrontageFtByFeatureIdRequest
+	64,  // 116: civil.mesh.parcels.v1.ParcelsReadService.GetDepthFtByFeatureId:input_type -> civil.mesh.parcels.v1.GetDepthFtByFeatureIdRequest
+	66,  // 117: civil.mesh.parcels.v1.ParcelsReadService.GetLandUseIdByFeatureId:input_type -> civil.mesh.parcels.v1.GetLandUseIdByFeatureIdRequest
+	68,  // 118: civil.mesh.parcels.v1.ParcelsReadService.GetZoningIdByFeatureId:input_type -> civil.mesh.parcels.v1.GetZoningIdByFeatureIdRequest
+	70,  // 119: civil.mesh.parcels.v1.ParcelsReadService.GetImprovementAreaSqftByFeatureId:input_type -> civil.mesh.parcels.v1.GetImprovementAreaSqftByFeatureIdRequest
+	72,  // 120: civil.mesh.parcels.v1.ParcelsReadService.GetBedroomsByFeatureId:input_type -> civil.mesh.parcels.v1.GetBedroomsByFeatureIdRequest
+	74,  // 121: civil.mesh.parcels.v1.ParcelsReadService.GetBathroomsByFeatureId:input_type -> civil.mesh.parcels.v1.GetBathroomsByFeatureIdRequest
+	76,  // 122: civil.mesh.parcels.v1.ParcelsReadService.GetUnitsByFeatureId:input_type -> civil.mesh.parcels.v1.GetUnitsByFeatureIdRequest
+	78,  // 123: civil.mesh.parcels.v1.ParcelsReadService.GetPrimaryImprovementYearBuiltByFeatureId:input_type -> civil.mesh.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdRequest
+	80,  // 124: civil.mesh.parcels.v1.ParcelsReadService.GetPrimaryImprovementEffectiveYearBuiltByFeatureId:input_type -> civil.mesh.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdRequest
+	82,  // 125: civil.mesh.parcels.v1.ParcelsReadService.GetPrimaryImprovementConditionIdByFeatureId:input_type -> civil.mesh.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdRequest
+	84,  // 126: civil.mesh.parcels.v1.ParcelsReadService.GetPrimaryImprovementTypeIdByFeatureId:input_type -> civil.mesh.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdRequest
+	9,   // 127: civil.mesh.parcels.v1.ParcelsReadService.SearchParcelsAddresses:input_type -> civil.mesh.parcels.v1.SearchParcelsAddressesRequest
+	87,  // 128: civil.mesh.parcels.v1.ParcelsReadService.GetParcelsByAddressId:input_type -> civil.mesh.parcels.v1.GetParcelsByAddressIdRequest
+	90,  // 129: civil.mesh.parcels.v1.ParcelsReadService.GetParcelsByPartyId:input_type -> civil.mesh.parcels.v1.GetParcelsByPartyIdRequest
+	12,  // 130: civil.mesh.parcels.v1.ParcelsWriteService.UpdateParcel:input_type -> civil.mesh.parcels.v1.UpdateParcelRequest
+	6,   // 131: civil.mesh.parcels.v1.ParcelsReadService.GetParcelsWithImprovementSummaryByParcelId:output_type -> civil.mesh.parcels.v1.GetParcelsWithImprovementSummaryByParcelIdResponse
+	8,   // 132: civil.mesh.parcels.v1.ParcelsReadService.GetParcelsWithImprovementSummaryByFeatureId:output_type -> civil.mesh.parcels.v1.GetParcelsWithImprovementSummaryByFeatureIdResponse
+	15,  // 133: civil.mesh.parcels.v1.ParcelsReadService.GetNumericalParcelStatsById:output_type -> civil.mesh.parcels.v1.GetNumericalParcelStatsByIdResponse
+	17,  // 134: civil.mesh.parcels.v1.ParcelsReadService.GetCategoricalParcelStatsById:output_type -> civil.mesh.parcels.v1.GetCategoricalParcelStatsByIdResponse
+	23,  // 135: civil.mesh.parcels.v1.ParcelsReadService.GetEquityComparables:output_type -> civil.mesh.parcels.v1.GetEquityComparablesResponse
+	25,  // 136: civil.mesh.parcels.v1.ParcelsReadService.GetSalesComparables:output_type -> civil.mesh.parcels.v1.GetSalesComparablesResponse
+	28,  // 137: civil.mesh.parcels.v1.ParcelsReadService.GetParcelIdsByFeatureId:output_type -> civil.mesh.parcels.v1.GetParcelIdsByFeatureIdResponse
+	30,  // 138: civil.mesh.parcels.v1.ParcelsReadService.GetEstimatedParcelsExtentWGS84:output_type -> civil.mesh.parcels.v1.GetEstimatedParcelsExtentWGS84Response
+	33,  // 139: civil.mesh.parcels.v1.ParcelsReadService.GetParcelExtentsWGS84ByParcelId:output_type -> civil.mesh.parcels.v1.GetParcelExtentsWGS84ByParcelIdResponse
+	35,  // 140: civil.mesh.parcels.v1.ParcelsReadService.GetLandAreaSqftByParcelId:output_type -> civil.mesh.parcels.v1.GetLandAreaSqftByParcelIdResponse
+	37,  // 141: civil.mesh.parcels.v1.ParcelsReadService.GetFrontageFtByParcelId:output_type -> civil.mesh.parcels.v1.GetFrontageFtByParcelIdResponse
+	39,  // 142: civil.mesh.parcels.v1.ParcelsReadService.GetDepthFtByParcelId:output_type -> civil.mesh.parcels.v1.GetDepthFtByParcelIdResponse
+	41,  // 143: civil.mesh.parcels.v1.ParcelsReadService.GetLandUseIdByParcelId:output_type -> civil.mesh.parcels.v1.GetLandUseIdByParcelIdResponse
+	43,  // 144: civil.mesh.parcels.v1.ParcelsReadService.GetZoningIdByParcelId:output_type -> civil.mesh.parcels.v1.GetZoningIdByParcelIdResponse
+	45,  // 145: civil.mesh.parcels.v1.ParcelsReadService.GetImprovementAreaSqftByParcelId:output_type -> civil.mesh.parcels.v1.GetImprovementAreaSqftByParcelIdResponse
+	47,  // 146: civil.mesh.parcels.v1.ParcelsReadService.GetBedroomsByParcelId:output_type -> civil.mesh.parcels.v1.GetBedroomsByParcelIdResponse
+	49,  // 147: civil.mesh.parcels.v1.ParcelsReadService.GetBathroomsByParcelId:output_type -> civil.mesh.parcels.v1.GetBathroomsByParcelIdResponse
+	51,  // 148: civil.mesh.parcels.v1.ParcelsReadService.GetUnitsByParcelId:output_type -> civil.mesh.parcels.v1.GetUnitsByParcelIdResponse
+	53,  // 149: civil.mesh.parcels.v1.ParcelsReadService.GetPrimaryImprovementYearBuiltByParcelId:output_type -> civil.mesh.parcels.v1.GetPrimaryImprovementYearBuiltByParcelIdResponse
+	55,  // 150: civil.mesh.parcels.v1.ParcelsReadService.GetPrimaryImprovementEffectiveYearBuiltByParcelId:output_type -> civil.mesh.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByParcelIdResponse
+	57,  // 151: civil.mesh.parcels.v1.ParcelsReadService.GetPrimaryImprovementConditionIdByParcelId:output_type -> civil.mesh.parcels.v1.GetPrimaryImprovementConditionIdByParcelIdResponse
+	59,  // 152: civil.mesh.parcels.v1.ParcelsReadService.GetPrimaryImprovementTypeIdByParcelId:output_type -> civil.mesh.parcels.v1.GetPrimaryImprovementTypeIdByParcelIdResponse
+	61,  // 153: civil.mesh.parcels.v1.ParcelsReadService.GetLandAreaSqftByFeatureId:output_type -> civil.mesh.parcels.v1.GetLandAreaSqftByFeatureIdResponse
+	63,  // 154: civil.mesh.parcels.v1.ParcelsReadService.GetFrontageFtByFeatureId:output_type -> civil.mesh.parcels.v1.GetFrontageFtByFeatureIdResponse
+	65,  // 155: civil.mesh.parcels.v1.ParcelsReadService.GetDepthFtByFeatureId:output_type -> civil.mesh.parcels.v1.GetDepthFtByFeatureIdResponse
+	67,  // 156: civil.mesh.parcels.v1.ParcelsReadService.GetLandUseIdByFeatureId:output_type -> civil.mesh.parcels.v1.GetLandUseIdByFeatureIdResponse
+	69,  // 157: civil.mesh.parcels.v1.ParcelsReadService.GetZoningIdByFeatureId:output_type -> civil.mesh.parcels.v1.GetZoningIdByFeatureIdResponse
+	71,  // 158: civil.mesh.parcels.v1.ParcelsReadService.GetImprovementAreaSqftByFeatureId:output_type -> civil.mesh.parcels.v1.GetImprovementAreaSqftByFeatureIdResponse
+	73,  // 159: civil.mesh.parcels.v1.ParcelsReadService.GetBedroomsByFeatureId:output_type -> civil.mesh.parcels.v1.GetBedroomsByFeatureIdResponse
+	75,  // 160: civil.mesh.parcels.v1.ParcelsReadService.GetBathroomsByFeatureId:output_type -> civil.mesh.parcels.v1.GetBathroomsByFeatureIdResponse
+	77,  // 161: civil.mesh.parcels.v1.ParcelsReadService.GetUnitsByFeatureId:output_type -> civil.mesh.parcels.v1.GetUnitsByFeatureIdResponse
+	79,  // 162: civil.mesh.parcels.v1.ParcelsReadService.GetPrimaryImprovementYearBuiltByFeatureId:output_type -> civil.mesh.parcels.v1.GetPrimaryImprovementYearBuiltByFeatureIdResponse
+	81,  // 163: civil.mesh.parcels.v1.ParcelsReadService.GetPrimaryImprovementEffectiveYearBuiltByFeatureId:output_type -> civil.mesh.parcels.v1.GetPrimaryImprovementEffectiveYearBuiltByFeatureIdResponse
+	83,  // 164: civil.mesh.parcels.v1.ParcelsReadService.GetPrimaryImprovementConditionIdByFeatureId:output_type -> civil.mesh.parcels.v1.GetPrimaryImprovementConditionIdByFeatureIdResponse
+	85,  // 165: civil.mesh.parcels.v1.ParcelsReadService.GetPrimaryImprovementTypeIdByFeatureId:output_type -> civil.mesh.parcels.v1.GetPrimaryImprovementTypeIdByFeatureIdResponse
+	10,  // 166: civil.mesh.parcels.v1.ParcelsReadService.SearchParcelsAddresses:output_type -> civil.mesh.parcels.v1.SearchParcelsAddressesResponse
+	88,  // 167: civil.mesh.parcels.v1.ParcelsReadService.GetParcelsByAddressId:output_type -> civil.mesh.parcels.v1.GetParcelsByAddressIdResponse
+	91,  // 168: civil.mesh.parcels.v1.ParcelsReadService.GetParcelsByPartyId:output_type -> civil.mesh.parcels.v1.GetParcelsByPartyIdResponse
+	13,  // 169: civil.mesh.parcels.v1.ParcelsWriteService.UpdateParcel:output_type -> civil.mesh.parcels.v1.UpdateParcelResponse
 	131, // [131:170] is the sub-list for method output_type
 	92,  // [92:131] is the sub-list for method input_type
 	92,  // [92:92] is the sub-list for extension type_name

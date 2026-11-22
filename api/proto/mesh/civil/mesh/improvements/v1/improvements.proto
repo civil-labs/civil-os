@@ -5,7 +5,7 @@ package civil.mesh.improvements.v1;
 import "civil/mesh/pagination/v1/pagination.proto";
 import "google/protobuf/timestamp.proto";
 
-service ImprovementReadService {
+service ImprovementsReadService {
   rpc GetImprovementTypes(GetImprovementTypesRequest) returns (GetImprovementTypesResponse) {}
 
   rpc GetImprovementConditions(GetImprovementConditionsRequest) returns (GetImprovementConditionsResponse) {}

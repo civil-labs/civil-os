@@ -11,7 +11,7 @@ import (
 )
 
 type LandUseServer struct {
-	dbReaderClient meshlandusesv1connect.LandUseReadServiceClient
+	dbReaderClient meshlandusesv1connect.LandUsesReadServiceClient
 	logger         *slog.Logger
 }
 

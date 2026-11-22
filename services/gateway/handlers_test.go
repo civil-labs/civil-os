@@ -239,8 +239,8 @@ var publicServices = []string{
 	improvementsv1connect.ImprovementsServiceName,
 	landusesv1connect.LandUsesServiceName,
 	zoningv1connect.ZoningServiceName,
-	publicvaluationsv1connect.ValuationServiceName,
-	publicneighborhoodsv1connect.NeighborhoodServiceName,
+	publicvaluationsv1connect.ValuationsServiceName,
+	publicneighborhoodsv1connect.NeighborhoodsServiceName,
 	publictransfersv1connect.RealPropertyTransfersServiceName,
 	publicaddressesv1connect.AddressesServiceName,
 	publicpartiesv1connect.PartiesServiceName,
@@ -394,8 +394,8 @@ func TestUpdateParcelForwardsTraceparent(t *testing.T) {
 		t.Fatal(err)
 	}
 	calls := g.mesh.reset(0)
-	if len(calls) != 1 || !strings.Contains(calls[0].procedure, "ParcelWriteService") {
-		t.Fatalf("expected one ParcelWriteService call, got %+v", calls)
+	if len(calls) != 1 || !strings.Contains(calls[0].procedure, "ParcelsWriteService") {
+		t.Fatalf("expected one ParcelsWriteService call, got %+v", calls)
 	}
 	if got := calls[0].header.Get("Traceparent"); got != tp {
 		t.Errorf("traceparent = %q, want %q", got, tp)
@@ -540,12 +540,12 @@ func (m *methodRecorder) RoundTrip(r *http.Request) (*http.Response, error) {
 	return http.DefaultTransport.RoundTrip(r)
 }
 
-// TestNeighborhoodRPCsOverGET calls each NeighborhoodService RPC with Connect
+// TestNeighborhoodRPCsOverGET calls each NeighborhoodsService RPC with Connect
 // GET. The handler only accepts GET for NO_SIDE_EFFECTS procedures, so a
 // call that reaches the mesh proves the idempotency level reaches it.
 func TestNeighborhoodRPCsOverGET(t *testing.T) {
 	g := startGateway(t, nil)
-	for _, md := range methods(t, publicneighborhoodsv1connect.NeighborhoodServiceName) {
+	for _, md := range methods(t, publicneighborhoodsv1connect.NeighborhoodsServiceName) {
 		t.Run(string(md.Name()), func(t *testing.T) {
 			rec := &methodRecorder{}
 			procedure := fmt.Sprintf("/%s/%s", md.Parent().FullName(), md.Name())

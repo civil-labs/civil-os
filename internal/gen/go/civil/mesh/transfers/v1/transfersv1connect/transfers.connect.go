@@ -21,9 +21,9 @@ import (
 const _ = connect.IsAtLeastVersion1_13_0
 
 const (
-	// RealPropertyTransferReadServiceName is the fully-qualified name of the
-	// RealPropertyTransferReadService service.
-	RealPropertyTransferReadServiceName = "civil.mesh.transfers.v1.RealPropertyTransferReadService"
+	// RealPropertyTransfersReadServiceName is the fully-qualified name of the
+	// RealPropertyTransfersReadService service.
+	RealPropertyTransfersReadServiceName = "civil.mesh.transfers.v1.RealPropertyTransfersReadService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -34,170 +34,170 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// RealPropertyTransferReadServiceGetTransfersByIdProcedure is the fully-qualified name of the
-	// RealPropertyTransferReadService's GetTransfersById RPC.
-	RealPropertyTransferReadServiceGetTransfersByIdProcedure = "/civil.mesh.transfers.v1.RealPropertyTransferReadService/GetTransfersById"
-	// RealPropertyTransferReadServiceGetTransfersByParcelIdProcedure is the fully-qualified name of the
-	// RealPropertyTransferReadService's GetTransfersByParcelId RPC.
-	RealPropertyTransferReadServiceGetTransfersByParcelIdProcedure = "/civil.mesh.transfers.v1.RealPropertyTransferReadService/GetTransfersByParcelId"
-	// RealPropertyTransferReadServiceGetTransfersByFeatureIdProcedure is the fully-qualified name of
-	// the RealPropertyTransferReadService's GetTransfersByFeatureId RPC.
-	RealPropertyTransferReadServiceGetTransfersByFeatureIdProcedure = "/civil.mesh.transfers.v1.RealPropertyTransferReadService/GetTransfersByFeatureId"
-	// RealPropertyTransferReadServiceGetTransfersByPartyIdProcedure is the fully-qualified name of the
-	// RealPropertyTransferReadService's GetTransfersByPartyId RPC.
-	RealPropertyTransferReadServiceGetTransfersByPartyIdProcedure = "/civil.mesh.transfers.v1.RealPropertyTransferReadService/GetTransfersByPartyId"
+	// RealPropertyTransfersReadServiceGetTransfersByIdProcedure is the fully-qualified name of the
+	// RealPropertyTransfersReadService's GetTransfersById RPC.
+	RealPropertyTransfersReadServiceGetTransfersByIdProcedure = "/civil.mesh.transfers.v1.RealPropertyTransfersReadService/GetTransfersById"
+	// RealPropertyTransfersReadServiceGetTransfersByParcelIdProcedure is the fully-qualified name of
+	// the RealPropertyTransfersReadService's GetTransfersByParcelId RPC.
+	RealPropertyTransfersReadServiceGetTransfersByParcelIdProcedure = "/civil.mesh.transfers.v1.RealPropertyTransfersReadService/GetTransfersByParcelId"
+	// RealPropertyTransfersReadServiceGetTransfersByFeatureIdProcedure is the fully-qualified name of
+	// the RealPropertyTransfersReadService's GetTransfersByFeatureId RPC.
+	RealPropertyTransfersReadServiceGetTransfersByFeatureIdProcedure = "/civil.mesh.transfers.v1.RealPropertyTransfersReadService/GetTransfersByFeatureId"
+	// RealPropertyTransfersReadServiceGetTransfersByPartyIdProcedure is the fully-qualified name of the
+	// RealPropertyTransfersReadService's GetTransfersByPartyId RPC.
+	RealPropertyTransfersReadServiceGetTransfersByPartyIdProcedure = "/civil.mesh.transfers.v1.RealPropertyTransfersReadService/GetTransfersByPartyId"
 )
 
-// RealPropertyTransferReadServiceClient is a client for the
-// civil.mesh.transfers.v1.RealPropertyTransferReadService service.
-type RealPropertyTransferReadServiceClient interface {
+// RealPropertyTransfersReadServiceClient is a client for the
+// civil.mesh.transfers.v1.RealPropertyTransfersReadService service.
+type RealPropertyTransfersReadServiceClient interface {
 	GetTransfersById(context.Context, *connect.Request[v1.GetTransfersByIdRequest]) (*connect.Response[v1.GetTransfersByIdResponse], error)
 	GetTransfersByParcelId(context.Context, *connect.Request[v1.GetTransfersByParcelIdRequest]) (*connect.Response[v1.GetTransfersByParcelIdResponse], error)
 	GetTransfersByFeatureId(context.Context, *connect.Request[v1.GetTransfersByFeatureIdRequest]) (*connect.Response[v1.GetTransfersByFeatureIdResponse], error)
 	GetTransfersByPartyId(context.Context, *connect.Request[v1.GetTransfersByPartyIdRequest]) (*connect.Response[v1.GetTransfersByPartyIdResponse], error)
 }
 
-// NewRealPropertyTransferReadServiceClient constructs a client for the
-// civil.mesh.transfers.v1.RealPropertyTransferReadService service. By default, it uses the Connect
+// NewRealPropertyTransfersReadServiceClient constructs a client for the
+// civil.mesh.transfers.v1.RealPropertyTransfersReadService service. By default, it uses the Connect
 // protocol with the binary Protobuf Codec, asks for gzipped responses, and sends uncompressed
 // requests. To use the gRPC or gRPC-Web protocols, supply the connect.WithGRPC() or
 // connect.WithGRPCWeb() options.
 //
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
 // http://api.acme.com or https://acme.com/grpc).
-func NewRealPropertyTransferReadServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) RealPropertyTransferReadServiceClient {
+func NewRealPropertyTransfersReadServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) RealPropertyTransfersReadServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
-	realPropertyTransferReadServiceMethods := v1.File_civil_mesh_transfers_v1_transfers_proto.Services().ByName("RealPropertyTransferReadService").Methods()
-	return &realPropertyTransferReadServiceClient{
+	realPropertyTransfersReadServiceMethods := v1.File_civil_mesh_transfers_v1_transfers_proto.Services().ByName("RealPropertyTransfersReadService").Methods()
+	return &realPropertyTransfersReadServiceClient{
 		getTransfersById: connect.NewClient[v1.GetTransfersByIdRequest, v1.GetTransfersByIdResponse](
 			httpClient,
-			baseURL+RealPropertyTransferReadServiceGetTransfersByIdProcedure,
-			connect.WithSchema(realPropertyTransferReadServiceMethods.ByName("GetTransfersById")),
+			baseURL+RealPropertyTransfersReadServiceGetTransfersByIdProcedure,
+			connect.WithSchema(realPropertyTransfersReadServiceMethods.ByName("GetTransfersById")),
 			connect.WithClientOptions(opts...),
 		),
 		getTransfersByParcelId: connect.NewClient[v1.GetTransfersByParcelIdRequest, v1.GetTransfersByParcelIdResponse](
 			httpClient,
-			baseURL+RealPropertyTransferReadServiceGetTransfersByParcelIdProcedure,
-			connect.WithSchema(realPropertyTransferReadServiceMethods.ByName("GetTransfersByParcelId")),
+			baseURL+RealPropertyTransfersReadServiceGetTransfersByParcelIdProcedure,
+			connect.WithSchema(realPropertyTransfersReadServiceMethods.ByName("GetTransfersByParcelId")),
 			connect.WithClientOptions(opts...),
 		),
 		getTransfersByFeatureId: connect.NewClient[v1.GetTransfersByFeatureIdRequest, v1.GetTransfersByFeatureIdResponse](
 			httpClient,
-			baseURL+RealPropertyTransferReadServiceGetTransfersByFeatureIdProcedure,
-			connect.WithSchema(realPropertyTransferReadServiceMethods.ByName("GetTransfersByFeatureId")),
+			baseURL+RealPropertyTransfersReadServiceGetTransfersByFeatureIdProcedure,
+			connect.WithSchema(realPropertyTransfersReadServiceMethods.ByName("GetTransfersByFeatureId")),
 			connect.WithClientOptions(opts...),
 		),
 		getTransfersByPartyId: connect.NewClient[v1.GetTransfersByPartyIdRequest, v1.GetTransfersByPartyIdResponse](
 			httpClient,
-			baseURL+RealPropertyTransferReadServiceGetTransfersByPartyIdProcedure,
-			connect.WithSchema(realPropertyTransferReadServiceMethods.ByName("GetTransfersByPartyId")),
+			baseURL+RealPropertyTransfersReadServiceGetTransfersByPartyIdProcedure,
+			connect.WithSchema(realPropertyTransfersReadServiceMethods.ByName("GetTransfersByPartyId")),
 			connect.WithClientOptions(opts...),
 		),
 	}
 }
 
-// realPropertyTransferReadServiceClient implements RealPropertyTransferReadServiceClient.
-type realPropertyTransferReadServiceClient struct {
+// realPropertyTransfersReadServiceClient implements RealPropertyTransfersReadServiceClient.
+type realPropertyTransfersReadServiceClient struct {
 	getTransfersById        *connect.Client[v1.GetTransfersByIdRequest, v1.GetTransfersByIdResponse]
 	getTransfersByParcelId  *connect.Client[v1.GetTransfersByParcelIdRequest, v1.GetTransfersByParcelIdResponse]
 	getTransfersByFeatureId *connect.Client[v1.GetTransfersByFeatureIdRequest, v1.GetTransfersByFeatureIdResponse]
 	getTransfersByPartyId   *connect.Client[v1.GetTransfersByPartyIdRequest, v1.GetTransfersByPartyIdResponse]
 }
 
-// GetTransfersById calls civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersById.
-func (c *realPropertyTransferReadServiceClient) GetTransfersById(ctx context.Context, req *connect.Request[v1.GetTransfersByIdRequest]) (*connect.Response[v1.GetTransfersByIdResponse], error) {
+// GetTransfersById calls civil.mesh.transfers.v1.RealPropertyTransfersReadService.GetTransfersById.
+func (c *realPropertyTransfersReadServiceClient) GetTransfersById(ctx context.Context, req *connect.Request[v1.GetTransfersByIdRequest]) (*connect.Response[v1.GetTransfersByIdResponse], error) {
 	return c.getTransfersById.CallUnary(ctx, req)
 }
 
 // GetTransfersByParcelId calls
-// civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByParcelId.
-func (c *realPropertyTransferReadServiceClient) GetTransfersByParcelId(ctx context.Context, req *connect.Request[v1.GetTransfersByParcelIdRequest]) (*connect.Response[v1.GetTransfersByParcelIdResponse], error) {
+// civil.mesh.transfers.v1.RealPropertyTransfersReadService.GetTransfersByParcelId.
+func (c *realPropertyTransfersReadServiceClient) GetTransfersByParcelId(ctx context.Context, req *connect.Request[v1.GetTransfersByParcelIdRequest]) (*connect.Response[v1.GetTransfersByParcelIdResponse], error) {
 	return c.getTransfersByParcelId.CallUnary(ctx, req)
 }
 
 // GetTransfersByFeatureId calls
-// civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByFeatureId.
-func (c *realPropertyTransferReadServiceClient) GetTransfersByFeatureId(ctx context.Context, req *connect.Request[v1.GetTransfersByFeatureIdRequest]) (*connect.Response[v1.GetTransfersByFeatureIdResponse], error) {
+// civil.mesh.transfers.v1.RealPropertyTransfersReadService.GetTransfersByFeatureId.
+func (c *realPropertyTransfersReadServiceClient) GetTransfersByFeatureId(ctx context.Context, req *connect.Request[v1.GetTransfersByFeatureIdRequest]) (*connect.Response[v1.GetTransfersByFeatureIdResponse], error) {
 	return c.getTransfersByFeatureId.CallUnary(ctx, req)
 }
 
 // GetTransfersByPartyId calls
-// civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByPartyId.
-func (c *realPropertyTransferReadServiceClient) GetTransfersByPartyId(ctx context.Context, req *connect.Request[v1.GetTransfersByPartyIdRequest]) (*connect.Response[v1.GetTransfersByPartyIdResponse], error) {
+// civil.mesh.transfers.v1.RealPropertyTransfersReadService.GetTransfersByPartyId.
+func (c *realPropertyTransfersReadServiceClient) GetTransfersByPartyId(ctx context.Context, req *connect.Request[v1.GetTransfersByPartyIdRequest]) (*connect.Response[v1.GetTransfersByPartyIdResponse], error) {
 	return c.getTransfersByPartyId.CallUnary(ctx, req)
 }
 
-// RealPropertyTransferReadServiceHandler is an implementation of the
-// civil.mesh.transfers.v1.RealPropertyTransferReadService service.
-type RealPropertyTransferReadServiceHandler interface {
+// RealPropertyTransfersReadServiceHandler is an implementation of the
+// civil.mesh.transfers.v1.RealPropertyTransfersReadService service.
+type RealPropertyTransfersReadServiceHandler interface {
 	GetTransfersById(context.Context, *connect.Request[v1.GetTransfersByIdRequest]) (*connect.Response[v1.GetTransfersByIdResponse], error)
 	GetTransfersByParcelId(context.Context, *connect.Request[v1.GetTransfersByParcelIdRequest]) (*connect.Response[v1.GetTransfersByParcelIdResponse], error)
 	GetTransfersByFeatureId(context.Context, *connect.Request[v1.GetTransfersByFeatureIdRequest]) (*connect.Response[v1.GetTransfersByFeatureIdResponse], error)
 	GetTransfersByPartyId(context.Context, *connect.Request[v1.GetTransfersByPartyIdRequest]) (*connect.Response[v1.GetTransfersByPartyIdResponse], error)
 }
 
-// NewRealPropertyTransferReadServiceHandler builds an HTTP handler from the service implementation.
-// It returns the path on which to mount the handler and the handler itself.
+// NewRealPropertyTransfersReadServiceHandler builds an HTTP handler from the service
+// implementation. It returns the path on which to mount the handler and the handler itself.
 //
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
-func NewRealPropertyTransferReadServiceHandler(svc RealPropertyTransferReadServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	realPropertyTransferReadServiceMethods := v1.File_civil_mesh_transfers_v1_transfers_proto.Services().ByName("RealPropertyTransferReadService").Methods()
-	realPropertyTransferReadServiceGetTransfersByIdHandler := connect.NewUnaryHandler(
-		RealPropertyTransferReadServiceGetTransfersByIdProcedure,
+func NewRealPropertyTransfersReadServiceHandler(svc RealPropertyTransfersReadServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	realPropertyTransfersReadServiceMethods := v1.File_civil_mesh_transfers_v1_transfers_proto.Services().ByName("RealPropertyTransfersReadService").Methods()
+	realPropertyTransfersReadServiceGetTransfersByIdHandler := connect.NewUnaryHandler(
+		RealPropertyTransfersReadServiceGetTransfersByIdProcedure,
 		svc.GetTransfersById,
-		connect.WithSchema(realPropertyTransferReadServiceMethods.ByName("GetTransfersById")),
+		connect.WithSchema(realPropertyTransfersReadServiceMethods.ByName("GetTransfersById")),
 		connect.WithHandlerOptions(opts...),
 	)
-	realPropertyTransferReadServiceGetTransfersByParcelIdHandler := connect.NewUnaryHandler(
-		RealPropertyTransferReadServiceGetTransfersByParcelIdProcedure,
+	realPropertyTransfersReadServiceGetTransfersByParcelIdHandler := connect.NewUnaryHandler(
+		RealPropertyTransfersReadServiceGetTransfersByParcelIdProcedure,
 		svc.GetTransfersByParcelId,
-		connect.WithSchema(realPropertyTransferReadServiceMethods.ByName("GetTransfersByParcelId")),
+		connect.WithSchema(realPropertyTransfersReadServiceMethods.ByName("GetTransfersByParcelId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	realPropertyTransferReadServiceGetTransfersByFeatureIdHandler := connect.NewUnaryHandler(
-		RealPropertyTransferReadServiceGetTransfersByFeatureIdProcedure,
+	realPropertyTransfersReadServiceGetTransfersByFeatureIdHandler := connect.NewUnaryHandler(
+		RealPropertyTransfersReadServiceGetTransfersByFeatureIdProcedure,
 		svc.GetTransfersByFeatureId,
-		connect.WithSchema(realPropertyTransferReadServiceMethods.ByName("GetTransfersByFeatureId")),
+		connect.WithSchema(realPropertyTransfersReadServiceMethods.ByName("GetTransfersByFeatureId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	realPropertyTransferReadServiceGetTransfersByPartyIdHandler := connect.NewUnaryHandler(
-		RealPropertyTransferReadServiceGetTransfersByPartyIdProcedure,
+	realPropertyTransfersReadServiceGetTransfersByPartyIdHandler := connect.NewUnaryHandler(
+		RealPropertyTransfersReadServiceGetTransfersByPartyIdProcedure,
 		svc.GetTransfersByPartyId,
-		connect.WithSchema(realPropertyTransferReadServiceMethods.ByName("GetTransfersByPartyId")),
+		connect.WithSchema(realPropertyTransfersReadServiceMethods.ByName("GetTransfersByPartyId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	return "/civil.mesh.transfers.v1.RealPropertyTransferReadService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/civil.mesh.transfers.v1.RealPropertyTransfersReadService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case RealPropertyTransferReadServiceGetTransfersByIdProcedure:
-			realPropertyTransferReadServiceGetTransfersByIdHandler.ServeHTTP(w, r)
-		case RealPropertyTransferReadServiceGetTransfersByParcelIdProcedure:
-			realPropertyTransferReadServiceGetTransfersByParcelIdHandler.ServeHTTP(w, r)
-		case RealPropertyTransferReadServiceGetTransfersByFeatureIdProcedure:
-			realPropertyTransferReadServiceGetTransfersByFeatureIdHandler.ServeHTTP(w, r)
-		case RealPropertyTransferReadServiceGetTransfersByPartyIdProcedure:
-			realPropertyTransferReadServiceGetTransfersByPartyIdHandler.ServeHTTP(w, r)
+		case RealPropertyTransfersReadServiceGetTransfersByIdProcedure:
+			realPropertyTransfersReadServiceGetTransfersByIdHandler.ServeHTTP(w, r)
+		case RealPropertyTransfersReadServiceGetTransfersByParcelIdProcedure:
+			realPropertyTransfersReadServiceGetTransfersByParcelIdHandler.ServeHTTP(w, r)
+		case RealPropertyTransfersReadServiceGetTransfersByFeatureIdProcedure:
+			realPropertyTransfersReadServiceGetTransfersByFeatureIdHandler.ServeHTTP(w, r)
+		case RealPropertyTransfersReadServiceGetTransfersByPartyIdProcedure:
+			realPropertyTransfersReadServiceGetTransfersByPartyIdHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
 	})
 }
 
-// UnimplementedRealPropertyTransferReadServiceHandler returns CodeUnimplemented from all methods.
-type UnimplementedRealPropertyTransferReadServiceHandler struct{}
+// UnimplementedRealPropertyTransfersReadServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedRealPropertyTransfersReadServiceHandler struct{}
 
-func (UnimplementedRealPropertyTransferReadServiceHandler) GetTransfersById(context.Context, *connect.Request[v1.GetTransfersByIdRequest]) (*connect.Response[v1.GetTransfersByIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersById is not implemented"))
+func (UnimplementedRealPropertyTransfersReadServiceHandler) GetTransfersById(context.Context, *connect.Request[v1.GetTransfersByIdRequest]) (*connect.Response[v1.GetTransfersByIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.transfers.v1.RealPropertyTransfersReadService.GetTransfersById is not implemented"))
 }
 
-func (UnimplementedRealPropertyTransferReadServiceHandler) GetTransfersByParcelId(context.Context, *connect.Request[v1.GetTransfersByParcelIdRequest]) (*connect.Response[v1.GetTransfersByParcelIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByParcelId is not implemented"))
+func (UnimplementedRealPropertyTransfersReadServiceHandler) GetTransfersByParcelId(context.Context, *connect.Request[v1.GetTransfersByParcelIdRequest]) (*connect.Response[v1.GetTransfersByParcelIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.transfers.v1.RealPropertyTransfersReadService.GetTransfersByParcelId is not implemented"))
 }
 
-func (UnimplementedRealPropertyTransferReadServiceHandler) GetTransfersByFeatureId(context.Context, *connect.Request[v1.GetTransfersByFeatureIdRequest]) (*connect.Response[v1.GetTransfersByFeatureIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByFeatureId is not implemented"))
+func (UnimplementedRealPropertyTransfersReadServiceHandler) GetTransfersByFeatureId(context.Context, *connect.Request[v1.GetTransfersByFeatureIdRequest]) (*connect.Response[v1.GetTransfersByFeatureIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.transfers.v1.RealPropertyTransfersReadService.GetTransfersByFeatureId is not implemented"))
 }
 
-func (UnimplementedRealPropertyTransferReadServiceHandler) GetTransfersByPartyId(context.Context, *connect.Request[v1.GetTransfersByPartyIdRequest]) (*connect.Response[v1.GetTransfersByPartyIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByPartyId is not implemented"))
+func (UnimplementedRealPropertyTransfersReadServiceHandler) GetTransfersByPartyId(context.Context, *connect.Request[v1.GetTransfersByPartyIdRequest]) (*connect.Response[v1.GetTransfersByPartyIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.transfers.v1.RealPropertyTransfersReadService.GetTransfersByPartyId is not implemented"))
 }

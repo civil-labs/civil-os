@@ -29,7 +29,7 @@ const (
 // Postgres SQLSTATE for check_violation (e.g. the properties_size_limit constraint).
 const pgCheckViolation = "23514"
 
-// ParcelServer implements ParcelWriteService.
+// ParcelServer implements ParcelsWriteService.
 type ParcelServer struct {
 	db     *pgxpool.Pool
 	logger *slog.Logger

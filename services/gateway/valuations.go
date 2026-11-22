@@ -11,7 +11,7 @@ import (
 )
 
 type ValuationServer struct {
-	dbReaderClient meshvaluationsv1connect.ValuationReadServiceClient
+	dbReaderClient meshvaluationsv1connect.ValuationsReadServiceClient
 	logger         *slog.Logger
 }
 

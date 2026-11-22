@@ -345,8 +345,8 @@ const file_civil_public_neighborhoods_v1_neighborhoods_proto_rawDesc = "" +
 	"\rneighborhoods\x18\x01 \x03(\v2J.civil.public.neighborhoods.v1.GetNeighborhoodsResponse.NeighborhoodsEntryB<\xbaG9\x92\x026Map of neighborhoods keyed by the UUID neighborhood IDR\rneighborhoods\x1am\n" +
 	"\x12NeighborhoodsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12A\n" +
-	"\x05value\x18\x02 \x01(\v2+.civil.public.neighborhoods.v1.NeighborhoodR\x05value:\x028\x012\xc9\x02\n" +
-	"\x13NeighborhoodService\x12\xa6\x01\n" +
+	"\x05value\x18\x02 \x01(\v2+.civil.public.neighborhoods.v1.NeighborhoodR\x05value:\x028\x012\xca\x02\n" +
+	"\x14NeighborhoodsService\x12\xa6\x01\n" +
 	"\x1aGetNeighborhoodDefinitions\x12@.civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsRequest\x1aA.civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse\"\x03\x90\x02\x01\x12\x88\x01\n" +
 	"\x10GetNeighborhoods\x126.civil.public.neighborhoods.v1.GetNeighborhoodsRequest\x1a7.civil.public.neighborhoods.v1.GetNeighborhoodsResponse\"\x03\x90\x02\x01B\xa9\x02\n" +
 	"!com.civil.public.neighborhoods.v1B\x12NeighborhoodsProtoP\x01ZWgithub.com/civil-labs/civil-os/api/gen/go/civil/public/neighborhoods/v1;neighborhoodsv1\xa2\x02\x03CPN\xaa\x02\x1dCivil.Public.Neighborhoods.V1\xca\x02\x1eCivil\\Public_\\Neighborhoods\\V1\xe2\x02*Civil\\Public_\\Neighborhoods\\V1\\GPBMetadata\xea\x02 Civil::Public::Neighborhoods::V1b\x06proto3"
@@ -379,10 +379,10 @@ var file_civil_public_neighborhoods_v1_neighborhoods_proto_depIdxs = []int32{
 	7, // 1: civil.public.neighborhoods.v1.GetNeighborhoodsResponse.neighborhoods:type_name -> civil.public.neighborhoods.v1.GetNeighborhoodsResponse.NeighborhoodsEntry
 	0, // 2: civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse.NeighborhoodDefinitionsEntry.value:type_name -> civil.public.neighborhoods.v1.NeighborhoodDefinition
 	1, // 3: civil.public.neighborhoods.v1.GetNeighborhoodsResponse.NeighborhoodsEntry.value:type_name -> civil.public.neighborhoods.v1.Neighborhood
-	2, // 4: civil.public.neighborhoods.v1.NeighborhoodService.GetNeighborhoodDefinitions:input_type -> civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsRequest
-	4, // 5: civil.public.neighborhoods.v1.NeighborhoodService.GetNeighborhoods:input_type -> civil.public.neighborhoods.v1.GetNeighborhoodsRequest
-	3, // 6: civil.public.neighborhoods.v1.NeighborhoodService.GetNeighborhoodDefinitions:output_type -> civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse
-	5, // 7: civil.public.neighborhoods.v1.NeighborhoodService.GetNeighborhoods:output_type -> civil.public.neighborhoods.v1.GetNeighborhoodsResponse
+	2, // 4: civil.public.neighborhoods.v1.NeighborhoodsService.GetNeighborhoodDefinitions:input_type -> civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsRequest
+	4, // 5: civil.public.neighborhoods.v1.NeighborhoodsService.GetNeighborhoods:input_type -> civil.public.neighborhoods.v1.GetNeighborhoodsRequest
+	3, // 6: civil.public.neighborhoods.v1.NeighborhoodsService.GetNeighborhoodDefinitions:output_type -> civil.public.neighborhoods.v1.GetNeighborhoodDefinitionsResponse
+	5, // 7: civil.public.neighborhoods.v1.NeighborhoodsService.GetNeighborhoods:output_type -> civil.public.neighborhoods.v1.GetNeighborhoodsResponse
 	6, // [6:8] is the sub-list for method output_type
 	4, // [4:6] is the sub-list for method input_type
 	4, // [4:4] is the sub-list for extension type_name

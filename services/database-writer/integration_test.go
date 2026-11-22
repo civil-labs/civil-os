@@ -23,12 +23,12 @@ import (
 
 const traceparent = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01"
 
-func startWriter(t *testing.T) (parcelsv1connect.ParcelWriteServiceClient, *pgxpool.Pool) {
+func startWriter(t *testing.T) (parcelsv1connect.ParcelsWriteServiceClient, *pgxpool.Pool) {
 	t.Helper()
 	pool := tu.FixtureDatabase(t).Pool(t)
 	srv := httptest.NewServer(newHandler(pool, slog.New(slog.DiscardHandler)))
 	t.Cleanup(srv.Close)
-	return parcelsv1connect.NewParcelWriteServiceClient(http.DefaultClient, srv.URL), pool
+	return parcelsv1connect.NewParcelsWriteServiceClient(http.DefaultClient, srv.URL), pool
 }
 
 // current is a parcel's attributes row valid now, read the way the reader
@@ -77,7 +77,7 @@ func historyCount(t *testing.T, pool *pgxpool.Pool, n int) int {
 
 func near(a, b float64) bool { return math.Abs(a-b) <= 1e-9*math.Max(1, math.Abs(b)) }
 
-func update(t *testing.T, c parcelsv1connect.ParcelWriteServiceClient, msg *parcelsv1.UpdateParcelRequest) error {
+func update(t *testing.T, c parcelsv1connect.ParcelsWriteServiceClient, msg *parcelsv1.UpdateParcelRequest) error {
 	t.Helper()
 	req := connect.NewRequest(msg)
 	req.Header().Set("traceparent", traceparent)

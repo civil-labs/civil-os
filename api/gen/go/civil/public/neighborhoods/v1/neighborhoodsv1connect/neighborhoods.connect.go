@@ -21,8 +21,8 @@ import (
 const _ = connect.IsAtLeastVersion1_13_0
 
 const (
-	// NeighborhoodServiceName is the fully-qualified name of the NeighborhoodService service.
-	NeighborhoodServiceName = "civil.public.neighborhoods.v1.NeighborhoodService"
+	// NeighborhoodsServiceName is the fully-qualified name of the NeighborhoodsService service.
+	NeighborhoodsServiceName = "civil.public.neighborhoods.v1.NeighborhoodsService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -33,17 +33,17 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// NeighborhoodServiceGetNeighborhoodDefinitionsProcedure is the fully-qualified name of the
-	// NeighborhoodService's GetNeighborhoodDefinitions RPC.
-	NeighborhoodServiceGetNeighborhoodDefinitionsProcedure = "/civil.public.neighborhoods.v1.NeighborhoodService/GetNeighborhoodDefinitions"
-	// NeighborhoodServiceGetNeighborhoodsProcedure is the fully-qualified name of the
-	// NeighborhoodService's GetNeighborhoods RPC.
-	NeighborhoodServiceGetNeighborhoodsProcedure = "/civil.public.neighborhoods.v1.NeighborhoodService/GetNeighborhoods"
+	// NeighborhoodsServiceGetNeighborhoodDefinitionsProcedure is the fully-qualified name of the
+	// NeighborhoodsService's GetNeighborhoodDefinitions RPC.
+	NeighborhoodsServiceGetNeighborhoodDefinitionsProcedure = "/civil.public.neighborhoods.v1.NeighborhoodsService/GetNeighborhoodDefinitions"
+	// NeighborhoodsServiceGetNeighborhoodsProcedure is the fully-qualified name of the
+	// NeighborhoodsService's GetNeighborhoods RPC.
+	NeighborhoodsServiceGetNeighborhoodsProcedure = "/civil.public.neighborhoods.v1.NeighborhoodsService/GetNeighborhoods"
 )
 
-// NeighborhoodServiceClient is a client for the civil.public.neighborhoods.v1.NeighborhoodService
+// NeighborhoodsServiceClient is a client for the civil.public.neighborhoods.v1.NeighborhoodsService
 // service.
-type NeighborhoodServiceClient interface {
+type NeighborhoodsServiceClient interface {
 	// Returns every neighborhood definition.
 	GetNeighborhoodDefinitions(context.Context, *connect.Request[v1.GetNeighborhoodDefinitionsRequest]) (*connect.Response[v1.GetNeighborhoodDefinitionsResponse], error)
 	// Returns the neighborhoods, each with the definitions that use it, or
@@ -51,55 +51,55 @@ type NeighborhoodServiceClient interface {
 	GetNeighborhoods(context.Context, *connect.Request[v1.GetNeighborhoodsRequest]) (*connect.Response[v1.GetNeighborhoodsResponse], error)
 }
 
-// NewNeighborhoodServiceClient constructs a client for the
-// civil.public.neighborhoods.v1.NeighborhoodService service. By default, it uses the Connect
+// NewNeighborhoodsServiceClient constructs a client for the
+// civil.public.neighborhoods.v1.NeighborhoodsService service. By default, it uses the Connect
 // protocol with the binary Protobuf Codec, asks for gzipped responses, and sends uncompressed
 // requests. To use the gRPC or gRPC-Web protocols, supply the connect.WithGRPC() or
 // connect.WithGRPCWeb() options.
 //
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
 // http://api.acme.com or https://acme.com/grpc).
-func NewNeighborhoodServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) NeighborhoodServiceClient {
+func NewNeighborhoodsServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) NeighborhoodsServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
-	neighborhoodServiceMethods := v1.File_civil_public_neighborhoods_v1_neighborhoods_proto.Services().ByName("NeighborhoodService").Methods()
-	return &neighborhoodServiceClient{
+	neighborhoodsServiceMethods := v1.File_civil_public_neighborhoods_v1_neighborhoods_proto.Services().ByName("NeighborhoodsService").Methods()
+	return &neighborhoodsServiceClient{
 		getNeighborhoodDefinitions: connect.NewClient[v1.GetNeighborhoodDefinitionsRequest, v1.GetNeighborhoodDefinitionsResponse](
 			httpClient,
-			baseURL+NeighborhoodServiceGetNeighborhoodDefinitionsProcedure,
-			connect.WithSchema(neighborhoodServiceMethods.ByName("GetNeighborhoodDefinitions")),
+			baseURL+NeighborhoodsServiceGetNeighborhoodDefinitionsProcedure,
+			connect.WithSchema(neighborhoodsServiceMethods.ByName("GetNeighborhoodDefinitions")),
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		getNeighborhoods: connect.NewClient[v1.GetNeighborhoodsRequest, v1.GetNeighborhoodsResponse](
 			httpClient,
-			baseURL+NeighborhoodServiceGetNeighborhoodsProcedure,
-			connect.WithSchema(neighborhoodServiceMethods.ByName("GetNeighborhoods")),
+			baseURL+NeighborhoodsServiceGetNeighborhoodsProcedure,
+			connect.WithSchema(neighborhoodsServiceMethods.ByName("GetNeighborhoods")),
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 	}
 }
 
-// neighborhoodServiceClient implements NeighborhoodServiceClient.
-type neighborhoodServiceClient struct {
+// neighborhoodsServiceClient implements NeighborhoodsServiceClient.
+type neighborhoodsServiceClient struct {
 	getNeighborhoodDefinitions *connect.Client[v1.GetNeighborhoodDefinitionsRequest, v1.GetNeighborhoodDefinitionsResponse]
 	getNeighborhoods           *connect.Client[v1.GetNeighborhoodsRequest, v1.GetNeighborhoodsResponse]
 }
 
 // GetNeighborhoodDefinitions calls
-// civil.public.neighborhoods.v1.NeighborhoodService.GetNeighborhoodDefinitions.
-func (c *neighborhoodServiceClient) GetNeighborhoodDefinitions(ctx context.Context, req *connect.Request[v1.GetNeighborhoodDefinitionsRequest]) (*connect.Response[v1.GetNeighborhoodDefinitionsResponse], error) {
+// civil.public.neighborhoods.v1.NeighborhoodsService.GetNeighborhoodDefinitions.
+func (c *neighborhoodsServiceClient) GetNeighborhoodDefinitions(ctx context.Context, req *connect.Request[v1.GetNeighborhoodDefinitionsRequest]) (*connect.Response[v1.GetNeighborhoodDefinitionsResponse], error) {
 	return c.getNeighborhoodDefinitions.CallUnary(ctx, req)
 }
 
-// GetNeighborhoods calls civil.public.neighborhoods.v1.NeighborhoodService.GetNeighborhoods.
-func (c *neighborhoodServiceClient) GetNeighborhoods(ctx context.Context, req *connect.Request[v1.GetNeighborhoodsRequest]) (*connect.Response[v1.GetNeighborhoodsResponse], error) {
+// GetNeighborhoods calls civil.public.neighborhoods.v1.NeighborhoodsService.GetNeighborhoods.
+func (c *neighborhoodsServiceClient) GetNeighborhoods(ctx context.Context, req *connect.Request[v1.GetNeighborhoodsRequest]) (*connect.Response[v1.GetNeighborhoodsResponse], error) {
 	return c.getNeighborhoods.CallUnary(ctx, req)
 }
 
-// NeighborhoodServiceHandler is an implementation of the
-// civil.public.neighborhoods.v1.NeighborhoodService service.
-type NeighborhoodServiceHandler interface {
+// NeighborhoodsServiceHandler is an implementation of the
+// civil.public.neighborhoods.v1.NeighborhoodsService service.
+type NeighborhoodsServiceHandler interface {
 	// Returns every neighborhood definition.
 	GetNeighborhoodDefinitions(context.Context, *connect.Request[v1.GetNeighborhoodDefinitionsRequest]) (*connect.Response[v1.GetNeighborhoodDefinitionsResponse], error)
 	// Returns the neighborhoods, each with the definitions that use it, or
@@ -107,46 +107,46 @@ type NeighborhoodServiceHandler interface {
 	GetNeighborhoods(context.Context, *connect.Request[v1.GetNeighborhoodsRequest]) (*connect.Response[v1.GetNeighborhoodsResponse], error)
 }
 
-// NewNeighborhoodServiceHandler builds an HTTP handler from the service implementation. It returns
+// NewNeighborhoodsServiceHandler builds an HTTP handler from the service implementation. It returns
 // the path on which to mount the handler and the handler itself.
 //
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
-func NewNeighborhoodServiceHandler(svc NeighborhoodServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	neighborhoodServiceMethods := v1.File_civil_public_neighborhoods_v1_neighborhoods_proto.Services().ByName("NeighborhoodService").Methods()
-	neighborhoodServiceGetNeighborhoodDefinitionsHandler := connect.NewUnaryHandler(
-		NeighborhoodServiceGetNeighborhoodDefinitionsProcedure,
+func NewNeighborhoodsServiceHandler(svc NeighborhoodsServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	neighborhoodsServiceMethods := v1.File_civil_public_neighborhoods_v1_neighborhoods_proto.Services().ByName("NeighborhoodsService").Methods()
+	neighborhoodsServiceGetNeighborhoodDefinitionsHandler := connect.NewUnaryHandler(
+		NeighborhoodsServiceGetNeighborhoodDefinitionsProcedure,
 		svc.GetNeighborhoodDefinitions,
-		connect.WithSchema(neighborhoodServiceMethods.ByName("GetNeighborhoodDefinitions")),
+		connect.WithSchema(neighborhoodsServiceMethods.ByName("GetNeighborhoodDefinitions")),
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
-	neighborhoodServiceGetNeighborhoodsHandler := connect.NewUnaryHandler(
-		NeighborhoodServiceGetNeighborhoodsProcedure,
+	neighborhoodsServiceGetNeighborhoodsHandler := connect.NewUnaryHandler(
+		NeighborhoodsServiceGetNeighborhoodsProcedure,
 		svc.GetNeighborhoods,
-		connect.WithSchema(neighborhoodServiceMethods.ByName("GetNeighborhoods")),
+		connect.WithSchema(neighborhoodsServiceMethods.ByName("GetNeighborhoods")),
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
-	return "/civil.public.neighborhoods.v1.NeighborhoodService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/civil.public.neighborhoods.v1.NeighborhoodsService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case NeighborhoodServiceGetNeighborhoodDefinitionsProcedure:
-			neighborhoodServiceGetNeighborhoodDefinitionsHandler.ServeHTTP(w, r)
-		case NeighborhoodServiceGetNeighborhoodsProcedure:
-			neighborhoodServiceGetNeighborhoodsHandler.ServeHTTP(w, r)
+		case NeighborhoodsServiceGetNeighborhoodDefinitionsProcedure:
+			neighborhoodsServiceGetNeighborhoodDefinitionsHandler.ServeHTTP(w, r)
+		case NeighborhoodsServiceGetNeighborhoodsProcedure:
+			neighborhoodsServiceGetNeighborhoodsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
 	})
 }
 
-// UnimplementedNeighborhoodServiceHandler returns CodeUnimplemented from all methods.
-type UnimplementedNeighborhoodServiceHandler struct{}
+// UnimplementedNeighborhoodsServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedNeighborhoodsServiceHandler struct{}
 
-func (UnimplementedNeighborhoodServiceHandler) GetNeighborhoodDefinitions(context.Context, *connect.Request[v1.GetNeighborhoodDefinitionsRequest]) (*connect.Response[v1.GetNeighborhoodDefinitionsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.neighborhoods.v1.NeighborhoodService.GetNeighborhoodDefinitions is not implemented"))
+func (UnimplementedNeighborhoodsServiceHandler) GetNeighborhoodDefinitions(context.Context, *connect.Request[v1.GetNeighborhoodDefinitionsRequest]) (*connect.Response[v1.GetNeighborhoodDefinitionsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.neighborhoods.v1.NeighborhoodsService.GetNeighborhoodDefinitions is not implemented"))
 }
 
-func (UnimplementedNeighborhoodServiceHandler) GetNeighborhoods(context.Context, *connect.Request[v1.GetNeighborhoodsRequest]) (*connect.Response[v1.GetNeighborhoodsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.neighborhoods.v1.NeighborhoodService.GetNeighborhoods is not implemented"))
+func (UnimplementedNeighborhoodsServiceHandler) GetNeighborhoods(context.Context, *connect.Request[v1.GetNeighborhoodsRequest]) (*connect.Response[v1.GetNeighborhoodsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.neighborhoods.v1.NeighborhoodsService.GetNeighborhoods is not implemented"))
 }

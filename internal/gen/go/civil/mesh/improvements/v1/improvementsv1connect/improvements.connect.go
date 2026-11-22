@@ -21,8 +21,8 @@ import (
 const _ = connect.IsAtLeastVersion1_13_0
 
 const (
-	// ImprovementReadServiceName is the fully-qualified name of the ImprovementReadService service.
-	ImprovementReadServiceName = "civil.mesh.improvements.v1.ImprovementReadService"
+	// ImprovementsReadServiceName is the fully-qualified name of the ImprovementsReadService service.
+	ImprovementsReadServiceName = "civil.mesh.improvements.v1.ImprovementsReadService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -33,140 +33,140 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// ImprovementReadServiceGetImprovementTypesProcedure is the fully-qualified name of the
-	// ImprovementReadService's GetImprovementTypes RPC.
-	ImprovementReadServiceGetImprovementTypesProcedure = "/civil.mesh.improvements.v1.ImprovementReadService/GetImprovementTypes"
-	// ImprovementReadServiceGetImprovementConditionsProcedure is the fully-qualified name of the
-	// ImprovementReadService's GetImprovementConditions RPC.
-	ImprovementReadServiceGetImprovementConditionsProcedure = "/civil.mesh.improvements.v1.ImprovementReadService/GetImprovementConditions"
-	// ImprovementReadServiceGetImprovementsByAddressIdProcedure is the fully-qualified name of the
-	// ImprovementReadService's GetImprovementsByAddressId RPC.
-	ImprovementReadServiceGetImprovementsByAddressIdProcedure = "/civil.mesh.improvements.v1.ImprovementReadService/GetImprovementsByAddressId"
+	// ImprovementsReadServiceGetImprovementTypesProcedure is the fully-qualified name of the
+	// ImprovementsReadService's GetImprovementTypes RPC.
+	ImprovementsReadServiceGetImprovementTypesProcedure = "/civil.mesh.improvements.v1.ImprovementsReadService/GetImprovementTypes"
+	// ImprovementsReadServiceGetImprovementConditionsProcedure is the fully-qualified name of the
+	// ImprovementsReadService's GetImprovementConditions RPC.
+	ImprovementsReadServiceGetImprovementConditionsProcedure = "/civil.mesh.improvements.v1.ImprovementsReadService/GetImprovementConditions"
+	// ImprovementsReadServiceGetImprovementsByAddressIdProcedure is the fully-qualified name of the
+	// ImprovementsReadService's GetImprovementsByAddressId RPC.
+	ImprovementsReadServiceGetImprovementsByAddressIdProcedure = "/civil.mesh.improvements.v1.ImprovementsReadService/GetImprovementsByAddressId"
 )
 
-// ImprovementReadServiceClient is a client for the
-// civil.mesh.improvements.v1.ImprovementReadService service.
-type ImprovementReadServiceClient interface {
+// ImprovementsReadServiceClient is a client for the
+// civil.mesh.improvements.v1.ImprovementsReadService service.
+type ImprovementsReadServiceClient interface {
 	GetImprovementTypes(context.Context, *connect.Request[v1.GetImprovementTypesRequest]) (*connect.Response[v1.GetImprovementTypesResponse], error)
 	GetImprovementConditions(context.Context, *connect.Request[v1.GetImprovementConditionsRequest]) (*connect.Response[v1.GetImprovementConditionsResponse], error)
 	GetImprovementsByAddressId(context.Context, *connect.Request[v1.GetImprovementsByAddressIdRequest]) (*connect.Response[v1.GetImprovementsByAddressIdResponse], error)
 }
 
-// NewImprovementReadServiceClient constructs a client for the
-// civil.mesh.improvements.v1.ImprovementReadService service. By default, it uses the Connect
+// NewImprovementsReadServiceClient constructs a client for the
+// civil.mesh.improvements.v1.ImprovementsReadService service. By default, it uses the Connect
 // protocol with the binary Protobuf Codec, asks for gzipped responses, and sends uncompressed
 // requests. To use the gRPC or gRPC-Web protocols, supply the connect.WithGRPC() or
 // connect.WithGRPCWeb() options.
 //
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
 // http://api.acme.com or https://acme.com/grpc).
-func NewImprovementReadServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ImprovementReadServiceClient {
+func NewImprovementsReadServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ImprovementsReadServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
-	improvementReadServiceMethods := v1.File_civil_mesh_improvements_v1_improvements_proto.Services().ByName("ImprovementReadService").Methods()
-	return &improvementReadServiceClient{
+	improvementsReadServiceMethods := v1.File_civil_mesh_improvements_v1_improvements_proto.Services().ByName("ImprovementsReadService").Methods()
+	return &improvementsReadServiceClient{
 		getImprovementTypes: connect.NewClient[v1.GetImprovementTypesRequest, v1.GetImprovementTypesResponse](
 			httpClient,
-			baseURL+ImprovementReadServiceGetImprovementTypesProcedure,
-			connect.WithSchema(improvementReadServiceMethods.ByName("GetImprovementTypes")),
+			baseURL+ImprovementsReadServiceGetImprovementTypesProcedure,
+			connect.WithSchema(improvementsReadServiceMethods.ByName("GetImprovementTypes")),
 			connect.WithClientOptions(opts...),
 		),
 		getImprovementConditions: connect.NewClient[v1.GetImprovementConditionsRequest, v1.GetImprovementConditionsResponse](
 			httpClient,
-			baseURL+ImprovementReadServiceGetImprovementConditionsProcedure,
-			connect.WithSchema(improvementReadServiceMethods.ByName("GetImprovementConditions")),
+			baseURL+ImprovementsReadServiceGetImprovementConditionsProcedure,
+			connect.WithSchema(improvementsReadServiceMethods.ByName("GetImprovementConditions")),
 			connect.WithClientOptions(opts...),
 		),
 		getImprovementsByAddressId: connect.NewClient[v1.GetImprovementsByAddressIdRequest, v1.GetImprovementsByAddressIdResponse](
 			httpClient,
-			baseURL+ImprovementReadServiceGetImprovementsByAddressIdProcedure,
-			connect.WithSchema(improvementReadServiceMethods.ByName("GetImprovementsByAddressId")),
+			baseURL+ImprovementsReadServiceGetImprovementsByAddressIdProcedure,
+			connect.WithSchema(improvementsReadServiceMethods.ByName("GetImprovementsByAddressId")),
 			connect.WithClientOptions(opts...),
 		),
 	}
 }
 
-// improvementReadServiceClient implements ImprovementReadServiceClient.
-type improvementReadServiceClient struct {
+// improvementsReadServiceClient implements ImprovementsReadServiceClient.
+type improvementsReadServiceClient struct {
 	getImprovementTypes        *connect.Client[v1.GetImprovementTypesRequest, v1.GetImprovementTypesResponse]
 	getImprovementConditions   *connect.Client[v1.GetImprovementConditionsRequest, v1.GetImprovementConditionsResponse]
 	getImprovementsByAddressId *connect.Client[v1.GetImprovementsByAddressIdRequest, v1.GetImprovementsByAddressIdResponse]
 }
 
-// GetImprovementTypes calls civil.mesh.improvements.v1.ImprovementReadService.GetImprovementTypes.
-func (c *improvementReadServiceClient) GetImprovementTypes(ctx context.Context, req *connect.Request[v1.GetImprovementTypesRequest]) (*connect.Response[v1.GetImprovementTypesResponse], error) {
+// GetImprovementTypes calls civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementTypes.
+func (c *improvementsReadServiceClient) GetImprovementTypes(ctx context.Context, req *connect.Request[v1.GetImprovementTypesRequest]) (*connect.Response[v1.GetImprovementTypesResponse], error) {
 	return c.getImprovementTypes.CallUnary(ctx, req)
 }
 
 // GetImprovementConditions calls
-// civil.mesh.improvements.v1.ImprovementReadService.GetImprovementConditions.
-func (c *improvementReadServiceClient) GetImprovementConditions(ctx context.Context, req *connect.Request[v1.GetImprovementConditionsRequest]) (*connect.Response[v1.GetImprovementConditionsResponse], error) {
+// civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementConditions.
+func (c *improvementsReadServiceClient) GetImprovementConditions(ctx context.Context, req *connect.Request[v1.GetImprovementConditionsRequest]) (*connect.Response[v1.GetImprovementConditionsResponse], error) {
 	return c.getImprovementConditions.CallUnary(ctx, req)
 }
 
 // GetImprovementsByAddressId calls
-// civil.mesh.improvements.v1.ImprovementReadService.GetImprovementsByAddressId.
-func (c *improvementReadServiceClient) GetImprovementsByAddressId(ctx context.Context, req *connect.Request[v1.GetImprovementsByAddressIdRequest]) (*connect.Response[v1.GetImprovementsByAddressIdResponse], error) {
+// civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementsByAddressId.
+func (c *improvementsReadServiceClient) GetImprovementsByAddressId(ctx context.Context, req *connect.Request[v1.GetImprovementsByAddressIdRequest]) (*connect.Response[v1.GetImprovementsByAddressIdResponse], error) {
 	return c.getImprovementsByAddressId.CallUnary(ctx, req)
 }
 
-// ImprovementReadServiceHandler is an implementation of the
-// civil.mesh.improvements.v1.ImprovementReadService service.
-type ImprovementReadServiceHandler interface {
+// ImprovementsReadServiceHandler is an implementation of the
+// civil.mesh.improvements.v1.ImprovementsReadService service.
+type ImprovementsReadServiceHandler interface {
 	GetImprovementTypes(context.Context, *connect.Request[v1.GetImprovementTypesRequest]) (*connect.Response[v1.GetImprovementTypesResponse], error)
 	GetImprovementConditions(context.Context, *connect.Request[v1.GetImprovementConditionsRequest]) (*connect.Response[v1.GetImprovementConditionsResponse], error)
 	GetImprovementsByAddressId(context.Context, *connect.Request[v1.GetImprovementsByAddressIdRequest]) (*connect.Response[v1.GetImprovementsByAddressIdResponse], error)
 }
 
-// NewImprovementReadServiceHandler builds an HTTP handler from the service implementation. It
+// NewImprovementsReadServiceHandler builds an HTTP handler from the service implementation. It
 // returns the path on which to mount the handler and the handler itself.
 //
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
-func NewImprovementReadServiceHandler(svc ImprovementReadServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	improvementReadServiceMethods := v1.File_civil_mesh_improvements_v1_improvements_proto.Services().ByName("ImprovementReadService").Methods()
-	improvementReadServiceGetImprovementTypesHandler := connect.NewUnaryHandler(
-		ImprovementReadServiceGetImprovementTypesProcedure,
+func NewImprovementsReadServiceHandler(svc ImprovementsReadServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	improvementsReadServiceMethods := v1.File_civil_mesh_improvements_v1_improvements_proto.Services().ByName("ImprovementsReadService").Methods()
+	improvementsReadServiceGetImprovementTypesHandler := connect.NewUnaryHandler(
+		ImprovementsReadServiceGetImprovementTypesProcedure,
 		svc.GetImprovementTypes,
-		connect.WithSchema(improvementReadServiceMethods.ByName("GetImprovementTypes")),
+		connect.WithSchema(improvementsReadServiceMethods.ByName("GetImprovementTypes")),
 		connect.WithHandlerOptions(opts...),
 	)
-	improvementReadServiceGetImprovementConditionsHandler := connect.NewUnaryHandler(
-		ImprovementReadServiceGetImprovementConditionsProcedure,
+	improvementsReadServiceGetImprovementConditionsHandler := connect.NewUnaryHandler(
+		ImprovementsReadServiceGetImprovementConditionsProcedure,
 		svc.GetImprovementConditions,
-		connect.WithSchema(improvementReadServiceMethods.ByName("GetImprovementConditions")),
+		connect.WithSchema(improvementsReadServiceMethods.ByName("GetImprovementConditions")),
 		connect.WithHandlerOptions(opts...),
 	)
-	improvementReadServiceGetImprovementsByAddressIdHandler := connect.NewUnaryHandler(
-		ImprovementReadServiceGetImprovementsByAddressIdProcedure,
+	improvementsReadServiceGetImprovementsByAddressIdHandler := connect.NewUnaryHandler(
+		ImprovementsReadServiceGetImprovementsByAddressIdProcedure,
 		svc.GetImprovementsByAddressId,
-		connect.WithSchema(improvementReadServiceMethods.ByName("GetImprovementsByAddressId")),
+		connect.WithSchema(improvementsReadServiceMethods.ByName("GetImprovementsByAddressId")),
 		connect.WithHandlerOptions(opts...),
 	)
-	return "/civil.mesh.improvements.v1.ImprovementReadService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/civil.mesh.improvements.v1.ImprovementsReadService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case ImprovementReadServiceGetImprovementTypesProcedure:
-			improvementReadServiceGetImprovementTypesHandler.ServeHTTP(w, r)
-		case ImprovementReadServiceGetImprovementConditionsProcedure:
-			improvementReadServiceGetImprovementConditionsHandler.ServeHTTP(w, r)
-		case ImprovementReadServiceGetImprovementsByAddressIdProcedure:
-			improvementReadServiceGetImprovementsByAddressIdHandler.ServeHTTP(w, r)
+		case ImprovementsReadServiceGetImprovementTypesProcedure:
+			improvementsReadServiceGetImprovementTypesHandler.ServeHTTP(w, r)
+		case ImprovementsReadServiceGetImprovementConditionsProcedure:
+			improvementsReadServiceGetImprovementConditionsHandler.ServeHTTP(w, r)
+		case ImprovementsReadServiceGetImprovementsByAddressIdProcedure:
+			improvementsReadServiceGetImprovementsByAddressIdHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
 	})
 }
 
-// UnimplementedImprovementReadServiceHandler returns CodeUnimplemented from all methods.
-type UnimplementedImprovementReadServiceHandler struct{}
+// UnimplementedImprovementsReadServiceHandler returns CodeUnimplemented from all methods.
+type UnimplementedImprovementsReadServiceHandler struct{}
 
-func (UnimplementedImprovementReadServiceHandler) GetImprovementTypes(context.Context, *connect.Request[v1.GetImprovementTypesRequest]) (*connect.Response[v1.GetImprovementTypesResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.improvements.v1.ImprovementReadService.GetImprovementTypes is not implemented"))
+func (UnimplementedImprovementsReadServiceHandler) GetImprovementTypes(context.Context, *connect.Request[v1.GetImprovementTypesRequest]) (*connect.Response[v1.GetImprovementTypesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementTypes is not implemented"))
 }
 
-func (UnimplementedImprovementReadServiceHandler) GetImprovementConditions(context.Context, *connect.Request[v1.GetImprovementConditionsRequest]) (*connect.Response[v1.GetImprovementConditionsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.improvements.v1.ImprovementReadService.GetImprovementConditions is not implemented"))
+func (UnimplementedImprovementsReadServiceHandler) GetImprovementConditions(context.Context, *connect.Request[v1.GetImprovementConditionsRequest]) (*connect.Response[v1.GetImprovementConditionsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementConditions is not implemented"))
 }
 
-func (UnimplementedImprovementReadServiceHandler) GetImprovementsByAddressId(context.Context, *connect.Request[v1.GetImprovementsByAddressIdRequest]) (*connect.Response[v1.GetImprovementsByAddressIdResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.improvements.v1.ImprovementReadService.GetImprovementsByAddressId is not implemented"))
+func (UnimplementedImprovementsReadServiceHandler) GetImprovementsByAddressId(context.Context, *connect.Request[v1.GetImprovementsByAddressIdRequest]) (*connect.Response[v1.GetImprovementsByAddressIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementsByAddressId is not implemented"))
 }

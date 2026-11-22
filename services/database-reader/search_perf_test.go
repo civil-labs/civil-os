@@ -102,7 +102,7 @@ func TestSearchLatency(t *testing.T) {
 	samples := perfSamples(t, pool)
 	srv := httptest.NewServer(newHandler(pool, slog.New(slog.DiscardHandler)))
 	t.Cleanup(srv.Close)
-	client := parcelsv1connect.NewParcelReadServiceClient(http.DefaultClient, srv.URL)
+	client := parcelsv1connect.NewParcelsReadServiceClient(http.DefaultClient, srv.URL)
 
 	call := func(q string) (time.Duration, int) {
 		first := int32(defaultPageSize)

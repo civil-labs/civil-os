@@ -526,8 +526,8 @@ const file_civil_mesh_improvements_v1_improvements_proto_rawDesc = "" +
 	"\x06_after\"\xb9\x01\n" +
 	"\"GetImprovementsByAddressIdResponse\x12R\n" +
 	"\fimprovements\x18\x01 \x03(\v2..civil.mesh.improvements.v1.AddressImprovementR\fimprovements\x12?\n" +
-	"\tpage_info\x18\x02 \x01(\v2\".civil.mesh.pagination.v1.PageInfoR\bpageInfo2\xdd\x03\n" +
-	"\x16ImprovementReadService\x12\x88\x01\n" +
+	"\tpage_info\x18\x02 \x01(\v2\".civil.mesh.pagination.v1.PageInfoR\bpageInfo2\xde\x03\n" +
+	"\x17ImprovementsReadService\x12\x88\x01\n" +
 	"\x13GetImprovementTypes\x126.civil.mesh.improvements.v1.GetImprovementTypesRequest\x1a7.civil.mesh.improvements.v1.GetImprovementTypesResponse\"\x00\x12\x97\x01\n" +
 	"\x18GetImprovementConditions\x12;.civil.mesh.improvements.v1.GetImprovementConditionsRequest\x1a<.civil.mesh.improvements.v1.GetImprovementConditionsResponse\"\x00\x12\x9d\x01\n" +
 	"\x1aGetImprovementsByAddressId\x12=.civil.mesh.improvements.v1.GetImprovementsByAddressIdRequest\x1a>.civil.mesh.improvements.v1.GetImprovementsByAddressIdResponse\"\x00B\x98\x02\n" +
@@ -569,12 +569,12 @@ var file_civil_mesh_improvements_v1_improvements_proto_depIdxs = []int32{
 	12, // 4: civil.mesh.improvements.v1.GetImprovementsByAddressIdResponse.page_info:type_name -> civil.mesh.pagination.v1.PageInfo
 	0,  // 5: civil.mesh.improvements.v1.GetImprovementTypesResponse.ImprovementTypesEntry.value:type_name -> civil.mesh.improvements.v1.ImprovementType
 	3,  // 6: civil.mesh.improvements.v1.GetImprovementConditionsResponse.ImprovementConditionsEntry.value:type_name -> civil.mesh.improvements.v1.ImprovementCondition
-	1,  // 7: civil.mesh.improvements.v1.ImprovementReadService.GetImprovementTypes:input_type -> civil.mesh.improvements.v1.GetImprovementTypesRequest
-	4,  // 8: civil.mesh.improvements.v1.ImprovementReadService.GetImprovementConditions:input_type -> civil.mesh.improvements.v1.GetImprovementConditionsRequest
-	7,  // 9: civil.mesh.improvements.v1.ImprovementReadService.GetImprovementsByAddressId:input_type -> civil.mesh.improvements.v1.GetImprovementsByAddressIdRequest
-	2,  // 10: civil.mesh.improvements.v1.ImprovementReadService.GetImprovementTypes:output_type -> civil.mesh.improvements.v1.GetImprovementTypesResponse
-	5,  // 11: civil.mesh.improvements.v1.ImprovementReadService.GetImprovementConditions:output_type -> civil.mesh.improvements.v1.GetImprovementConditionsResponse
-	8,  // 12: civil.mesh.improvements.v1.ImprovementReadService.GetImprovementsByAddressId:output_type -> civil.mesh.improvements.v1.GetImprovementsByAddressIdResponse
+	1,  // 7: civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementTypes:input_type -> civil.mesh.improvements.v1.GetImprovementTypesRequest
+	4,  // 8: civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementConditions:input_type -> civil.mesh.improvements.v1.GetImprovementConditionsRequest
+	7,  // 9: civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementsByAddressId:input_type -> civil.mesh.improvements.v1.GetImprovementsByAddressIdRequest
+	2,  // 10: civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementTypes:output_type -> civil.mesh.improvements.v1.GetImprovementTypesResponse
+	5,  // 11: civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementConditions:output_type -> civil.mesh.improvements.v1.GetImprovementConditionsResponse
+	8,  // 12: civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementsByAddressId:output_type -> civil.mesh.improvements.v1.GetImprovementsByAddressIdResponse
 	10, // [10:13] is the sub-list for method output_type
 	7,  // [7:10] is the sub-list for method input_type
 	7,  // [7:7] is the sub-list for extension type_name

@@ -114,13 +114,13 @@ func newHandler(pool *pgxpool.Pool, logger *slog.Logger) http.Handler {
 	}
 	mux := http.NewServeMux()
 
-	path, handler := parcelsv1connect.NewParcelWriteServiceHandler(srv)
+	path, handler := parcelsv1connect.NewParcelsWriteServiceHandler(srv)
 	mux.Handle(path, handler)
 
 	// Pass the fully qualified name of the service so the health check
 	// can report on this specific service, as well as the global server status.
 	checker := grpchealth.NewStaticChecker(
-		parcelsv1connect.ParcelWriteServiceName,
+		parcelsv1connect.ParcelsWriteServiceName,
 	)
 
 	healthPath, healthHandler := grpchealth.NewHandler(checker)

@@ -171,8 +171,8 @@ const file_civil_public_valuations_v1_valuations_proto_rawDesc = "" +
 	"valuations\x1ad\n" +
 	"\x0fValuationsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12;\n" +
-	"\x05value\x18\x02 \x01(\v2%.civil.public.valuations.v1.ValuationR\x05value:\x028\x012\x8a\x01\n" +
-	"\x10ValuationService\x12v\n" +
+	"\x05value\x18\x02 \x01(\v2%.civil.public.valuations.v1.ValuationR\x05value:\x028\x012\x8b\x01\n" +
+	"\x11ValuationsService\x12v\n" +
 	"\rGetValuations\x120.civil.public.valuations.v1.GetValuationsRequest\x1a1.civil.public.valuations.v1.GetValuationsResponse\"\x00B\x91\x02\n" +
 	"\x1ecom.civil.public.valuations.v1B\x0fValuationsProtoP\x01ZQgithub.com/civil-labs/civil-os/api/gen/go/civil/public/valuations/v1;valuationsv1\xa2\x02\x03CPV\xaa\x02\x1aCivil.Public.Valuations.V1\xca\x02\x1bCivil\\Public_\\Valuations\\V1\xe2\x02'Civil\\Public_\\Valuations\\V1\\GPBMetadata\xea\x02\x1dCivil::Public::Valuations::V1b\x06proto3"
 
@@ -200,8 +200,8 @@ var file_civil_public_valuations_v1_valuations_proto_depIdxs = []int32{
 	4, // 0: civil.public.valuations.v1.Valuation.valuation_timestamp:type_name -> google.protobuf.Timestamp
 	3, // 1: civil.public.valuations.v1.GetValuationsResponse.valuations:type_name -> civil.public.valuations.v1.GetValuationsResponse.ValuationsEntry
 	0, // 2: civil.public.valuations.v1.GetValuationsResponse.ValuationsEntry.value:type_name -> civil.public.valuations.v1.Valuation
-	1, // 3: civil.public.valuations.v1.ValuationService.GetValuations:input_type -> civil.public.valuations.v1.GetValuationsRequest
-	2, // 4: civil.public.valuations.v1.ValuationService.GetValuations:output_type -> civil.public.valuations.v1.GetValuationsResponse
+	1, // 3: civil.public.valuations.v1.ValuationsService.GetValuations:input_type -> civil.public.valuations.v1.GetValuationsRequest
+	2, // 4: civil.public.valuations.v1.ValuationsService.GetValuations:output_type -> civil.public.valuations.v1.GetValuationsResponse
 	4, // [4:5] is the sub-list for method output_type
 	3, // [3:4] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name

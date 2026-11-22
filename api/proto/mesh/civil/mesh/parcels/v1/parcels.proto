@@ -6,7 +6,7 @@ import "civil/mesh/pagination/v1/pagination.proto";
 import "google/protobuf/timestamp.proto";
 import "google/type/interval.proto";
 
-service ParcelReadService {
+service ParcelsReadService {
   // Retrieves the value for a specified attribute for a given parcel
   rpc GetParcelsWithImprovementSummaryByParcelId(GetParcelsWithImprovementSummaryByParcelIdRequest) returns (GetParcelsWithImprovementSummaryByParcelIdResponse) {}
 
@@ -92,8 +92,8 @@ service ParcelReadService {
 }
 
 // Parcel mutations. Served by the database-writer, which connects with a
-// write-capable database role; reads stay on ParcelReadService.
-service ParcelWriteService {
+// write-capable database role; reads stay on ParcelsReadService.
+service ParcelsWriteService {
   // Corrects the current legal record of a parcel's attributes in place.
   // Only fields present in the request change; properties replaces the
   // stored JSON object.

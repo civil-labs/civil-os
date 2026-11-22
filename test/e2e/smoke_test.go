@@ -354,7 +354,7 @@ func TestSmoke(t *testing.T) {
 
 	t.Run("neighborhoods", func(t *testing.T) {
 		// Over Connect GET: the RPCs are NO_SIDE_EFFECTS.
-		nbhds := neighborhoodsv1connect.NewNeighborhoodServiceClient(httpClient, gatewayURL, connect.WithHTTPGet())
+		nbhds := neighborhoodsv1connect.NewNeighborhoodsServiceClient(httpClient, gatewayURL, connect.WithHTTPGet())
 		defs, err := nbhds.GetNeighborhoodDefinitions(ctx, authed(token, &neighborhoodsv1.GetNeighborhoodDefinitionsRequest{}))
 		if err != nil {
 			t.Fatal(err)

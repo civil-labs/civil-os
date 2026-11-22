@@ -88,9 +88,9 @@ func TestReverseLookupPlacement(t *testing.T) {
 
 	g := startGateway(t, nil)
 	for _, c := range []struct{ service, method, mesh string }{
-		{publicparcelsv1connect.ParcelsServiceName, "GetParcelsByAddressId", "civil.mesh.parcels.v1.ParcelReadService"},
-		{publicparcelsv1connect.ParcelsServiceName, "GetParcelsByPartyId", "civil.mesh.parcels.v1.ParcelReadService"},
-		{publicimprovementsv1connect.ImprovementsServiceName, "GetImprovementsByAddressId", "civil.mesh.improvements.v1.ImprovementReadService"},
+		{publicparcelsv1connect.ParcelsServiceName, "GetParcelsByAddressId", "civil.mesh.parcels.v1.ParcelsReadService"},
+		{publicparcelsv1connect.ParcelsServiceName, "GetParcelsByPartyId", "civil.mesh.parcels.v1.ParcelsReadService"},
+		{publicimprovementsv1connect.ImprovementsServiceName, "GetImprovementsByAddressId", "civil.mesh.improvements.v1.ImprovementsReadService"},
 		{publicpartiesv1connect.PartiesServiceName, "GetPartiesByAddressId", "civil.mesh.parties.v1.PartiesReadService"},
 	} {
 		t.Run(c.method, func(t *testing.T) {

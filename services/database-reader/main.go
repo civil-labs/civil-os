@@ -143,25 +143,25 @@ func newHandler(pool *pgxpool.Pool, logger *slog.Logger, opts ...handlerOption) 
 	}
 	mux := http.NewServeMux()
 
-	path, handler := parcelsv1connect.NewParcelReadServiceHandler(srv)
+	path, handler := parcelsv1connect.NewParcelsReadServiceHandler(srv)
 	mux.Handle(path, handler)
 
-	path2, handler2 := improvementsv1connect.NewImprovementReadServiceHandler(srv)
+	path2, handler2 := improvementsv1connect.NewImprovementsReadServiceHandler(srv)
 	mux.Handle(path2, handler2)
 
-	path3, handler3 := landusesv1connect.NewLandUseReadServiceHandler(srv)
+	path3, handler3 := landusesv1connect.NewLandUsesReadServiceHandler(srv)
 	mux.Handle(path3, handler3)
 
 	path4, handler4 := zoningv1connect.NewZoningReadServiceHandler(srv)
 	mux.Handle(path4, handler4)
 
-	path5, handler5 := meshvaluationsv1connect.NewValuationReadServiceHandler(srv)
+	path5, handler5 := meshvaluationsv1connect.NewValuationsReadServiceHandler(srv)
 	mux.Handle(path5, handler5)
 
-	path6, handler6 := meshneighborhoodsv1connect.NewNeighborhoodReadServiceHandler(srv)
+	path6, handler6 := meshneighborhoodsv1connect.NewNeighborhoodsReadServiceHandler(srv)
 	mux.Handle(path6, handler6)
 
-	path7, handler7 := transfersv1connect.NewRealPropertyTransferReadServiceHandler(srv)
+	path7, handler7 := transfersv1connect.NewRealPropertyTransfersReadServiceHandler(srv)
 	mux.Handle(path7, handler7)
 
 	path8, handler8 := partiesv1connect.NewPartiesReadServiceHandler(srv)
@@ -173,13 +173,13 @@ func newHandler(pool *pgxpool.Pool, logger *slog.Logger, opts ...handlerOption) 
 	// Pass the fully qualified name of the service so the health check
 	// can report on this specific service, as well as the global server status.
 	checker := grpchealth.NewStaticChecker(
-		parcelsv1connect.ParcelReadServiceName,
-		improvementsv1connect.ImprovementReadServiceName,
-		landusesv1connect.LandUseReadServiceName,
+		parcelsv1connect.ParcelsReadServiceName,
+		improvementsv1connect.ImprovementsReadServiceName,
+		landusesv1connect.LandUsesReadServiceName,
 		zoningv1connect.ZoningReadServiceName,
-		meshvaluationsv1connect.ValuationReadServiceName,
-		meshneighborhoodsv1connect.NeighborhoodReadServiceName,
-		transfersv1connect.RealPropertyTransferReadServiceName,
+		meshvaluationsv1connect.ValuationsReadServiceName,
+		meshneighborhoodsv1connect.NeighborhoodsReadServiceName,
+		transfersv1connect.RealPropertyTransfersReadServiceName,
 		partiesv1connect.PartiesReadServiceName,
 		addressesv1connect.AddressesReadServiceName,
 	)

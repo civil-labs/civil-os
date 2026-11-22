@@ -9,7 +9,7 @@ import "google/type/interval.proto";
 
 // Reads real property transfers. Served by the database reader; see
 // docs/real-property-transfers-api/spec.md for the contract.
-service RealPropertyTransferReadService {
+service RealPropertyTransfersReadService {
   rpc GetTransfersById(GetTransfersByIdRequest) returns (GetTransfersByIdResponse) {}
 
   rpc GetTransfersByParcelId(GetTransfersByParcelIdRequest) returns (GetTransfersByParcelIdResponse) {}

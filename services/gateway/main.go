@@ -173,17 +173,17 @@ func newHandler(config *Config, logger *slog.Logger) (http.Handler, error) {
 
 	dbReaderAddress := "http://" + config.DBReaderHost
 
-	meshClient := meshparcelsv1connect.NewParcelReadServiceClient(
+	meshClient := meshparcelsv1connect.NewParcelsReadServiceClient(
 		http.DefaultClient,
 		dbReaderAddress, // The Envoy-routable address for the db-reader service
 	)
 
-	meshImprovementsClient := meshimprovementsv1connect.NewImprovementReadServiceClient(
+	meshImprovementsClient := meshimprovementsv1connect.NewImprovementsReadServiceClient(
 		http.DefaultClient,
 		dbReaderAddress,
 	)
 
-	meshLandUsesClient := meshlandusesv1connect.NewLandUseReadServiceClient(
+	meshLandUsesClient := meshlandusesv1connect.NewLandUsesReadServiceClient(
 		http.DefaultClient,
 		dbReaderAddress,
 	)
@@ -193,17 +193,17 @@ func newHandler(config *Config, logger *slog.Logger) (http.Handler, error) {
 		dbReaderAddress,
 	)
 
-	meshValuationsClient := meshvaluationsv1connect.NewValuationReadServiceClient(
+	meshValuationsClient := meshvaluationsv1connect.NewValuationsReadServiceClient(
 		http.DefaultClient,
 		dbReaderAddress,
 	)
 
-	meshNeighborhoodsClient := meshneighborhoodsv1connect.NewNeighborhoodReadServiceClient(
+	meshNeighborhoodsClient := meshneighborhoodsv1connect.NewNeighborhoodsReadServiceClient(
 		http.DefaultClient,
 		dbReaderAddress,
 	)
 
-	meshTransfersClient := meshtransfersv1connect.NewRealPropertyTransferReadServiceClient(
+	meshTransfersClient := meshtransfersv1connect.NewRealPropertyTransfersReadServiceClient(
 		http.DefaultClient,
 		dbReaderAddress,
 	)
@@ -217,7 +217,7 @@ func newHandler(config *Config, logger *slog.Logger) (http.Handler, error) {
 
 	// Parcel writes are optional: without a writer host, UpdateParcel returns Unavailable.
 	if config.DBWriterHost != "" {
-		parcelsServer.dbWriterClient = meshparcelsv1connect.NewParcelWriteServiceClient(
+		parcelsServer.dbWriterClient = meshparcelsv1connect.NewParcelsWriteServiceClient(
 			http.DefaultClient,
 			"http://"+config.DBWriterHost,
 		)
@@ -286,7 +286,7 @@ func newHandler(config *Config, logger *slog.Logger) (http.Handler, error) {
 		logger:         logger,
 	}
 
-	valuationsPath, valuationsHandler := publicvaluationsv1connect.NewValuationServiceHandler(
+	valuationsPath, valuationsHandler := publicvaluationsv1connect.NewValuationsServiceHandler(
 		valuationsServer,
 		connect.WithInterceptors(validate.NewInterceptor()),
 	)
@@ -298,7 +298,7 @@ func newHandler(config *Config, logger *slog.Logger) (http.Handler, error) {
 		logger:         logger,
 	}
 
-	neighborhoodsPath, neighborhoodsHandler := publicneighborhoodsv1connect.NewNeighborhoodServiceHandler(
+	neighborhoodsPath, neighborhoodsHandler := publicneighborhoodsv1connect.NewNeighborhoodsServiceHandler(
 		neighborhoodsServer,
 		connect.WithInterceptors(validate.NewInterceptor()),
 	)

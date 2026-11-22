@@ -6,7 +6,7 @@ import "buf/validate/validate.proto";
 import "gnostic/openapi/v3/annotations.proto";
 import "google/protobuf/timestamp.proto";
 
-service ValuationService {
+service ValuationsService {
   rpc GetValuations(GetValuationsRequest) returns (GetValuationsResponse) {}
 }
 

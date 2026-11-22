@@ -10,8 +10,8 @@ one port.
 | `civil.public.improvements.v1` | `ImprovementsService` | Improvement types and conditions, and the improvements at an address (paginated) |
 | `civil.public.landuses.v1` | `LandUsesService` | Land uses and land-use types |
 | `civil.public.zoning.v1` | `ZoningService` | Zoning designations |
-| `civil.public.neighborhoods.v1` | `NeighborhoodService` | Neighborhood definitions (with `is_legal`), and neighborhoods with the definitions that use them, optionally filtered by definition. Both RPCs accept Connect GET. |
-| `civil.public.valuations.v1` | `ValuationService` | Valuations |
+| `civil.public.neighborhoods.v1` | `NeighborhoodsService` | Neighborhood definitions (with `is_legal`), and neighborhoods with the definitions that use them, optionally filtered by definition. Both RPCs accept Connect GET. |
+| `civil.public.valuations.v1` | `ValuationsService` | Valuations |
 | `civil.public.transfers.v1` | `RealPropertyTransfersService` | Real property transfers by transfer, parcel, map feature or party, with grantors, grantees, shares, codes and recordings. Paginated. |
 | `civil.public.addresses.v1` | `AddressesService` | Addresses by ID |
 | `civil.public.parties.v1` | `PartiesService` | Parties (owners, grantors, grantees) by ID, and the parties with a mailing address (paginated) |
@@ -99,7 +99,7 @@ definitions*. An instance can have several definitions, and none, one or
 several of them can be legal. A parcel has at most one neighborhood per
 definition at a time.
 
-1. **Pick a definition.** `NeighborhoodService.GetNeighborhoodDefinitions`
+1. **Pick a definition.** `NeighborhoodsService.GetNeighborhoodDefinitions`
    returns every definition, keyed by ID, with its `name` and `is_legal`.
    A legal definition's assignments are dated, so a parcel's neighborhood
    under it depends on the legal time. A non-legal one's usually aren't.
@@ -116,7 +116,7 @@ definition at a time.
    definition is requested, or the parcel has no neighborhood under it then.
    There is no default definition.
 
-Both `NeighborhoodService` RPCs have no side effects, so they can be called
+Both `NeighborhoodsService` RPCs have no side effects, so they can be called
 with Connect GET and cached.
 
 ## Vector tiles

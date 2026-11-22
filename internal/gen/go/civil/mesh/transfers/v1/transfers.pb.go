@@ -1110,8 +1110,8 @@ const file_civil_mesh_transfers_v1_transfers_proto_rawDesc = "" +
 	"\x06_after\"\xad\x01\n" +
 	"\x1dGetTransfersByPartyIdResponse\x12K\n" +
 	"\ttransfers\x18\x01 \x03(\v2-.civil.mesh.transfers.v1.RealPropertyTransferR\ttransfers\x12?\n" +
-	"\tpage_info\x18\x02 \x01(\v2\".civil.mesh.pagination.v1.PageInfoR\bpageInfo2\xc6\x04\n" +
-	"\x1fRealPropertyTransferReadService\x12y\n" +
+	"\tpage_info\x18\x02 \x01(\v2\".civil.mesh.pagination.v1.PageInfoR\bpageInfo2\xc7\x04\n" +
+	" RealPropertyTransfersReadService\x12y\n" +
 	"\x10GetTransfersById\x120.civil.mesh.transfers.v1.GetTransfersByIdRequest\x1a1.civil.mesh.transfers.v1.GetTransfersByIdResponse\"\x00\x12\x8b\x01\n" +
 	"\x16GetTransfersByParcelId\x126.civil.mesh.transfers.v1.GetTransfersByParcelIdRequest\x1a7.civil.mesh.transfers.v1.GetTransfersByParcelIdResponse\"\x00\x12\x8e\x01\n" +
 	"\x17GetTransfersByFeatureId\x127.civil.mesh.transfers.v1.GetTransfersByFeatureIdRequest\x1a8.civil.mesh.transfers.v1.GetTransfersByFeatureIdResponse\"\x00\x12\x88\x01\n" +
@@ -1176,14 +1176,14 @@ var file_civil_mesh_transfers_v1_transfers_proto_depIdxs = []int32{
 	18, // 19: civil.mesh.transfers.v1.GetTransfersByPartyIdRequest.time_range:type_name -> google.type.Interval
 	0,  // 20: civil.mesh.transfers.v1.GetTransfersByPartyIdResponse.transfers:type_name -> civil.mesh.transfers.v1.RealPropertyTransfer
 	19, // 21: civil.mesh.transfers.v1.GetTransfersByPartyIdResponse.page_info:type_name -> civil.mesh.pagination.v1.PageInfo
-	7,  // 22: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersById:input_type -> civil.mesh.transfers.v1.GetTransfersByIdRequest
-	9,  // 23: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByParcelId:input_type -> civil.mesh.transfers.v1.GetTransfersByParcelIdRequest
-	11, // 24: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByFeatureId:input_type -> civil.mesh.transfers.v1.GetTransfersByFeatureIdRequest
-	14, // 25: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByPartyId:input_type -> civil.mesh.transfers.v1.GetTransfersByPartyIdRequest
-	8,  // 26: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersById:output_type -> civil.mesh.transfers.v1.GetTransfersByIdResponse
-	10, // 27: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByParcelId:output_type -> civil.mesh.transfers.v1.GetTransfersByParcelIdResponse
-	12, // 28: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByFeatureId:output_type -> civil.mesh.transfers.v1.GetTransfersByFeatureIdResponse
-	15, // 29: civil.mesh.transfers.v1.RealPropertyTransferReadService.GetTransfersByPartyId:output_type -> civil.mesh.transfers.v1.GetTransfersByPartyIdResponse
+	7,  // 22: civil.mesh.transfers.v1.RealPropertyTransfersReadService.GetTransfersById:input_type -> civil.mesh.transfers.v1.GetTransfersByIdRequest
+	9,  // 23: civil.mesh.transfers.v1.RealPropertyTransfersReadService.GetTransfersByParcelId:input_type -> civil.mesh.transfers.v1.GetTransfersByParcelIdRequest
+	11, // 24: civil.mesh.transfers.v1.RealPropertyTransfersReadService.GetTransfersByFeatureId:input_type -> civil.mesh.transfers.v1.GetTransfersByFeatureIdRequest
+	14, // 25: civil.mesh.transfers.v1.RealPropertyTransfersReadService.GetTransfersByPartyId:input_type -> civil.mesh.transfers.v1.GetTransfersByPartyIdRequest
+	8,  // 26: civil.mesh.transfers.v1.RealPropertyTransfersReadService.GetTransfersById:output_type -> civil.mesh.transfers.v1.GetTransfersByIdResponse
+	10, // 27: civil.mesh.transfers.v1.RealPropertyTransfersReadService.GetTransfersByParcelId:output_type -> civil.mesh.transfers.v1.GetTransfersByParcelIdResponse
+	12, // 28: civil.mesh.transfers.v1.RealPropertyTransfersReadService.GetTransfersByFeatureId:output_type -> civil.mesh.transfers.v1.GetTransfersByFeatureIdResponse
+	15, // 29: civil.mesh.transfers.v1.RealPropertyTransfersReadService.GetTransfersByPartyId:output_type -> civil.mesh.transfers.v1.GetTransfersByPartyIdResponse
 	26, // [26:30] is the sub-list for method output_type
 	22, // [22:26] is the sub-list for method input_type
 	22, // [22:22] is the sub-list for extension type_name

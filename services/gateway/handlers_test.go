@@ -233,14 +233,52 @@ func (g *gateway) call(t *testing.T, md protoreflect.MethodDescriptor, req *dyna
 	return res.Msg, nil
 }
 
+// TestMeshServiceNames: every mesh service is a public service's domain plus
+// ReadService or WriteService, such as ParcelsService -> ParcelsReadService
+// (docs/mesh-plural-service-names/spec.md).
+func TestMeshServiceNames(t *testing.T) {
+	public := map[string]bool{}
+	var mesh []string
+	protoregistry.GlobalFiles.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
+		pkg := string(fd.Package())
+		for i := 0; i < fd.Services().Len(); i++ {
+			name := string(fd.Services().Get(i).Name())
+			switch {
+			case strings.HasPrefix(pkg, "civil.public."):
+				public[name] = true
+			case strings.HasPrefix(pkg, "civil.mesh."):
+				mesh = append(mesh, pkg+"."+name)
+			}
+		}
+		return true
+	})
+	if len(mesh) == 0 || len(public) == 0 {
+		t.Fatalf("found %d mesh and %d public services; the registry walk is broken", len(mesh), len(public))
+	}
+	for _, full := range mesh {
+		name := full[strings.LastIndex(full, ".")+1:]
+		domain, ok := strings.CutSuffix(name, "ReadService")
+		if !ok {
+			domain, ok = strings.CutSuffix(name, "WriteService")
+		}
+		if !ok {
+			t.Errorf("%s: a mesh service name must end in ReadService or WriteService", full)
+			continue
+		}
+		if !public[domain+"Service"] {
+			t.Errorf("%s: no public %sService to match", full, domain)
+		}
+	}
+}
+
 // publicServices are the services the gateway serves from the mesh.
 var publicServices = []string{
 	parcelsv1connect.ParcelsServiceName,
 	improvementsv1connect.ImprovementsServiceName,
 	landusesv1connect.LandUsesServiceName,
 	zoningv1connect.ZoningServiceName,
-	publicvaluationsv1connect.ValuationServiceName,
-	publicneighborhoodsv1connect.NeighborhoodServiceName,
+	publicvaluationsv1connect.ValuationsServiceName,
+	publicneighborhoodsv1connect.NeighborhoodsServiceName,
 	publictransfersv1connect.RealPropertyTransfersServiceName,
 	publicaddressesv1connect.AddressesServiceName,
 	publicpartiesv1connect.PartiesServiceName,
@@ -394,8 +432,8 @@ func TestUpdateParcelForwardsTraceparent(t *testing.T) {
 		t.Fatal(err)
 	}
 	calls := g.mesh.reset(0)
-	if len(calls) != 1 || !strings.Contains(calls[0].procedure, "ParcelWriteService") {
-		t.Fatalf("expected one ParcelWriteService call, got %+v", calls)
+	if len(calls) != 1 || !strings.Contains(calls[0].procedure, "ParcelsWriteService") {
+		t.Fatalf("expected one ParcelsWriteService call, got %+v", calls)
 	}
 	if got := calls[0].header.Get("Traceparent"); got != tp {
 		t.Errorf("traceparent = %q, want %q", got, tp)
@@ -540,12 +578,12 @@ func (m *methodRecorder) RoundTrip(r *http.Request) (*http.Response, error) {
 	return http.DefaultTransport.RoundTrip(r)
 }
 
-// TestNeighborhoodRPCsOverGET calls each NeighborhoodService RPC with Connect
+// TestNeighborhoodRPCsOverGET calls each NeighborhoodsService RPC with Connect
 // GET. The handler only accepts GET for NO_SIDE_EFFECTS procedures, so a
 // call that reaches the mesh proves the idempotency level reaches it.
 func TestNeighborhoodRPCsOverGET(t *testing.T) {
 	g := startGateway(t, nil)
-	for _, md := range methods(t, publicneighborhoodsv1connect.NeighborhoodServiceName) {
+	for _, md := range methods(t, publicneighborhoodsv1connect.NeighborhoodsServiceName) {
 		t.Run(string(md.Name()), func(t *testing.T) {
 			rec := &methodRecorder{}
 			procedure := fmt.Sprintf("/%s/%s", md.Parent().FullName(), md.Name())

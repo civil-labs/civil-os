@@ -5,7 +5,7 @@ package civil.public.neighborhoods.v1;
 import "buf/validate/validate.proto";
 import "gnostic/openapi/v3/annotations.proto";
 
-service NeighborhoodService {
+service NeighborhoodsService {
   // Returns every neighborhood definition.
   rpc GetNeighborhoodDefinitions(GetNeighborhoodDefinitionsRequest) returns (GetNeighborhoodDefinitionsResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;

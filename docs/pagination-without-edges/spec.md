@@ -151,7 +151,12 @@ pagination (`first` / `after`) is supported for now", stays.
   > Per-result cursors are gone.
 
 - **Versions:** the public API goes from 0.4.1 to 0.5.0, and the npm SDK
-  with it. The root package's next version is a minor bump too, since the
+  with it.
+- **The same release moves four of these RPCs** to the service of what they
+  return, if [`../reverse-lookups-by-returned-type/intent.md`](../reverse-lookups-by-returned-type/intent.md),
+  written in this spec's PR, is accepted. Its spec and plan come after this
+  one. This spec names the RPCs where they are today, and the shape it sets
+  out doesn't depend on where they live. The root package's next version is a minor bump too, since the
   gateway's responses change.
 
 ## The records app

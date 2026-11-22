@@ -233,6 +233,44 @@ func (g *gateway) call(t *testing.T, md protoreflect.MethodDescriptor, req *dyna
 	return res.Msg, nil
 }
 
+// TestMeshServiceNames: every mesh service is a public service's domain plus
+// ReadService or WriteService, such as ParcelsService -> ParcelsReadService
+// (docs/mesh-plural-service-names/spec.md).
+func TestMeshServiceNames(t *testing.T) {
+	public := map[string]bool{}
+	var mesh []string
+	protoregistry.GlobalFiles.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
+		pkg := string(fd.Package())
+		for i := 0; i < fd.Services().Len(); i++ {
+			name := string(fd.Services().Get(i).Name())
+			switch {
+			case strings.HasPrefix(pkg, "civil.public."):
+				public[name] = true
+			case strings.HasPrefix(pkg, "civil.mesh."):
+				mesh = append(mesh, pkg+"."+name)
+			}
+		}
+		return true
+	})
+	if len(mesh) == 0 || len(public) == 0 {
+		t.Fatalf("found %d mesh and %d public services; the registry walk is broken", len(mesh), len(public))
+	}
+	for _, full := range mesh {
+		name := full[strings.LastIndex(full, ".")+1:]
+		domain, ok := strings.CutSuffix(name, "ReadService")
+		if !ok {
+			domain, ok = strings.CutSuffix(name, "WriteService")
+		}
+		if !ok {
+			t.Errorf("%s: a mesh service name must end in ReadService or WriteService", full)
+			continue
+		}
+		if !public[domain+"Service"] {
+			t.Errorf("%s: no public %sService to match", full, domain)
+		}
+	}
+}
+
 // publicServices are the services the gateway serves from the mesh.
 var publicServices = []string{
 	parcelsv1connect.ParcelsServiceName,

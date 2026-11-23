@@ -36,6 +36,11 @@ go.work.sum
 /services/gateway/gateway
 /services/database-reader/reader
 /services/database-writer/writer
+# `go build ./services/<name>` from the repo root
+/gateway
+/database-reader
+/database-writer
+/tile-server
 
 # Generated at build/publish time, never committed
 /api/gen/openapi/

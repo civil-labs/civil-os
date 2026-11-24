@@ -20,6 +20,11 @@ PRs are split go in `plan.md`.
 | Field numbers | **`total_bathrooms` keeps number 4** and becomes the derived total. The two counts are new fields, 12 and 13. See [Public API](#public-api). |
 | The release version | Automatic. release-please bumps the minor version for a breaking change before 1.0 (`bump-minor-pre-major`), so this ships as the next public API minor release after `public-api-v0.5.0`. |
 
+## Correction to the intent
+
+The intent calls the message `ParcelImprovementSummary`. Its name in both the public and
+mesh protos is **`ParcelImprovementsSummary`**; this spec uses that.
+
 ## Departures from the intent
 
 Both were decided by the owner in the spec brainstorm:
@@ -51,7 +56,7 @@ Existing rows keep their counts as full baths, and `half_bathrooms` is null.
 
 In `civil.public.parcels.v1`:
 
-**`ParcelImprovementSummary`**
+**`ParcelImprovementsSummary`**
 
 | Field | Before | After |
 |---|---|---|
@@ -59,10 +64,30 @@ In `civil.public.parcels.v1`:
 | 12 | none | `int32 total_full_bathrooms`: the sum of `full_bathrooms`. |
 | 13 | none | `int32 total_half_bathrooms`: the sum of `half_bathrooms`. |
 
-Each new field gets a comment that says what it sums. `total_bathrooms`'s comment gives the
-formula.
+**Comments.** With no validation rules, the comments are the contract, so each field's
+comment states what it holds and the values it can take:
 
-**No protovalidate rules on these fields.** `ParcelImprovementSummary` is a response
+```proto
+// The number of bathrooms, counting a half bath as 0.5:
+// total_full_bathrooms + 0.5 * total_half_bathrooms.
+// Always >= 0, in steps of 0.5. 0 when the parcel has no improvements or no
+// bathroom counts are recorded.
+double total_bathrooms = 4;
+
+// The sum of the full bathrooms across the parcel's improvements.
+// Always >= 0. 0 when the parcel has no improvements or none records full baths.
+int32 total_full_bathrooms = 12;
+
+// The sum of the half bathrooms across the parcel's improvements.
+// Always >= 0. 0 when the parcel has no improvements or none records half baths.
+int32 total_half_bathrooms = 13;
+```
+
+The `values` fields of `GetBathroomsByParcelIdResponse` and
+`GetBathroomsByFeatureIdResponse` get the same note as `total_bathrooms`: the derived
+total, always >= 0, in steps of 0.5.
+
+**No protovalidate rules on these fields.** `ParcelImprovementsSummary` is a response
 message, and the gateway's protovalidate interceptor checks requests only, so a rule here
 would never be enforced. Field 4's existing `gte: 0` rule is dropped with its type change.
 The other summary fields' rules (`total_area_sq_ft`, `total_bedrooms`, `total_units`) are

@@ -112,7 +112,8 @@ message ParcelAffordances {
 message ParcelImprovementsSummary {
   repeated string improvement_ids = 1;
 
-  string primary_improvement_id = 2;
+  // The primary improvement's ID. Unset when the parcel has no improvements.
+  optional string primary_improvement_id = 2;
 
   // Physically impossible to be negative
   double total_area_sq_ft = 3;

@@ -192,9 +192,10 @@ func (x *ParcelAffordances) GetMaxLotCoveragePct() float64 {
 }
 
 type ParcelImprovementsSummary struct {
-	state                protoimpl.MessageState `protogen:"open.v1"`
-	ImprovementIds       []string               `protobuf:"bytes,1,rep,name=improvement_ids,json=improvementIds,proto3" json:"improvement_ids,omitempty"`
-	PrimaryImprovementId string                 `protobuf:"bytes,2,opt,name=primary_improvement_id,json=primaryImprovementId,proto3" json:"primary_improvement_id,omitempty"`
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	ImprovementIds []string               `protobuf:"bytes,1,rep,name=improvement_ids,json=improvementIds,proto3" json:"improvement_ids,omitempty"`
+	// The primary improvement's ID. Unset when the parcel has no improvements.
+	PrimaryImprovementId *string `protobuf:"bytes,2,opt,name=primary_improvement_id,json=primaryImprovementId,proto3,oneof" json:"primary_improvement_id,omitempty"`
 	// Physically impossible to be negative
 	TotalAreaSqFt float64 `protobuf:"fixed64,3,opt,name=total_area_sq_ft,json=totalAreaSqFt,proto3" json:"total_area_sq_ft,omitempty"`
 	// The number of bathrooms, counting a half bath as 0.5:
@@ -257,8 +258,8 @@ func (x *ParcelImprovementsSummary) GetImprovementIds() []string {
 }
 
 func (x *ParcelImprovementsSummary) GetPrimaryImprovementId() string {
-	if x != nil {
-		return x.PrimaryImprovementId
+	if x != nil && x.PrimaryImprovementId != nil {
+		return *x.PrimaryImprovementId
 	}
 	return ""
 }
@@ -5357,23 +5358,24 @@ const file_civil_mesh_parcels_v1_parcels_proto_rawDesc = "" +
 	"\x13_min_lot_size_sq_ftB\x10\n" +
 	"\x0e_max_height_ftB\x1e\n" +
 	"\x1c_max_dwelling_units_per_acreB\x17\n" +
-	"\x15_max_lot_coverage_pct\"\xd9\x06\n" +
+	"\x15_max_lot_coverage_pct\"\xf9\x06\n" +
 	"\x19ParcelImprovementsSummary\x12'\n" +
-	"\x0fimprovement_ids\x18\x01 \x03(\tR\x0eimprovementIds\x124\n" +
-	"\x16primary_improvement_id\x18\x02 \x01(\tR\x14primaryImprovementId\x12'\n" +
+	"\x0fimprovement_ids\x18\x01 \x03(\tR\x0eimprovementIds\x129\n" +
+	"\x16primary_improvement_id\x18\x02 \x01(\tH\x00R\x14primaryImprovementId\x88\x01\x01\x12'\n" +
 	"\x10total_area_sq_ft\x18\x03 \x01(\x01R\rtotalAreaSqFt\x12'\n" +
 	"\x0ftotal_bathrooms\x18\x04 \x01(\x01R\x0etotalBathrooms\x12%\n" +
 	"\x0etotal_bedrooms\x18\x05 \x01(\x05R\rtotalBedrooms\x12\x1f\n" +
 	"\vtotal_units\x18\x06 \x01(\x05R\n" +
 	"totalUnits\x121\n" +
-	"\x12primary_year_built\x18\a \x01(\x05H\x00R\x10primaryYearBuilt\x88\x01\x01\x12D\n" +
-	"\x1cprimary_effective_year_built\x18\b \x01(\x05H\x01R\x19primaryEffectiveYearBuilt\x88\x01\x01\x125\n" +
-	"\x14primary_condition_id\x18\t \x01(\tH\x02R\x12primaryConditionId\x88\x01\x01\x12H\n" +
+	"\x12primary_year_built\x18\a \x01(\x05H\x01R\x10primaryYearBuilt\x88\x01\x01\x12D\n" +
+	"\x1cprimary_effective_year_built\x18\b \x01(\x05H\x02R\x19primaryEffectiveYearBuilt\x88\x01\x01\x125\n" +
+	"\x14primary_condition_id\x18\t \x01(\tH\x03R\x12primaryConditionId\x88\x01\x01\x12H\n" +
 	"\x1etotal_market_improvement_value\x18\n" +
-	" \x01(\tH\x03R\x1btotalMarketImprovementValue\x88\x01\x01\x12L\n" +
-	" total_assessed_improvement_value\x18\v \x01(\tH\x04R\x1dtotalAssessedImprovementValue\x88\x01\x01\x120\n" +
+	" \x01(\tH\x04R\x1btotalMarketImprovementValue\x88\x01\x01\x12L\n" +
+	" total_assessed_improvement_value\x18\v \x01(\tH\x05R\x1dtotalAssessedImprovementValue\x88\x01\x01\x120\n" +
 	"\x14total_full_bathrooms\x18\f \x01(\x05R\x12totalFullBathrooms\x120\n" +
-	"\x14total_half_bathrooms\x18\r \x01(\x05R\x12totalHalfBathroomsB\x15\n" +
+	"\x14total_half_bathrooms\x18\r \x01(\x05R\x12totalHalfBathroomsB\x19\n" +
+	"\x17_primary_improvement_idB\x15\n" +
 	"\x13_primary_year_builtB\x1f\n" +
 	"\x1d_primary_effective_year_builtB\x17\n" +
 	"\x15_primary_condition_idB!\n" +

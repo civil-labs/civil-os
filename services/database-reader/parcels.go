@@ -195,7 +195,7 @@ func (s *APIServer) getParcelsWithImprovementSummary(
 			pv_agg.assessed_land_value,
 
 			COALESCE(imp_totals.improvement_ids, '{}'::text[]) AS improvement_ids,
-			COALESCE(pid.primary_improvement_public_id, '') AS primary_improvement_id,
+			pid.primary_improvement_public_id AS primary_improvement_id,
 			COALESCE(imp_totals.total_area_sq_m, 0.0) AS total_area_sq_m,
 			COALESCE(imp_totals.total_full_bathrooms, 0) AS total_full_bathrooms,
 			COALESCE(imp_totals.total_half_bathrooms, 0) AS total_half_bathrooms,
@@ -316,7 +316,7 @@ func (s *APIServer) getParcelsWithImprovementSummary(
 			assessedLandValue *string
 
 			improvementIDs            []string
-			primaryImpID              string
+			primaryImpID              *string
 			totalAreaSqM              float64
 			totalFullBathrooms        int32
 			totalHalfBathrooms        int32

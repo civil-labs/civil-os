@@ -562,7 +562,7 @@ func TestParcelsWithImprovementSummary(t *testing.T) {
 	}
 
 	p17 := byID.Msg.Parcels[tu.ParcelID(17)]
-	if s := p17.GetImprovementSummary(); len(s.GetImprovementIds()) != 0 || s.GetPrimaryImprovementId() != "" {
+	if s := p17.GetImprovementSummary(); len(s.GetImprovementIds()) != 0 || s.PrimaryImprovementId != nil {
 		t.Errorf("unimproved parcel 17 summary = %v", s)
 	}
 }

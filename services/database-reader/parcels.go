@@ -422,7 +422,7 @@ func (s *APIServer) getParcelsWithImprovementSummary(
 				ImprovementIds:                improvementIDs,
 				PrimaryImprovementId:          primaryImpID,
 				TotalAreaSqFt:                 totalAreaSqFt,
-				TotalBathrooms:                totalBathrooms,
+				TotalBathrooms:                float64(totalBathrooms),
 				TotalBedrooms:                 totalBedrooms,
 				TotalUnits:                    totalUnits,
 				PrimaryYearBuilt:              primaryYearBuilt,
@@ -1604,8 +1604,8 @@ func (s *APIServer) GetBathroomsByParcelId(ctx context.Context, req *connect.Req
 	return connect.NewResponse(&parcelsv1.GetBathroomsByParcelIdResponse{Values: values}), nil
 }
 
-func (s *APIServer) getBathroomsByParcelId(ctx context.Context, parcelIds []string, legalAsOf *timestamppb.Timestamp) (map[string]int32, error) {
-	values := make(map[string]int32)
+func (s *APIServer) getBathroomsByParcelId(ctx context.Context, parcelIds []string, legalAsOf *timestamppb.Timestamp) (map[string]float64, error) {
+	values := make(map[string]float64)
 	if len(parcelIds) == 0 {
 		return values, nil
 	}
@@ -1630,7 +1630,7 @@ func (s *APIServer) getBathroomsByParcelId(ctx context.Context, parcelIds []stri
 		if err := rows.Scan(&pid, &bathrooms); err != nil {
 			return nil, err
 		}
-		values[pid] = bathrooms
+		values[pid] = float64(bathrooms)
 	}
 	return values, nil
 }
@@ -2159,8 +2159,8 @@ func (s *APIServer) GetBathroomsByFeatureId(ctx context.Context, req *connect.Re
 	return connect.NewResponse(&parcelsv1.GetBathroomsByFeatureIdResponse{Values: values}), nil
 }
 
-func (s *APIServer) getBathroomsByFeatureId(ctx context.Context, featureIds []int64, legalAsOf *timestamppb.Timestamp) (map[int64]int32, error) {
-	values := make(map[int64]int32)
+func (s *APIServer) getBathroomsByFeatureId(ctx context.Context, featureIds []int64, legalAsOf *timestamppb.Timestamp) (map[int64]float64, error) {
+	values := make(map[int64]float64)
 	if len(featureIds) == 0 {
 		return values, nil
 	}
@@ -2186,7 +2186,7 @@ func (s *APIServer) getBathroomsByFeatureId(ctx context.Context, featureIds []in
 		if err := rows.Scan(&fid, &bathrooms); err != nil {
 			return nil, err
 		}
-		values[fid] = bathrooms
+		values[fid] = float64(bathrooms)
 	}
 	return values, nil
 }

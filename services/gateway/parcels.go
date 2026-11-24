@@ -431,6 +431,8 @@ func mapParcelWithImprovementSummary(meshParcels map[string]*meshparcelsv1.Parce
 				PrimaryConditionId:            ms.PrimaryConditionId,
 				TotalMarketImprovementValue:   ms.TotalMarketImprovementValue,
 				TotalAssessedImprovementValue: ms.TotalAssessedImprovementValue,
+				TotalFullBathrooms:            ms.TotalFullBathrooms,
+				TotalHalfBathrooms:            ms.TotalHalfBathrooms,
 			}
 		}
 

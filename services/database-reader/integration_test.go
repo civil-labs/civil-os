@@ -318,7 +318,7 @@ func TestAttributesByParcelID(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	checkValues(t, "Bathrooms", ba.Msg.Values, pid, func(parcel) int32 { return 2 }, true, eqI)
+	checkValues(t, "Bathrooms", ba.Msg.Values, pid, func(parcel) float64 { return 2 }, true, eqF)
 
 	un, err := c.GetUnitsByParcelId(ctx, connect.NewRequest(&parcelsv1.GetUnitsByParcelIdRequest{ParcelIds: ids}))
 	if err != nil {
@@ -404,7 +404,7 @@ func TestAttributesByFeatureID(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	checkValues(t, "Bathrooms", ba.Msg.Values, fid, func(parcel) int32 { return 2 }, true, eqI)
+	checkValues(t, "Bathrooms", ba.Msg.Values, fid, func(parcel) float64 { return 2 }, true, eqF)
 
 	un, err := c.GetUnitsByFeatureId(ctx, connect.NewRequest(&parcelsv1.GetUnitsByFeatureIdRequest{FeatureIds: ids}))
 	if err != nil {

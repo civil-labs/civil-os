@@ -27,14 +27,15 @@ const (
 type ParcelAttribute int32
 
 const (
-	ParcelAttribute_PARCEL_ATTRIBUTE_UNSPECIFIED                              ParcelAttribute = 0
-	ParcelAttribute_PARCEL_ATTRIBUTE_LAND_AREA_SQ_FT                          ParcelAttribute = 1
-	ParcelAttribute_PARCEL_ATTRIBUTE_FRONTAGE_FT                              ParcelAttribute = 2
-	ParcelAttribute_PARCEL_ATTRIBUTE_DEPTH_FT                                 ParcelAttribute = 3
-	ParcelAttribute_PARCEL_ATTRIBUTE_LAND_USE_ID                              ParcelAttribute = 4
-	ParcelAttribute_PARCEL_ATTRIBUTE_ZONING_ID                                ParcelAttribute = 5
-	ParcelAttribute_PARCEL_ATTRIBUTE_IMPROVEMENT_AREA_SQ_FT                   ParcelAttribute = 6
-	ParcelAttribute_PARCEL_ATTRIBUTE_BEDROOMS                                 ParcelAttribute = 7
+	ParcelAttribute_PARCEL_ATTRIBUTE_UNSPECIFIED            ParcelAttribute = 0
+	ParcelAttribute_PARCEL_ATTRIBUTE_LAND_AREA_SQ_FT        ParcelAttribute = 1
+	ParcelAttribute_PARCEL_ATTRIBUTE_FRONTAGE_FT            ParcelAttribute = 2
+	ParcelAttribute_PARCEL_ATTRIBUTE_DEPTH_FT               ParcelAttribute = 3
+	ParcelAttribute_PARCEL_ATTRIBUTE_LAND_USE_ID            ParcelAttribute = 4
+	ParcelAttribute_PARCEL_ATTRIBUTE_ZONING_ID              ParcelAttribute = 5
+	ParcelAttribute_PARCEL_ATTRIBUTE_IMPROVEMENT_AREA_SQ_FT ParcelAttribute = 6
+	ParcelAttribute_PARCEL_ATTRIBUTE_BEDROOMS               ParcelAttribute = 7
+	// The number of bathrooms, counting a half bath as 0.5: full + 0.5 * half.
 	ParcelAttribute_PARCEL_ATTRIBUTE_BATHROOMS                                ParcelAttribute = 8
 	ParcelAttribute_PARCEL_ATTRIBUTE_UNITS                                    ParcelAttribute = 9
 	ParcelAttribute_PARCEL_ATTRIBUTE_PRIMARY_IMPROVEMENT_YEAR_BUILT           ParcelAttribute = 10
@@ -195,8 +196,12 @@ type ParcelImprovementsSummary struct {
 	ImprovementIds       []string               `protobuf:"bytes,1,rep,name=improvement_ids,json=improvementIds,proto3" json:"improvement_ids,omitempty"`
 	PrimaryImprovementId string                 `protobuf:"bytes,2,opt,name=primary_improvement_id,json=primaryImprovementId,proto3" json:"primary_improvement_id,omitempty"`
 	// Physically impossible to be negative
-	TotalAreaSqFt                 float64 `protobuf:"fixed64,3,opt,name=total_area_sq_ft,json=totalAreaSqFt,proto3" json:"total_area_sq_ft,omitempty"`
-	TotalBathrooms                int32   `protobuf:"varint,4,opt,name=total_bathrooms,json=totalBathrooms,proto3" json:"total_bathrooms,omitempty"`
+	TotalAreaSqFt float64 `protobuf:"fixed64,3,opt,name=total_area_sq_ft,json=totalAreaSqFt,proto3" json:"total_area_sq_ft,omitempty"`
+	// The number of bathrooms, counting a half bath as 0.5:
+	// total_full_bathrooms + 0.5 * total_half_bathrooms.
+	// Always >= 0, in steps of 0.5. 0 when the parcel has no improvements or no
+	// bathroom counts are recorded.
+	TotalBathrooms                float64 `protobuf:"fixed64,4,opt,name=total_bathrooms,json=totalBathrooms,proto3" json:"total_bathrooms,omitempty"`
 	TotalBedrooms                 int32   `protobuf:"varint,5,opt,name=total_bedrooms,json=totalBedrooms,proto3" json:"total_bedrooms,omitempty"`
 	TotalUnits                    int32   `protobuf:"varint,6,opt,name=total_units,json=totalUnits,proto3" json:"total_units,omitempty"`
 	PrimaryYearBuilt              *int32  `protobuf:"varint,7,opt,name=primary_year_built,json=primaryYearBuilt,proto3,oneof" json:"primary_year_built,omitempty"`
@@ -204,8 +209,14 @@ type ParcelImprovementsSummary struct {
 	PrimaryConditionId            *string `protobuf:"bytes,9,opt,name=primary_condition_id,json=primaryConditionId,proto3,oneof" json:"primary_condition_id,omitempty"`
 	TotalMarketImprovementValue   *string `protobuf:"bytes,10,opt,name=total_market_improvement_value,json=totalMarketImprovementValue,proto3,oneof" json:"total_market_improvement_value,omitempty"`
 	TotalAssessedImprovementValue *string `protobuf:"bytes,11,opt,name=total_assessed_improvement_value,json=totalAssessedImprovementValue,proto3,oneof" json:"total_assessed_improvement_value,omitempty"`
-	unknownFields                 protoimpl.UnknownFields
-	sizeCache                     protoimpl.SizeCache
+	// The sum of the full bathrooms across the parcel's improvements.
+	// Always >= 0. 0 when the parcel has no improvements or none records full baths.
+	TotalFullBathrooms int32 `protobuf:"varint,12,opt,name=total_full_bathrooms,json=totalFullBathrooms,proto3" json:"total_full_bathrooms,omitempty"`
+	// The sum of the half bathrooms across the parcel's improvements.
+	// Always >= 0. 0 when the parcel has no improvements or none records half baths.
+	TotalHalfBathrooms int32 `protobuf:"varint,13,opt,name=total_half_bathrooms,json=totalHalfBathrooms,proto3" json:"total_half_bathrooms,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *ParcelImprovementsSummary) Reset() {
@@ -259,7 +270,7 @@ func (x *ParcelImprovementsSummary) GetTotalAreaSqFt() float64 {
 	return 0
 }
 
-func (x *ParcelImprovementsSummary) GetTotalBathrooms() int32 {
+func (x *ParcelImprovementsSummary) GetTotalBathrooms() float64 {
 	if x != nil {
 		return x.TotalBathrooms
 	}
@@ -313,6 +324,20 @@ func (x *ParcelImprovementsSummary) GetTotalAssessedImprovementValue() string {
 		return *x.TotalAssessedImprovementValue
 	}
 	return ""
+}
+
+func (x *ParcelImprovementsSummary) GetTotalFullBathrooms() int32 {
+	if x != nil {
+		return x.TotalFullBathrooms
+	}
+	return 0
+}
+
+func (x *ParcelImprovementsSummary) GetTotalHalfBathrooms() int32 {
+	if x != nil {
+		return x.TotalHalfBathrooms
+	}
+	return 0
 }
 
 type ParcelDetails struct {
@@ -3192,7 +3217,7 @@ func (x *GetBathroomsByParcelIdRequest) GetLegalAsOf() *timestamppb.Timestamp {
 
 type GetBathroomsByParcelIdResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Values        map[string]int32       `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
+	Values        map[string]float64     `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"fixed64,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3227,7 +3252,7 @@ func (*GetBathroomsByParcelIdResponse) Descriptor() ([]byte, []int) {
 	return file_civil_mesh_parcels_v1_parcels_proto_rawDescGZIP(), []int{48}
 }
 
-func (x *GetBathroomsByParcelIdResponse) GetValues() map[string]int32 {
+func (x *GetBathroomsByParcelIdResponse) GetValues() map[string]float64 {
 	if x != nil {
 		return x.Values
 	}
@@ -4441,7 +4466,7 @@ func (x *GetBathroomsByFeatureIdRequest) GetLegalAsOf() *timestamppb.Timestamp {
 
 type GetBathroomsByFeatureIdResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Values        map[int64]int32        `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty" protobuf_key:"varint,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
+	Values        map[int64]float64      `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty" protobuf_key:"varint,1,opt,name=key" protobuf_val:"fixed64,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4476,7 +4501,7 @@ func (*GetBathroomsByFeatureIdResponse) Descriptor() ([]byte, []int) {
 	return file_civil_mesh_parcels_v1_parcels_proto_rawDescGZIP(), []int{74}
 }
 
-func (x *GetBathroomsByFeatureIdResponse) GetValues() map[int64]int32 {
+func (x *GetBathroomsByFeatureIdResponse) GetValues() map[int64]float64 {
 	if x != nil {
 		return x.Values
 	}
@@ -5332,12 +5357,12 @@ const file_civil_mesh_parcels_v1_parcels_proto_rawDesc = "" +
 	"\x13_min_lot_size_sq_ftB\x10\n" +
 	"\x0e_max_height_ftB\x1e\n" +
 	"\x1c_max_dwelling_units_per_acreB\x17\n" +
-	"\x15_max_lot_coverage_pct\"\xf5\x05\n" +
+	"\x15_max_lot_coverage_pct\"\xd9\x06\n" +
 	"\x19ParcelImprovementsSummary\x12'\n" +
 	"\x0fimprovement_ids\x18\x01 \x03(\tR\x0eimprovementIds\x124\n" +
 	"\x16primary_improvement_id\x18\x02 \x01(\tR\x14primaryImprovementId\x12'\n" +
 	"\x10total_area_sq_ft\x18\x03 \x01(\x01R\rtotalAreaSqFt\x12'\n" +
-	"\x0ftotal_bathrooms\x18\x04 \x01(\x05R\x0etotalBathrooms\x12%\n" +
+	"\x0ftotal_bathrooms\x18\x04 \x01(\x01R\x0etotalBathrooms\x12%\n" +
 	"\x0etotal_bedrooms\x18\x05 \x01(\x05R\rtotalBedrooms\x12\x1f\n" +
 	"\vtotal_units\x18\x06 \x01(\x05R\n" +
 	"totalUnits\x121\n" +
@@ -5346,7 +5371,9 @@ const file_civil_mesh_parcels_v1_parcels_proto_rawDesc = "" +
 	"\x14primary_condition_id\x18\t \x01(\tH\x02R\x12primaryConditionId\x88\x01\x01\x12H\n" +
 	"\x1etotal_market_improvement_value\x18\n" +
 	" \x01(\tH\x03R\x1btotalMarketImprovementValue\x88\x01\x01\x12L\n" +
-	" total_assessed_improvement_value\x18\v \x01(\tH\x04R\x1dtotalAssessedImprovementValue\x88\x01\x01B\x15\n" +
+	" total_assessed_improvement_value\x18\v \x01(\tH\x04R\x1dtotalAssessedImprovementValue\x88\x01\x01\x120\n" +
+	"\x14total_full_bathrooms\x18\f \x01(\x05R\x12totalFullBathrooms\x120\n" +
+	"\x14total_half_bathrooms\x18\r \x01(\x05R\x12totalHalfBathroomsB\x15\n" +
 	"\x13_primary_year_builtB\x1f\n" +
 	"\x1d_primary_effective_year_builtB\x17\n" +
 	"\x15_primary_condition_idB!\n" +
@@ -5706,7 +5733,7 @@ const file_civil_mesh_parcels_v1_parcels_proto_rawDesc = "" +
 	"\x06values\x18\x01 \x03(\v2A.civil.mesh.parcels.v1.GetBathroomsByParcelIdResponse.ValuesEntryR\x06values\x1a9\n" +
 	"\vValuesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\x05R\x05value:\x028\x01\"\x8b\x01\n" +
+	"\x05value\x18\x02 \x01(\x01R\x05value:\x028\x01\"\x8b\x01\n" +
 	"\x19GetUnitsByParcelIdRequest\x12\x1d\n" +
 	"\n" +
 	"parcel_ids\x18\x01 \x03(\tR\tparcelIds\x12?\n" +
@@ -5836,7 +5863,7 @@ const file_civil_mesh_parcels_v1_parcels_proto_rawDesc = "" +
 	"\x06values\x18\x01 \x03(\v2B.civil.mesh.parcels.v1.GetBathroomsByFeatureIdResponse.ValuesEntryR\x06values\x1a9\n" +
 	"\vValuesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\x03R\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\x05R\x05value:\x028\x01\"\x8e\x01\n" +
+	"\x05value\x18\x02 \x01(\x01R\x05value:\x028\x01\"\x8e\x01\n" +
 	"\x1aGetUnitsByFeatureIdRequest\x12\x1f\n" +
 	"\vfeature_ids\x18\x01 \x03(\x03R\n" +
 	"featureIds\x12?\n" +

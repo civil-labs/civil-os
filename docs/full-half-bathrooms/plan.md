@@ -20,8 +20,9 @@
 - **Verification before "done".** The PR's checks are run locally, and their output goes in
   the PR description.
 - **Generated code is never edited by hand.** Proto changes go through `mise run generate`,
-  and `api/gen/go`, `internal/gen/go`, `sdk/js/gen` and `api/gen/openapi` are committed with
-  the `.proto` change.
+  and `api/gen/go` and `internal/gen/go` are committed with the `.proto` change.
+  `sdk/js/gen` and `api/gen/openapi` are gitignored and built at release; they're checked
+  locally but not committed.
 - **Agents never run Atlas** and never write in `database/migrations`
   (`.claude/skills/atlas-migrations/SKILL.md`). The owner generates the migration in step 1.
 - **Synthetic data only.** This repo is public.
@@ -134,10 +135,15 @@ Public `civil/public/parcels/v1/parcels.proto`, as the spec lists:
 
 Mesh `civil/mesh/parcels/v1/parcels.proto`: the same fields, numbers and map types, no rules.
 
-`buf format -w`, `mise run generate`, and commit the generated code. Go builds fail at this
-commit's uses of `TotalBathrooms` and the maps, so step 2 also changes their types in the
-reader and gateway mechanically (`int32` to `float64`), computing `total_bathrooms` from the
-old full-bath sum for now. `buf breaking` fails as expected.
+`buf format -w`, `mise run generate`, and commit the generated Go code. Go builds fail at
+this commit's uses of `TotalBathrooms` and the maps, so step 2 also changes their types in
+the reader and its integration tests mechanically (`int32` to `float64`), computing
+`total_bathrooms` from the old full-bath sum for now. `buf breaking` fails as expected.
+
+*Departure, found in implementation:* the gateway's field-for-field mapping tests
+(`TestPublicRPCs`, `TestMapParcelWithImprovementSummary`) fail as soon as the mesh message
+has fields the gateway doesn't copy, so step 2 also maps `TotalFullBathrooms` and
+`TotalHalfBathrooms` in the gateway, keeping `mise run check` green.
 
 ### Step 3: reader and gateway (`feat!: read full and half bathrooms`)
 
@@ -152,8 +158,8 @@ old full-bath sum for now. `buf breaking` fails as expected.
   `(COALESCE(SUM(attr.full_bathrooms), 0) + 0.5 * COALESCE(SUM(attr.half_bathrooms), 0))::float8`
   into `map[…]float64`, keeping their voided-parcel and `legal_valid_range` filters.
 
-`services/gateway/parcels.go`: map `TotalFullBathrooms` and `TotalHalfBathrooms`; the two
-RPCs keep passing the maps through (the types now match).
+`services/gateway/parcels.go`: nothing left (the new fields are mapped in step 2, and the
+two RPCs pass the maps through).
 
 Unit test: `bathroomTotal` (0/0, 2/0, 2/1, 3/2).
 

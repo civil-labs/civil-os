@@ -226,7 +226,11 @@ message ParcelImprovementsSummary {
   // Physically impossible to be negative
   double total_area_sq_ft = 3 [(buf.validate.field).double = {gte: 0.0}];
 
-  int32 total_bathrooms = 4 [(buf.validate.field).int32 = {gte: 0}];
+  // The number of bathrooms, counting a half bath as 0.5:
+  // total_full_bathrooms + 0.5 * total_half_bathrooms.
+  // Always >= 0, in steps of 0.5. 0 when the parcel has no improvements or no
+  // bathroom counts are recorded.
+  double total_bathrooms = 4 [(buf.validate.field).double = {gte: 0.0}];
 
   int32 total_bedrooms = 5 [(buf.validate.field).int32 = {gte: 0}];
 
@@ -260,6 +264,14 @@ message ParcelImprovementsSummary {
     },
     (gnostic.openapi.v3.property) = {description: "Is only returned if a valuation_id is provided which contains a valuation for improvements attached to this parcel"}
   ];
+
+  // The sum of the full bathrooms across the parcel's improvements.
+  // Always >= 0. 0 when the parcel has no improvements or none records full baths.
+  int32 total_full_bathrooms = 12 [(buf.validate.field).int32 = {gte: 0}];
+
+  // The sum of the half bathrooms across the parcel's improvements.
+  // Always >= 0. 0 when the parcel has no improvements or none records half baths.
+  int32 total_half_bathrooms = 13 [(buf.validate.field).int32 = {gte: 0}];
 }
 
 message ParcelDetails {
@@ -534,6 +546,7 @@ enum ParcelAttribute {
   PARCEL_ATTRIBUTE_ZONING_ID = 5;
   PARCEL_ATTRIBUTE_IMPROVEMENT_AREA_SQ_FT = 6;
   PARCEL_ATTRIBUTE_BEDROOMS = 7;
+  // The number of bathrooms, counting a half bath as 0.5: full + 0.5 * half.
   PARCEL_ATTRIBUTE_BATHROOMS = 8;
   PARCEL_ATTRIBUTE_UNITS = 9;
   PARCEL_ATTRIBUTE_PRIMARY_IMPROVEMENT_YEAR_BUILT = 10;
@@ -1103,7 +1116,10 @@ message GetBathroomsByParcelIdRequest {
 }
 
 message GetBathroomsByParcelIdResponse {
-  map<string, int32> values = 1;
+  // Each parcel's number of bathrooms, counting a half bath as 0.5
+  // (full + 0.5 * half, summed over its improvements), as in
+  // ParcelImprovementsSummary.total_bathrooms. Always >= 0, in steps of 0.5.
+  map<string, double> values = 1 [(buf.validate.field).map.values.double = {gte: 0.0}];
 }
 
 message GetUnitsByParcelIdRequest {
@@ -1493,7 +1509,10 @@ message GetBathroomsByFeatureIdRequest {
 }
 
 message GetBathroomsByFeatureIdResponse {
-  map<int64, int32> values = 1;
+  // Each feature's number of bathrooms, counting a half bath as 0.5
+  // (full + 0.5 * half, summed over its improvements), as in
+  // ParcelImprovementsSummary.total_bathrooms. Always >= 0, in steps of 0.5.
+  map<int64, double> values = 1 [(buf.validate.field).map.values.double = {gte: 0.0}];
 }
 
 message GetUnitsByFeatureIdRequest {

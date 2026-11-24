@@ -55,12 +55,18 @@ In `civil.public.parcels.v1`:
 
 | Field | Before | After |
 |---|---|---|
-| 4 | `int32 total_bathrooms` (sum of `bathrooms`) | `double total_bathrooms`: `total_full_bathrooms + 0.5 × total_half_bathrooms`. Validated `gte: 0.0`. |
-| 12 | none | `int32 total_full_bathrooms`: the sum of `full_bathrooms`. Validated `gte: 0`. |
-| 13 | none | `int32 total_half_bathrooms`: the sum of `half_bathrooms`. Validated `gte: 0`. |
+| 4 | `int32 total_bathrooms` (sum of `bathrooms`), with a `gte: 0` rule | `double total_bathrooms`: `total_full_bathrooms + 0.5 × total_half_bathrooms`. No validation rule. |
+| 12 | none | `int32 total_full_bathrooms`: the sum of `full_bathrooms`. |
+| 13 | none | `int32 total_half_bathrooms`: the sum of `half_bathrooms`. |
 
 Each new field gets a comment that says what it sums. `total_bathrooms`'s comment gives the
 formula.
+
+**No protovalidate rules on these fields.** `ParcelImprovementSummary` is a response
+message, and the gateway's protovalidate interceptor checks requests only, so a rule here
+would never be enforced. Field 4's existing `gte: 0` rule is dropped with its type change.
+The other summary fields' rules (`total_area_sq_ft`, `total_bedrooms`, `total_units`) are
+left as they are; removing them is a separate cleanup.
 
 **Per-parcel and per-feature values**
 

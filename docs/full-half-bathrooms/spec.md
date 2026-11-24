@@ -60,38 +60,46 @@ In `civil.public.parcels.v1`:
 
 | Field | Before | After |
 |---|---|---|
-| 4 | `int32 total_bathrooms` (sum of `bathrooms`), with a `gte: 0` rule | `double total_bathrooms`: `total_full_bathrooms + 0.5 × total_half_bathrooms`. No validation rule. |
-| 12 | none | `int32 total_full_bathrooms`: the sum of `full_bathrooms`. |
-| 13 | none | `int32 total_half_bathrooms`: the sum of `half_bathrooms`. |
+| 4 | `int32 total_bathrooms` (sum of `bathrooms`), with a `gte: 0` rule | `double total_bathrooms`: `total_full_bathrooms + 0.5 × total_half_bathrooms`. Rule `double = {gte: 0.0}`. |
+| 12 | none | `int32 total_full_bathrooms`: the sum of `full_bathrooms`. Rule `int32 = {gte: 0}`. |
+| 13 | none | `int32 total_half_bathrooms`: the sum of `half_bathrooms`. Rule `int32 = {gte: 0}`. |
 
-**Comments.** With no validation rules, the comments are the contract, so each field's
-comment states what it holds and the values it can take:
+**Comments and rules.** API consumers learn a field's possible values in two places, and
+each field uses both:
+
+- **The comment** becomes JSDoc in the TypeScript SDK and a doc comment in Go; it's the only
+  thing SDK users see. It states what the field holds and every value it can take.
+- **The `buf.validate` rule** becomes a JSON Schema constraint in the published OpenAPI
+  (`protoc-gen-connect-openapi` turns `gte: 0` into `minimum: 0`), for clients generated
+  from it. A rule can't say "in steps of 0.5", so the comment carries that.
+
+The fields, with their comments:
 
 ```proto
 // The number of bathrooms, counting a half bath as 0.5:
 // total_full_bathrooms + 0.5 * total_half_bathrooms.
 // Always >= 0, in steps of 0.5. 0 when the parcel has no improvements or no
 // bathroom counts are recorded.
-double total_bathrooms = 4;
+double total_bathrooms = 4 [(buf.validate.field).double = {gte: 0.0}];
 
 // The sum of the full bathrooms across the parcel's improvements.
 // Always >= 0. 0 when the parcel has no improvements or none records full baths.
-int32 total_full_bathrooms = 12;
+int32 total_full_bathrooms = 12 [(buf.validate.field).int32 = {gte: 0}];
 
 // The sum of the half bathrooms across the parcel's improvements.
 // Always >= 0. 0 when the parcel has no improvements or none records half baths.
-int32 total_half_bathrooms = 13;
+int32 total_half_bathrooms = 13 [(buf.validate.field).int32 = {gte: 0}];
 ```
 
 The `values` fields of `GetBathroomsByParcelIdResponse` and
 `GetBathroomsByFeatureIdResponse` get the same note as `total_bathrooms`: the derived
-total, always >= 0, in steps of 0.5.
+total, always >= 0, in steps of 0.5. Their rule is
+`(buf.validate.field).map.values.double = {gte: 0.0}`.
 
-**No protovalidate rules on these fields.** `ParcelImprovementsSummary` is a response
-message, and the gateway's protovalidate interceptor checks requests only, so a rule here
-would never be enforced. Field 4's existing `gte: 0` rule is dropped with its type change.
-The other summary fields' rules (`total_area_sq_ft`, `total_bedrooms`, `total_units`) are
-left as they are; removing them is a separate cleanup.
+**The rules are checked by tests, not at runtime.** The gateway's protovalidate
+interceptor checks requests only. The integration tests below validate the responses they
+receive, so a rule the reader breaks fails CI instead of misleading a client. Checking every
+response in the API that way is [`../response-validation-rules/intent.md`](../response-validation-rules/intent.md).
 
 **Per-parcel and per-feature values**
 
@@ -164,6 +172,9 @@ mesh to public. Nothing else changes.
 
 **Integration tests** (`mise run test:integration`):
 
+- Every response these tests receive from the summary and bathroom RPCs passes
+  `protovalidate.Validate`, including the 2.5-bath parcel and a parcel with no
+  improvements.
 - A parcel with 2 full and 1 half bath reports `total_full_bathrooms = 2`,
   `total_half_bathrooms = 1` and `total_bathrooms = 2.5` from the summary RPC, and 2.5 from
   `GetBathroomsByParcelId` and `GetBathroomsByFeatureId`.

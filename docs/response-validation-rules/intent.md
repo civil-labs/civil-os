@@ -99,3 +99,16 @@ Other response fields that have constraints carry no rule at all.
    response fields.
 4. **`ParcelAffordances`:** delete or keep.
 5. **Order of work:** all messages in one PR, or one service at a time.
+6. **Leading spaces in OpenAPI descriptions.** *Added 2026-11-24, from #88.*
+   `protoc-gen-connect-openapi` turns a multi-line comment into a `description` whose
+   continuation lines keep the space after `//`:
+
+   ```yaml
+   description: |-
+     The number of bathrooms, counting a half bath as 0.5:
+      total_full_bathrooms + 0.5 * total_half_bathrooms.
+   ```
+
+   It renders correctly as Markdown, but the raw text is uneven. The spec decides whether
+   to accept it, fix it in the comment style (for example comments written as one
+   paragraph), or post-process the generated spec at release.

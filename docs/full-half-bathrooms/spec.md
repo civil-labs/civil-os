@@ -34,8 +34,14 @@ Both were decided by the owner in the spec brainstorm:
    becomes the derived total, `full + 0.5 × half`, as a `double`.
 2. **The per-parcel and per-feature bathroom RPCs are in scope.** The intent left the map
    values unchanged. `GetBathroomsByParcelId`, `GetBathroomsByFeatureId` and the
-   `PARCEL_ATTRIBUTE_BATHROOMS` filters and sorts return the same derived total instead, so
-   "bathrooms" means one thing everywhere in the API.
+   `PARCEL_ATTRIBUTE_BATHROOMS` comparables criterion return the same derived total
+   instead, so "bathrooms" means one thing everywhere in the API.
+3. **`primary_improvement_id` becomes `optional`.** *Amended 2026-11-24, by the owner,
+   during implementation.* The e2e response check found that a parcel with no improvements
+   returns `ParcelImprovementsSummary.primary_improvement_id` as `""`, which breaks the
+   field's existing `string.uuid` rule. It becomes `optional string` (public and mesh, same
+   number), unset when the parcel has no improvements, and its comment and OpenAPI
+   description say so. It ships in the same breaking release.
 
 ## Schema
 
@@ -97,8 +103,8 @@ total, always >= 0, in steps of 0.5. Their rule is
 `(buf.validate.field).map.values.double = {gte: 0.0}`.
 
 **The rules are checked by tests, not at runtime.** The gateway's protovalidate
-interceptor checks requests only. The integration tests below validate the responses they
-receive, so a rule the reader breaks fails CI instead of misleading a client. Checking every
+interceptor checks requests only. The e2e smoke tests below validate the public responses
+they receive, so a rule the reader breaks fails CI instead of misleading a client. Checking every
 response in the API that way is [`../response-validation-rules/intent.md`](../response-validation-rules/intent.md).
 
 **Per-parcel and per-feature values**
@@ -108,8 +114,9 @@ response in the API that way is [`../response-validation-rules/intent.md`](../re
 | `GetBathroomsByParcelIdResponse` | `map<string, int32> values = 1` | `map<string, double> values = 1`: each parcel's derived total |
 | `GetBathroomsByFeatureIdResponse` | `map<int64, int32> values = 1` | `map<int64, double> values = 1`: each feature's derived total |
 
-`PARCEL_ATTRIBUTE_BATHROOMS = 8` keeps its name and number. Filters and sorts on it compare
-the derived total.
+`PARCEL_ATTRIBUTE_BATHROOMS = 8` keeps its name and number. The equity and sales
+comparables, the only RPCs that read it (as a `criteria` attribute), return the derived
+total. *Corrected 2026-11-24:* this said "filters and sorts", which no RPC offers on it.
 
 ### Why this is breaking
 
@@ -146,8 +153,8 @@ The mesh API has no compatibility promise; nothing outside civil-os uses it.
 - **`getBathroomsByParcelId` and `getBathroomsByFeatureId`**: return
   `COALESCE(SUM(attr.full_bathrooms), 0) + 0.5 * COALESCE(SUM(attr.half_bathrooms), 0)` as
   `float8`, in `map[…]float64`.
-- **Filters and sorts on `PARCEL_ATTRIBUTE_BATHROOMS`**: the per-parcel value is the derived
-  total.
+- **The comparables' `PARCEL_ATTRIBUTE_BATHROOMS` criterion**: the per-parcel value is the
+  derived total.
 
 Voided parcels stay hidden (`NOT p.is_voided`), as today.
 
@@ -170,11 +177,14 @@ mesh to public. Nothing else changes.
 
 ## Tests
 
+**e2e smoke tests** (`mise run test:e2e`): every public response they receive from the
+summary and bathroom RPCs passes `protovalidate.Validate`, including the 2.5-bath parcel and
+a parcel with no improvements. *Clarified 2026-11-24:* this said the integration tests, but
+those receive mesh messages, which have no rules; only the smoke tests receive public
+responses from real data.
+
 **Integration tests** (`mise run test:integration`):
 
-- Every response these tests receive from the summary and bathroom RPCs passes
-  `protovalidate.Validate`, including the 2.5-bath parcel and a parcel with no
-  improvements.
 - A parcel with 2 full and 1 half bath reports `total_full_bathrooms = 2`,
   `total_half_bathrooms = 1` and `total_bathrooms = 2.5` from the summary RPC, and 2.5 from
   `GetBathroomsByParcelId` and `GetBathroomsByFeatureId`.

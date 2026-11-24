@@ -131,7 +131,8 @@ func (s *APIServer) getParcelsWithImprovementSummary(
 				pi.parcel_id,
 				array_remove(array_agg(DISTINCT imp.public_id::text), NULL) AS improvement_ids,
 				COALESCE(SUM(attr.area_sq_m), 0) AS total_area_sq_m,
-				COALESCE(SUM(attr.bathrooms), 0) AS total_bathrooms,
+				COALESCE(SUM(attr.full_bathrooms), 0) AS total_full_bathrooms,
+				COALESCE(SUM(attr.half_bathrooms), 0) AS total_half_bathrooms,
 				COALESCE(SUM(attr.bedrooms), 0) AS total_bedrooms,
 				COALESCE(SUM(attr.units), 0) AS total_units,
 				SUM(val.market_value)::numeric(19,4)::text AS total_market_improvement_value,
@@ -194,9 +195,10 @@ func (s *APIServer) getParcelsWithImprovementSummary(
 			pv_agg.assessed_land_value,
 
 			COALESCE(imp_totals.improvement_ids, '{}'::text[]) AS improvement_ids,
-			COALESCE(pid.primary_improvement_public_id, '') AS primary_improvement_id,
+			pid.primary_improvement_public_id AS primary_improvement_id,
 			COALESCE(imp_totals.total_area_sq_m, 0.0) AS total_area_sq_m,
-			COALESCE(imp_totals.total_bathrooms, 0) AS total_bathrooms,
+			COALESCE(imp_totals.total_full_bathrooms, 0) AS total_full_bathrooms,
+			COALESCE(imp_totals.total_half_bathrooms, 0) AS total_half_bathrooms,
 			COALESCE(imp_totals.total_bedrooms, 0) AS total_bedrooms,
 			COALESCE(imp_totals.total_units, 0) AS total_units,
 			pid.primary_year_built,
@@ -314,9 +316,10 @@ func (s *APIServer) getParcelsWithImprovementSummary(
 			assessedLandValue *string
 
 			improvementIDs            []string
-			primaryImpID              string
+			primaryImpID              *string
 			totalAreaSqM              float64
-			totalBathrooms            int32
+			totalFullBathrooms        int32
+			totalHalfBathrooms        int32
 			totalBedrooms             int32
 			totalUnits                int32
 			primaryYearBuilt          *int32
@@ -356,7 +359,8 @@ func (s *APIServer) getParcelsWithImprovementSummary(
 			&improvementIDs,
 			&primaryImpID,
 			&totalAreaSqM,
-			&totalBathrooms,
+			&totalFullBathrooms,
+			&totalHalfBathrooms,
 			&totalBedrooms,
 			&totalUnits,
 			&primaryYearBuilt,
@@ -422,7 +426,9 @@ func (s *APIServer) getParcelsWithImprovementSummary(
 				ImprovementIds:                improvementIDs,
 				PrimaryImprovementId:          primaryImpID,
 				TotalAreaSqFt:                 totalAreaSqFt,
-				TotalBathrooms:                totalBathrooms,
+				TotalBathrooms:                bathroomTotal(totalFullBathrooms, totalHalfBathrooms),
+				TotalFullBathrooms:            totalFullBathrooms,
+				TotalHalfBathrooms:            totalHalfBathrooms,
 				TotalBedrooms:                 totalBedrooms,
 				TotalUnits:                    totalUnits,
 				PrimaryYearBuilt:              primaryYearBuilt,
@@ -519,7 +525,7 @@ type CompParcelInfo struct {
 	YearBuilt           *int32
 	EffectiveYearBuilt  *int32
 	Bedrooms            int32
-	Bathrooms           int32
+	Bathrooms           float64 // bathroomTotal of the parcel's full and half baths
 	Units               int32
 	ConditionIDs        []string
 	ImprovementTypeIDs  []string
@@ -574,7 +580,8 @@ func (s *APIServer) fetchParcelsForComps(
 		landUseID                 *string
 		zoningIDs                 []string
 		totalAreaSqM              float64
-		totalBathrooms            int32
+		totalFullBathrooms        int32
+		totalHalfBathrooms        int32
 		totalBedrooms             int32
 		totalUnits                int32
 		primaryYearBuilt          *int32
@@ -643,7 +650,8 @@ func (s *APIServer) fetchParcelsForComps(
                         SELECT 
                             pi.parcel_id,
                             COALESCE(SUM(attr.area_sq_m), 0) AS total_area_sq_m,
-                            COALESCE(SUM(attr.bathrooms), 0) AS total_bathrooms,
+                            COALESCE(SUM(attr.full_bathrooms), 0) AS total_full_bathrooms,
+                            COALESCE(SUM(attr.half_bathrooms), 0) AS total_half_bathrooms,
                             COALESCE(SUM(attr.bedrooms), 0) AS total_bedrooms,
                             COALESCE(SUM(attr.units), 0) AS total_units
                         FROM parcel_improvements pi
@@ -655,13 +663,15 @@ func (s *APIServer) fetchParcelsForComps(
                     ) imp_agg ON p.parcel_id = imp_agg.parcel_id`)
 				selectFields = append(selectFields,
 					"COALESCE(imp_agg.total_area_sq_m, 0)",
-					"COALESCE(imp_agg.total_bathrooms, 0)",
+					"COALESCE(imp_agg.total_full_bathrooms, 0)",
+					"COALESCE(imp_agg.total_half_bathrooms, 0)",
 					"COALESCE(imp_agg.total_bedrooms, 0)",
 					"COALESCE(imp_agg.total_units, 0)",
 				)
 				scanDest = append(scanDest,
 					&totalAreaSqM,
-					&totalBathrooms,
+					&totalFullBathrooms,
+					&totalHalfBathrooms,
 					&totalBedrooms,
 					&totalUnits,
 				)
@@ -842,7 +852,7 @@ func (s *APIServer) fetchParcelsForComps(
 			YearBuilt:           yearBuilt,
 			EffectiveYearBuilt:  effectiveYearBuilt,
 			Bedrooms:            totalBedrooms,
-			Bathrooms:           totalBathrooms,
+			Bathrooms:           bathroomTotal(totalFullBathrooms, totalHalfBathrooms),
 			Units:               totalUnits,
 			ConditionIDs:        conditionIDs,
 			ImprovementTypeIDs:  improvementTypeIDs,
@@ -886,7 +896,7 @@ func getNumericalValue(p *CompParcelInfo, attr parcelsv1.ParcelAttribute) (*floa
 		val := float64(p.Bedrooms)
 		return &val, true
 	case parcelsv1.ParcelAttribute_PARCEL_ATTRIBUTE_BATHROOMS:
-		val := float64(p.Bathrooms)
+		val := p.Bathrooms
 		return &val, true
 	case parcelsv1.ParcelAttribute_PARCEL_ATTRIBUTE_UNITS:
 		val := float64(p.Units)
@@ -1604,14 +1614,14 @@ func (s *APIServer) GetBathroomsByParcelId(ctx context.Context, req *connect.Req
 	return connect.NewResponse(&parcelsv1.GetBathroomsByParcelIdResponse{Values: values}), nil
 }
 
-func (s *APIServer) getBathroomsByParcelId(ctx context.Context, parcelIds []string, legalAsOf *timestamppb.Timestamp) (map[string]int32, error) {
-	values := make(map[string]int32)
+func (s *APIServer) getBathroomsByParcelId(ctx context.Context, parcelIds []string, legalAsOf *timestamppb.Timestamp) (map[string]float64, error) {
+	values := make(map[string]float64)
 	if len(parcelIds) == 0 {
 		return values, nil
 	}
 	targetTime := getTargetTime(legalAsOf)
 	query := `
-		SELECT p.public_id::text, COALESCE(SUM(attr.bathrooms), 0)::int
+		SELECT p.public_id::text, (COALESCE(SUM(attr.full_bathrooms), 0) + 0.5 * COALESCE(SUM(attr.half_bathrooms), 0))::float8
 		FROM core.parcels p
 		JOIN core.parcel_improvements pi ON p.parcel_id = pi.parcel_id AND pi.legal_valid_range @> $1::timestamptz
 		JOIN core.improvements imp ON pi.improvement_id = imp.improvement_id
@@ -1626,7 +1636,7 @@ func (s *APIServer) getBathroomsByParcelId(ctx context.Context, parcelIds []stri
 	defer rows.Close()
 	for rows.Next() {
 		var pid string
-		var bathrooms int32
+		var bathrooms float64
 		if err := rows.Scan(&pid, &bathrooms); err != nil {
 			return nil, err
 		}
@@ -2159,14 +2169,14 @@ func (s *APIServer) GetBathroomsByFeatureId(ctx context.Context, req *connect.Re
 	return connect.NewResponse(&parcelsv1.GetBathroomsByFeatureIdResponse{Values: values}), nil
 }
 
-func (s *APIServer) getBathroomsByFeatureId(ctx context.Context, featureIds []int64, legalAsOf *timestamppb.Timestamp) (map[int64]int32, error) {
-	values := make(map[int64]int32)
+func (s *APIServer) getBathroomsByFeatureId(ctx context.Context, featureIds []int64, legalAsOf *timestamppb.Timestamp) (map[int64]float64, error) {
+	values := make(map[int64]float64)
 	if len(featureIds) == 0 {
 		return values, nil
 	}
 	targetTime := getTargetTime(legalAsOf)
 	query := `
-		SELECT pg.feature_id, COALESCE(SUM(attr.bathrooms), 0)::int
+		SELECT pg.feature_id, (COALESCE(SUM(attr.full_bathrooms), 0) + 0.5 * COALESCE(SUM(attr.half_bathrooms), 0))::float8
 		FROM geo.parcel_geometry pg
 		JOIN core.parcels vp ON vp.parcel_id = pg.parcel_id AND NOT vp.is_voided
 		JOIN core.parcel_improvements pi ON pg.parcel_id = pi.parcel_id AND pi.legal_valid_range @> $1::timestamptz
@@ -2182,7 +2192,7 @@ func (s *APIServer) getBathroomsByFeatureId(ctx context.Context, featureIds []in
 	defer rows.Close()
 	for rows.Next() {
 		var fid int64
-		var bathrooms int32
+		var bathrooms float64
 		if err := rows.Scan(&fid, &bathrooms); err != nil {
 			return nil, err
 		}
@@ -2463,4 +2473,11 @@ func (s *APIServer) GetParcelExtentsWGS84ByParcelId(
 		return nil, s.dbError("parcel extents", err)
 	}
 	return connect.NewResponse(res), nil
+}
+
+// bathroomTotal is the number of bathrooms counting a half bath as 0.5, as
+// ParcelImprovementsSummary.total_bathrooms defines it. The two bathroom value
+// RPCs compute the same formula in SQL.
+func bathroomTotal(full, half int32) float64 {
+	return float64(full) + 0.5*float64(half)
 }

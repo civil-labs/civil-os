@@ -4,6 +4,7 @@ package database_test
 
 import (
 	"context"
+	"os"
 	"strings"
 	"testing"
 
@@ -157,4 +158,72 @@ func TestFixturesLoad(t *testing.T) {
 	if size == 0 {
 		t.Error("fixture tile is empty")
 	}
+}
+
+// TestBathroomsRenameKeepsValues applies the migrations up to the full and
+// half bathrooms change over a row with bathrooms set, then the rest, and
+// checks the count survives as full_bathrooms (docs/full-half-bathrooms/spec.md).
+// A migration that dropped and re-added the column would lose it.
+func TestBathroomsRenameKeepsValues(t *testing.T) {
+	ctx := context.Background()
+	db := testutil.EmptyDatabase(t)
+	conn, err := pgx.Connect(ctx, db.URL())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close(ctx)
+
+	files, err := testutil.MigrationFiles()
+	if err != nil {
+		t.Fatal(err)
+	}
+	rename := -1
+	for i, f := range files {
+		sql, err := os.ReadFile(f)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if strings.Contains(string(sql), `RENAME COLUMN "bathrooms" TO "full_bathrooms"`) {
+			rename = i
+			break
+		}
+	}
+	if rename < 0 {
+		t.Fatal("no migration renames bathrooms to full_bathrooms")
+	}
+	if err := testutil.ExecFiles(ctx, conn, files[:rename]...); err != nil {
+		t.Fatal(err)
+	}
+
+	// Only the column matters here, so skip the foreign keys rather than
+	// building the improvement, address and type rows they point to.
+	if _, err := conn.Exec(ctx, `SET session_replication_role = replica`); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := conn.Exec(ctx, `INSERT INTO core.improvement_attributes
+		(improvement_id, address_id, improvement_type_id, bathrooms, legal_valid_range, trace_id)
+		VALUES (1, 1, 1, 3, tstzrange('2020-01-01 00:00:00+00', NULL), 'test')`); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := conn.Exec(ctx, `SET session_replication_role = DEFAULT`); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := testutil.ExecFiles(ctx, conn, files[rename:]...); err != nil {
+		t.Fatal(err)
+	}
+	var full, half *int32
+	if err := conn.QueryRow(ctx, `SELECT full_bathrooms, half_bathrooms FROM core.improvement_attributes`).Scan(&full, &half); err != nil {
+		t.Fatal(err)
+	}
+	if full == nil || *full != 3 || half != nil {
+		t.Errorf("after the migration: full_bathrooms = %v, half_bathrooms = %v; want 3 and null", deref(full), deref(half))
+	}
+}
+
+func deref(p *int32) any {
+	if p == nil {
+		return nil
+	}
+	return *p
 }

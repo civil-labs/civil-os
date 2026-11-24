@@ -20,8 +20,9 @@
 - **Verification before "done".** The PR's checks are run locally, and their output goes in
   the PR description.
 - **Generated code is never edited by hand.** Proto changes go through `mise run generate`,
-  and `api/gen/go`, `internal/gen/go`, `sdk/js/gen` and `api/gen/openapi` are committed with
-  the `.proto` change.
+  and `api/gen/go` and `internal/gen/go` are committed with the `.proto` change.
+  `sdk/js/gen` and `api/gen/openapi` are gitignored and built at release; they're checked
+  locally but not committed.
 - **Agents never run Atlas** and never write in `database/migrations`
   (`.claude/skills/atlas-migrations/SKILL.md`). The owner generates the migration in step 1.
 - **Synthetic data only.** This repo is public.
@@ -46,16 +47,18 @@ squash commit carries the `!`, so release-please cuts the next public API minor 
   - `services/database-reader/parcels.go`:
     - the by-parcel summary's `imp_totals` sum (134, 199) and scan (319, 359, 425);
     - the by-feature path's `imp_agg` sum (646, 658), scan (577, 664) and the in-memory
-      `Bathrooms` field (522, 845) used by filters, sorts and the numerical stats (889);
+      `Bathrooms` field (522, 845) used by the comparables' criteria (889);
     - `getBathroomsByParcelId` (1607–1633) and `getBathroomsByFeatureId` (2162–2189).
   - `services/gateway/parcels.go`: the summary mapping (426) and the two bathroom RPCs (584,
     766), which pass the maps through.
   - `database/fixtures/synthetic.sql`: the `improvement_attributes` insert (318).
   - `services/database-reader/integration_test.go` (317–321, 403–407) and
     `legal_time_integration_test.go` (185–187).
-- **Filters, sorts and numerical stats on `PARCEL_ATTRIBUTE_BATHROOMS`** already convert the
-  in-memory value to `float64` (`parcels.go:889`). Changing the field to the derived total
-  is enough; the stats RPCs need no other change.
+- **`PARCEL_ATTRIBUTE_BATHROOMS` is read by the equity and sales comparables** (their
+  `criteria`, through `getNumericalValue`, `parcels.go:889`), which already convert the
+  value to `float64`. Changing the field to the derived total is enough. *Corrected in
+  implementation:* the spec and this plan said "filters and sorts"; the attribute is used
+  only by the comparables, and they return the derived total, as the spec intends.
 - **The fixtures:** 17 improvements, each with 2 bathrooms except improvement 16 (0), which
   is the second improvement on parcel 3. Parcel 20 has improvement 17. No fixture sets a
   half bath.
@@ -134,10 +137,15 @@ Public `civil/public/parcels/v1/parcels.proto`, as the spec lists:
 
 Mesh `civil/mesh/parcels/v1/parcels.proto`: the same fields, numbers and map types, no rules.
 
-`buf format -w`, `mise run generate`, and commit the generated code. Go builds fail at this
-commit's uses of `TotalBathrooms` and the maps, so step 2 also changes their types in the
-reader and gateway mechanically (`int32` to `float64`), computing `total_bathrooms` from the
-old full-bath sum for now. `buf breaking` fails as expected.
+`buf format -w`, `mise run generate`, and commit the generated Go code. Go builds fail at
+this commit's uses of `TotalBathrooms` and the maps, so step 2 also changes their types in
+the reader and its integration tests mechanically (`int32` to `float64`), computing
+`total_bathrooms` from the old full-bath sum for now. `buf breaking` fails as expected.
+
+*Departure, found in implementation:* the gateway's field-for-field mapping tests
+(`TestPublicRPCs`, `TestMapParcelWithImprovementSummary`) fail as soon as the mesh message
+has fields the gateway doesn't copy, so step 2 also maps `TotalFullBathrooms` and
+`TotalHalfBathrooms` in the gateway, keeping `mise run check` green.
 
 ### Step 3: reader and gateway (`feat!: read full and half bathrooms`)
 
@@ -152,8 +160,8 @@ old full-bath sum for now. `buf breaking` fails as expected.
   `(COALESCE(SUM(attr.full_bathrooms), 0) + 0.5 * COALESCE(SUM(attr.half_bathrooms), 0))::float8`
   into `map[…]float64`, keeping their voided-parcel and `legal_valid_range` filters.
 
-`services/gateway/parcels.go`: map `TotalFullBathrooms` and `TotalHalfBathrooms`; the two
-RPCs keep passing the maps through (the types now match).
+`services/gateway/parcels.go`: nothing left (the new fields are mapped in step 2, and the
+two RPCs pass the maps through).
 
 Unit test: `bathroomTotal` (0/0, 2/0, 2/1, 3/2).
 
@@ -166,13 +174,14 @@ expected totals if the tests need it.
 
 `services/database-reader/integration_test.go`:
 
-- the summary for parcel 1 has full 2, half 1, total 2.5; parcel 2 has full 2, half 0, total
-  2 (null half baths); parcel 3 has full 2 (2 + 0), half 0; an unimproved parcel (16) has
-  0, 0, 0; voided parcel 20, which has improvement 17, stays hidden;
+- the summaries, by parcel and by feature, for the test's queried parcels: parcel 1 has full 2,
+  half 1, total 2.5; parcels 3 (2 + 0 on its secondary) and 13 have full 2, half 0, total 2
+  (null half baths); unimproved parcel 17 has 0, 0, 0; voided parcel 20, which has
+  improvement 17, stays hidden;
 - `GetBathroomsByParcelId` and `GetBathroomsByFeatureId` return 2.5 for parcel 1 and 2 for the
   other improved parcels (`checkValues` with `eqF`);
-- a filter or sort on `PARCEL_ATTRIBUTE_BATHROOMS` puts parcel 1 (2.5) after a 2-bath parcel,
-  and the numerical stats include 2.5.
+- `GetEquityComparables` with a `PARCEL_ATTRIBUTE_BATHROOMS` criterion returns 2.5 for
+  parcel 1 and 2 for parcel 3.
 
 `legal_time_integration_test.go`: the insert copies `full_bathrooms, half_bathrooms`.
 
@@ -189,6 +198,15 @@ check `full_bathrooms = 3` and `half_bathrooms IS NULL`. It fails on a drop-and-
 `protovalidate.Validate` on each response. Do the same for an unimproved parcel. The spec's
 Tests section is updated in this commit (see [Spec clarification](#spec-clarification)).
 
+*Found in implementation:* the check failed on the unimproved parcel, whose
+`primary_improvement_id` was `""` against its `string.uuid` rule. The owner chose to make
+the field `optional` (spec departure 3). That's its own commit before the test
+(`feat!: unset primary_improvement_id when a parcel has no improvements`): both protos, the
+reader (no `COALESCE` to `''`, scanned as `*string`), regenerated code, and the integration
+test for parcel 17. The e2e smoke tests run against a separate compose project
+(`docker compose -p civil-os-e2e`) when the default stack holds data that `mise run down`
+would delete.
+
 ### Checks before pushing
 
 - `mise run check`
@@ -196,8 +214,9 @@ Tests section is updated in this commit (see [Spec clarification](#spec-clarific
 - `mise run generate`, then `git diff --exit-code api/gen/go internal/gen/go`
 - `mise run test:integration`
 - `mise run test:e2e` (the gateway port 8080 must be free)
-- `buf breaking`: expected to fail on field 4 and the two maps' types, and nothing else. The
-  output goes in the PR description.
+- `buf breaking`: expected to fail on field 4 and the two maps' types, and on
+  `primary_improvement_id`'s cardinality (step 5), and nothing else. The output goes in the
+  PR description.
 
 ## opencama-record-keeper
 

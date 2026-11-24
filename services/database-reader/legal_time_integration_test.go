@@ -182,9 +182,9 @@ func TestComparablesUseCurrentRows(t *testing.T) {
 	pool := tu.FixtureDatabase(t).Pool(t)
 	_, err = pool.Exec(ctx, `
 		INSERT INTO core.improvement_attributes (improvement_id, address_id, improvement_type_id, improvement_condition_id,
-		       improvement_quality_id, area_sq_m, bathrooms, bedrooms, year_built, effective_year_built, units, legal_valid_range, trace_id)
+		       improvement_quality_id, area_sq_m, full_bathrooms, half_bathrooms, bedrooms, year_built, effective_year_built, units, legal_valid_range, trace_id)
 		SELECT improvement_id, address_id, improvement_type_id, improvement_condition_id, improvement_quality_id,
-		       9999, bathrooms, bedrooms, year_built, effective_year_built, units,
+		       9999, full_bathrooms, half_bathrooms, bedrooms, year_built, effective_year_built, units,
 		       tstzrange('2015-01-01 00:00:00+00', '2020-01-01 00:00:00+00'), 'test'
 		FROM core.improvement_attributes ia JOIN core.improvements i USING (improvement_id)
 		WHERE i.public_id = $1`, tu.FixtureID(tu.ImprovementPrefix, 5))

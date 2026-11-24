@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.6.0](https://github.com/civil-labs/civil-os/compare/public-api-v0.5.0...public-api-v0.6.0) (2026-11-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* full and half bathrooms ([#88](https://github.com/civil-labs/civil-os/issues/88))
+
+### Features
+
+* full and half bathrooms ([#88](https://github.com/civil-labs/civil-os/issues/88)) ([13ca068](https://github.com/civil-labs/civil-os/commit/13ca0681bab681e5fd8a039c2fba91894682c799))
+
 ## [0.5.0](https://github.com/civil-labs/civil-os/compare/public-api-v0.4.1...public-api-v0.5.0) (2026-11-22)
 
 

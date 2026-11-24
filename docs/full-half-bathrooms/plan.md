@@ -114,9 +114,8 @@ Then `mise run check`, and **stop for the owner**, per the Atlas skill, with:
   Step 4's migration test fails on a drop-and-add.
 - **Operational effects:** a rename and a nullable column without a default are
   catalogue-only. Adding a `CHECK` scans `improvement_attributes` under an `ACCESS
-  EXCLUSIVE` lock; on a large table the owner may prefer `NOT VALID` plus `VALIDATE
-  CONSTRAINT`, which the HCL can't express, so the plan takes the plain scan (seconds on
-  hundreds of thousands of rows) unless the owner says otherwise.
+  EXCLUSIVE` lock, which takes seconds on hundreds of thousands of rows. The owner accepted
+  the plain `CHECK` on 2026-11-24, instead of `NOT VALID` plus `VALIDATE CONSTRAINT`.
 
 The owner runs `mise run db:diff` and `mise run db:validate`. The agent reviews the
 generated SQL against the list above, and the migration and `atlas.sum` are committed with
@@ -237,7 +236,7 @@ The migration renames a column that a data load writes. The order:
 | Risk | Mitigation |
 |---|---|
 | Atlas plans a drop and add, losing every bathroom count | The owner checks the generated SQL; `TestBathroomsRenameKeepsValues` fails on it. |
-| The `CHECK` constraints lock a large table while they validate | Seconds at current sizes; the owner may choose `NOT VALID` at step 1. |
+| The `CHECK` constraints lock a large table while they validate | Seconds at current sizes; accepted by the owner. |
 | A data load writes `bathrooms` after its database is migrated | The rollout ships the load's change with each deployment's migration. |
 | Old binary clients read `total_bathrooms` as 0 | Documented in the spec; the only known client uses JSON. |
 

@@ -1533,7 +1533,13 @@ table "improvement_attributes" {
     null = true
   }
 
-  column "bathrooms" {
+  column "full_bathrooms" {
+    type = int
+    null = true
+  }
+
+  # Null where the source doesn't record half baths (docs/full-half-bathrooms/spec.md).
+  column "half_bathrooms" {
     type = int
     null = true
   }
@@ -1658,6 +1664,14 @@ table "improvement_attributes" {
   check "properties_size_limit" {
     expr = "pg_column_size(properties) <= 5000"
   }
+
+  check "chk_improvement_attributes_full_bathrooms" {
+    expr = "full_bathrooms IS NULL OR full_bathrooms >= 0"
+  }
+
+  check "chk_improvement_attributes_half_bathrooms" {
+    expr = "half_bathrooms IS NULL OR half_bathrooms >= 0"
+  }
 }
 
 table "improvement_attributes_history" {
@@ -1702,7 +1716,13 @@ table "improvement_attributes_history" {
     null = true
   }
 
-  column "bathrooms" {
+  column "full_bathrooms" {
+    type = int
+    null = true
+  }
+
+  # Null where the source doesn't record half baths (docs/full-half-bathrooms/spec.md).
+  column "half_bathrooms" {
     type = int
     null = true
   }
@@ -6820,7 +6840,8 @@ function "record_improvement_attributes_history" {
             improvement_condition_id,
             improvement_quality_id,
             area_sq_m,
-            bathrooms,
+            full_bathrooms,
+            half_bathrooms,
             bedrooms,
             year_built,
             effective_year_built,
@@ -6839,7 +6860,8 @@ function "record_improvement_attributes_history" {
             OLD.improvement_condition_id,
             OLD.improvement_quality_id,
             OLD.area_sq_m,
-            OLD.bathrooms,
+            OLD.full_bathrooms,
+            OLD.half_bathrooms,
             OLD.bedrooms,
             OLD.year_built,
             OLD.effective_year_built,

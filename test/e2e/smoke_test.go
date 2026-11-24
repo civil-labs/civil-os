@@ -26,7 +26,9 @@ import (
 	"testing"
 	"time"
 
+	"buf.build/go/protovalidate"
 	"connectrpc.com/connect"
+	"google.golang.org/protobuf/proto"
 
 	addressesv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/addresses/v1"
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/addresses/v1/addressesv1connect"
@@ -186,6 +188,48 @@ func TestSmoke(t *testing.T) {
 		}
 		if got := back.Msg.Values[id]; math.Abs(got-want) > 1e-6 {
 			t.Errorf("frontage read back %v, want %v", got, want)
+		}
+	})
+
+	t.Run("bathrooms", func(t *testing.T) {
+		// The half-bath parcel has 2 full and 1 half bath; parcel 17 has no
+		// improvements. Each public response must also satisfy its own
+		// protovalidate rules, which the gateway doesn't check on responses
+		// (docs/full-half-bathrooms/spec.md).
+		half, none := tu.HalfBathParcel, 17
+		ids := []string{tu.ParcelID(half), tu.ParcelID(none)}
+		features := []int64{tu.ParcelFeatureID(half), tu.ParcelFeatureID(none)}
+
+		sum, err := parcels.GetParcelsWithImprovementSummaryByParcelId(ctx, authed(token, &parcelsv1.GetParcelsWithImprovementSummaryByParcelIdRequest{ParcelIds: ids}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		byParcel, err := parcels.GetBathroomsByParcelId(ctx, authed(token, &parcelsv1.GetBathroomsByParcelIdRequest{ParcelIds: ids}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		byFeature, err := parcels.GetBathroomsByFeatureId(ctx, authed(token, &parcelsv1.GetBathroomsByFeatureIdRequest{FeatureIds: features}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		for name, msg := range map[string]proto.Message{"summary": sum.Msg, "by parcel": byParcel.Msg, "by feature": byFeature.Msg} {
+			if err := protovalidate.Validate(msg); err != nil {
+				t.Errorf("%s response breaks its rules: %v", name, err)
+			}
+		}
+
+		if s := sum.Msg.Parcels[tu.ParcelID(half)].GetImprovementSummary(); s.GetTotalFullBathrooms() != 2 || s.GetTotalHalfBathrooms() != 1 || s.GetTotalBathrooms() != 2.5 {
+			t.Errorf("parcel %d summary bathrooms = %d full, %d half, %v total; want 2, 1, 2.5",
+				half, s.GetTotalFullBathrooms(), s.GetTotalHalfBathrooms(), s.GetTotalBathrooms())
+		}
+		if s := sum.Msg.Parcels[tu.ParcelID(none)].GetImprovementSummary(); s.GetTotalFullBathrooms() != 0 || s.GetTotalHalfBathrooms() != 0 || s.GetTotalBathrooms() != 0 {
+			t.Errorf("unimproved parcel %d summary bathrooms = %v, want all 0", none, s)
+		}
+		if got := byParcel.Msg.Values[tu.ParcelID(half)]; got != 2.5 {
+			t.Errorf("GetBathroomsByParcelId[%d] = %v, want 2.5", half, got)
+		}
+		if got := byFeature.Msg.Values[tu.ParcelFeatureID(half)]; got != 2.5 {
+			t.Errorf("GetBathroomsByFeatureId[%d] = %v, want 2.5", half, got)
 		}
 	})
 

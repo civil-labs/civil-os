@@ -198,6 +198,15 @@ check `full_bathrooms = 3` and `half_bathrooms IS NULL`. It fails on a drop-and-
 `protovalidate.Validate` on each response. Do the same for an unimproved parcel. The spec's
 Tests section is updated in this commit (see [Spec clarification](#spec-clarification)).
 
+*Found in implementation:* the check failed on the unimproved parcel, whose
+`primary_improvement_id` was `""` against its `string.uuid` rule. The owner chose to make
+the field `optional` (spec departure 3). That's its own commit before the test
+(`feat!: unset primary_improvement_id when a parcel has no improvements`): both protos, the
+reader (no `COALESCE` to `''`, scanned as `*string`), regenerated code, and the integration
+test for parcel 17. The e2e smoke tests run against a separate compose project
+(`docker compose -p civil-os-e2e`) when the default stack holds data that `mise run down`
+would delete.
+
 ### Checks before pushing
 
 - `mise run check`
@@ -205,8 +214,9 @@ Tests section is updated in this commit (see [Spec clarification](#spec-clarific
 - `mise run generate`, then `git diff --exit-code api/gen/go internal/gen/go`
 - `mise run test:integration`
 - `mise run test:e2e` (the gateway port 8080 must be free)
-- `buf breaking`: expected to fail on field 4 and the two maps' types, and nothing else. The
-  output goes in the PR description.
+- `buf breaking`: expected to fail on field 4 and the two maps' types, and on
+  `primary_improvement_id`'s cardinality (step 5), and nothing else. The output goes in the
+  PR description.
 
 ## opencama-record-keeper
 

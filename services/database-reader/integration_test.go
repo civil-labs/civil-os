@@ -197,6 +197,17 @@ func (p parcel) impAreaSqft() float64 {
 	}
 	return a * sqftPerSqm
 }
+
+// Every improved parcel's improvements have 2 full baths between them (parcel
+// 3's secondary improvement has none); the half-bath parcel also has 1 half.
+func (p parcel) fullBaths() int32 { return 2 }
+func (p parcel) halfBaths() int32 {
+	if p.n == tu.HalfBathParcel {
+		return 1
+	}
+	return 0
+}
+func (p parcel) bathrooms() float64 { return float64(p.fullBaths()) + 0.5*float64(p.halfBaths()) }
 func (p parcel) units() int32 {
 	if p.n == tu.SecondaryImpParcel {
 		return 2
@@ -318,7 +329,7 @@ func TestAttributesByParcelID(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	checkValues(t, "Bathrooms", ba.Msg.Values, pid, func(parcel) float64 { return 2 }, true, eqF)
+	checkValues(t, "Bathrooms", ba.Msg.Values, pid, parcel.bathrooms, true, eqF)
 
 	un, err := c.GetUnitsByParcelId(ctx, connect.NewRequest(&parcelsv1.GetUnitsByParcelIdRequest{ParcelIds: ids}))
 	if err != nil {
@@ -404,7 +415,7 @@ func TestAttributesByFeatureID(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	checkValues(t, "Bathrooms", ba.Msg.Values, fid, func(parcel) float64 { return 2 }, true, eqF)
+	checkValues(t, "Bathrooms", ba.Msg.Values, fid, parcel.bathrooms, true, eqF)
 
 	un, err := c.GetUnitsByFeatureId(ctx, connect.NewRequest(&parcelsv1.GetUnitsByFeatureIdRequest{FeatureIds: ids}))
 	if err != nil {
@@ -517,6 +528,29 @@ func TestParcelsWithImprovementSummary(t *testing.T) {
 		t.Errorf("parcel 3 improvement summary = %v", s)
 	}
 
+	// Bathrooms: parcel 1 has a half bath (2.5), parcels 3 and 13 have full
+	// baths and unrecorded half baths (2), and unimproved parcel 17 has none.
+	byFeatureID := map[int64]*parcelsv1.ParcelWithImprovementSummary{}
+	for _, p := range byFeature.Msg.Parcels {
+		byFeatureID[p.GetParcelDetails().GetFeatureId()] = p
+	}
+	for _, p := range queried {
+		var full, half int32
+		var total float64
+		if p.improved() {
+			full, half, total = p.fullBaths(), p.halfBaths(), p.bathrooms()
+		}
+		for name, got := range map[string]*parcelsv1.ParcelWithImprovementSummary{
+			"by parcel": byID.Msg.Parcels[p.id()], "by feature": byFeatureID[p.feature()],
+		} {
+			s := got.GetImprovementSummary()
+			if s.GetTotalFullBathrooms() != full || s.GetTotalHalfBathrooms() != half || s.GetTotalBathrooms() != total {
+				t.Errorf("%s: parcel %d bathrooms = %d full, %d half, %v total; want %d, %d, %v", name, p.n,
+					s.GetTotalFullBathrooms(), s.GetTotalHalfBathrooms(), s.GetTotalBathrooms(), full, half, total)
+			}
+		}
+	}
+
 	p2, err := r.parcels.GetParcelsWithImprovementSummaryByParcelId(ctx, connect.NewRequest(&parcelsv1.GetParcelsWithImprovementSummaryByParcelIdRequest{
 		ParcelIds: []string{tu.ParcelID(tu.MultiOwnerParcel)},
 	}))
@@ -563,6 +597,27 @@ func TestEquityComparables(t *testing.T) {
 	}
 	if keys := sortedKeys(sel.Msg.Parcels); len(keys) != 2 {
 		t.Errorf("selected parcels: got %v", keys)
+	}
+
+	// Comparables' bathroom values are the derived total: 2.5 for the
+	// half-bath parcel, 2 for parcel 3 (2 full + 0 on its secondary).
+	baths, err := r.parcels.GetEquityComparables(ctx, connect.NewRequest(&parcelsv1.GetEquityComparablesRequest{
+		SelectedParcelIds: ids(tu.ParcelPrefix, tu.HalfBathParcel, tu.SecondaryImpParcel),
+		Criteria:          []*parcelsv1.ComparableCriteria{{Attribute: parcelsv1.ParcelAttribute_PARCEL_ATTRIBUTE_BATHROOMS}},
+	}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for n, want := range map[int]float64{tu.HalfBathParcel: 2.5, tu.SecondaryImpParcel: 2} {
+		var got []float64
+		for _, a := range baths.Msg.Parcels[tu.ParcelID(n)].GetAttributes() {
+			if a.GetAttribute() == parcelsv1.ParcelAttribute_PARCEL_ATTRIBUTE_BATHROOMS {
+				got = append(got, a.GetNumericalValue())
+			}
+		}
+		if len(got) != 1 || got[0] != want {
+			t.Errorf("comparable parcel %d bathrooms = %v, want [%v]", n, got, want)
+		}
 	}
 
 	// The polygon covers the first grid row: parcels 1-4.

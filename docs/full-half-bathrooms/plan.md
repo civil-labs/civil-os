@@ -47,16 +47,18 @@ squash commit carries the `!`, so release-please cuts the next public API minor 
   - `services/database-reader/parcels.go`:
     - the by-parcel summary's `imp_totals` sum (134, 199) and scan (319, 359, 425);
     - the by-feature path's `imp_agg` sum (646, 658), scan (577, 664) and the in-memory
-      `Bathrooms` field (522, 845) used by filters, sorts and the numerical stats (889);
+      `Bathrooms` field (522, 845) used by the comparables' criteria (889);
     - `getBathroomsByParcelId` (1607–1633) and `getBathroomsByFeatureId` (2162–2189).
   - `services/gateway/parcels.go`: the summary mapping (426) and the two bathroom RPCs (584,
     766), which pass the maps through.
   - `database/fixtures/synthetic.sql`: the `improvement_attributes` insert (318).
   - `services/database-reader/integration_test.go` (317–321, 403–407) and
     `legal_time_integration_test.go` (185–187).
-- **Filters, sorts and numerical stats on `PARCEL_ATTRIBUTE_BATHROOMS`** already convert the
-  in-memory value to `float64` (`parcels.go:889`). Changing the field to the derived total
-  is enough; the stats RPCs need no other change.
+- **`PARCEL_ATTRIBUTE_BATHROOMS` is read by the equity and sales comparables** (their
+  `criteria`, through `getNumericalValue`, `parcels.go:889`), which already convert the
+  value to `float64`. Changing the field to the derived total is enough. *Corrected in
+  implementation:* the spec and this plan said "filters and sorts"; the attribute is used
+  only by the comparables, and they return the derived total, as the spec intends.
 - **The fixtures:** 17 improvements, each with 2 bathrooms except improvement 16 (0), which
   is the second improvement on parcel 3. Parcel 20 has improvement 17. No fixture sets a
   half bath.
@@ -172,13 +174,14 @@ expected totals if the tests need it.
 
 `services/database-reader/integration_test.go`:
 
-- the summary for parcel 1 has full 2, half 1, total 2.5; parcel 2 has full 2, half 0, total
-  2 (null half baths); parcel 3 has full 2 (2 + 0), half 0; an unimproved parcel (16) has
-  0, 0, 0; voided parcel 20, which has improvement 17, stays hidden;
+- the summaries, by parcel and by feature, for the test's queried parcels: parcel 1 has full 2,
+  half 1, total 2.5; parcels 3 (2 + 0 on its secondary) and 13 have full 2, half 0, total 2
+  (null half baths); unimproved parcel 17 has 0, 0, 0; voided parcel 20, which has
+  improvement 17, stays hidden;
 - `GetBathroomsByParcelId` and `GetBathroomsByFeatureId` return 2.5 for parcel 1 and 2 for the
   other improved parcels (`checkValues` with `eqF`);
-- a filter or sort on `PARCEL_ATTRIBUTE_BATHROOMS` puts parcel 1 (2.5) after a 2-bath parcel,
-  and the numerical stats include 2.5.
+- `GetEquityComparables` with a `PARCEL_ATTRIBUTE_BATHROOMS` criterion returns 2.5 for
+  parcel 1 and 2 for parcel 3.
 
 `legal_time_integration_test.go`: the insert copies `full_bathrooms, half_bathrooms`.
 

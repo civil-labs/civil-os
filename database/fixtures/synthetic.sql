@@ -315,10 +315,13 @@ WHERE fx.n <= 20;
 INSERT INTO core.improvements (public_id, legacy_id, trace_id)
 SELECT pg_temp.fid('53000000', k), 'FX-IMP-' || k, 'fixture' FROM generate_series(1, 17) k;
 
-INSERT INTO core.improvement_attributes (improvement_id, address_id, improvement_type_id, improvement_condition_id, improvement_quality_id, area_sq_m, bathrooms, bedrooms, year_built, effective_year_built, units, legal_valid_range, trace_id)
+INSERT INTO core.improvement_attributes (improvement_id, address_id, improvement_type_id, improvement_condition_id, improvement_quality_id, area_sq_m, full_bathrooms, half_bathrooms, bedrooms, year_built, effective_year_built, units, legal_valid_range, trace_id)
 SELECT i.improvement_id, a.address_id, it.improvement_type_id, c.improvement_condition_id, q.improvement_quality_id,
        CASE WHEN v.k = 16 THEN 30 ELSE 120 + 5 * v.k END,
        CASE WHEN v.k = 16 THEN 0 ELSE 2 END,
+       -- Parcel 1's improvement has a half bath (2.5 baths in all); the others
+       -- leave half_bathrooms unrecorded (docs/full-half-bathrooms/spec.md).
+       CASE WHEN v.k = 1 THEN 1 END,
        CASE WHEN v.k = 16 THEN 0 ELSE 3 END,
        1980 + v.k, 1990 + v.k, 1,
        tstzrange('2020-01-01 00:00:00+00', NULL), 'fixture'

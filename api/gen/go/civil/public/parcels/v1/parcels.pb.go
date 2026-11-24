@@ -5243,10 +5243,10 @@ const file_civil_public_parcels_v1_parcels_proto_rawDesc = "" +
 	"\x13_min_lot_size_sq_ftB\x10\n" +
 	"\x0e_max_height_ftB\x1e\n" +
 	"\x1c_max_dwelling_units_per_acreB\x17\n" +
-	"\x15_max_lot_coverage_pct\"\xd2\r\n" +
+	"\x15_max_lot_coverage_pct\"\xf0\f\n" +
 	"\x19ParcelImprovementsSummary\x12\xd6\x01\n" +
-	"\x0fimprovement_ids\x18\x01 \x03(\tB\xac\x01\xbaG\x97\x01:R\x12P['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']\x92\x02@A list of unique identifiers for the improvements on the parcel.\xbaH\x0e\x92\x01\v\x102\x18\x01\"\x05r\x03\xb0\x01\x01R\x0eimprovementIds\x12\xd1\x01\n" +
-	"\x16primary_improvement_id\x18\x02 \x01(\tB\x95\x01\xbaG\x89\x01:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\x92\x02\\The ID of the primary improvement on this parcel. Unset when the parcel has no improvements.\xbaH\x05r\x03\xb0\x01\x01H\x00R\x14primaryImprovementId\x88\x01\x01\x127\n" +
+	"\x0fimprovement_ids\x18\x01 \x03(\tB\xac\x01\xbaG\x97\x01:R\x12P['d25f625b-4e82-4761-82ca-10dafc5dcf77', 'a11c834a-9f12-4852-9bca-32dabc5def88']\x92\x02@A list of unique identifiers for the improvements on the parcel.\xbaH\x0e\x92\x01\v\x102\x18\x01\"\x05r\x03\xb0\x01\x01R\x0eimprovementIds\x12p\n" +
+	"\x16primary_improvement_id\x18\x02 \x01(\tB5\xbaG*:(\x12&'d25f625b-4e82-4761-82ca-10dafc5dcf77'\xbaH\x05r\x03\xb0\x01\x01H\x00R\x14primaryImprovementId\x88\x01\x01\x127\n" +
 	"\x10total_area_sq_ft\x18\x03 \x01(\x01B\x0e\xbaH\v\x12\t)\x00\x00\x00\x00\x00\x00\x00\x00R\rtotalAreaSqFt\x127\n" +
 	"\x0ftotal_bathrooms\x18\x04 \x01(\x01B\x0e\xbaH\v\x12\t)\x00\x00\x00\x00\x00\x00\x00\x00R\x0etotalBathrooms\x12.\n" +
 	"\x0etotal_bedrooms\x18\x05 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\rtotalBedrooms\x12(\n" +

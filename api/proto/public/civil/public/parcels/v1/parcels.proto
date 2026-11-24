@@ -218,8 +218,8 @@ message ParcelImprovementsSummary {
   optional string primary_improvement_id = 2 [
     (buf.validate.field).string.uuid = true,
 
+    // The description comes from the comment above; gnostic adds only the example.
     (gnostic.openapi.v3.property) = {
-      description: "The ID of the primary improvement on this parcel. Unset when the parcel has no improvements."
       example: {yaml: "'d25f625b-4e82-4761-82ca-10dafc5dcf77'"}
     }
   ];

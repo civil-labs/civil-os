@@ -147,3 +147,65 @@ func mapAddressImprovement(m *meshimprovementsv1.AddressImprovement) *publicimpr
 		ParcelIds:     m.GetParcelIds(),
 	}
 }
+
+func (s *ImprovementServer) GetImprovementsById(
+	ctx context.Context,
+	req *connect.Request[publicimprovementsv1.GetImprovementsByIdRequest],
+) (*connect.Response[publicimprovementsv1.GetImprovementsByIdResponse], error) {
+	s.logger.Debug("received GetImprovementsById request")
+
+	m := req.Msg
+	meshRes, err := s.dbReaderClient.GetImprovementsById(ctx, connect.NewRequest(&meshimprovementsv1.GetImprovementsByIdRequest{
+		ImprovementIds: m.ImprovementIds, LegalAsOf: m.LegalAsOf, ValuationId: m.ValuationId,
+	}))
+	if err != nil {
+		s.logger.Error("upstream GetImprovementsById request failed", slog.Any("error", err))
+		return nil, err // keep the mesh status code
+	}
+	improvements := make(map[string]*publicimprovementsv1.Improvement, len(meshRes.Msg.Improvements))
+	for k, v := range meshRes.Msg.Improvements {
+		if v != nil {
+			improvements[k] = mapImprovement(v)
+		}
+	}
+	return connect.NewResponse(&publicimprovementsv1.GetImprovementsByIdResponse{Improvements: improvements}), nil
+}
+
+func mapImprovement(m *meshimprovementsv1.Improvement) *publicimprovementsv1.Improvement {
+	return &publicimprovementsv1.Improvement{
+		ImprovementId:      m.GetImprovementId(),
+		TypeId:             m.GetTypeId(),
+		ConditionId:        m.ConditionId,
+		QualityId:          m.QualityId,
+		AddressId:          m.AddressId,
+		FormattedAddress:   m.FormattedAddress,
+		AreaSqFt:           m.AreaSqFt,
+		FullBathrooms:      m.FullBathrooms,
+		HalfBathrooms:      m.HalfBathrooms,
+		Bathrooms:          m.Bathrooms,
+		Bedrooms:           m.Bedrooms,
+		Units:              m.Units,
+		YearBuilt:          m.YearBuilt,
+		EffectiveYearBuilt: m.EffectiveYearBuilt,
+		Properties:         m.Properties,
+		Parcels:            mapSlice(m.GetParcels(), mapImprovementParcel),
+		Parties:            mapSlice(m.GetParties(), mapImprovementShare),
+		MarketValue:        m.MarketValue,
+		AssessedValue:      m.AssessedValue,
+	}
+}
+
+func mapImprovementParcel(m *meshimprovementsv1.ImprovementParcel) *publicimprovementsv1.ImprovementParcel {
+	return &publicimprovementsv1.ImprovementParcel{
+		ParcelId:  m.GetParcelId(),
+		FeatureId: m.FeatureId,
+		IsPrimary: m.GetIsPrimary(),
+	}
+}
+
+func mapImprovementShare(m *meshimprovementsv1.ImprovementShare) *publicimprovementsv1.ImprovementShare {
+	return &publicimprovementsv1.ImprovementShare{
+		PartyId:        m.GetPartyId(),
+		OwnershipShare: m.GetOwnershipShare(),
+	}
+}

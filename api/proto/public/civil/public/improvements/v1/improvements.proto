@@ -28,6 +28,15 @@ service ImprovementsService {
   rpc GetImprovementQualities(GetImprovementQualitiesRequest) returns (GetImprovementQualitiesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+
+  // Returns improvements by UUID as of `legal_as_of`, each with the parcels it
+  // sits on and the owners recorded on it, and its values when a
+  // `valuation_id` is given. Voided and unknown improvements, those with no
+  // record at `legal_as_of`, and those on no visible parcel are left out of
+  // the map.
+  rpc GetImprovementsById(GetImprovementsByIdRequest) returns (GetImprovementsByIdResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 message ImprovementType {
@@ -111,4 +120,139 @@ message GetImprovementQualitiesRequest {}
 message GetImprovementQualitiesResponse {
   // Keyed by the quality's UUID.
   map<string, ImprovementQuality> improvement_qualities = 1;
+}
+
+// An improvement (a building or other structure) as of `legal_as_of`.
+message Improvement {
+  // The improvement's UUID.
+  string improvement_id = 1 [(buf.validate.field).string.uuid = true];
+
+  // The improvement type's UUID, from GetImprovementTypes. Always set.
+  string type_id = 2 [(buf.validate.field).string.uuid = true];
+
+  // The condition's UUID. Set only when GetImprovementConditions returns that
+  // condition now; unset when none is recorded.
+  optional string condition_id = 3 [(buf.validate.field).string.uuid = true];
+
+  // The quality's UUID. Set only when GetImprovementQualities returns that
+  // quality now; unset when none is recorded.
+  optional string quality_id = 4 [(buf.validate.field).string.uuid = true];
+
+  // The improvement's address UUID. Unset when the address is voided or has
+  // no record at `legal_as_of`, so a set ID can always be read with
+  // AddressesService.GetAddressesById.
+  optional string address_id = 5 [(buf.validate.field).string.uuid = true];
+
+  // The address as one line. Set exactly when `address_id` is.
+  optional string formatted_address = 6 [(buf.validate.field).string.max_len = 256];
+
+  // The improvement's area in square feet, >= 0. Unset when not recorded.
+  optional double area_sq_ft = 7 [(buf.validate.field).double.gte = 0.0];
+
+  // The number of full bathrooms, >= 0. Unset when not recorded.
+  optional int32 full_bathrooms = 8 [(buf.validate.field).int32.gte = 0];
+
+  // The number of half bathrooms, >= 0. Unset when not recorded.
+  optional int32 half_bathrooms = 9 [(buf.validate.field).int32.gte = 0];
+
+  // The number of bathrooms, counting a half bath as 0.5:
+  // full_bathrooms + 0.5 * half_bathrooms, with an unset count taken as 0.
+  // >= 0, in steps of 0.5. Unset only when both counts are unset.
+  optional double bathrooms = 10 [(buf.validate.field).double.gte = 0.0];
+
+  // The number of bedrooms, >= 0. Unset when not recorded.
+  optional int32 bedrooms = 11 [(buf.validate.field).int32.gte = 0];
+
+  // The number of units, >= 0. Unset when not recorded.
+  optional int32 units = 12 [(buf.validate.field).int32.gte = 0];
+
+  // The year the improvement was built. Unset when not recorded.
+  optional int32 year_built = 13;
+
+  // The year the improvement's condition corresponds to, after renovations.
+  // Unset when not recorded.
+  optional int32 effective_year_built = 14;
+
+  // Extra attributes as a JSON object in text, up to 5 KB. Unset when none
+  // are recorded.
+  optional string properties = 15 [(buf.validate.field).string.max_bytes = 5120];
+
+  // The visible parcels the improvement sits on at `legal_as_of`, ordered by
+  // parcel UUID, each once. Never empty. An improvement can sit on several
+  // parcels: don't assume one.
+  repeated ImprovementParcel parcels = 16 [(buf.validate.field).repeated.min_items = 1];
+
+  // The owners recorded on the improvement itself at `legal_as_of`, ordered
+  // by party UUID, each once. Often empty: that means no separate ownership
+  // of the improvement is recorded, not that it has no owner. See the
+  // parcel's owners in that case.
+  repeated ImprovementShare parties = 17;
+
+  // The market value in the requested valuation, as a decimal string. Set
+  // only when a `valuation_id` is given and has a value for this improvement
+  // at `legal_as_of`.
+  optional string market_value = 18 [(buf.validate.field).string = {
+    // Up to 15 digits before the decimal point and 4 after, matching the
+    // database column, numeric(19,4).
+    pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"
+  }];
+
+  // The assessed value in the requested valuation, as a decimal string. Set
+  // exactly when `market_value` is.
+  optional string assessed_value = 19 [(buf.validate.field).string = {
+    // Up to 15 digits before the decimal point and 4 after, matching the
+    // database column, numeric(19,4).
+    pattern: "^-?[0-9]{1,15}(\\.[0-9]{1,4})?$"
+  }];
+}
+
+// A parcel an improvement sits on.
+message ImprovementParcel {
+  // The parcel's UUID.
+  string parcel_id = 1 [(buf.validate.field).string.uuid = true];
+
+  // The tile feature ID of the parcel's geometry at `legal_as_of`.
+  optional int64 feature_id = 2;
+
+  // Whether this improvement is the primary improvement of this parcel. At
+  // most one improvement per parcel is primary at a time. It doesn't mean
+  // this is the improvement's main parcel.
+  bool is_primary = 3;
+}
+
+// A party's share of an improvement.
+message ImprovementShare {
+  // The party's UUID, readable with PartiesService.GetPartiesById.
+  string party_id = 1 [(buf.validate.field).string.uuid = true];
+
+  // The party's share of the improvement, a decimal string in (0, 1] with up
+  // to 4 places, such as "0.5000", as PartyParcel.ownership_share.
+  string ownership_share = 2;
+}
+
+message GetImprovementsByIdRequest {
+  // The improvements' UUIDs, 1 to 100, each once.
+  repeated string improvement_ids = 1 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 100
+    unique: true
+    items: {
+      string: {uuid: true}
+    }
+  }];
+
+  // The legal time to read at. Defaults to now.
+  optional google.protobuf.Timestamp legal_as_of = 2 [(buf.validate.field).timestamp = {
+    gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+  }];
+
+  // A valuation's UUID. With one, each improvement carries its
+  // `market_value` and `assessed_value` in that valuation.
+  optional string valuation_id = 3 [(buf.validate.field).string.uuid = true];
+}
+
+message GetImprovementsByIdResponse {
+  // Keyed by the improvement's UUID. Improvements that aren't visible at
+  // `legal_as_of` are absent.
+  map<string, Improvement> improvements = 1;
 }

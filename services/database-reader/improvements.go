@@ -7,6 +7,7 @@ import (
 
 	"connectrpc.com/connect"
 	improvementsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/improvements/v1"
+	"github.com/jackc/pgx/v5"
 )
 
 func (s *APIServer) GetImprovementTypes(
@@ -97,5 +98,41 @@ func (s *APIServer) GetImprovementConditions(
 
 	return connect.NewResponse(&improvementsv1.GetImprovementConditionsResponse{
 		ImprovementConditions: conditions,
+	}), nil
+}
+
+// GetImprovementQualities lists the qualities that aren't voided, with their
+// attributes at the current time, as GetImprovementConditions does
+// (docs/improvement-read-api/spec.md, "Quality lookup").
+func (s *APIServer) GetImprovementQualities(
+	ctx context.Context,
+	req *connect.Request[improvementsv1.GetImprovementQualitiesRequest],
+) (*connect.Response[improvementsv1.GetImprovementQualitiesResponse], error) {
+	s.logger.Debug("received GetImprovementQualities request")
+
+	rows, err := s.db.Query(ctx, `
+		SELECT q.public_id::text, a.name, a.quality_adjustment_modifier
+		FROM improvement_qualities q
+		JOIN improvement_quality_attributes a ON q.improvement_quality_id = a.improvement_quality_id
+		WHERE NOT q.is_voided
+		  AND CURRENT_TIMESTAMP <@ a.legal_valid_range
+	`)
+	if err != nil {
+		return nil, s.dbError("improvement qualities", err)
+	}
+	qualities, err := collectRows(rows, func(r pgx.Rows) (*improvementsv1.ImprovementQuality, error) {
+		q := &improvementsv1.ImprovementQuality{}
+		return q, r.Scan(&q.Id, &q.Name, &q.QualityAdjustmentModifier)
+	}, func(err error) error { return s.dbError("improvement qualities", err) })
+	if err != nil {
+		return nil, err
+	}
+
+	byID := make(map[string]*improvementsv1.ImprovementQuality, len(qualities))
+	for _, q := range qualities {
+		byID[q.Id] = q
+	}
+	return connect.NewResponse(&improvementsv1.GetImprovementQualitiesResponse{
+		ImprovementQualities: byID,
 	}), nil
 }

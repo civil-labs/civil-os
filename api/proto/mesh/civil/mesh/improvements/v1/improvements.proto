@@ -11,6 +11,8 @@ service ImprovementsReadService {
   rpc GetImprovementConditions(GetImprovementConditionsRequest) returns (GetImprovementConditionsResponse) {}
 
   rpc GetImprovementsByAddressId(GetImprovementsByAddressIdRequest) returns (GetImprovementsByAddressIdResponse) {}
+
+  rpc GetImprovementQualities(GetImprovementQualitiesRequest) returns (GetImprovementQualitiesResponse) {}
 }
 
 message ImprovementType {
@@ -54,4 +56,16 @@ message GetImprovementsByAddressIdRequest {
 message GetImprovementsByAddressIdResponse {
   repeated AddressImprovement improvements = 1;
   civil.mesh.pagination.v1.PageInfo page_info = 2;
+}
+
+message ImprovementQuality {
+  string id = 1;
+  string name = 2;
+  double quality_adjustment_modifier = 3;
+}
+
+message GetImprovementQualitiesRequest {}
+
+message GetImprovementQualitiesResponse {
+  map<string, ImprovementQuality> improvement_qualities = 1;
 }

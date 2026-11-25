@@ -40,7 +40,7 @@ const (
 	MultiOwnerParcel   = 2  // owned 50/50 by parties 2 and 3
 	SecondaryImpParcel = 3  // also has secondary improvement 16
 	HalfBathParcel     = 1  // improvement 1 has 2 full and 1 half bath; every other improvement's half_bathrooms is null
-	ImprovedParcels    = 15 // active parcels 1..15 have primary improvement n; voided parcel 20 has improvement 17
+	ImprovedParcels    = 15 // active parcels 1..15 have primary improvement n; voided parcel 20 has improvement 17; non-primary 18 is MovingImprovement
 	UnattachedAddress  = 21 // address on no parcel
 )
 
@@ -62,6 +62,29 @@ const (
 var (
 	HistoryChange  = time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
 	GeometryChange = time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+)
+
+// Improvements; see the header of database/fixtures/synthetic.sql and
+// docs/improvement-read-api/spec.md.
+const (
+	ImprovementCount               = 18
+	SecondaryImprovement           = 16 // non-primary on parcel 3; parties 5 and voided 11 at 0.5 each
+	HistoricalImprovement          = 4  // earlier attributes until ImprovementHistoryChange
+	OwnerChangeImprovement         = 6  // party 10 until ImprovementOwnerChange, party 6 from then
+	MovingImprovement              = 18 // non-primary shed; on parcel 11, then 12 from ImprovementMove
+	MovingImprovementEarlierParcel = 11
+	MovingImprovementParcel        = 12
+	UnusedQuality                  = 2 // 'Fixture Premium', used by no improvement
+)
+
+// ImprovementHistoryChange is when improvement 4's attributes change,
+// ImprovementOwnerChange when improvement 6 changes owner, and
+// ImprovementMove when improvement 18 moves to parcel 12. ImprovementMove is
+// the same instant as GeometryChange, but the two are independent.
+var (
+	ImprovementHistoryChange = time.Date(2023, 6, 1, 0, 0, 0, 0, time.UTC)
+	ImprovementOwnerChange   = time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC)
+	ImprovementMove          = time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 )
 
 // Real property transfers; see the header of database/fixtures/synthetic.sql.
@@ -102,6 +125,23 @@ func PartyID(n int) string { return FixtureID(PartyPrefix, n) }
 
 // AddressID returns the public ID of fixture address n.
 func AddressID(n int) string { return FixtureID(AddressPrefix, n) }
+
+// ImprovementID returns the public ID of fixture improvement n.
+func ImprovementID(n int) string { return FixtureID(ImprovementPrefix, n) }
+
+// ImprovementQualityID returns the public ID of fixture improvement quality n.
+func ImprovementQualityID(n int) string { return FixtureID(ImprovementQualityPrefix, n) }
+
+// ImprovementAreaSqM is fixture improvement n's current area.
+func ImprovementAreaSqM(n int) float64 {
+	switch n {
+	case SecondaryImprovement:
+		return 30
+	case MovingImprovement:
+		return 20
+	}
+	return float64(120 + 5*n)
+}
 
 // NeighborhoodDefinitionID returns the public ID of fixture neighborhood definition n.
 func NeighborhoodDefinitionID(n int) string { return FixtureID(NeighborhoodDefPrefix, n) }

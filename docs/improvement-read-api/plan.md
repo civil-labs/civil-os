@@ -234,8 +234,13 @@ implements it):
   - An improvement missing from step 2's results can't happen, because rule
     1 checks the same join. If it does, log it and leave the improvement
     out, so the "never empty" promise holds.
-- **Validation:** check that the ID list holds only UUIDs, as the other
-  by-ID reads in the reader do.
+- **Validation:** none in the reader, as in `GetPartiesById` and
+  `GetAddressesById`: the gateway's protovalidate rules check the IDs.
+  *Amended while implementing:* the plan said the other by-ID reads check
+  UUIDs in the reader. They don't.
+- **Area:** a named `sqFtPerSqM` constant for the new code. Replacing the
+  existing `10.7639` literals in `parcels.go` and `zoning.go` is left out of
+  this feature.
 
 **2.3 Reader integration tests** (`test: reader tests for improvements by ID`),
 in `improvements_integration_test.go`:

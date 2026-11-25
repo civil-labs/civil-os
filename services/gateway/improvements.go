@@ -55,6 +55,35 @@ func (s *ImprovementServer) GetImprovementConditions(
 	return connect.NewResponse(publicRes), nil
 }
 
+func (s *ImprovementServer) GetImprovementQualities(
+	ctx context.Context,
+	req *connect.Request[publicimprovementsv1.GetImprovementQualitiesRequest],
+) (*connect.Response[publicimprovementsv1.GetImprovementQualitiesResponse], error) {
+	s.logger.Debug("received GetImprovementQualities request")
+
+	meshRes, err := s.dbReaderClient.GetImprovementQualities(ctx, connect.NewRequest(&meshimprovementsv1.GetImprovementQualitiesRequest{}))
+	if err != nil {
+		s.logger.Error("upstream GetImprovementQualities request failed", slog.Any("error", err))
+		return nil, err // keep the mesh status code
+	}
+
+	qualities := make(map[string]*publicimprovementsv1.ImprovementQuality, len(meshRes.Msg.ImprovementQualities))
+	for k, v := range meshRes.Msg.ImprovementQualities {
+		if v != nil {
+			qualities[k] = mapImprovementQuality(v)
+		}
+	}
+	return connect.NewResponse(&publicimprovementsv1.GetImprovementQualitiesResponse{ImprovementQualities: qualities}), nil
+}
+
+func mapImprovementQuality(m *meshimprovementsv1.ImprovementQuality) *publicimprovementsv1.ImprovementQuality {
+	return &publicimprovementsv1.ImprovementQuality{
+		Id:                        m.Id,
+		Name:                      m.Name,
+		QualityAdjustmentModifier: m.QualityAdjustmentModifier,
+	}
+}
+
 func mapImprovementTypes(meshTypes map[string]*meshimprovementsv1.ImprovementType) map[string]*publicimprovementsv1.ImprovementType {
 	if meshTypes == nil {
 		return nil

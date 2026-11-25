@@ -4,7 +4,7 @@
 |---|---|
 | **Author / product owner** | Jackson |
 | **Date** | 2026-11-25 |
-| **Status** | Draft. Accepted when merged. |
+| **Status** | Draft. Decisions signed off by the owner on 2026-11-25. Accepted when merged. |
 | **Intent** | [`intent.md`](intent.md) |
 
 This spec sets out the contract: protos, query behaviour, fixtures and tests.

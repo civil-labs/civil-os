@@ -153,8 +153,11 @@ In `database/fixtures/synthetic.sql`, using `pg_temp.fid(prefix, n)` and
   (`NO_SIDE_EFFECTS`), with field comments as the spec writes them. Run
   `mise run generate`, and check that the SDK index exports it.
 - `services/gateway/improvements.go`: the handler and
-  `mapImprovementQualities`, as for conditions.
-- `mappers_test.go`: a `checkFullMapping` round trip for `ImprovementQuality`.
+  `mapImprovementQuality`, used per map entry.
+- `services/gateway/improvements_test.go` (new; PR 2 and PR 3 extend it): a
+  `checkFullMapping` round trip for `ImprovementQuality`. *Amended while
+  implementing:* `checkFullMapping` lives in the gateway's `_test.go` files
+  for each service, not `mappers_test.go`.
 
 **1.5 Tests** (`test: reader tests for qualities and the new fixtures`)
 - **Reader integration:**
@@ -265,7 +268,7 @@ in `improvements_integration_test.go`:
 **2.5 Gateway** (`feat: serve improvements by ID from the gateway`):
 - `services/gateway/improvements.go`: a handler plus `mapImprovement`,
   `mapImprovementParcel` and `mapImprovementShare`, one-to-one.
-- `mappers_test.go`: `checkFullMapping` for all three.
+- `improvements_test.go`: `checkFullMapping` for all three.
 - `handlers_test.go` already reaches the RPC through `publicServices`.
   Confirm that `fillValid` fills `valuation_id` with a UUID.
 

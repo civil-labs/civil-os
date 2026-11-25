@@ -484,6 +484,146 @@ func (x *GetImprovementsByAddressIdResponse) GetPageInfo() *v1.PageInfo {
 	return nil
 }
 
+type ImprovementQuality struct {
+	state                     protoimpl.MessageState `protogen:"open.v1"`
+	Id                        string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                      string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	QualityAdjustmentModifier float64                `protobuf:"fixed64,3,opt,name=quality_adjustment_modifier,json=qualityAdjustmentModifier,proto3" json:"quality_adjustment_modifier,omitempty"`
+	unknownFields             protoimpl.UnknownFields
+	sizeCache                 protoimpl.SizeCache
+}
+
+func (x *ImprovementQuality) Reset() {
+	*x = ImprovementQuality{}
+	mi := &file_civil_mesh_improvements_v1_improvements_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ImprovementQuality) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ImprovementQuality) ProtoMessage() {}
+
+func (x *ImprovementQuality) ProtoReflect() protoreflect.Message {
+	mi := &file_civil_mesh_improvements_v1_improvements_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ImprovementQuality.ProtoReflect.Descriptor instead.
+func (*ImprovementQuality) Descriptor() ([]byte, []int) {
+	return file_civil_mesh_improvements_v1_improvements_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ImprovementQuality) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ImprovementQuality) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ImprovementQuality) GetQualityAdjustmentModifier() float64 {
+	if x != nil {
+		return x.QualityAdjustmentModifier
+	}
+	return 0
+}
+
+type GetImprovementQualitiesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetImprovementQualitiesRequest) Reset() {
+	*x = GetImprovementQualitiesRequest{}
+	mi := &file_civil_mesh_improvements_v1_improvements_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetImprovementQualitiesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetImprovementQualitiesRequest) ProtoMessage() {}
+
+func (x *GetImprovementQualitiesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_civil_mesh_improvements_v1_improvements_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetImprovementQualitiesRequest.ProtoReflect.Descriptor instead.
+func (*GetImprovementQualitiesRequest) Descriptor() ([]byte, []int) {
+	return file_civil_mesh_improvements_v1_improvements_proto_rawDescGZIP(), []int{10}
+}
+
+type GetImprovementQualitiesResponse struct {
+	state                protoimpl.MessageState         `protogen:"open.v1"`
+	ImprovementQualities map[string]*ImprovementQuality `protobuf:"bytes,1,rep,name=improvement_qualities,json=improvementQualities,proto3" json:"improvement_qualities,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *GetImprovementQualitiesResponse) Reset() {
+	*x = GetImprovementQualitiesResponse{}
+	mi := &file_civil_mesh_improvements_v1_improvements_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetImprovementQualitiesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetImprovementQualitiesResponse) ProtoMessage() {}
+
+func (x *GetImprovementQualitiesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_civil_mesh_improvements_v1_improvements_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetImprovementQualitiesResponse.ProtoReflect.Descriptor instead.
+func (*GetImprovementQualitiesResponse) Descriptor() ([]byte, []int) {
+	return file_civil_mesh_improvements_v1_improvements_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GetImprovementQualitiesResponse) GetImprovementQualities() map[string]*ImprovementQuality {
+	if x != nil {
+		return x.ImprovementQualities
+	}
+	return nil
+}
+
 var File_civil_mesh_improvements_v1_improvements_proto protoreflect.FileDescriptor
 
 const file_civil_mesh_improvements_v1_improvements_proto_rawDesc = "" +
@@ -526,11 +666,22 @@ const file_civil_mesh_improvements_v1_improvements_proto_rawDesc = "" +
 	"\x06_after\"\xb9\x01\n" +
 	"\"GetImprovementsByAddressIdResponse\x12R\n" +
 	"\fimprovements\x18\x01 \x03(\v2..civil.mesh.improvements.v1.AddressImprovementR\fimprovements\x12?\n" +
-	"\tpage_info\x18\x02 \x01(\v2\".civil.mesh.pagination.v1.PageInfoR\bpageInfo2\xde\x03\n" +
+	"\tpage_info\x18\x02 \x01(\v2\".civil.mesh.pagination.v1.PageInfoR\bpageInfo\"x\n" +
+	"\x12ImprovementQuality\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12>\n" +
+	"\x1bquality_adjustment_modifier\x18\x03 \x01(\x01R\x19qualityAdjustmentModifier\" \n" +
+	"\x1eGetImprovementQualitiesRequest\"\xa7\x02\n" +
+	"\x1fGetImprovementQualitiesResponse\x12\x8a\x01\n" +
+	"\x15improvement_qualities\x18\x01 \x03(\v2U.civil.mesh.improvements.v1.GetImprovementQualitiesResponse.ImprovementQualitiesEntryR\x14improvementQualities\x1aw\n" +
+	"\x19ImprovementQualitiesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12D\n" +
+	"\x05value\x18\x02 \x01(\v2..civil.mesh.improvements.v1.ImprovementQualityR\x05value:\x028\x012\xf5\x04\n" +
 	"\x17ImprovementsReadService\x12\x88\x01\n" +
 	"\x13GetImprovementTypes\x126.civil.mesh.improvements.v1.GetImprovementTypesRequest\x1a7.civil.mesh.improvements.v1.GetImprovementTypesResponse\"\x00\x12\x97\x01\n" +
 	"\x18GetImprovementConditions\x12;.civil.mesh.improvements.v1.GetImprovementConditionsRequest\x1a<.civil.mesh.improvements.v1.GetImprovementConditionsResponse\"\x00\x12\x9d\x01\n" +
-	"\x1aGetImprovementsByAddressId\x12=.civil.mesh.improvements.v1.GetImprovementsByAddressIdRequest\x1a>.civil.mesh.improvements.v1.GetImprovementsByAddressIdResponse\"\x00B\x98\x02\n" +
+	"\x1aGetImprovementsByAddressId\x12=.civil.mesh.improvements.v1.GetImprovementsByAddressIdRequest\x1a>.civil.mesh.improvements.v1.GetImprovementsByAddressIdResponse\"\x00\x12\x94\x01\n" +
+	"\x17GetImprovementQualities\x12:.civil.mesh.improvements.v1.GetImprovementQualitiesRequest\x1a;.civil.mesh.improvements.v1.GetImprovementQualitiesResponse\"\x00B\x98\x02\n" +
 	"\x1ecom.civil.mesh.improvements.v1B\x11ImprovementsProtoP\x01ZXgithub.com/civil-labs/civil-os/internal/gen/go/civil/mesh/improvements/v1;improvementsv1\xa2\x02\x03CMI\xaa\x02\x1aCivil.Mesh.Improvements.V1\xca\x02\x1aCivil\\Mesh\\Improvements\\V1\xe2\x02&Civil\\Mesh\\Improvements\\V1\\GPBMetadata\xea\x02\x1dCivil::Mesh::Improvements::V1b\x06proto3"
 
 var (
@@ -545,7 +696,7 @@ func file_civil_mesh_improvements_v1_improvements_proto_rawDescGZIP() []byte {
 	return file_civil_mesh_improvements_v1_improvements_proto_rawDescData
 }
 
-var file_civil_mesh_improvements_v1_improvements_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_civil_mesh_improvements_v1_improvements_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_civil_mesh_improvements_v1_improvements_proto_goTypes = []any{
 	(*ImprovementType)(nil),                    // 0: civil.mesh.improvements.v1.ImprovementType
 	(*GetImprovementTypesRequest)(nil),         // 1: civil.mesh.improvements.v1.GetImprovementTypesRequest
@@ -556,30 +707,38 @@ var file_civil_mesh_improvements_v1_improvements_proto_goTypes = []any{
 	(*AddressImprovement)(nil),                 // 6: civil.mesh.improvements.v1.AddressImprovement
 	(*GetImprovementsByAddressIdRequest)(nil),  // 7: civil.mesh.improvements.v1.GetImprovementsByAddressIdRequest
 	(*GetImprovementsByAddressIdResponse)(nil), // 8: civil.mesh.improvements.v1.GetImprovementsByAddressIdResponse
-	nil,                           // 9: civil.mesh.improvements.v1.GetImprovementTypesResponse.ImprovementTypesEntry
-	nil,                           // 10: civil.mesh.improvements.v1.GetImprovementConditionsResponse.ImprovementConditionsEntry
-	(*timestamppb.Timestamp)(nil), // 11: google.protobuf.Timestamp
-	(*v1.PageInfo)(nil),           // 12: civil.mesh.pagination.v1.PageInfo
+	(*ImprovementQuality)(nil),                 // 9: civil.mesh.improvements.v1.ImprovementQuality
+	(*GetImprovementQualitiesRequest)(nil),     // 10: civil.mesh.improvements.v1.GetImprovementQualitiesRequest
+	(*GetImprovementQualitiesResponse)(nil),    // 11: civil.mesh.improvements.v1.GetImprovementQualitiesResponse
+	nil,                                        // 12: civil.mesh.improvements.v1.GetImprovementTypesResponse.ImprovementTypesEntry
+	nil,                                        // 13: civil.mesh.improvements.v1.GetImprovementConditionsResponse.ImprovementConditionsEntry
+	nil,                                        // 14: civil.mesh.improvements.v1.GetImprovementQualitiesResponse.ImprovementQualitiesEntry
+	(*timestamppb.Timestamp)(nil),              // 15: google.protobuf.Timestamp
+	(*v1.PageInfo)(nil),                        // 16: civil.mesh.pagination.v1.PageInfo
 }
 var file_civil_mesh_improvements_v1_improvements_proto_depIdxs = []int32{
-	9,  // 0: civil.mesh.improvements.v1.GetImprovementTypesResponse.improvement_types:type_name -> civil.mesh.improvements.v1.GetImprovementTypesResponse.ImprovementTypesEntry
-	10, // 1: civil.mesh.improvements.v1.GetImprovementConditionsResponse.improvement_conditions:type_name -> civil.mesh.improvements.v1.GetImprovementConditionsResponse.ImprovementConditionsEntry
-	11, // 2: civil.mesh.improvements.v1.GetImprovementsByAddressIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
+	12, // 0: civil.mesh.improvements.v1.GetImprovementTypesResponse.improvement_types:type_name -> civil.mesh.improvements.v1.GetImprovementTypesResponse.ImprovementTypesEntry
+	13, // 1: civil.mesh.improvements.v1.GetImprovementConditionsResponse.improvement_conditions:type_name -> civil.mesh.improvements.v1.GetImprovementConditionsResponse.ImprovementConditionsEntry
+	15, // 2: civil.mesh.improvements.v1.GetImprovementsByAddressIdRequest.legal_as_of:type_name -> google.protobuf.Timestamp
 	6,  // 3: civil.mesh.improvements.v1.GetImprovementsByAddressIdResponse.improvements:type_name -> civil.mesh.improvements.v1.AddressImprovement
-	12, // 4: civil.mesh.improvements.v1.GetImprovementsByAddressIdResponse.page_info:type_name -> civil.mesh.pagination.v1.PageInfo
-	0,  // 5: civil.mesh.improvements.v1.GetImprovementTypesResponse.ImprovementTypesEntry.value:type_name -> civil.mesh.improvements.v1.ImprovementType
-	3,  // 6: civil.mesh.improvements.v1.GetImprovementConditionsResponse.ImprovementConditionsEntry.value:type_name -> civil.mesh.improvements.v1.ImprovementCondition
-	1,  // 7: civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementTypes:input_type -> civil.mesh.improvements.v1.GetImprovementTypesRequest
-	4,  // 8: civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementConditions:input_type -> civil.mesh.improvements.v1.GetImprovementConditionsRequest
-	7,  // 9: civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementsByAddressId:input_type -> civil.mesh.improvements.v1.GetImprovementsByAddressIdRequest
-	2,  // 10: civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementTypes:output_type -> civil.mesh.improvements.v1.GetImprovementTypesResponse
-	5,  // 11: civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementConditions:output_type -> civil.mesh.improvements.v1.GetImprovementConditionsResponse
-	8,  // 12: civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementsByAddressId:output_type -> civil.mesh.improvements.v1.GetImprovementsByAddressIdResponse
-	10, // [10:13] is the sub-list for method output_type
-	7,  // [7:10] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	16, // 4: civil.mesh.improvements.v1.GetImprovementsByAddressIdResponse.page_info:type_name -> civil.mesh.pagination.v1.PageInfo
+	14, // 5: civil.mesh.improvements.v1.GetImprovementQualitiesResponse.improvement_qualities:type_name -> civil.mesh.improvements.v1.GetImprovementQualitiesResponse.ImprovementQualitiesEntry
+	0,  // 6: civil.mesh.improvements.v1.GetImprovementTypesResponse.ImprovementTypesEntry.value:type_name -> civil.mesh.improvements.v1.ImprovementType
+	3,  // 7: civil.mesh.improvements.v1.GetImprovementConditionsResponse.ImprovementConditionsEntry.value:type_name -> civil.mesh.improvements.v1.ImprovementCondition
+	9,  // 8: civil.mesh.improvements.v1.GetImprovementQualitiesResponse.ImprovementQualitiesEntry.value:type_name -> civil.mesh.improvements.v1.ImprovementQuality
+	1,  // 9: civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementTypes:input_type -> civil.mesh.improvements.v1.GetImprovementTypesRequest
+	4,  // 10: civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementConditions:input_type -> civil.mesh.improvements.v1.GetImprovementConditionsRequest
+	7,  // 11: civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementsByAddressId:input_type -> civil.mesh.improvements.v1.GetImprovementsByAddressIdRequest
+	10, // 12: civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementQualities:input_type -> civil.mesh.improvements.v1.GetImprovementQualitiesRequest
+	2,  // 13: civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementTypes:output_type -> civil.mesh.improvements.v1.GetImprovementTypesResponse
+	5,  // 14: civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementConditions:output_type -> civil.mesh.improvements.v1.GetImprovementConditionsResponse
+	8,  // 15: civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementsByAddressId:output_type -> civil.mesh.improvements.v1.GetImprovementsByAddressIdResponse
+	11, // 16: civil.mesh.improvements.v1.ImprovementsReadService.GetImprovementQualities:output_type -> civil.mesh.improvements.v1.GetImprovementQualitiesResponse
+	13, // [13:17] is the sub-list for method output_type
+	9,  // [9:13] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_civil_mesh_improvements_v1_improvements_proto_init() }
@@ -595,7 +754,7 @@ func file_civil_mesh_improvements_v1_improvements_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_civil_mesh_improvements_v1_improvements_proto_rawDesc), len(file_civil_mesh_improvements_v1_improvements_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

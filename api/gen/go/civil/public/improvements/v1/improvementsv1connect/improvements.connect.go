@@ -42,6 +42,9 @@ const (
 	// ImprovementsServiceGetImprovementsByAddressIdProcedure is the fully-qualified name of the
 	// ImprovementsService's GetImprovementsByAddressId RPC.
 	ImprovementsServiceGetImprovementsByAddressIdProcedure = "/civil.public.improvements.v1.ImprovementsService/GetImprovementsByAddressId"
+	// ImprovementsServiceGetImprovementQualitiesProcedure is the fully-qualified name of the
+	// ImprovementsService's GetImprovementQualities RPC.
+	ImprovementsServiceGetImprovementQualitiesProcedure = "/civil.public.improvements.v1.ImprovementsService/GetImprovementQualities"
 )
 
 // ImprovementsServiceClient is a client for the civil.public.improvements.v1.ImprovementsService
@@ -54,6 +57,9 @@ type ImprovementsServiceClient interface {
 	// improvements, and improvements on no visible parcel, are left out. An
 	// unknown or voided address has no improvements.
 	GetImprovementsByAddressId(context.Context, *connect.Request[v1.GetImprovementsByAddressIdRequest]) (*connect.Response[v1.GetImprovementsByAddressIdResponse], error)
+	// Returns every improvement quality that isn't voided, keyed by its UUID,
+	// with its name and modifier as of now.
+	GetImprovementQualities(context.Context, *connect.Request[v1.GetImprovementQualitiesRequest]) (*connect.Response[v1.GetImprovementQualitiesResponse], error)
 }
 
 // NewImprovementsServiceClient constructs a client for the
@@ -89,6 +95,13 @@ func NewImprovementsServiceClient(httpClient connect.HTTPClient, baseURL string,
 			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
+		getImprovementQualities: connect.NewClient[v1.GetImprovementQualitiesRequest, v1.GetImprovementQualitiesResponse](
+			httpClient,
+			baseURL+ImprovementsServiceGetImprovementQualitiesProcedure,
+			connect.WithSchema(improvementsServiceMethods.ByName("GetImprovementQualities")),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -97,6 +110,7 @@ type improvementsServiceClient struct {
 	getImprovementTypes        *connect.Client[v1.GetImprovementTypesRequest, v1.GetImprovementTypesResponse]
 	getImprovementConditions   *connect.Client[v1.GetImprovementConditionsRequest, v1.GetImprovementConditionsResponse]
 	getImprovementsByAddressId *connect.Client[v1.GetImprovementsByAddressIdRequest, v1.GetImprovementsByAddressIdResponse]
+	getImprovementQualities    *connect.Client[v1.GetImprovementQualitiesRequest, v1.GetImprovementQualitiesResponse]
 }
 
 // GetImprovementTypes calls civil.public.improvements.v1.ImprovementsService.GetImprovementTypes.
@@ -116,6 +130,12 @@ func (c *improvementsServiceClient) GetImprovementsByAddressId(ctx context.Conte
 	return c.getImprovementsByAddressId.CallUnary(ctx, req)
 }
 
+// GetImprovementQualities calls
+// civil.public.improvements.v1.ImprovementsService.GetImprovementQualities.
+func (c *improvementsServiceClient) GetImprovementQualities(ctx context.Context, req *connect.Request[v1.GetImprovementQualitiesRequest]) (*connect.Response[v1.GetImprovementQualitiesResponse], error) {
+	return c.getImprovementQualities.CallUnary(ctx, req)
+}
+
 // ImprovementsServiceHandler is an implementation of the
 // civil.public.improvements.v1.ImprovementsService service.
 type ImprovementsServiceHandler interface {
@@ -126,6 +146,9 @@ type ImprovementsServiceHandler interface {
 	// improvements, and improvements on no visible parcel, are left out. An
 	// unknown or voided address has no improvements.
 	GetImprovementsByAddressId(context.Context, *connect.Request[v1.GetImprovementsByAddressIdRequest]) (*connect.Response[v1.GetImprovementsByAddressIdResponse], error)
+	// Returns every improvement quality that isn't voided, keyed by its UUID,
+	// with its name and modifier as of now.
+	GetImprovementQualities(context.Context, *connect.Request[v1.GetImprovementQualitiesRequest]) (*connect.Response[v1.GetImprovementQualitiesResponse], error)
 }
 
 // NewImprovementsServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -156,6 +179,13 @@ func NewImprovementsServiceHandler(svc ImprovementsServiceHandler, opts ...conne
 		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
+	improvementsServiceGetImprovementQualitiesHandler := connect.NewUnaryHandler(
+		ImprovementsServiceGetImprovementQualitiesProcedure,
+		svc.GetImprovementQualities,
+		connect.WithSchema(improvementsServiceMethods.ByName("GetImprovementQualities")),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/civil.public.improvements.v1.ImprovementsService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ImprovementsServiceGetImprovementTypesProcedure:
@@ -164,6 +194,8 @@ func NewImprovementsServiceHandler(svc ImprovementsServiceHandler, opts ...conne
 			improvementsServiceGetImprovementConditionsHandler.ServeHTTP(w, r)
 		case ImprovementsServiceGetImprovementsByAddressIdProcedure:
 			improvementsServiceGetImprovementsByAddressIdHandler.ServeHTTP(w, r)
+		case ImprovementsServiceGetImprovementQualitiesProcedure:
+			improvementsServiceGetImprovementQualitiesHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -183,4 +215,8 @@ func (UnimplementedImprovementsServiceHandler) GetImprovementConditions(context.
 
 func (UnimplementedImprovementsServiceHandler) GetImprovementsByAddressId(context.Context, *connect.Request[v1.GetImprovementsByAddressIdRequest]) (*connect.Response[v1.GetImprovementsByAddressIdResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.improvements.v1.ImprovementsService.GetImprovementsByAddressId is not implemented"))
+}
+
+func (UnimplementedImprovementsServiceHandler) GetImprovementQualities(context.Context, *connect.Request[v1.GetImprovementQualitiesRequest]) (*connect.Response[v1.GetImprovementQualitiesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("civil.public.improvements.v1.ImprovementsService.GetImprovementQualities is not implemented"))
 }

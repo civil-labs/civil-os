@@ -34,6 +34,8 @@ import (
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/addresses/v1/addressesv1connect"
 	dexv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/dex/v1"
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/dex/v1/dexv1connect"
+	improvementsv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/improvements/v1"
+	"github.com/civil-labs/civil-os/api/gen/go/civil/public/improvements/v1/improvementsv1connect"
 	instancev1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/instance/v1"
 	"github.com/civil-labs/civil-os/api/gen/go/civil/public/instance/v1/instancev1connect"
 	neighborhoodsv1 "github.com/civil-labs/civil-os/api/gen/go/civil/public/neighborhoods/v1"
@@ -393,6 +395,18 @@ func TestSmoke(t *testing.T) {
 		}
 		if want := []string{tu.TransferID(5), tu.TransferID(2)}; !slices.Equal(got, want) {
 			t.Errorf("party 1 transfers = %v, want %v", got, want)
+		}
+	})
+
+	t.Run("improvement qualities", func(t *testing.T) {
+		improvements := improvementsv1connect.NewImprovementsServiceClient(httpClient, gatewayURL)
+		res, err := improvements.GetImprovementQualities(ctx, authed(token, &improvementsv1.GetImprovementQualitiesRequest{}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		q := res.Msg.GetImprovementQualities()
+		if len(q) != 2 || q[tu.ImprovementQualityID(1)].GetName() != "Fixture Standard" {
+			t.Errorf("improvement qualities = %v", q)
 		}
 	})
 

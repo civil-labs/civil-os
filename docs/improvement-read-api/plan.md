@@ -296,13 +296,16 @@ because the gateway doesn't build until it implements a new public RPC.
 
 **3.1 Mesh proto and reader** (`feat: serve improvements by party from the database reader`):
 - On `ImprovementsReadService`: `GetImprovementsByPartyId`, with
-  `PartyImprovement`, `PartyImprovementEdge`, and the request (`party_id`,
-  `legal_as_of`, `first`, `after`) and response (`edges`, `page_info`).
+  `PartyImprovement`, and the request (`party_id`, `legal_as_of`, `first`,
+  `after`) and response (`improvements`, `page_info`). *Amended in PR 3:*
+  the spec first said `PartyImprovementEdge edges`, but every paginated RPC
+  returns a plain list since `../pagination-without-edges/spec.md`, so the owner chose the list and the spec was
+  amended to match.
   `mise run generate`.
 - **Reader:** `pageByID("GetImprovementsByPartyId", ...)` with a `read`
   function:
   - First, the party must be visible at `t` (`NOT is_voided`, plus
-    `party_attributes` at `t`). If it isn't, the result is no edges.
+    `party_attributes` at `t`). If it isn't, the result is empty.
   - `improvement_parties` at `t` for that party, joined to improvements
     that pass rule 1. Write rule 1 once in 2.2 as a shared SQL fragment, and
     reuse it here.
@@ -313,7 +316,7 @@ because the gateway doesn't build until it implements a new public RPC.
   `legal_as_of`) and `first = 500` clamped to 100.
 
 **3.2 Public proto, gateway, e2e and docs**, as in 2.4–2.6:
-- the RPC, `PartyImprovement` and `PartyImprovementEdge`, with `party_id`
+- the RPC and `PartyImprovement`, with `party_id`
   required as a UUID, `first` 1..100, and `after` 1..512;
 - `mapPartyImprovement`, with a `checkFullMapping` round trip;
 - `GetImprovementsByPartyId` added to `TestAddressPartyPageSizeDefault`'s

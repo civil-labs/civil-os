@@ -332,7 +332,10 @@ Check against `main` after PR 3 merges, and list the evidence in PR 3's
 description:
 - Each intent success criterion:
   - every improvement ID returned by the parcel summary, the address lookup
-    and the transfers API can be read, except improvement 17;
+    and the transfers API can be read, except improvement 17. *Amended in
+    PR 3:* this is now a standing integration test,
+    `TestEveryReturnedImprovementIsReadable`, which also covers the party
+    lookup;
   - improvement 16's party differs from parcel 3's owner;
   - improvement 4 at 2022 has its earlier values.
 - `openapi.yaml` has the three new paths.

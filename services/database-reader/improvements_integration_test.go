@@ -16,6 +16,7 @@ import (
 	improvementsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/improvements/v1"
 	paginationv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/pagination/v1"
 	parcelsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1"
+	transfersv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/transfers/v1"
 	tu "github.com/civil-labs/civil-os/internal/testutil"
 )
 
@@ -548,5 +549,80 @@ func TestImprovementsByPartyPagination(t *testing.T) {
 	res, err := page(&improvementsv1.GetImprovementsByPartyIdRequest{PartyId: party, First: &big})
 	if err != nil || len(res.GetImprovements()) != 2 || res.GetPageInfo().GetHasNextPage() {
 		t.Errorf("first = 500: %v, %v", res, err)
+	}
+}
+
+// TestEveryReturnedImprovementIsReadable: the intent's first success
+// criterion. Every improvement ID that the parcel summary, the address and
+// party lookups and the transfers API return now can be read with
+// GetImprovementsById.
+func TestEveryReturnedImprovementIsReadable(t *testing.T) {
+	r := startReader(t)
+	ctx := context.Background()
+	big := int32(100)
+	seen := map[string]string{} // improvement ID -> where it came from
+
+	var parcels []string
+	for n := 1; n <= tu.ParcelCount; n++ {
+		parcels = append(parcels, tu.ParcelID(n))
+	}
+	summary, err := r.parcels.GetParcelsWithImprovementSummaryByParcelId(ctx, connect.NewRequest(&parcelsv1.GetParcelsWithImprovementSummaryByParcelIdRequest{ParcelIds: parcels}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, p := range summary.Msg.GetParcels() {
+		for _, id := range p.GetImprovementSummary().GetImprovementIds() {
+			seen[id] = "parcel summary"
+		}
+	}
+	// Fixture addresses share the parcels' numbering (1..21).
+	for n := 1; n <= tu.ParcelCount; n++ {
+		res, err := r.improvements.GetImprovementsByAddressId(ctx, connect.NewRequest(&improvementsv1.GetImprovementsByAddressIdRequest{AddressId: tu.AddressID(n), First: &big}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, m := range res.Msg.GetImprovements() {
+			seen[m.GetImprovementId()] = fmt.Sprintf("address %d", n)
+		}
+	}
+	for n := 1; n <= tu.VoidedParty; n++ {
+		res, err := r.improvements.GetImprovementsByPartyId(ctx, connect.NewRequest(&improvementsv1.GetImprovementsByPartyIdRequest{PartyId: tu.PartyID(n), First: &big}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, m := range res.Msg.GetImprovements() {
+			seen[m.GetImprovementId()] = fmt.Sprintf("party %d", n)
+		}
+	}
+	transfers, err := r.transfers.GetTransfersByParcelId(ctx, connect.NewRequest(&transfersv1.GetTransfersByParcelIdRequest{ParcelIds: parcels, First: &big}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if transfers.Msg.GetPageInfo().GetHasNextPage() {
+		t.Fatal("transfers didn't fit on one page")
+	}
+	for _, tr := range transfers.Msg.GetTransfers() {
+		for _, m := range tr.GetImprovements() {
+			seen[m.GetImprovementId()] = "transfer " + tr.GetTransferId()
+		}
+	}
+
+	// Improvement 17 is on voided parcel 20, so nothing returns it; every
+	// other fixture improvement comes back from at least one read.
+	if from, ok := seen[tu.ImprovementID(17)]; ok {
+		t.Errorf("improvement 17 returned by %s", from)
+	}
+	if want := tu.ImprovementCount - 1; len(seen) != want {
+		t.Errorf("reads returned %d improvement IDs, want %d", len(seen), want)
+	}
+	var ids []string
+	for id := range seen {
+		ids = append(ids, id)
+	}
+	got := improvementsByID(t, r, nil, nil, ids...)
+	for id, from := range seen {
+		if _, ok := got[id]; !ok {
+			t.Errorf("improvement %s, returned by %s, can't be read", id, from)
+		}
 	}
 }

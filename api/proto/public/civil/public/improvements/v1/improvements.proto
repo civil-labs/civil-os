@@ -37,6 +37,17 @@ service ImprovementsService {
   rpc GetImprovementsById(GetImprovementsByIdRequest) returns (GetImprovementsByIdResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
+
+  // Returns the improvements recorded as held by this party at `legal_as_of`
+  // (owners recorded on the improvement itself), each with the party's
+  // share, ordered by `improvement_id`. Improvements on parcels the party
+  // owns aren't included unless the party is recorded on the improvement:
+  // use ParcelsService.GetParcelsByPartyId for those. Voided improvements, and
+  // improvements on no visible parcel, are left out. An unknown or voided
+  // party has no improvements.
+  rpc GetImprovementsByPartyId(GetImprovementsByPartyIdRequest) returns (GetImprovementsByPartyIdResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 message ImprovementType {
@@ -255,4 +266,44 @@ message GetImprovementsByIdResponse {
   // Keyed by the improvement's UUID. Improvements that aren't visible at
   // `legal_as_of` are absent.
   map<string, Improvement> improvements = 1;
+}
+
+// An improvement a party holds.
+message PartyImprovement {
+  // The improvement's UUID, readable with GetImprovementsById.
+  string improvement_id = 1 [(buf.validate.field).string.uuid = true];
+
+  // The party's share of the improvement, a decimal string in (0, 1] with up
+  // to 4 places, such as "0.5000", as ImprovementShare.ownership_share.
+  string ownership_share = 2;
+}
+
+message GetImprovementsByPartyIdRequest {
+  // The party's UUID.
+  string party_id = 1 [(buf.validate.field).string.uuid = true];
+
+  // The legal time to read the holdings at. Defaults to now.
+  optional google.protobuf.Timestamp legal_as_of = 2 [(buf.validate.field).timestamp = {
+    gt: {seconds: -62135596800} /* Approx Jan 1, 0 CE */
+  }];
+
+  // The page size, 1 to 100. Defaults to 25.
+  optional int32 first = 3 [(buf.validate.field).int32 = {
+    gte: 1
+    lte: 100
+  }];
+
+  // Return the improvements after this cursor, from a previous page of the
+  // same request.
+  optional string after = 4 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 512
+  }];
+}
+
+message GetImprovementsByPartyIdResponse {
+  // The page's improvements, ordered by `improvement_id`. Fewer than `first`
+  // only on the last page.
+  repeated PartyImprovement improvements = 1;
+  civil.public.pagination.v1.PageInfo page_info = 2;
 }

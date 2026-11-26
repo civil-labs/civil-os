@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.6.1](https://github.com/civil-labs/civil-os/compare/public-api-v0.6.0...public-api-v0.6.1) (2026-11-26)
+
+
+### Features
+
+* improvement qualities lookup and improvement read fixtures ([#93](https://github.com/civil-labs/civil-os/issues/93)) ([f18ebfc](https://github.com/civil-labs/civil-os/commit/f18ebfcf82ebf0f6bfc937b66c89f2a75be95af5))
+* read improvements by ID ([#95](https://github.com/civil-labs/civil-os/issues/95)) ([98a49af](https://github.com/civil-labs/civil-os/commit/98a49afc92ea653eb9f48438c28e3f6f2391532c))
+* read improvements by party ([#96](https://github.com/civil-labs/civil-os/issues/96)) ([8c822f3](https://github.com/civil-labs/civil-os/commit/8c822f3521a21c48f69d60cc1209bfe8b3396f40))
+
 ## [0.6.0](https://github.com/civil-labs/civil-os/compare/public-api-v0.5.0...public-api-v0.6.0) (2026-11-24)
 
 

@@ -410,6 +410,31 @@ func TestSmoke(t *testing.T) {
 		}
 	})
 
+	t.Run("improvements by ID", func(t *testing.T) {
+		// Improvement 1 and the secondary building on parcel 3, which has its
+		// own owner. The response must satisfy its own protovalidate rules.
+		improvements := improvementsv1connect.NewImprovementsServiceClient(httpClient, gatewayURL)
+		val := tu.FixtureID(tu.ValuationPrefix, 1)
+		res, err := improvements.GetImprovementsById(ctx, authed(token, &improvementsv1.GetImprovementsByIdRequest{
+			ImprovementIds: []string{tu.ImprovementID(1), tu.ImprovementID(tu.SecondaryImprovement)},
+			ValuationId:    &val,
+		}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := protovalidate.Validate(res.Msg); err != nil {
+			t.Errorf("response breaks its rules: %v", err)
+		}
+		got := res.Msg.GetImprovements()
+		if m := got[tu.ImprovementID(1)]; m.GetBathrooms() != 2.5 || m.GetMarketValue() != "82000.0000" ||
+			len(m.GetParcels()) != 1 || m.GetParcels()[0].GetParcelId() != tu.ParcelID(1) {
+			t.Errorf("improvement 1 = %v", m)
+		}
+		if m := got[tu.ImprovementID(tu.SecondaryImprovement)]; len(m.GetParties()) != 1 || m.GetParties()[0].GetPartyId() != tu.PartyID(5) {
+			t.Errorf("improvement 16 = %v, want party 5 only", m)
+		}
+	})
+
 	t.Run("neighborhoods", func(t *testing.T) {
 		// Over Connect GET: the RPCs are NO_SIDE_EFFECTS.
 		nbhds := neighborhoodsv1connect.NewNeighborhoodsServiceClient(httpClient, gatewayURL, connect.WithHTTPGet())

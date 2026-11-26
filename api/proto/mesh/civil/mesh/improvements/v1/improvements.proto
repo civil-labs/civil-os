@@ -13,6 +13,8 @@ service ImprovementsReadService {
   rpc GetImprovementsByAddressId(GetImprovementsByAddressIdRequest) returns (GetImprovementsByAddressIdResponse) {}
 
   rpc GetImprovementQualities(GetImprovementQualitiesRequest) returns (GetImprovementQualitiesResponse) {}
+
+  rpc GetImprovementsById(GetImprovementsByIdRequest) returns (GetImprovementsByIdResponse) {}
 }
 
 message ImprovementType {
@@ -68,4 +70,47 @@ message GetImprovementQualitiesRequest {}
 
 message GetImprovementQualitiesResponse {
   map<string, ImprovementQuality> improvement_qualities = 1;
+}
+
+message Improvement {
+  string improvement_id = 1;
+  string type_id = 2;
+  optional string condition_id = 3;
+  optional string quality_id = 4;
+  optional string address_id = 5;
+  optional string formatted_address = 6;
+  optional double area_sq_ft = 7;
+  optional int32 full_bathrooms = 8;
+  optional int32 half_bathrooms = 9;
+  optional double bathrooms = 10;
+  optional int32 bedrooms = 11;
+  optional int32 units = 12;
+  optional int32 year_built = 13;
+  optional int32 effective_year_built = 14;
+  optional string properties = 15;
+  repeated ImprovementParcel parcels = 16;
+  repeated ImprovementShare parties = 17;
+  optional string market_value = 18;
+  optional string assessed_value = 19;
+}
+
+message ImprovementParcel {
+  string parcel_id = 1;
+  optional int64 feature_id = 2;
+  bool is_primary = 3;
+}
+
+message ImprovementShare {
+  string party_id = 1;
+  string ownership_share = 2;
+}
+
+message GetImprovementsByIdRequest {
+  repeated string improvement_ids = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
+  optional string valuation_id = 3;
+}
+
+message GetImprovementsByIdResponse {
+  map<string, Improvement> improvements = 1;
 }

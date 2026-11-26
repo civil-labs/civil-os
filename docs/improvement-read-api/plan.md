@@ -234,8 +234,13 @@ implements it):
   - An improvement missing from step 2's results can't happen, because rule
     1 checks the same join. If it does, log it and leave the improvement
     out, so the "never empty" promise holds.
-- **Validation:** check that the ID list holds only UUIDs, as the other
-  by-ID reads in the reader do.
+- **Validation:** none in the reader, as in `GetPartiesById` and
+  `GetAddressesById`: the gateway's protovalidate rules check the IDs.
+  *Amended while implementing:* the plan said the other by-ID reads check
+  UUIDs in the reader. They don't.
+- **Area:** a named `sqFtPerSqM` constant for the new code. Replacing the
+  existing `10.7639` literals in `parcels.go` and `zoning.go` is left out of
+  this feature.
 
 **2.3 Reader integration tests** (`test: reader tests for improvements by ID`),
 in `improvements_integration_test.go`:
@@ -254,13 +259,18 @@ in `improvements_integration_test.go`:
 - Tests that void an improvement or address run on their own fixture
   database.
 
-**2.4 Public proto** (`feat: public improvements by ID`):
+**2.4 Public proto** (one commit with 2.5, `feat: public improvements by ID`,
+because the gateway doesn't build until it implements a new public RPC.
+*Amended while implementing.*):
 - The RPC and messages, with the spec's comments.
 - Request rules: `improvement_ids` unique, 1..100, UUID items;
   `legal_as_of` with the existing rule and description; `valuation_id`
   `string.uuid`.
-- Response fields carry the rules the spec gives: `unique` on the two
-  lists, `gte: 0` on counts and area, and the money `pattern` on the values.
+- Response fields carry the rules the spec gives: `gte: 0` on counts and
+  area, `min_items: 1` on `parcels`, and the money `pattern` on the values.
+  *Amended while implementing:* protovalidate allows `unique` only on lists
+  of scalars, so "each once" on `parcels` and `parties` is stated in their
+  comments instead.
   Ranges also go in comments, per
   [`../response-validation-rules/intent.md`](../response-validation-rules/intent.md).
 - `mise run generate`.

@@ -1,6 +1,6 @@
 {
   "name": "@civil-labs/civil-os-api",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "type": "module",
   "description": "Protobuf messages and ConnectRPC service definitions for the civil-os public API",
   "keywords": [

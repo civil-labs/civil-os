@@ -14,7 +14,9 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	improvementsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/improvements/v1"
+	paginationv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/pagination/v1"
 	parcelsv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/parcels/v1"
+	transfersv1 "github.com/civil-labs/civil-os/internal/gen/go/civil/mesh/transfers/v1"
 	tu "github.com/civil-labs/civil-os/internal/testutil"
 )
 
@@ -416,4 +418,211 @@ func addDecimal(t *testing.T, sum *big.Rat, v *string) {
 		t.Fatalf("not a decimal: %q", *v)
 	}
 	sum.Add(sum, x)
+}
+
+func improvementsByParty(t *testing.T, r readerClients, party string, when *timestamppb.Timestamp) []string {
+	t.Helper()
+	res, err := r.improvements.GetImprovementsByPartyId(context.Background(), connect.NewRequest(&improvementsv1.GetImprovementsByPartyIdRequest{
+		PartyId: party, LegalAsOf: when,
+	}))
+	if err != nil {
+		t.Fatalf("party %s: %v", party, err)
+	}
+	var out []string
+	for _, n := range res.Msg.GetImprovements() {
+		out = append(out, n.GetImprovementId()+"="+n.GetOwnershipShare())
+	}
+	return out
+}
+
+func held(improvement int, value string) string { return tu.ImprovementID(improvement) + "=" + value }
+
+// TestImprovementsByParty: the spec's "Reader integration: by party" row.
+func TestImprovementsByParty(t *testing.T) {
+	r := startReader(t)
+	then := timestamppb.New(before)
+	for _, c := range []struct {
+		name  string
+		party string
+		when  *timestamppb.Timestamp
+		want  []string
+	}{
+		{"party 3, in ID order", tu.PartyID(3), nil, []string{held(2, "0.5000"), held(3, "1.0000")}},
+		{"party 2", tu.PartyID(2), nil, []string{held(2, "0.5000")}},
+		{"party 5, not parcel 3's owner", tu.PartyID(5), nil, []string{held(tu.SecondaryImprovement, "0.5000")}},
+		{"party 10 before the owner change", tu.PartyID(10), then, []string{held(tu.OwnerChangeImprovement, "1.0000")}},
+		{"party 10 now, never improvement 17", tu.PartyID(10), nil, nil},
+		{"party 6 now", tu.PartyID(6), nil, []string{held(tu.OwnerChangeImprovement, "1.0000")}},
+		{"party 6 before the owner change", tu.PartyID(6), then, nil},
+		{"voided party", tu.PartyID(tu.VoidedParty), nil, nil},
+		{"unknown party", tu.MissingID, nil, nil},
+	} {
+		if got := improvementsByParty(t, r, c.party, c.when); !slices.Equal(got, c.want) {
+			t.Errorf("%s: got %v, want %v", c.name, got, c.want)
+		}
+	}
+}
+
+// TestImprovementsByPartyVisibility: rule 1 hides an improvement voided in
+// the test, and rule 4 hides a party with no attributes at t even though its
+// shares cover t.
+func TestImprovementsByPartyVisibility(t *testing.T) {
+	pool := tu.FixtureDatabase(t).Pool(t)
+	// This test has its own database copy, so nothing needs restoring.
+	ctx := context.Background()
+	if _, err := pool.Exec(ctx,
+		`UPDATE core.improvements SET is_voided = true, voided_at = now() WHERE public_id = $1`,
+		tu.ImprovementID(2)); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := pool.Exec(ctx, `
+		UPDATE core.party_attributes pa SET legal_valid_range = tstzrange('2020-01-01', '2023-01-01')
+		FROM core.parties pt WHERE pt.party_id = pa.party_id AND pt.public_id = $1`,
+		tu.PartyID(5)); err != nil {
+		t.Fatal(err)
+	}
+	r := startReaderOn(t, pool)
+	if got, want := improvementsByParty(t, r, tu.PartyID(3), nil), []string{held(3, "1.0000")}; !slices.Equal(got, want) {
+		t.Errorf("party 3 with improvement 2 voided: got %v, want %v", got, want)
+	}
+	if got := improvementsByParty(t, r, tu.PartyID(5), nil); len(got) != 0 {
+		t.Errorf("party 5 with no attributes now: got %v, want nothing", got)
+	}
+}
+
+func TestImprovementsByPartyPagination(t *testing.T) {
+	r := startReader(t)
+	ctx := context.Background()
+	page := func(req *improvementsv1.GetImprovementsByPartyIdRequest) (*improvementsv1.GetImprovementsByPartyIdResponse, error) {
+		res, err := r.improvements.GetImprovementsByPartyId(ctx, connect.NewRequest(req))
+		if err != nil {
+			return nil, err
+		}
+		return res.Msg, nil
+	}
+	party := tu.PartyID(3)
+
+	walked := walkPages(t, "party 3", func(first *int32, after *string) ([]string, *paginationv1.PageInfo) {
+		res, err := page(&improvementsv1.GetImprovementsByPartyIdRequest{PartyId: party, First: first, After: after})
+		if err != nil {
+			t.Fatal(err)
+		}
+		var got []string
+		for _, n := range res.GetImprovements() {
+			got = append(got, n.GetImprovementId())
+		}
+		return got, res.GetPageInfo()
+	})
+	if want := []string{tu.ImprovementID(2), tu.ImprovementID(3)}; !slices.Equal(walked, want) {
+		t.Errorf("walked %v, want %v", walked, want)
+	}
+
+	one := int32(1)
+	first, err := page(&improvementsv1.GetImprovementsByPartyIdRequest{PartyId: party, First: &one})
+	if err != nil {
+		t.Fatal(err)
+	}
+	cursor := first.GetPageInfo().EndCursor
+	for name, call := range map[string]func() error{
+		"another party": func() error {
+			_, err := page(&improvementsv1.GetImprovementsByPartyIdRequest{PartyId: tu.PartyID(2), After: cursor})
+			return err
+		},
+		"another legal_as_of": func() error {
+			_, err := page(&improvementsv1.GetImprovementsByPartyIdRequest{PartyId: party, LegalAsOf: timestamppb.New(before), After: cursor})
+			return err
+		},
+		"another RPC": func() error {
+			_, err := r.improvements.GetImprovementsByAddressId(ctx, connect.NewRequest(&improvementsv1.GetImprovementsByAddressIdRequest{
+				AddressId: party, After: cursor,
+			}))
+			return err
+		},
+	} {
+		if err := call(); connect.CodeOf(err) != connect.CodeInvalidArgument {
+			t.Errorf("%s: got %v, want InvalidArgument", name, err)
+		}
+	}
+
+	// The mesh has no validation, so the reader clamps first itself.
+	big := int32(500)
+	res, err := page(&improvementsv1.GetImprovementsByPartyIdRequest{PartyId: party, First: &big})
+	if err != nil || len(res.GetImprovements()) != 2 || res.GetPageInfo().GetHasNextPage() {
+		t.Errorf("first = 500: %v, %v", res, err)
+	}
+}
+
+// TestEveryReturnedImprovementIsReadable: the intent's first success
+// criterion. Every improvement ID that the parcel summary, the address and
+// party lookups and the transfers API return now can be read with
+// GetImprovementsById.
+func TestEveryReturnedImprovementIsReadable(t *testing.T) {
+	r := startReader(t)
+	ctx := context.Background()
+	big := int32(100)
+	seen := map[string]string{} // improvement ID -> where it came from
+
+	var parcels []string
+	for n := 1; n <= tu.ParcelCount; n++ {
+		parcels = append(parcels, tu.ParcelID(n))
+	}
+	summary, err := r.parcels.GetParcelsWithImprovementSummaryByParcelId(ctx, connect.NewRequest(&parcelsv1.GetParcelsWithImprovementSummaryByParcelIdRequest{ParcelIds: parcels}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, p := range summary.Msg.GetParcels() {
+		for _, id := range p.GetImprovementSummary().GetImprovementIds() {
+			seen[id] = "parcel summary"
+		}
+	}
+	// Fixture addresses share the parcels' numbering (1..21).
+	for n := 1; n <= tu.ParcelCount; n++ {
+		res, err := r.improvements.GetImprovementsByAddressId(ctx, connect.NewRequest(&improvementsv1.GetImprovementsByAddressIdRequest{AddressId: tu.AddressID(n), First: &big}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, m := range res.Msg.GetImprovements() {
+			seen[m.GetImprovementId()] = fmt.Sprintf("address %d", n)
+		}
+	}
+	for n := 1; n <= tu.VoidedParty; n++ {
+		res, err := r.improvements.GetImprovementsByPartyId(ctx, connect.NewRequest(&improvementsv1.GetImprovementsByPartyIdRequest{PartyId: tu.PartyID(n), First: &big}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, m := range res.Msg.GetImprovements() {
+			seen[m.GetImprovementId()] = fmt.Sprintf("party %d", n)
+		}
+	}
+	transfers, err := r.transfers.GetTransfersByParcelId(ctx, connect.NewRequest(&transfersv1.GetTransfersByParcelIdRequest{ParcelIds: parcels, First: &big}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if transfers.Msg.GetPageInfo().GetHasNextPage() {
+		t.Fatal("transfers didn't fit on one page")
+	}
+	for _, tr := range transfers.Msg.GetTransfers() {
+		for _, m := range tr.GetImprovements() {
+			seen[m.GetImprovementId()] = "transfer " + tr.GetTransferId()
+		}
+	}
+
+	// Improvement 17 is on voided parcel 20, so nothing returns it; every
+	// other fixture improvement comes back from at least one read.
+	if from, ok := seen[tu.ImprovementID(17)]; ok {
+		t.Errorf("improvement 17 returned by %s", from)
+	}
+	if want := tu.ImprovementCount - 1; len(seen) != want {
+		t.Errorf("reads returned %d improvement IDs, want %d", len(seen), want)
+	}
+	var ids []string
+	for id := range seen {
+		ids = append(ids, id)
+	}
+	got := improvementsByID(t, r, nil, nil, ids...)
+	for id, from := range seen {
+		if _, ok := got[id]; !ok {
+			t.Errorf("improvement %s, returned by %s, can't be read", id, from)
+		}
+	}
 }

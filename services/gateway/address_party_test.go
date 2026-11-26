@@ -62,6 +62,7 @@ func TestAddressPartyPageSizeDefault(t *testing.T) {
 	slices.Sort(tested)
 	want := []string{
 		"GetImprovementsByAddressId",
+		"GetImprovementsByPartyId",
 		"GetParcelsByAddressId",
 		"GetParcelsByPartyId",
 		"GetPartiesByAddressId",
@@ -91,6 +92,7 @@ func TestReverseLookupPlacement(t *testing.T) {
 		{publicparcelsv1connect.ParcelsServiceName, "GetParcelsByAddressId", "civil.mesh.parcels.v1.ParcelsReadService"},
 		{publicparcelsv1connect.ParcelsServiceName, "GetParcelsByPartyId", "civil.mesh.parcels.v1.ParcelsReadService"},
 		{publicimprovementsv1connect.ImprovementsServiceName, "GetImprovementsByAddressId", "civil.mesh.improvements.v1.ImprovementsReadService"},
+		{publicimprovementsv1connect.ImprovementsServiceName, "GetImprovementsByPartyId", "civil.mesh.improvements.v1.ImprovementsReadService"},
 		{publicpartiesv1connect.PartiesServiceName, "GetPartiesByAddressId", "civil.mesh.parties.v1.PartiesReadService"},
 	} {
 		t.Run(c.method, func(t *testing.T) {

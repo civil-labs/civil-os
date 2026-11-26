@@ -15,6 +15,8 @@ service ImprovementsReadService {
   rpc GetImprovementQualities(GetImprovementQualitiesRequest) returns (GetImprovementQualitiesResponse) {}
 
   rpc GetImprovementsById(GetImprovementsByIdRequest) returns (GetImprovementsByIdResponse) {}
+
+  rpc GetImprovementsByPartyId(GetImprovementsByPartyIdRequest) returns (GetImprovementsByPartyIdResponse) {}
 }
 
 message ImprovementType {
@@ -113,4 +115,21 @@ message GetImprovementsByIdRequest {
 
 message GetImprovementsByIdResponse {
   map<string, Improvement> improvements = 1;
+}
+
+message PartyImprovement {
+  string improvement_id = 1;
+  string ownership_share = 2;
+}
+
+message GetImprovementsByPartyIdRequest {
+  string party_id = 1;
+  optional google.protobuf.Timestamp legal_as_of = 2;
+  optional int32 first = 3;
+  optional string after = 4;
+}
+
+message GetImprovementsByPartyIdResponse {
+  repeated PartyImprovement improvements = 1;
+  civil.mesh.pagination.v1.PageInfo page_info = 2;
 }

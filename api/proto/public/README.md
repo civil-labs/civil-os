@@ -7,7 +7,7 @@ one port.
 | Package | Service | What it serves |
 |---|---|---|
 | `civil.public.parcels.v1` | `ParcelsService` | Parcel details, attribute lookups by parcel or map feature, parcel extents (bounding boxes), stats, comparables, address search (`SearchParcelsAddresses`, paginated), the parcels at an address or held by a party (paginated), `UpdateParcel` |
-| `civil.public.improvements.v1` | `ImprovementsService` | Improvements by ID, with their parcels, owners and values; improvement types, conditions and qualities; and the improvements at an address (paginated) |
+| `civil.public.improvements.v1` | `ImprovementsService` | Improvements by ID, with their parcels, owners and values; improvement types, conditions and qualities; and the improvements at an address or held by a party (paginated) |
 | `civil.public.landuses.v1` | `LandUsesService` | Land uses and land-use types |
 | `civil.public.zoning.v1` | `ZoningService` | Zoning designations |
 | `civil.public.neighborhoods.v1` | `NeighborhoodsService` | Neighborhood definitions (with `is_legal`), and neighborhoods with the definitions that use them, optionally filtered by definition. Both RPCs accept Connect GET. |

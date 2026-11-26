@@ -132,13 +132,13 @@ message PartyImprovement {
 |---|---|
 | `GetImprovementQualitiesResponse` | `map<string, ImprovementQuality> improvement_qualities` |
 | `GetImprovementsByIdResponse` | `map<string, Improvement> improvements`, keyed by improvement ID |
-| `GetImprovementsByPartyIdResponse` | `repeated PartyImprovementEdge edges` (`cursor`, `node`), `civil.public.pagination.v1.PageInfo page_info` |
+| `GetImprovementsByPartyIdResponse` | `repeated PartyImprovement improvements`, ordered by `improvement_id`; `civil.public.pagination.v1.PageInfo page_info`. A plain list with no per-item cursors, as [`../pagination-without-edges/spec.md`](../pagination-without-edges/spec.md) set for every paginated RPC (owner, 2026-11-25; the first draft said `PartyImprovementEdge edges`). |
 
 - **`legal_as_of`** has the same validation and description as on
   `GetParcelsWithImprovementSummaryByParcelIdRequest` (after year 0, defaults to
   now). Attributes, parcel links, parties, the address, parcel visibility and
   valuations are all resolved with `legal_valid_range @> t`.
-- **`GetImprovementsByPartyId` on a hidden or unknown party** returns no edges,
+- **`GetImprovementsByPartyId` on a hidden or unknown party** returns no improvements,
   not an error, as the other reverse lookups do.
 
 ## Pagination
@@ -165,7 +165,7 @@ parcels are the address and party spec's rules 1–3.
 3. **A party share** is listed only when its `improvement_parties` row
    contains `t` and the party is visible. A hidden party never hides the
    improvement, and an improvement left with no shares is still returned.
-4. **`GetImprovementsByPartyId`** returns an edge when the requested party is
+4. **`GetImprovementsByPartyId`** returns an improvement when the requested party is
    visible and has an `improvement_parties` row at `t` on a visible improvement.
 
 ## Mesh API: `civil.mesh.improvements.v1`

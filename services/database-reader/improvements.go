@@ -307,3 +307,45 @@ func (s *APIServer) GetImprovementsById(
 	}
 	return connect.NewResponse(res), nil
 }
+
+// GetImprovementsByPartyId pages through the improvements a party holds at
+// legal_as_of (improvement_parties), ordered by improvement ID. A hidden or
+// unknown party gives an empty page (docs/improvement-read-api/spec.md,
+// visibility rule 4).
+func (s *APIServer) GetImprovementsByPartyId(
+	ctx context.Context,
+	req *connect.Request[improvementsv1.GetImprovementsByPartyIdRequest],
+) (*connect.Response[improvementsv1.GetImprovementsByPartyIdResponse], error) {
+	s.logger.Debug("received GetImprovementsByPartyId request")
+
+	at := getTargetTime(req.Msg.LegalAsOf)
+	read := func(afterID *string, limit int) ([]*improvementsv1.PartyImprovement, error) {
+		// The party itself must be visible at t; the improvement must pass rule 1.
+		rows, err := s.db.Query(ctx, `
+			SELECT i.public_id::text, ip.ownership_share::text
+			FROM core.parties pt
+			JOIN core.party_attributes pa ON pa.party_id = pt.party_id AND pa.legal_valid_range @> $1::timestamptz
+			JOIN core.improvement_parties ip ON ip.party_id = pt.party_id AND ip.legal_valid_range @> $1::timestamptz
+			JOIN core.improvements i ON i.improvement_id = ip.improvement_id AND NOT i.is_voided
+			JOIN core.improvement_attributes ia ON ia.improvement_id = i.improvement_id AND ia.legal_valid_range @> $1::timestamptz
+			WHERE pt.public_id = $2::uuid AND NOT pt.is_voided
+			  AND `+improvementOnVisibleParcelSQL+`
+			  AND ($3::uuid IS NULL OR i.public_id > $3::uuid)
+			ORDER BY i.public_id
+			LIMIT $4`, at, req.Msg.PartyId, afterID, limit)
+		if err != nil {
+			return nil, s.dbError("party improvements", err)
+		}
+		return collectRows(rows, func(r pgx.Rows) (*improvementsv1.PartyImprovement, error) {
+			n := &improvementsv1.PartyImprovement{}
+			return n, r.Scan(&n.ImprovementId, &n.OwnershipShare)
+		}, func(err error) error { return s.dbError("party improvements", err) })
+	}
+
+	nodes, pageInfo, err := pageByID("GetImprovementsByPartyId", req.Msg.PartyId, req.Msg.LegalAsOf,
+		req.Msg.First, req.Msg.After, read, func(n *improvementsv1.PartyImprovement) string { return n.ImprovementId })
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&improvementsv1.GetImprovementsByPartyIdResponse{Improvements: nodes, PageInfo: pageInfo}), nil
+}

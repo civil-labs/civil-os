@@ -435,6 +435,27 @@ func TestSmoke(t *testing.T) {
 		}
 	})
 
+	t.Run("improvements by party", func(t *testing.T) {
+		improvements := improvementsv1connect.NewImprovementsServiceClient(httpClient, gatewayURL)
+		res, err := improvements.GetImprovementsByPartyId(ctx, authed(token, &improvementsv1.GetImprovementsByPartyIdRequest{
+			PartyId: tu.PartyID(3),
+		}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := protovalidate.Validate(res.Msg); err != nil {
+			t.Errorf("response breaks its rules: %v", err)
+		}
+		var got []string
+		for _, n := range res.Msg.GetImprovements() {
+			got = append(got, n.GetImprovementId()+"="+n.GetOwnershipShare())
+		}
+		want := []string{tu.ImprovementID(2) + "=0.5000", tu.ImprovementID(3) + "=1.0000"}
+		if !slices.Equal(got, want) || res.Msg.GetPageInfo().GetHasNextPage() {
+			t.Errorf("party 3 holds %v (%v), want %v on one page", got, res.Msg.GetPageInfo(), want)
+		}
+	})
+
 	t.Run("neighborhoods", func(t *testing.T) {
 		// Over Connect GET: the RPCs are NO_SIDE_EFFECTS.
 		nbhds := neighborhoodsv1connect.NewNeighborhoodsServiceClient(httpClient, gatewayURL, connect.WithHTTPGet())

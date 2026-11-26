@@ -209,3 +209,30 @@ func mapImprovementShare(m *meshimprovementsv1.ImprovementShare) *publicimprovem
 		OwnershipShare: m.GetOwnershipShare(),
 	}
 }
+
+func (s *ImprovementServer) GetImprovementsByPartyId(
+	ctx context.Context,
+	req *connect.Request[publicimprovementsv1.GetImprovementsByPartyIdRequest],
+) (*connect.Response[publicimprovementsv1.GetImprovementsByPartyIdResponse], error) {
+	s.logger.Debug("received GetImprovementsByPartyId request")
+
+	m := req.Msg
+	meshRes, err := s.dbReaderClient.GetImprovementsByPartyId(ctx, connect.NewRequest(&meshimprovementsv1.GetImprovementsByPartyIdRequest{
+		PartyId: m.PartyId, LegalAsOf: m.LegalAsOf, First: pageSize(m.First), After: m.After,
+	}))
+	if err != nil {
+		s.logger.Error("upstream GetImprovementsByPartyId request failed", slog.Any("error", err))
+		return nil, err // keep the mesh status code
+	}
+	return connect.NewResponse(&publicimprovementsv1.GetImprovementsByPartyIdResponse{
+		Improvements: mapSlice(meshRes.Msg.Improvements, mapPartyImprovement),
+		PageInfo:     mapPageInfo(meshRes.Msg.PageInfo),
+	}), nil
+}
+
+func mapPartyImprovement(m *meshimprovementsv1.PartyImprovement) *publicimprovementsv1.PartyImprovement {
+	return &publicimprovementsv1.PartyImprovement{
+		ImprovementId:  m.GetImprovementId(),
+		OwnershipShare: m.GetOwnershipShare(),
+	}
+}

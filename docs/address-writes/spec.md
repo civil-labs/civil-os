@@ -98,7 +98,8 @@ These rules apply to addresses here and to every later write API.
 ### Concurrency
 
 **Decided: an optional per-row `etag`, checked when sent** ([AIP-154](https://google.aip.dev/154)).
-It asserts that the legal row the caller read hasn't changed since.
+It asserts that the legal row the write acts on is the row the caller
+read, and that it hasn't changed since.
 
 - **The token** is an opaque string that encodes two values. The first is
   the row's `legal_valid_from`, which locates it: the exclusion constraint
@@ -117,23 +118,32 @@ It asserts that the legal row the caller read hasn't changed since.
   nothing. Any edit to that row changes its `system_updated_at`, because
   the history trigger sets it to the transaction time: a correction, a
   `Change` that splits it, or a `Retire` that ends it. So the legal range
-  itself needn't be compared.
+  itself needn't be compared. If the row is current but isn't the row the
+  write acts on, the write fails with `FailedPrecondition`, naming both
+  rows' `legal_valid_from`. The caller reads at the write's legal time and
+  sends that row's etag.
 - **Without an etag**, the last write wins. Scripts may leave it out.
 - **Per RPC:**
-  - `Correct`, `Change` and `Retire` check the row the token names. That's
-    usually the row they act on. When it isn't, for example a `Change` at a
-    T in another row, the check is still "what I read is current".
-  - A `Change` that reopens an address in a gap usually has no etag, since
-    there was nothing to read. If it sends one, it's checked the same way.
+  - The token must name the row the write acts on: for `Correct`, the row
+    at `legal_as_of`; for `Change` and `Retire`, the row containing T.
+    `Change` copies unmasked fields from that row, so the check covers
+    every value the new row takes from the database.
+  - A `Change` that reopens an address in a gap acts on no row, since there
+    was nothing to read. It must not send an etag. One that does fails with
+    `Aborted` if the token's row has changed, and `FailedPrecondition`
+    otherwise.
   - `Void` acts on the whole record. It ignores the token's row and checks
     only that the address isn't voided, which `NotFound` already covers.
 - **What it gains:** an edit to the 2019 row doesn't make an editor's 2024
   etag stale.
-- **What it doesn't catch:** a change to a row the caller didn't read but
-  the write depends on. For example, `Change` copies unmasked fields from
-  the row containing T, which may not be the row the caller read. The checks
-  each RPC makes on the server (rows after a retirement, references) still
-  apply.
+- **What it doesn't check:** rows the write doesn't act on. The checks
+  each RPC makes on the server (rows after a retirement, references) cover
+  those.
+- **Why not full replacement.** Dropping the field mask wouldn't remove
+  the need to bind the etag to the row acted on: a client sending every
+  field still builds them from that row. It would also widen lost updates
+  without an etag to every field, and a client built against an older proto
+  would clear fields added since.
 - **Same-microsecond writes.** `system_updated_at` is the transaction's
   `now()`. Two writes to one row in the same microsecond would leave the
   same version. Writes to a record are serialized by the identity-row lock,
@@ -362,7 +372,7 @@ The synthetic fixtures' `5 Fixture Way, Testville ZZ000` fits the rule
 | `NotFound` | The address is unknown or voided (every RPC but `Create`). |
 | `AlreadyExists` | `Create` with a `legacy_id` in use. |
 | `Aborted` | The row the `etag` names is gone or has changed. |
-| `FailedPrecondition` | No row at the legal time, T at the start of a row, rows after a retirement, or the address is referenced. The message says which. |
+| `FailedPrecondition` | No row at the legal time, T at the start of a row, rows after a retirement, the address is referenced, or the `etag` names a current row the write doesn't act on. The message says which. |
 | `Unavailable` | The gateway has no writer configured (`CIVIL_OS_GATEWAY_WRITER_HOST` unset), as for `UpdateParcel`. |
 | `Internal` | Anything else. The cause is logged, not returned. |
 
@@ -418,7 +428,9 @@ history rows the trigger wrote:
 6. An etag read from the `[2023, ∞)` row is `Aborted` after that row is
    corrected, split or ended, and nothing changes. It still succeeds after an
    edit to the `[2020, 2023)` row. No etag succeeds. `Void` ignores the
-   token's row.
+   token's row. An unchanged etag from the `[2023, ∞)` row sent with a
+   `Change` at 2021 or a `Correct` at 2021 is `FailedPrecondition`, and
+   nothing changes. A reopening `Change` with an etag is rejected.
 7. The formatter's unit tests cover every combination of empty parts, the
    rebuild-on-mask rules and a custom value surviving an unrelated edit.
 8. Gateway handler tests map each RPC, return `Unavailable` without a
